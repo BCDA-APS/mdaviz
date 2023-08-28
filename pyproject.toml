@@ -10,10 +10,9 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "gemviz"
+name = "mdaviz"
 description = "Visualize Bluesky data from tiled server."
 authors = [
-  { name="Ollivier Gassant" },
   { name="Fanny Rodolakis", email="rodolakis@anl.gov" },
   { name="Pete Jemian", email="prjemian@gmail.com" },
 ]
@@ -26,7 +25,7 @@ readme = "README.md"
 requires-python = ">=3.8"
 keywords = ["bluesky", "databroker", "tiled", "catalog"]
 # https://packaging.python.org/en/latest/specifications/declaring-project-metadata/?highlight=license
-license = {file = "gemviz/LICENSE"}
+license = {file = "mdaviz/LICENSE"}
 # https://pypi.org/classifiers/
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -56,11 +55,11 @@ classifiers = [
 [tool.setuptools_scm]
 
 [project.urls]
-"Homepage" = "https://github.com/BCDA-APS/gemviz"
-"Bug Tracker" = "https://github.com/BCDA-APS/gemviz/issues"
+"Homepage" = "https://github.com/BCDA-APS/mdaviz"
+"Bug Tracker" = "https://github.com/BCDA-APS/mdaviz/issues"
 
 [project.scripts]
-gemviz = "gemviz.app:main"
+mdaviz = "mdaviz.app:main"
 
 [tool.flake8]
 max-line-length = 88

@@ -1,2 +1,2 @@
 [console_scripts]
-gemviz = gemviz.app:main
+mdaviz = mdaviz.app:main

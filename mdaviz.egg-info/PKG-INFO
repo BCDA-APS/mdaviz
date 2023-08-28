@@ -1,5 +1,5 @@
 Metadata-Version: 2.1
-Name: gemviz
+Name: mdaviz
 Version: 0.0.2.dev131+g5f472a9
 Summary: Visualize Bluesky data from tiled server.
 Author: Ollivier Gassant
@@ -9,7 +9,7 @@ License: Copyright (c) 2017-2023, UChicago Argonne, LLC
         
         All Rights Reserved
         
-        gemviz
+        mdaviz
         
         BCDA, Advanced Photon Source, Argonne National Laboratory
         
@@ -54,8 +54,8 @@ License: Copyright (c) 2017-2023, UChicago Argonne, LLC
         
         ****************************************************************************
         
-Project-URL: Homepage, https://github.com/BCDA-APS/gemviz
-Project-URL: Bug Tracker, https://github.com/BCDA-APS/gemviz/issues
+Project-URL: Homepage, https://github.com/BCDA-APS/mdaviz
+Project-URL: Bug Tracker, https://github.com/BCDA-APS/mdaviz/issues
 Keywords: bluesky,databroker,tiled,catalog
 Classifier: Development Status :: 3 - Alpha
 Classifier: Environment :: Console
@@ -82,7 +82,7 @@ Classifier: Topic :: Utilities
 Requires-Python: >=3.8
 Description-Content-Type: text/markdown
 
-# gemviz
+# mdaviz
 
 Python Qt5 application to visualize Bluesky data from tiled server.
 
@@ -102,7 +102,7 @@ Python Qt5 application to visualize Bluesky data from tiled server.
 ## How to run this code?
 
 First said, this software application is pre-release and may contain significant unhandled
-bugs.  Please [report any you encounter](https://github.com/BCDA-APS/gemviz/issues/new) or
+bugs.  Please [report any you encounter](https://github.com/BCDA-APS/mdaviz/issues/new) or
 feature requests, too.
 
 Suggested installation for developers is to use
@@ -111,18 +111,18 @@ Suggested installation for developers is to use
 This project is still in development.
 We have [plans for production
 release](https://github.com/orgs/BCDA-APS/projects/6).
-Until the production release, you should run `gemviz`
+Until the production release, you should run `mdaviz`
 as would a developer by following these instructions:
 
 1. Navigate to a directory where you have similar software projects
-2. `git clone https://github.com/BCDA-APS/gemviz`
+2. `git clone https://github.com/BCDA-APS/mdaviz`
    - only need to do this once, assumes you have `git` command
-3. `cd gemviz`
-4. `conda env create --force -n gemviz -f ./env.yml`
+3. `cd mdaviz`
+4. `conda env create --force -n mdaviz -f ./env.yml`
    - only need to do this once, assumes you have `conda` command
-5. `conda activate gemviz`
+5. `conda activate mdaviz`
 6. `pip install -e .`
-7. `gemviz &`
+7. `mdaviz &`
 
 ## Acknowledgements
 

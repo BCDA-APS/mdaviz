@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-gemviz: Python Qt5 application to visualize Bluesky data from tiled server.
+mdaviz: Python Qt5 application to visualize Bluesky data from tiled server.
 """
 
 import sys

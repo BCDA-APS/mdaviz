@@ -16,24 +16,23 @@ except (LookupError, ModuleNotFoundError):
     del version
 
 __settings_orgName__ = "BCDA-APS"
-__package_name__ = "gemviz"
+__package_name__ = "mdaviz"
 
 ROOT_DIR = pathlib.Path(__file__).parent
 UI_DIR = ROOT_DIR / "resources"
 
-APP_DESC = "Visualize Bluesky data from tiled server."
+APP_DESC = "Visualize mda files."
 APP_TITLE = __package_name__
 AUTHOR_LIST = [
     s.strip()
     for s in """
-        Ollivier Gassant
         Fanny Rodolakis
         Pete Jemian
     """.strip().splitlines()
 ]
 
 COPYRIGHT_TEXT = "(c) 2023, UChicago Argonne, LLC, (see LICENSE file for details)"
-DOCS_URL = "https://github.com/BCDA-APS/tiled-viz2023/blob/main/README.md"
-ISSUES_URL = "https://github.com/BCDA-APS/tiled-viz2023/issues"
+DOCS_URL = "https://github.com/BCDA-APS/mdaviz/blob/main/README.md"
+ISSUES_URL = "https://github.com/BCDA-APS/mdaviz/issues"
 LICENSE_FILE = ROOT_DIR / "LICENSE"
 VERSION = "0.0.1"
