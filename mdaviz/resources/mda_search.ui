@@ -40,19 +40,6 @@
           </attribute>
           <layout class="QFormLayout" name="formLayout">
            <item row="0" column="0">
-            <widget class="QLabel" name="label">
-             <property name="toolTip">
-              <string>Search for runs between these two dates.</string>
-             </property>
-             <property name="text">
-              <string>Date &amp; Time</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="DateTimeRangeSlider" name="date_time_widget" native="true"/>
-           </item>
-           <item row="1" column="0">
             <widget class="QLabel" name="fiile_label">
              <property name="toolTip">
               <string>Search for runs that match this Bluesky plan.</string>
@@ -62,7 +49,14 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
+           <item row="0" column="1">
+            <widget class="QLabel" name="file_name">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
             <widget class="QLabel" name="scan_label">
              <property name="toolTip">
               <string>Search for runs with this scan ID.</string>
@@ -72,14 +66,28 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
+           <item row="1" column="1">
+            <widget class="QLabel" name="file_num">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
             <widget class="QLabel" name="size_label">
              <property name="text">
               <string>Size</string>
              </property>
             </widget>
            </item>
-           <item row="4" column="0">
+           <item row="2" column="1">
+            <widget class="QLabel" name="file_size">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
             <widget class="QLabel" name="date_label">
              <property name="toolTip">
               <string>Search for runs with these detector(s). Use a comma to separate more than one name. (such as &quot;diode, I0&quot;)</string>
@@ -89,28 +97,7 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="file_name">
-             <property name="text">
-              <string>TextLabel</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="file_num">
-             <property name="text">
-              <string>TextLabel</string>
-             </property>
-            </widget>
-           </item>
            <item row="3" column="1">
-            <widget class="QLabel" name="file_size">
-             <property name="text">
-              <string>TextLabel</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
             <widget class="QLabel" name="file_date">
              <property name="text">
               <string>TextLabel</string>
@@ -141,14 +128,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>DateTimeRangeSlider</class>
-   <extends>QWidget</extends>
-   <header>date_time_range_slider.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
