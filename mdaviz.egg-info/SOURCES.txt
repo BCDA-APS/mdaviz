@@ -1,9 +1,9 @@
 .DS_Store
-.gitignore
 MANIFEST.in
 README.md
 env.yml
 pyproject.toml
+mdaviz/.DS_Store
 mdaviz/LICENSE
 mdaviz/__init__.py
 mdaviz/aboutdialog.py

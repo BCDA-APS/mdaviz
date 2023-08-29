@@ -1,8 +1,7 @@
 Metadata-Version: 2.1
 Name: mdaviz
-Version: 0.0.2.dev131+g5f472a9
+Version: 0.1.dev3+g223dc38
 Summary: Visualize Bluesky data from tiled server.
-Author: Ollivier Gassant
 Author-email: Fanny Rodolakis <rodolakis@anl.gov>, Pete Jemian <prjemian@gmail.com>
 Maintainer-email: Fanny Rodolakis <rodolakis@anl.gov>, Pete Jemian <prjemian@gmail.com>
 License: Copyright (c) 2017-2023, UChicago Argonne, LLC
@@ -86,19 +85,6 @@ Description-Content-Type: text/markdown
 
 Python Qt5 application to visualize Bluesky data from tiled server.
 
-## Goals
-
-- minimum: PyQt app that can select runs, show line charts
-- ideal: add database filters, config file, autodetect data types, and representations
-- stretch: data visualization integrate with https://github.com/BCDA-APS/qs-web2023
-
-## Web Links
-
-- https://github.com/bluesky/tiled
-- https://github.com/bluesky/bluesky-widgets
-- [Tiled Python Client Demonstration](https://github.com/BCDA-APS/bdp-tiled/blob/main/demo_client.ipynb) - shows the JSON API between tiled server and client
-- [Tiled Python Client Python API](https://github.com/BCDA-APS/bdp-tiled/blob/main/pyapi_client.py) - terse example using `tiled.client` libary
-
 ## How to run this code?
 
 First said, this software application is pre-release and may contain significant unhandled
@@ -125,9 +111,6 @@ as would a developer by following these instructions:
 7. `mdaviz &`
 
 ## Acknowledgements
-
-We'd like to thank the [GEM fellow program](https://www.gemfellowship.org/) for sponsoring
-an intern fellowship for the development of this software at the Advanced Photon Source.
 
 "This product includes software produced by UChicago Argonne, LLC 
 under Contract No. DE-AC02-06CH11357 with the Department of Energy."
