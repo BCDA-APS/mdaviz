@@ -29,7 +29,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._mdaFileName = None
         self._folderPath = None
         self._folderName = None
-        self._mdaFiles = None
+        self._mdaFileList = None
         self.mvc_folder = None
     
         self.setWindowTitle(APP_TITLE)
@@ -110,13 +110,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def mdaFilePath(self):
         return self._folderPath / self._mdaFileName
     
-    def mdaFiles(self):
-        return self._mdaFiles
+    def mdaFileList(self):
+        return self._mdaFileList
     
 
-    def setmdaFiles(self,folder_path):
-        self._mdaFiles = sorted([file.name for file in folder_path.glob('*.mda')])
-    # def mdaFiles(self,folder_path, as_string=False):
+    def setmdaFileList(self,folder_path):
+        self._mdaFileList = sorted([file.name for file in folder_path.glob('*.mda')])
+    # def mdaFileList(self,folder_path, as_string=False):
     #     if as_string:
     #        return sorted([file.name for file in folder_path.glob('*.mda')])
     #     else:
@@ -149,8 +149,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.spec_name.setText(spec_name)
         self.setStatus(f"Folder path: {folder_name!r}")
         
-        self.setmdaFiles(folder_path)
-        mda_list = self.mdaFiles()
+        self.setmdaFileList(folder_path)
+        mda_list = self.mdaFileList()
         self.setFiles(mda_list)
 
         layout = self.groupbox.layout()

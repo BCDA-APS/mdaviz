@@ -33,13 +33,8 @@ class mdaSearchPanel(QtWidgets.QWidget):
     def mdaFileName(self):
         return self.parent.mdaFileName()  
     
-    # TODO: already exist in mainwindow?
-    def mdaFiles(self,folder_path, as_string=False):
-        if as_string:
-            return sorted([file.name for file in folder_path.glob('*.mda')])
-        else:
-            return [file for file in folder_path.glob('*.mda')]
-        
+    def mdaFileList(self):
+        return self.parent.mdaFileList()       
         
     # TODO: self.mda_folder.mda_search_panel.setupFile(self,mda_file)    
     def setupFile(self,filename):
@@ -63,11 +58,25 @@ class mdaSearchPanel(QtWidgets.QWidget):
             
    
     def doNext(self):
-        print('do next')
+        self.doButton(1)
+        print('do next')        
+        
+    def doPrevious(self):
+        self.doButton(-1)
+        print('do previous')
+        
+    def doButton(self,i):            
+        current_mdaFile=self.mdaFileName()
+        current_mdaIndex = self.mdaFileList().index(current_mdaFile)
+        next_mdaIndex = current_mdaIndex+i
+        next_mdaFile=self.mdaFileList()[next_mdaIndex]
+        self.parent.parent.catalogs.setCurrentIndex(next_mdaIndex)
+        print(f"{current_mdaFile=}")        
+        print(f"{next_mdaFile=}")
+        # TODO: will the index of the QcomboBox always match the index of mdaFileLIst? I think so 
         
     
-    def doPrevious(self):
-        print('do previous')
+
         
         
     def setStatus(self, text):

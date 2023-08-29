@@ -76,10 +76,17 @@ class MDA_MVC(QtWidgets.QWidget):
         return self.parent.folderPath()
 
     def folderName(self):
-        return self.parent.folderName()
+        return self.parent.folderName()    
     
-    def mdaFile(self):
-        return self.parent.mdaFile()  
+    def mdaFilePath(self):
+        return self.parent.mdaFilePath()  
+
+    def mdaFileName(self):
+        return self.parent.mdaFileName()  
+    
+    def mdaFileList(self):
+        return self.parent.mdaFileList() 
+     
     
     def splitter_moved(self, key, *arg, **kwargs):
         thread = getattr(self, f"{key}_wait_thread", None)
