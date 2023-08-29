@@ -1,7 +1,6 @@
 """
 MVC implementation of mda files.
 
-* MDA: BlueskyRunsCatalog
 * MVC: Model View Controller
 
 .. autosummary::
@@ -37,9 +36,9 @@ class MDA_MVC(QtWidgets.QWidget):
         # from .mda_viz import mdaVisualization
         
         self.mda_search_panel = mdaSearchPanel(self)
-        layout = self.file_groupbox.layout()
+        layout = self.folder_groupbox.layout()
         layout.addWidget(self.mda_search_panel)
-        self.mda_search_panel.setupFile(self.fileName())
+        self.mda_search_panel.setupFolder(self.folderPath())
 
         # self.mda_tableview = mdaTableView(self)
         # layout = self.mda_groupbox.layout()
@@ -71,11 +70,11 @@ class MDA_MVC(QtWidgets.QWidget):
             settings.restoreSplitter(splitter, sname)
             splitter.splitterMoved.connect(partial(self.splitter_moved, key))
 
-    def file(self):
-        return self.parent.file()
+    def folderPath(self):
+        return self.parent.folderPath()
 
-    def fileName(self):
-        return self.parent.fileName()
+    def folderName(self):
+        return self.parent.folderName()
     
     def splitter_moved(self, key, *arg, **kwargs):
         thread = getattr(self, f"{key}_wait_thread", None)

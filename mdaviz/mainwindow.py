@@ -1,3 +1,4 @@
+from pathlib import Path
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
@@ -7,11 +8,10 @@ from .app_settings import settings
 from .tiledserverdialog import LOCALHOST_URL
 from .tiledserverdialog import TESTING_URL
 from .tiledserverdialog import TILED_SERVER_SETTINGS_KEY
-
 # TODO: remove testing URLs before production
 
 UI_FILE = utils.getUiFileName(__file__)
-
+DATA_FOLDER = Path(__file__).parent / "data"
 
 class MainWindow(QtWidgets.QMainWindow):
     """The main window of the app, built in Qt designer."""
@@ -26,15 +26,20 @@ class MainWindow(QtWidgets.QMainWindow):
         self._catalog = None
         self._serverList = None
         self.mvc_catalog = None
+        self._folderPath = None
+        self._folderName = None
+        self.mvc_folder = None
 
         self.setWindowTitle(APP_TITLE)
         self.setServers(None)
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
+        # TODO: set up open dialog for folder
+
 
         self.server_uri.currentTextChanged.connect(self.connectServer)
-        self.catalogs.currentTextChanged.connect(self.setCatalog)
+        # self.catalogs.currentTextChanged.connect(self.setCatalog)
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
 
@@ -73,6 +78,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.close()
 
+    # TODO: adapt doOpen to files and folders
     def doOpen(self, *args, **kw):
         """
         User chose to open (connect with) a tiled server.
@@ -88,6 +94,42 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             uri_list.insert(0, server_uri)
         self.setServers(uri_list)
+
+    def folderPath(self):
+        return self._folderPath
+    
+    def folderName(self):
+        return self._folderName
+
+
+    def setFolderPath(self, folder_path = DATA_FOLDER):
+        """A folder was selected (from the open dialog)."""
+        # TODO: check for validity (folder exists?)
+        # if len(catalog_name) == 0 or catalog_name not in self.server():
+        #     if len(catalog_name) > 0:
+        #         self.setStatus(f"Catalog {catalog_name!r} is not supported now.")
+        #     return
+        folder_name = str(folder_path)
+        self._folderPath = folder_path
+        self._folderName = folder_name
+        
+        spec_name = "mda folder"
+        self.spec_name.setText(spec_name)
+        self.setStatus(f"Folder path: {folder_name!r}")
+
+        layout = self.groupbox.layout()
+        self.clearContent(clear_cat=False)
+
+        if spec_name == "mda folder":
+            from .mda_folder import MDA_MVC
+            
+            self.mvc_folder = MDA_MVC(self)
+            layout.addWidget(self.mvc_folder)
+            
+        else:
+            self.mvc_folder = None
+            layout.addWidget(QtWidgets.QWidget())  # nothing to show
+
 
     def catalog(self):
         return self._catalog
@@ -129,6 +171,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
             self.mvc_catalog = BRC_MVC(self)
             layout.addWidget(self.mvc_catalog)
+            
         else:
             self.mvc_catalog = None
             layout.addWidget(QtWidgets.QWidget())  # nothing to show
@@ -151,10 +194,10 @@ class MainWindow(QtWidgets.QMainWindow):
         """Set the list of server URIs and remove duplicate"""
         unique_uris = set()
         new_server_list = []
-
-        if not uri_list:
+        # TODO: save last folder in settings
+        if not uri_list: 
             previous_uri = settings.getKey(TILED_SERVER_SETTINGS_KEY)
-            candidate_uris = ["", previous_uri, TESTING_URL, LOCALHOST_URL, "Other..."]
+            candidate_uris = ["", str(DATA_FOLDER), previous_uri, TESTING_URL, LOCALHOST_URL, "Other..."]
         else:
             candidate_uris = uri_list
         for uri in candidate_uris:
@@ -175,6 +218,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.clearContent()
         if server_uri == "Other...":
             self.doOpen()
+        elif server_uri == str(DATA_FOLDER):
+            self.setFolderPath(DATA_FOLDER)  
         else:
             # check the value
             url = QtCore.QUrl(server_uri)

@@ -23,7 +23,7 @@
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
-      <widget class="QGroupBox" name="file_groupbox">
+      <widget class="QGroupBox" name="folder_groupbox">
        <property name="title">
         <string>Search Terms</string>
        </property>

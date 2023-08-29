@@ -4,7 +4,7 @@ Search for mda files.
 """
 
 from PyQt5 import QtWidgets
-
+from pathlib import Path
 from . import utils
 
 
@@ -21,8 +21,15 @@ class mdaSearchPanel(QtWidgets.QWidget):
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
 
-    def file(self):
-        return self.parent.file()
+    def folderPath(self):
+        return self.parent.folderPath()
 
+    def folderName(self):
+        return self.parent.folderName()      
+    
+    def setupFolder(self,folder_path):
+        mda_files = [file for file in folder_path.glob('*.mda')]
+        return mda_files
+    
     def setStatus(self, text):
         self.parent.setStatus(text)
