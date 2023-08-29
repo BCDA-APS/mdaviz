@@ -33,3 +33,11 @@ class mdaSearchPanel(QtWidgets.QWidget):
     
     def setStatus(self, text):
         self.parent.setStatus(text)
+
+
+        
+
+
+
+
+
