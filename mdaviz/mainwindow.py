@@ -26,6 +26,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._catalog = None
         self._serverList = None
         self.mvc_catalog = None
+        self._mdaFileName = None
         self._folderPath = None
         self._folderName = None
         self.mvc_folder = None
@@ -39,8 +40,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
         self.server_uri.currentTextChanged.connect(self.connectServer)
-        self.catalogs.currentTextChanged.connect(self.setFile)
-
+        self.catalogs.currentTextChanged.connect(self.setCatalog)
+        
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
 
     @property
@@ -100,12 +101,21 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def folderPath(self):
         return self._folderPath
+    
+    def mdaFileName(self):
+        return self._mdaFileName
+    
+    def mdaFilePath(self):
+        return self._folderPath / self._mdaFileName
+    
 
-    def mdaFiles(self,folder_path, as_string=False):
-        if as_string:
-            return sorted([file.name for file in folder_path.glob('*.mda')])
-        else:
-            return [file for file in folder_path.glob('*.mda')]
+    def mdaFiles(self,folder_path):
+        return sorted([file.name for file in folder_path.glob('*.mda')])
+    # def mdaFiles(self,folder_path, as_string=False):
+    #     if as_string:
+    #        return sorted([file.name for file in folder_path.glob('*.mda')])
+    #     else:
+    #        return [file for file in folder_path.glob('*.mda')]
     
     def setFiles(self, files_list):
         """Set the names (of server's catalogs) in the pop-up list."""
@@ -113,9 +123,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.catalogs.addItems(files_list)   
         
     def setFile(self,mda_file):
+        print(f"{mda_file=}")
         full_path_str=self.folderName()+'/'+mda_file
         self.setStatus(f"Selected file {full_path_str!r}.")    
         # TODO: check for validity of the file?    
+        self._mdaFileName=mda_file
     
     def setFolderPath(self, folder_path = DATA_FOLDER):
         """A folder was selected (from the open dialog)."""
@@ -132,7 +144,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.spec_name.setText(spec_name)
         self.setStatus(f"Folder path: {folder_name!r}")
         
-        mda_list = self.mdaFiles(folder_path, as_string=True)
+        mda_list = self.mdaFiles(folder_path)
         self.setFiles(mda_list)
 
         layout = self.groupbox.layout()
@@ -153,7 +165,7 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def catalog(self):
         return self._catalog
-
+    
     def catalogType(self):
         catalog = self.catalog()
         specs = catalog.specs
@@ -171,30 +183,34 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def setCatalog(self, catalog_name):
         """A catalog was selected (from the pop-up menu)."""
-        self.setStatus(f"Selected catalog {catalog_name!r}.")
-        if len(catalog_name) == 0 or catalog_name not in self.server():
-            if len(catalog_name) > 0:
-                self.setStatus(f"Catalog {catalog_name!r} is not supported now.")
-            return
-        self._catalogName = catalog_name
-        self._catalog = self.server()[catalog_name]
-
-        spec_name = self.catalogType()
-        self.spec_name.setText(spec_name)
-        self.setStatus(f"catalog {catalog_name!r} is {spec_name!r}")
-
-        layout = self.groupbox.layout()
-        self.clearContent(clear_cat=False)
-
-        if spec_name == "CatalogOfBlueskyRuns, v1":
-            from .bluesky_runs_catalog import BRC_MVC
-
-            self.mvc_catalog = BRC_MVC(self)
-            layout.addWidget(self.mvc_catalog)
-            
+        if self.folderPath() == DATA_FOLDER:
+            self.setFile(catalog_name)
+            # TODO: opening the folder should populate the MDA_MVC with the first scan info
         else:
-            self.mvc_catalog = None
-            layout.addWidget(QtWidgets.QWidget())  # nothing to show
+            self.setStatus(f"Selected catalog {catalog_name!r}.")
+            if len(catalog_name) == 0 or catalog_name not in self.server():
+                if len(catalog_name) > 0:
+                    self.setStatus(f"Catalog {catalog_name!r} is not supported now.")
+                return
+            self._catalogName = catalog_name
+            self._catalog = self.server()[catalog_name]
+
+            spec_name = self.catalogType()
+            self.spec_name.setText(spec_name)
+            self.setStatus(f"catalog {catalog_name!r} is {spec_name!r}")
+
+            layout = self.groupbox.layout()
+            self.clearContent(clear_cat=False)
+
+            if spec_name == "CatalogOfBlueskyRuns, v1":
+                from .bluesky_runs_catalog import BRC_MVC
+
+                self.mvc_catalog = BRC_MVC(self)
+                layout.addWidget(self.mvc_catalog)
+                
+            else:
+                self.mvc_catalog = None
+                layout.addWidget(QtWidgets.QWidget())  # nothing to show
 
     def setCatalogs(self, catalogs):
         """Set the names (of server's catalogs) in the pop-up list."""

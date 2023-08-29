@@ -38,7 +38,7 @@ class MDA_MVC(QtWidgets.QWidget):
         self.mda_search_panel = mdaSearchPanel(self)
         layout = self.folder_groupbox.layout()
         layout.addWidget(self.mda_search_panel)
-        self.parent.mdaFiles(self.folderPath())
+        self.parent.catalogs.currentTextChanged.connect(self.mda_search_panel.setupFile)
 
         # self.mda_tableview = mdaTableView(self)
         # layout = self.mda_groupbox.layout()
@@ -75,6 +75,9 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def folderName(self):
         return self.parent.folderName()
+    
+    def mdaFile(self):
+        return self.parent.mdaFile()  
     
     def splitter_moved(self, key, *arg, **kwargs):
         thread = getattr(self, f"{key}_wait_thread", None)
