@@ -60,8 +60,16 @@ class mdaSearchPanel(QtWidgets.QWidget):
             # print(f"{scan_number=}")
             # print(f"{scan_size=}")
             # print(f"{scan_date=}")
+            
+   
+    def doNext(self):
+        print('do next')
         
     
+    def doPrevious(self):
+        print('do previous')
+        
+        
     def setStatus(self, text):
         self.parent.setStatus(text)
 

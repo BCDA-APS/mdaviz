@@ -39,7 +39,9 @@ class MDA_MVC(QtWidgets.QWidget):
         layout = self.folder_groupbox.layout()
         layout.addWidget(self.mda_search_panel)
         self.parent.catalogs.currentTextChanged.connect(self.mda_search_panel.setupFile)
-
+        self.mda_search_panel.next.released.connect(self.mda_search_panel.doNext)
+        self.mda_search_panel.previous.released.connect(self.mda_search_panel.doPrevious)
+         
         # self.mda_tableview = mdaTableView(self)
         # layout = self.mda_groupbox.layout()
         # layout.addWidget(self.mda_tableview)

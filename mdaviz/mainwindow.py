@@ -29,6 +29,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._mdaFileName = None
         self._folderPath = None
         self._folderName = None
+        self._mdaFiles = None
         self.mvc_folder = None
     
         self.setWindowTitle(APP_TITLE)
@@ -41,6 +42,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.server_uri.currentTextChanged.connect(self.connectServer)
         self.catalogs.currentTextChanged.connect(self.setCatalog)
+        # TODO: populate the MVC with the content of first scan
         
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
 
@@ -108,9 +110,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def mdaFilePath(self):
         return self._folderPath / self._mdaFileName
     
+    def mdaFiles(self):
+        return self._mdaFiles
+    
 
-    def mdaFiles(self,folder_path):
-        return sorted([file.name for file in folder_path.glob('*.mda')])
+    def setmdaFiles(self,folder_path):
+        self._mdaFiles = sorted([file.name for file in folder_path.glob('*.mda')])
     # def mdaFiles(self,folder_path, as_string=False):
     #     if as_string:
     #        return sorted([file.name for file in folder_path.glob('*.mda')])
@@ -144,7 +149,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.spec_name.setText(spec_name)
         self.setStatus(f"Folder path: {folder_name!r}")
         
-        mda_list = self.mdaFiles(folder_path)
+        self.setmdaFiles(folder_path)
+        mda_list = self.mdaFiles()
         self.setFiles(mda_list)
 
         layout = self.groupbox.layout()
