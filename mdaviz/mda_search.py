@@ -27,7 +27,7 @@ class mdaSearchPanel(QtWidgets.QWidget):
     def folderName(self):
         return self.parent.folderName()      
     
-    def setupFolder(self,folder_path):
+    def mdaFiles(self,folder_path):
         mda_files = [file for file in folder_path.glob('*.mda')]
         return mda_files
     

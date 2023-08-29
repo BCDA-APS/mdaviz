@@ -29,7 +29,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._folderPath = None
         self._folderName = None
         self.mvc_folder = None
-
+    
         self.setWindowTitle(APP_TITLE)
         self.setServers(None)
         self.actionOpen.triggered.connect(self.doOpen)
@@ -39,7 +39,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
         self.server_uri.currentTextChanged.connect(self.connectServer)
-        # self.catalogs.currentTextChanged.connect(self.setCatalog)
+        #self.catalogs.currentTextChanged.connect(self.setCatalog)
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
 
@@ -95,12 +95,11 @@ class MainWindow(QtWidgets.QMainWindow):
             uri_list.insert(0, server_uri)
         self.setServers(uri_list)
 
-    def folderPath(self):
-        return self._folderPath
-    
     def folderName(self):
         return self._folderName
-
+    
+    def folderPath(self):
+        return self._folderPath
 
     def setFolderPath(self, folder_path = DATA_FOLDER):
         """A folder was selected (from the open dialog)."""
@@ -116,9 +115,12 @@ class MainWindow(QtWidgets.QMainWindow):
         spec_name = "mda folder"
         self.spec_name.setText(spec_name)
         self.setStatus(f"Folder path: {folder_name!r}")
+        
+        mda_list = self.mdaFiles(folder_path, as_string=True)
+        self.setFiles(mda_list)
 
         layout = self.groupbox.layout()
-        self.clearContent(clear_cat=False)
+        self.clearContent(clear_cat=False)  # TODO: do I need that?
 
         if spec_name == "mda folder":
             from .mda_folder import MDA_MVC
@@ -130,7 +132,20 @@ class MainWindow(QtWidgets.QMainWindow):
             self.mvc_folder = None
             layout.addWidget(QtWidgets.QWidget())  # nothing to show
 
-
+    def mdaFiles(self,folder_path, as_string=False):
+        if as_string:
+            return sorted([file.name for file in folder_path.glob('*.mda')])
+        else:
+            return [file for file in folder_path.glob('*.mda')]
+    
+    def setFiles(self, files_list):
+        """Set the names (of server's catalogs) in the pop-up list."""
+        self.catalogs.clear()
+        self.catalogs.addItems(files_list)    
+    
+    
+    ####################### BCR Stuff:
+    
     def catalog(self):
         return self._catalog
 

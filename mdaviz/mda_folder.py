@@ -38,7 +38,7 @@ class MDA_MVC(QtWidgets.QWidget):
         self.mda_search_panel = mdaSearchPanel(self)
         layout = self.folder_groupbox.layout()
         layout.addWidget(self.mda_search_panel)
-        self.mda_search_panel.setupFolder(self.folderPath())
+        self.parent.mdaFiles(self.folderPath())
 
         # self.mda_tableview = mdaTableView(self)
         # layout = self.mda_groupbox.layout()
