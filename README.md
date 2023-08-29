@@ -1,6 +1,6 @@
 # mdaviz
 
-Python Qt5 application to visualize Bluesky data from tiled server.
+Python Qt5 application to visualize mda data.
 
 ## How to run this code?
 
