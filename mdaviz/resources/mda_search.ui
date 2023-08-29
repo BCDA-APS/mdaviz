@@ -49,93 +49,73 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="1">
+            <widget class="DateTimeRangeSlider" name="date_time_widget" native="true"/>
+           </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="plan_label">
+            <widget class="QLabel" name="fiile_label">
              <property name="toolTip">
               <string>Search for runs that match this Bluesky plan.</string>
              </property>
              <property name="text">
-              <string>Plan</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="plan_name">
-             <property name="toolTip">
-              <string/>
+              <string>File</string>
              </property>
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QLabel" name="scan_id_label">
+            <widget class="QLabel" name="scan_label">
              <property name="toolTip">
               <string>Search for runs with this scan ID.</string>
              </property>
              <property name="text">
-              <string>Scan ID</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="scan_id">
-             <property name="toolTip">
-              <string/>
+              <string>Scan #</string>
              </property>
             </widget>
            </item>
            <item row="3" column="0">
-            <widget class="QLabel" name="status_label">
+            <widget class="QLabel" name="size_label">
              <property name="text">
-              <string>Status</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="status">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="toolTip">
-              <string>It is not possible to filter on the run Status at this time. That information comes from the stop document which is currently not searchable.</string>
+              <string>Size</string>
              </property>
             </widget>
            </item>
            <item row="4" column="0">
-            <widget class="QLabel" name="positioner_label">
-             <property name="toolTip">
-              <string>Search for runs with these motor(s). Use a comma to separate more than one name. (such as &quot;m1, m2&quot;)</string>
-             </property>
-             <property name="text">
-              <string>Positioner(s)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QLineEdit" name="positioners">
-             <property name="toolTip">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="detector_label">
+            <widget class="QLabel" name="date_label">
              <property name="toolTip">
               <string>Search for runs with these detector(s). Use a comma to separate more than one name. (such as &quot;diode, I0&quot;)</string>
              </property>
              <property name="text">
-              <string>Detector(s)</string>
+              <string>Date &amp; time</string>
              </property>
             </widget>
            </item>
-           <item row="5" column="1">
-            <widget class="QLineEdit" name="detectors">
-             <property name="toolTip">
-              <string/>
+           <item row="1" column="1">
+            <widget class="QLabel" name="file_name">
+             <property name="text">
+              <string>TextLabel</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="DateTimeRangeSlider" name="date_time_widget" native="true"/>
+           <item row="2" column="1">
+            <widget class="QLabel" name="file_num">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLabel" name="file_size">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QLabel" name="file_date">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -165,7 +145,7 @@
   <customwidget>
    <class>DateTimeRangeSlider</class>
    <extends>QWidget</extends>
-   <header>mdaviz.date_time_range_slider.h</header>
+   <header>date_time_range_slider.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
