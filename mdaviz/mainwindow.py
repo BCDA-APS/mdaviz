@@ -39,7 +39,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
         self.server_uri.currentTextChanged.connect(self.connectServer)
-        #self.catalogs.currentTextChanged.connect(self.setCatalog)
+        self.catalogs.currentTextChanged.connect(self.setFile)
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
 
@@ -101,6 +101,22 @@ class MainWindow(QtWidgets.QMainWindow):
     def folderPath(self):
         return self._folderPath
 
+    def mdaFiles(self,folder_path, as_string=False):
+        if as_string:
+            return sorted([file.name for file in folder_path.glob('*.mda')])
+        else:
+            return [file for file in folder_path.glob('*.mda')]
+    
+    def setFiles(self, files_list):
+        """Set the names (of server's catalogs) in the pop-up list."""
+        self.catalogs.clear()
+        self.catalogs.addItems(files_list)   
+        
+    def setFile(self,mda_file):
+        full_path_str=self.folderName()+'/'+mda_file
+        self.setStatus(f"Selected file {full_path_str!r}.")    
+        # TODO: check for validity of the file?    
+    
     def setFolderPath(self, folder_path = DATA_FOLDER):
         """A folder was selected (from the open dialog)."""
         # TODO: check for validity (folder exists?)
@@ -132,18 +148,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.mvc_folder = None
             layout.addWidget(QtWidgets.QWidget())  # nothing to show
 
-    def mdaFiles(self,folder_path, as_string=False):
-        if as_string:
-            return sorted([file.name for file in folder_path.glob('*.mda')])
-        else:
-            return [file for file in folder_path.glob('*.mda')]
-    
-    def setFiles(self, files_list):
-        """Set the names (of server's catalogs) in the pop-up list."""
-        self.catalogs.clear()
-        self.catalogs.addItems(files_list)    
-    
-    
+
     ####################### BCR Stuff:
     
     def catalog(self):
