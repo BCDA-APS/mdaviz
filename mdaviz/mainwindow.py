@@ -127,18 +127,21 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setStatus(f"Selected file {full_path_str!r}.")      
         self._mdaFileName=mda_file
     
-    def setFolderPath(self, folder_path = DATA_FOLDER):
+    def setFolderPath(self, folder_name = DATA_FOLDER):
         """A folder was selected (from the open dialog)."""
         # TODO: check for validity (does it has mda in there?)
         # if len(catalog_name) == 0 or catalog_name not in self.server():
         #     if len(catalog_name) > 0:
         #         self.setStatus(f"Catalog {catalog_name!r} is not supported now.")
         #     return
-        folder_name = str(folder_path)
+        
+        folder_path = Path(folder_name)
+
         self._folderPath = folder_path
         self._folderName = folder_name
         
-        if isinstance(folder_path,Path): 
+
+        if isinstance(folder_path,Path):   # FIXME not really useful at the moment since we convert the str to path just above
             from .mda_folder import MDA_MVC
 
             # TODO: check if the folder has mda files in it 
