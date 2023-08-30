@@ -116,9 +116,11 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def setmdaFileList(self,folder_path):
         self._mdaFileList = sorted([file.name for file in folder_path.glob('*.mda')])
+        # TODO: what if new file gets added to the directory, you want to append those to the list without the user having to reselect the file nor the entire MVC
+        # TODO: check for new file automatically (every x seconds)
 
     # def setmdaFileList(self,folder_path, as_string=True):
-    #     if isinstance(folder_path,str):
+    #     if isinstance(folder_path,str):   
     #         folder_path=Path(folder_path)
     #     if as_string:
     #        return sorted([file.name for file in folder_path.glob('*.mda')])

@@ -73,8 +73,7 @@ class mdaSearchPanel(QtWidgets.QWidget):
         self.parent.parent.catalogs.setCurrentIndex(next_mdaIndex)
         print(f"{current_mdaFile=}")        
         print(f"{next_mdaFile=}")
-        # TODO: will the index of the QcomboBox always match the index of mdaFileLIst? I think so 
-        
+    
     
 
         
