@@ -12,6 +12,7 @@ from .tiledserverdialog import TILED_SERVER_SETTINGS_KEY
 
 UI_FILE = utils.getUiFileName(__file__)
 DATA_FOLDER = Path(__file__).parent / "data"
+MDA_SPEC_NAME = "mda folder"
 
 class MainWindow(QtWidgets.QMainWindow):
     """The main window of the app, built in Qt designer."""
@@ -113,10 +114,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def mdaFileList(self):
         return self._mdaFileList
     
-
     def setmdaFileList(self,folder_path):
         self._mdaFileList = sorted([file.name for file in folder_path.glob('*.mda')])
-    # def mdaFileList(self,folder_path, as_string=False):
+
+    # def setmdaFileList(self,folder_path, as_string=True):
+    #     if isinstance(folder_path,str):
+    #         folder_path=Path(folder_path)
     #     if as_string:
     #        return sorted([file.name for file in folder_path.glob('*.mda')])
     #     else:
@@ -130,13 +133,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def setFile(self,mda_file):
         print(f"{mda_file=}")
         full_path_str=self.folderName()+'/'+mda_file
-        self.setStatus(f"Selected file {full_path_str!r}.")    
-        # TODO: check for validity of the file?    
+        self.setStatus(f"Selected file {full_path_str!r}.")      
         self._mdaFileName=mda_file
     
     def setFolderPath(self, folder_path = DATA_FOLDER):
         """A folder was selected (from the open dialog)."""
-        # TODO: check for validity (folder exists?)
+        # TODO: check for validity (folder exists? does it has mda in there?)
         # if len(catalog_name) == 0 or catalog_name not in self.server():
         #     if len(catalog_name) > 0:
         #         self.setStatus(f"Catalog {catalog_name!r} is not supported now.")
@@ -145,26 +147,28 @@ class MainWindow(QtWidgets.QMainWindow):
         self._folderPath = folder_path
         self._folderName = folder_name
         
-        spec_name = "mda folder"
-        self.spec_name.setText(spec_name)
-        self.setStatus(f"Folder path: {folder_name!r}")
-        
-        self.setmdaFileList(folder_path)
-        mda_list = self.mdaFileList()
-        self.setFiles(mda_list)
-
-        layout = self.groupbox.layout()
-        self.clearContent(clear_cat=False)  # TODO: do I need that?
-
-        if spec_name == "mda folder":
+        if isinstance(folder_path,Path): 
             from .mda_folder import MDA_MVC
+
+            # TODO: check if the folder has mda files in it 
+            spec_name = MDA_SPEC_NAME
+            self.spec_name.setText(spec_name)
+            self.setStatus(f"Folder path: {folder_name!r}")
             
+            self.setmdaFileList(folder_path)
+            mda_list = self.mdaFileList()
+            self.setFiles(mda_list)
+
+            layout = self.groupbox.layout()
+            self.clearContent(clear_cat=False)
+                
             self.mvc_folder = MDA_MVC(self)
             layout.addWidget(self.mvc_folder)
-            
+
         else:
             self.mvc_folder = None
             layout.addWidget(QtWidgets.QWidget())  # nothing to show
+
 
 
     ####################### BCR Stuff:
