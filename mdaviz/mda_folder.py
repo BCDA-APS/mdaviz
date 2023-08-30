@@ -78,8 +78,8 @@ class MDA_MVC(QtWidgets.QWidget):
     def folderName(self):
         return self.parent.folderName()    
     
-    def mdaFilePath(self):
-        return self.parent.mdaFilePath()  
+    # def mdaFilePath(self):
+    #     return self.parent.mdaFilePath()  
 
     def mdaFileName(self):
         return self.parent.mdaFileName()  
