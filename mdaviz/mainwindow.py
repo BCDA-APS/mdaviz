@@ -35,7 +35,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.folder.currentTextChanged.connect(self.setFolderPath)
         self.files.currentTextChanged.connect(self.setFile)
-        # TODO: populate the MVC with the content of first scan
         
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
 
