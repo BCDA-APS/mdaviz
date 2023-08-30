@@ -35,7 +35,7 @@ class mdaSearchPanel(QtWidgets.QWidget):
     def mdaFileList(self):
         return self.parent.mdaFileList()       
         
-    # TODO: self.mda_folder.mda_search_panel.setupFile(self,mda_file)    
+    # TODO:     
     def setupFile(self,filename):
         if not filename:
             pass

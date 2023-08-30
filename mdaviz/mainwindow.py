@@ -33,7 +33,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionExit.triggered.connect(self.doClose)
         # TODO: set up open dialog for folder
 
-
         self.folder.currentTextChanged.connect(self.setFolderPath)
         self.files.currentTextChanged.connect(self.setFile)
         # TODO: populate the MVC with the content of first scan
@@ -140,13 +139,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self._folderPath = folder_path
         self._folderName = folder_name
         
-
-        if isinstance(folder_path,Path):   # FIXME not really useful at the moment since we convert the str to path just above
+        # FIXME the is bellow is not longer very relevant since we now convert the str to path just above; need to check for validity above
+        if isinstance(folder_path,Path):   
             from .mda_folder import MDA_MVC
 
             # TODO: check if the folder has mda files in it 
             spec_name = MDA_SPEC_NAME
             self.spec_name.setText(spec_name)
+            # TODO do we really want to display that or is there a more relevant message to display? (eg valid folder?)
             self.setStatus(f"Folder path: {folder_name!r}")
             
             self.setmdaFileList(folder_path)
