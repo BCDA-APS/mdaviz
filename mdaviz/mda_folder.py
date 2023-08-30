@@ -38,7 +38,7 @@ class MDA_MVC(QtWidgets.QWidget):
         self.mda_folder_search_panel = mdaSearchPanel(self)
         layout = self.folder_groupbox.layout()
         layout.addWidget(self.mda_folder_search_panel)
-        self.parent.catalogs.currentTextChanged.connect(self.mda_folder_search_panel.setupFile)
+        self.parent.files.currentTextChanged.connect(self.mda_folder_search_panel.setupFile)
         self.mda_folder_search_panel.next.released.connect(self.mda_folder_search_panel.doNext)
         self.mda_folder_search_panel.previous.released.connect(self.mda_folder_search_panel.doPrevious)
          

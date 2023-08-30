@@ -134,7 +134,7 @@ class MainWindow(QtWidgets.QMainWindow):
         #     if len(catalog_name) > 0:
         #         self.setStatus(f"Catalog {catalog_name!r} is not supported now.")
         #     return
-        
+
         folder_path = Path(folder_name)
 
         self._folderPath = folder_path
@@ -154,7 +154,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.setFiles(mda_list)
 
             layout = self.groupbox.layout()
-            self.clearContent(clear_cat=False)
+            self.clearContent(clear_file=False)
                 
             self.mvc_folder = MDA_MVC(self)
             layout.addWidget(self.mvc_folder)
@@ -208,10 +208,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 return
             self.setFolderPath(folder_path) 
 
-    def clearContent(self, clear_cat=True):
+    def clearContent(self, clear_file=True):
         layout = self.groupbox.layout()
         utils.removeAllLayoutWidgets(layout)
-        if clear_cat:
+        if clear_file:
             self.files.clear()
 
 
