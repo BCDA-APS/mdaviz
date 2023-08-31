@@ -125,8 +125,10 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         return folder
     
     def get_file_path(self,file):
-        from mdaviz.mainwindow import folderPath
-        return folderPath() / file
+        from mdaviz.mainwindow import MainWindow
+        tmp = MainWindow()
+        folder_path = tmp.folderPath()
+        return folder_path / file
 
     def get_file_size(self,file):
         filepath = self.get_file_path(file)
