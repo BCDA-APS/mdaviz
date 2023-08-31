@@ -116,7 +116,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         end = start + self.pageSize()
         ascending = 1 if self.ascending() else -1
         gen = folder[start-1: end]
-        if not self.ascending():
+        if ascending < 0:
             gen.reverse()
         return list(gen) 
 
@@ -133,7 +133,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         return self._folderSize    
 
     def setFolder(self,folder):
-        self._folder = folder
+        self._data = folder
         self._folderSize=len(folder)
     
     def fileList(self):  # truncated file list
