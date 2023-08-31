@@ -43,7 +43,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
 
     def rowCount(self, parent=None):
         # Want it to return the number of rows to be shown at a given time
-        value = len(self.uidList())
+        value = len(self.fileList())
         return value
 
     def columnCount(self, parent=None):
