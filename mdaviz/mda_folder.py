@@ -43,7 +43,7 @@ class MDA_MVC(QtWidgets.QWidget):
         self.mda_folder_search_panel.next.released.connect(self.mda_folder_search_panel.doNext)
         self.mda_folder_search_panel.previous.released.connect(self.mda_folder_search_panel.doPrevious)
         
-        self.mda_folder_tableview = mdaFolderTableView(self,self.mda_folder_search_panel)
+        self.mda_folder_tableview = mdaFolderTableView(self)
         self.mda_folder_tableview.displayTable()
          
         # self.mda_tableview = mdaTableView(self)
