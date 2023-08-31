@@ -14,14 +14,13 @@ class mdaFolderTableView(QtWidgets.QWidget):
 
     def __init__(self, parent):
         self.parent = parent
-        self.tableview = self.parent.tableview
         
         super().__init__()
         # utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
         
     def setup(self):
-        header = self.tableView.horizontalHeader()   #tableview belong to mda_folder_search
+        header = self.parent.tableview.horizontalHeader()   #tableview belong to mda_folder_search
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)        
         
         for button_name in "first back next last".split():
@@ -32,11 +31,11 @@ class mdaFolderTableView(QtWidgets.QWidget):
         self.parent.pageSize.currentTextChanged.connect(self.doPageSize)
         self.doButtonPermissions()
         self.setPagerStatus()
-        self.tableView.doubleClicked.connect(self.doFileSelected)
+        self.parent.tableview.doubleClicked.connect(self.doFileSelected)
         
     def doPagerButtons(self, action, **kwargs):
         # self.setStatus(f"{action=} {kwargs=}")
-        model = self.tableView.model()
+        model = self.parent.tableview.model()
 
         if model is not None:
             model.doPager(action)
@@ -46,7 +45,7 @@ class mdaFolderTableView(QtWidgets.QWidget):
 
     def doPageSize(self, value):
         # self.setStatus(f"doPageSize {value =}")
-        model = self.tableView.model()
+        model = self.parent.tableview.model()
 
         if model is not None:
             model.doPager("pageSize", value)
@@ -54,7 +53,7 @@ class mdaFolderTableView(QtWidgets.QWidget):
         self.setPagerStatus()
 
     def doButtonPermissions(self):
-        model = self.tableView.model()
+        model = self.parent.tableview.model()
         atStart = False if model is None else model.isPagerAtStart()
         atEnd = False if model is None else model.isPagerAtEnd()
 
@@ -69,7 +68,7 @@ class mdaFolderTableView(QtWidgets.QWidget):
         self.folder = self.parent.mdaFileList()
         data_model = MDAFolderTableModel(self.folder)
         page_size = self.parent.pageSize.currentText()  # remember the current value
-        self.tableView.setModel(data_model)
+        self.parent.tableview.setModel(data_model)
         self.doPageSize(page_size)  # restore
         self.setPagerStatus()
         
@@ -78,8 +77,8 @@ class mdaFolderTableView(QtWidgets.QWidget):
         def centerColumn(label):
             if label in labels:
                 column = labels.index(label)
-                delegate = _AlignCenterDelegate(self.tableView)
-                self.tableView.setItemDelegateForColumn(column, delegate)
+                delegate = _AlignCenterDelegate(self.parent.tableview)
+                self.parent.tableview.setItemDelegateForColumn(column, delegate)
 
         centerColumn("Scan #")
         centerColumn("Points")
@@ -87,7 +86,7 @@ class mdaFolderTableView(QtWidgets.QWidget):
 
     def setPagerStatus(self, text=None):
         if text is None:
-            model = self.tableView.model()
+            model = self.parent.tableview.model()
             if model is not None:
                 text = model.pagerStatus()
 
@@ -95,7 +94,7 @@ class mdaFolderTableView(QtWidgets.QWidget):
         self.setStatus(text)
 
     def doFileSelected(self, index):
-        model = self.tableView.model()
+        model = self.parent.tableview.model()
         if model is not None:
             self.setStatus(f"A file as been selected: {index=}")
 
