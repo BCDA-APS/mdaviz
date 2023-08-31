@@ -185,7 +185,10 @@ class mdaFolderTableView(QtWidgets.QWidget):
         return self.parent.mdaFileName()  
     
     def mdaFileList(self):
-        return self.parent.mdaFileList()    
+        return self.parent.mdaFileList()   
+    
+    def folderSize(self):
+        return self.parent.folderSize 
 
     def setStatus(self, text):
         self.parent.setStatus(text)
