@@ -30,6 +30,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._mdaFileName = None
         self._folderPath = None
         self._folderName = None
+        self._folderSize = None
         self._mdaFileList = None
         self.mvc_folder = None
     
