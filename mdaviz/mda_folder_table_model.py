@@ -31,7 +31,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         
         # self.setPageOffset(DEFAULT_PAGE_OFFSET, init=True)
         # self.setPageSize(DEFAULT_PAGE_SIZE, init=True)
-        # self.setAscending(True)
+        self.setAscending(True)
         self.folderSize = 0   # FIXME: using parent.folderSize for debugging; will need to change that (if folder grows)
 
         super().__init__()
@@ -122,7 +122,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         ascending = 1 if self.ascending() else -1
         if ascending < 0:
             folder.reverse()
-        return list(folder) 
+        return folder
 
     # # ------------ get & set methods
     
