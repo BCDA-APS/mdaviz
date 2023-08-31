@@ -56,6 +56,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         if role == QtCore.Qt.DisplayRole:
             # print("Display role:", index.row(), index.column())
             file = self.fileList()[index.row()]
+            print(f"{file=}")
             content = self.folder()[file]
             label = self.columnLabels[index.column()]
             action = self.actions_library[label]
@@ -142,6 +143,8 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
     def setFolder(self,folder):
         self._data = folder
         self._folderSize=len(folder)
+        print(f"{folder=}")
+        print(f"{len(folder)=}")
     
     def fileList(self):  # truncated file list
         return self._fileList
