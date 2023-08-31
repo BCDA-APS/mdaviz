@@ -138,7 +138,7 @@ class mdaFolderTableView(QtWidgets.QWidget):
     #     self.next.setEnabled(not atEnd)
     #     self.last.setEnabled(not atEnd)
 
-    def displayTable(self, parent):
+    def displayTable(self):
         from mdaviz.mda_folder_table_model import MDAFolderTableModel
         data = self.mdaFileList()
         data_model = MDAFolderTableModel(data, self.parent)
