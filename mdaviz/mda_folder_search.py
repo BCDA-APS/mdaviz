@@ -98,56 +98,56 @@ class mdaFolderTableView(QtWidgets.QWidget):
         header = self.tableView.horizontalHeader()   #tableview belong to mda_folder_search
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)        
         
-        for button_name in "first back next last".split():
-            button = getattr(self, button_name)
-            # custom: pass the button name to the receiver
-            button.released.connect(partial(self.doPagerButtons, button_name))
+        # for button_name in "first back next last".split():
+        #     button = getattr(self, button_name)
+        #     # custom: pass the button name to the receiver
+        #     button.released.connect(partial(self.doPagerButtons, button_name))
             
-        self.pageSize.currentTextChanged.connect(self.doPageSize)
-        self.doButtonPermissions()
-        self.setPagerStatus()
+        # self.pageSize.currentTextChanged.connect(self.doPageSize)
+        # self.doButtonPermissions()
+        # self.setPagerStatus()
         self.tableView.doubleClicked.connect(self.doFileSelected)
         
-    def doPagerButtons(self, action, **kwargs):
-        # self.setStatus(f"{action=} {kwargs=}")
-        model = self.tableView.model()
+    # def doPagerButtons(self, action, **kwargs):
+    #     # self.setStatus(f"{action=} {kwargs=}")
+    #     model = self.tableView.model()
 
-        if model is not None:
-            model.doPager(action)
-            self.setStatus(f"{model.pageOffset()=}")
-        self.doButtonPermissions()
-        self.setPagerStatus()
+    #     if model is not None:
+    #         model.doPager(action)
+    #         self.setStatus(f"{model.pageOffset()=}")
+    #     self.doButtonPermissions()
+    #     self.setPagerStatus()
 
-    def doPageSize(self, value):
-        # self.setStatus(f"doPageSize {value =}")
-        model = self.tableView.model()
-        print(f"{value=}")
-        if model is not None:
-            print("no Model")
-            model.doPager("pageSize", value)
-        self.doButtonPermissions()
-        self.setPagerStatus()
+    # def doPageSize(self, value):
+    #     # self.setStatus(f"doPageSize {value =}")
+    #     model = self.tableView.model()
+    #     print(f"{value=}")
+    #     if model is not None:
+    #         print("no Model")
+    #         model.doPager("pageSize", value)
+    #     self.doButtonPermissions()
+    #     self.setPagerStatus()
 
-    def doButtonPermissions(self):
-        model = self.tableView.model()
-        atStart = False if model is None else model.isPagerAtStart()
-        atEnd = False if model is None else model.isPagerAtEnd()
+    # def doButtonPermissions(self):
+    #     model = self.tableView.model()
+    #     atStart = False if model is None else model.isPagerAtStart()
+    #     atEnd = False if model is None else model.isPagerAtEnd()
 
-        self.first.setEnabled(not atStart)
-        self.back.setEnabled(not atStart)
-        self.next.setEnabled(not atEnd)
-        self.last.setEnabled(not atEnd)
+    #     self.first.setEnabled(not atStart)
+    #     self.back.setEnabled(not atStart)
+    #     self.next.setEnabled(not atEnd)
+    #     self.last.setEnabled(not atEnd)
 
     def displayTable(self):
         from mdaviz.mda_folder_table_model import MDAFolderTableModel
-
-        data_model = MDAFolderTableModel(self.mdaFileList())
-        print(f"{data_model=}")
-        page_size = self.pageSize.currentText()  # remember the current value
-        print(f"{page_size=}")
+        data = self.mdaFileList()
+        data_model = MDAFolderTableModel(data)
+        # print(f"{data_model=}")
+        # page_size = self.pageSize.currentText()  # remember the current value
+        # print(f"{page_size=}")
         self.tableView.setModel(data_model)
-        self.doPageSize(page_size)  # restore
-        self.setPagerStatus()
+        # self.doPageSize(page_size)  # restore
+        # self.setPagerStatus()
         
         labels = data_model.columnLabels
  
@@ -161,14 +161,14 @@ class mdaFolderTableView(QtWidgets.QWidget):
         centerColumn("Points")
         centerColumn("Dim")
 
-    def setPagerStatus(self, text=None):
-        if text is None:
-            model = self.tableView.model()
-            if model is not None:
-                text = model.pagerStatus()
+    # def setPagerStatus(self, text=None):
+    #     if text is None:
+    #         model = self.tableView.model()
+    #         if model is not None:
+    #             text = model.pagerStatus()
 
-        self.status.setText(text)
-        self.setStatus(text)
+    #     self.status.setText(text)
+    #     self.setStatus(text)
 
     def doFileSelected(self, index):
         model = self.tableView.model()
