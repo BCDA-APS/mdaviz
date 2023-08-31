@@ -31,18 +31,21 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def setup(self):
         from .app_settings import settings
-        from .mda_folder_search import mdaSearchPanel
+        # from .mda_folder_search import mdaSearchPanel
         from .mda_folder_search import mdaFolderTableView
         # from .mda_table_view import mdaTableView
         # from .mda_viz import mdaVisualization
         
-        self.mda_folder_search_panel = mdaSearchPanel(self)
+        # self.mda_folder_search_panel = mdaSearchPanel(self)
+        # layout = self.folder_groupbox.layout()
+        # layout.addWidget(self.mda_folder_search_panel)
+        # self.parent.catalogs.currentTextChanged.connect(self.mda_folder_search_panel.setupFile)
+        # self.mda_folder_search_panel.next.released.connect(self.mda_folder_search_panel.doNext)
+        # self.mda_folder_search_panel.previous.released.connect(self.mda_folder_search_panel.doPrevious)
+        
+        self.mda_folder_tableview = mdaFolderTableView(self)
         layout = self.folder_groupbox.layout()
         layout.addWidget(self.mda_folder_search_panel)
-        self.parent.catalogs.currentTextChanged.connect(self.mda_folder_search_panel.setupFile)
-        self.mda_folder_search_panel.next.released.connect(self.mda_folder_search_panel.doNext)
-        self.mda_folder_search_panel.previous.released.connect(self.mda_folder_search_panel.doPrevious)
-        
         self.mda_folder_tableview = mdaFolderTableView(self)
         self.mda_folder_tableview.displayTable()
          
