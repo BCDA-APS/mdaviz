@@ -56,7 +56,6 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         if role == QtCore.Qt.DisplayRole:
             # print("Display role:", index.row(), index.column())
             file = self.fileList()[index.row()]
-            print(f"{file=}")
             label = self.columnLabels[index.column()]
             action = self.actions_library[label]
             return action(file)
