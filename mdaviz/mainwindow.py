@@ -5,10 +5,6 @@ from PyQt5 import QtWidgets
 from . import APP_TITLE
 from . import utils
 from .app_settings import settings
-from .tiledserverdialog import LOCALHOST_URL
-from .tiledserverdialog import TESTING_URL
-from .tiledserverdialog import TILED_SERVER_SETTINGS_KEY
-# TODO: remove testing URLs before production
 
 UI_FILE = utils.getUiFileName(__file__)
 DATA_FOLDER = Path(__file__).parent / "data"
@@ -23,27 +19,22 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setup()
 
     def setup(self):
-        self._server = None
-        self._catalog = None
-        self._serverList = None
-        self.mvc_catalog = None
-        self._mdaFileName = None
         self._folderPath = None
         self._folderName = None
+        self._folderList = None
+        self._mdaFileName = None
         self._mdaFileList = None
         self.mvc_folder = None
     
         self.setWindowTitle(APP_TITLE)
-        self.setServers(None)
+        self.setRecent(None)
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
         # TODO: set up open dialog for folder
 
-
-        self.server_uri.currentTextChanged.connect(self.connectServer)
-        self.catalogs.currentTextChanged.connect(self.setCatalog)
-        # TODO: populate the MVC with the content of first scan
+        self.folder.currentTextChanged.connect(self.setFolderPath)
+        self.files.currentTextChanged.connect(self.setFile)
         
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
 
@@ -87,17 +78,18 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         User chose to open (connect with) a tiled server.
         """
-        from .tiledserverdialog import TiledServerDialog
+        pass
+        # from .tiledserverdialog import TiledServerDialog
 
-        server_uri = TiledServerDialog.getServer(self)
-        if not server_uri:
-            self.clearContent()
-        uri_list = self.serverList()
-        if uri_list[0] == "":
-            uri_list[0] = server_uri
-        else:
-            uri_list.insert(0, server_uri)
-        self.setServers(uri_list)
+        # server_uri = TiledServerDialog.getServer(self)
+        # if not server_uri:
+        #     self.clearContent()
+        # uri_list = self.serverList()
+        # if uri_list[0] == "":
+        #     uri_list[0] = server_uri
+        # else:
+        #     uri_list.insert(0, server_uri)
+        # self.setServers(uri_list)
 
     def folderName(self):
         return self._folderName
@@ -105,11 +97,14 @@ class MainWindow(QtWidgets.QMainWindow):
     def folderPath(self):
         return self._folderPath
     
+    def folderList(self):
+        return self._folderList
+    
     def mdaFileName(self):
         return self._mdaFileName
     
-    def mdaFilePath(self):
-        return self._folderPath / self._mdaFileName
+    # def mdaFilePath(self):
+    #     return self._folderPath / self._mdaFileName
     
     def mdaFileList(self):
         return self._mdaFileList
@@ -118,19 +113,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self._mdaFileList = sorted([file.name for file in folder_path.glob('*.mda')])
         # TODO: what if new file gets added to the directory, you want to append those to the list without the user having to reselect the file nor the entire MVC
         # TODO: check for new file automatically (every x seconds)
-
-    # def setmdaFileList(self,folder_path, as_string=True):
-    #     if isinstance(folder_path,str):   
-    #         folder_path=Path(folder_path)
-    #     if as_string:
-    #        return sorted([file.name for file in folder_path.glob('*.mda')])
-    #     else:
-    #        return [file for file in folder_path.glob('*.mda')]
     
     def setFiles(self, files_list):
-        """Set the names (of server's catalogs) in the pop-up list."""
-        self.catalogs.clear()
-        self.catalogs.addItems(files_list)   
+        """Set the file names in the pop-up list."""
+        self.files.clear()
+        self.files.addItems(files_list)   
         
     def setFile(self,mda_file):
         print(f"{mda_file=}")
@@ -138,23 +125,27 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setStatus(f"Selected file {full_path_str!r}.")      
         self._mdaFileName=mda_file
     
-    def setFolderPath(self, folder_path = DATA_FOLDER):
+    def setFolderPath(self, folder_name = DATA_FOLDER):
         """A folder was selected (from the open dialog)."""
-        # TODO: check for validity (folder exists? does it has mda in there?)
+        # TODO: check for validity (does it has mda in there?)
         # if len(catalog_name) == 0 or catalog_name not in self.server():
         #     if len(catalog_name) > 0:
         #         self.setStatus(f"Catalog {catalog_name!r} is not supported now.")
         #     return
-        folder_name = str(folder_path)
+
+        folder_path = Path(folder_name)
+
         self._folderPath = folder_path
         self._folderName = folder_name
         
-        if isinstance(folder_path,Path): 
+        # FIXME the is bellow is not longer very relevant since we now convert the str to path just above; need to check for validity above
+        if isinstance(folder_path,Path):   
             from .mda_folder import MDA_MVC
 
             # TODO: check if the folder has mda files in it 
             spec_name = MDA_SPEC_NAME
             self.spec_name.setText(spec_name)
+            # TODO do we really want to display that or is there a more relevant message to display? (eg valid folder?)
             self.setStatus(f"Folder path: {folder_name!r}")
             
             self.setmdaFileList(folder_path)
@@ -162,7 +153,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.setFiles(mda_list)
 
             layout = self.groupbox.layout()
-            self.clearContent(clear_cat=False)
+            self.clearContent(clear_file=False)
                 
             self.mvc_folder = MDA_MVC(self)
             layout.addWidget(self.mvc_folder)
@@ -171,128 +162,56 @@ class MainWindow(QtWidgets.QMainWindow):
             self.mvc_folder = None
             layout.addWidget(QtWidgets.QWidget())  # nothing to show
 
+  
 
-
-    ####################### BCR Stuff:
-    
-    def catalog(self):
-        return self._catalog
-    
-    def catalogType(self):
-        catalog = self.catalog()
-        specs = catalog.specs
-        # print(f"{specs=}")
-        # print(f'{catalog.item["attributes"]["structure_family"]=}')
-        try:
-            spec = specs[0]
-            spec_name = f"{spec.name}, v{spec.version}"
-        except IndexError:
-            spec_name = "not supported now"
-        return spec_name
-
-    def catalogName(self):
-        return self._catalogName
-
-    def setCatalog(self, catalog_name):
-        """A catalog was selected (from the pop-up menu)."""
-        if self.folderPath() == DATA_FOLDER:
-            self.setFile(catalog_name)
-            # TODO: opening the folder should populate the MDA_MVC with the first scan info
-        else:
-            self.setStatus(f"Selected catalog {catalog_name!r}.")
-            if len(catalog_name) == 0 or catalog_name not in self.server():
-                if len(catalog_name) > 0:
-                    self.setStatus(f"Catalog {catalog_name!r} is not supported now.")
-                return
-            self._catalogName = catalog_name
-            self._catalog = self.server()[catalog_name]
-
-            spec_name = self.catalogType()
-            self.spec_name.setText(spec_name)
-            self.setStatus(f"catalog {catalog_name!r} is {spec_name!r}")
-
-            layout = self.groupbox.layout()
-            self.clearContent(clear_cat=False)
-
-            if spec_name == "CatalogOfBlueskyRuns, v1":
-                from .bluesky_runs_catalog import BRC_MVC
-
-                self.mvc_catalog = BRC_MVC(self)
-                layout.addWidget(self.mvc_catalog)
-                
-            else:
-                self.mvc_catalog = None
-                layout.addWidget(QtWidgets.QWidget())  # nothing to show
-
-    def setCatalogs(self, catalogs):
-        """Set the names (of server's catalogs) in the pop-up list."""
-        self.catalogs.clear()
-        self.catalogs.addItems(catalogs)
-
-    def clearContent(self, clear_cat=True):
-        layout = self.groupbox.layout()
-        utils.removeAllLayoutWidgets(layout)
-        if clear_cat:
-            self.catalogs.clear()
-
-    def serverList(self):
-        return self._serverList
-
-    def setServerList(self, uri_list=None):
-        """Set the list of server URIs and remove duplicate"""
-        unique_uris = set()
-        new_server_list = []
+    def setFolderList(self,folder_list=None):
+        """Set the list of recent folder and remove duplicate"""
+        unique_paths = set()
+        new_path_list = []
         # TODO: save last folder in settings
-        if not uri_list: 
-            previous_uri = settings.getKey(TILED_SERVER_SETTINGS_KEY)
-            candidate_uris = ["", str(DATA_FOLDER), previous_uri, TESTING_URL, LOCALHOST_URL, "Other..."]
+        if not folder_list: 
+            # TODO: create KEY for recent folder
+            #previous_path = settings.getKey(TILED_SERVER_SETTINGS_KEY)
+            #candidate_paths = ["", str(DATA_FOLDER), previous_path, "Other..."]
+            candidate_paths = ["", str(DATA_FOLDER), "Other..."]
         else:
-            candidate_uris = uri_list
-        for uri in candidate_uris:
-            if uri not in unique_uris:  # Check for duplicates
-                unique_uris.add(uri)
-                new_server_list.append(uri)
-        self._serverList = new_server_list
+            candidate_paths = folder_list
+        for p in candidate_paths:
+            if p not in unique_paths:  # Check for duplicates
+                unique_paths.add(p)
+                new_path_list.append(p)
+        self._folderList = new_path_list            
 
-    def setServers(self, uri_list):
+    def setRecent(self,folder_list):
         """Set the server URIs in the pop-up list"""
-        self.setServerList(uri_list)
-        uri_list = self.serverList()
-        self.server_uri.clear()
-        self.server_uri.addItems(uri_list)
+        self.setFolderList(folder_list)
+        folder_list = self.folderList()
+        self.folder.clear()
+        self.folder.addItems(folder_list)
 
-    def connectServer(self, server_uri):
+    def connectFolder(self,folder_path):
         """Connect to the server URI and return URI and client"""
         self.clearContent()
-        if server_uri == "Other...":
-            self.doOpen()
-        elif server_uri == str(DATA_FOLDER):
-            self.setFolderPath(DATA_FOLDER)  
+        if folder_path == "Other...":
+            self.doOpen()  
         else:
-            # check the value
-            url = QtCore.QUrl(server_uri)
-            # print(f"{url=} {url.isValid()=} {url.isRelative()=}")
-            if url.isValid() and not url.isRelative():
-                settings.setKey(TILED_SERVER_SETTINGS_KEY, server_uri)
-            else:
+            # TODO: check that folder exist
+            # TODO: same folder path to settings 
+            # if url.isValid() and not url.isRelative():
+            #     settings.setKey(TILED_SERVER_SETTINGS_KEY, server_uri)
+            # else:
+            #     return
+            # previous_uri = settings.getKey(TILED_SERVER_SETTINGS_KEY) or ""
+            if folder_path is None:
+                self.setStatus("No folder selected.")
                 return
-            previous_uri = settings.getKey(TILED_SERVER_SETTINGS_KEY) or ""
-            if server_uri is None:
-                self.setStatus("No tiled server selected.")
-                return
-            self.setStatus(f"selected tiled {server_uri=!r}")
-            try:
-                client = utils.connect_tiled_server(server_uri)
-            except Exception as exc:
-                self.setStatus(f"Error for {server_uri=!r}: {exc}")
-                settings.setKey(TILED_SERVER_SETTINGS_KEY, previous_uri)
-                return
-            self.setServer(server_uri, client)
+            self.setFolderPath(folder_path) 
 
-    def server(self):
-        return self._server
+    def clearContent(self, clear_file=True):
+        layout = self.groupbox.layout()
+        utils.removeAllLayoutWidgets(layout)
+        if clear_file:
+            self.files.clear()
 
-    def setServer(self, uri, server):
-        """Define the tiled server URI."""
-        self._server = server
-        self.setCatalogs(list(server))
+
+

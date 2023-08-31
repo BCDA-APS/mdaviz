@@ -16,7 +16,6 @@ class mdaSearchPanel(QtWidgets.QWidget):
 
     def __init__(self, parent):
         self.parent = parent
-        self._server = None
 
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
@@ -27,8 +26,8 @@ class mdaSearchPanel(QtWidgets.QWidget):
     def folderName(self):
         return self.parent.folderName()    
     
-    def mdaFilePath(self):
-        return self.parent.mdaFilePath()  
+    # def mdaFilePath(self):
+    #     return self.parent.mdaFilePath()  
 
     def mdaFileName(self):
         return self.parent.mdaFileName()  
@@ -36,7 +35,6 @@ class mdaSearchPanel(QtWidgets.QWidget):
     def mdaFileList(self):
         return self.parent.mdaFileList()       
         
-    # TODO: self.mda_folder.mda_search_panel.setupFile(self,mda_file)    
     def setupFile(self,filename):
         if not filename:
             pass
@@ -70,7 +68,7 @@ class mdaSearchPanel(QtWidgets.QWidget):
         current_mdaIndex = self.mdaFileList().index(current_mdaFile)
         next_mdaIndex = current_mdaIndex+i
         next_mdaFile=self.mdaFileList()[next_mdaIndex]
-        self.parent.parent.catalogs.setCurrentIndex(next_mdaIndex)
+        self.parent.parent.files.setCurrentIndex(next_mdaIndex)
         print(f"{current_mdaFile=}")        
         print(f"{next_mdaFile=}")
     
