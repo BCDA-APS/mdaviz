@@ -121,8 +121,8 @@ class mdaFolderTableView(QtWidgets.QWidget):
     def doPageSize(self, value):
         # self.setStatus(f"doPageSize {value =}")
         model = self.tableView.model()
-
         if model is not None:
+            print("no Model")
             model.doPager("pageSize", value)
         self.doButtonPermissions()
         self.setPagerStatus()
