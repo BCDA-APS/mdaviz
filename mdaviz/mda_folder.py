@@ -46,7 +46,6 @@ class MDA_MVC(QtWidgets.QWidget):
         self.mda_folder_tableview = mdaFolderTableView(self)
         layout = self.folder_groupbox.layout()
         layout.addWidget(self.mda_folder_tableview)
-        self.mda_folder_tableview = mdaFolderTableView(self)
         self.mda_folder_tableview.displayTable()
          
         # self.mda_tableview = mdaTableView(self)
