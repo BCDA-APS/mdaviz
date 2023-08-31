@@ -32,7 +32,7 @@ class MDA_MVC(QtWidgets.QWidget):
     def setup(self):
         from .app_settings import settings
         from .mda_folder_search import mdaSearchPanel
-        from .mda_folder_table_view import mdaFolderTableView
+        from .mda_folder_table_view import mdaSearchPanel
         # from .mda_table_view import mdaTableView
         # from .mda_viz import mdaVisualization
         
