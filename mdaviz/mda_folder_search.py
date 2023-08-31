@@ -173,7 +173,7 @@ class mdaFolderTableView(QtWidgets.QWidget):
     def doFileSelected(self, index):
         model = self.tableView.model()
         if model is not None:
-            self.setStatus(f"A file as been selected: {index=}")
+            self.setStatus(f"A file as been selected: {index!r}")
 
     def folderName(self):
         return self.parent.folderName()    
