@@ -134,7 +134,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
     
     def get_file_date(self,file):
         filepath = self.get_file_path(file)
-        return utils.utils.ts2iso(round(filepath.stat().st_ctime))
+        return utils.ts2iso(round(filepath.stat().st_ctime))
     
     
 
