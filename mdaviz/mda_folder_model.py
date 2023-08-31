@@ -18,32 +18,32 @@ DEFAULT_PAGE_SIZE = 20
 DEFAULT_PAGE_OFFSET = 0
 
 
+
+
 class MDAFolderTableModel(QtCore.QAbstractTableModel):
 
     def __init__(self, data):
+        
         self.actions_library = {
-            "Scan ID": lambda run: utils.get_md(run, "start", "scan_id"),
-            "Plan Name": lambda run: utils.get_md(run, "start", "plan_name"),
-            "Positioners": lambda run: self.get_str_list(run, "start", "motors"),
-            "Detectors": lambda run: self.get_str_list(run, "start", "detectors"),
-            "#points": lambda run: utils.get_md(run, "start", "num_points"),
-            "Date": self.get_run_start_time,
-            "Status": lambda run: utils.get_md(run, "stop", "exit_status"),
-            "Streams": lambda run: self.get_str_list(run, "summary", "stream_names"),
-            # "uid": lambda run: utils.get_md(run, "start", "uid"),
-            # "uid7": self.get_run_uid7,
+            "Scan prefix": lambda file: file.rsplit('_', 1)[0],
+            "Scan #": lambda file: file.rsplit('_', 1)[1],
+            "Points": lambda file: 'TODO',# TODO: get_file_pts
+            "Dim": lambda file: 'TODO',   # TODO: get_file_dim need to extract data from the file for that, will need parent (file path)
+            "Size": lambda file: 'TODO',  # TODO: get_size_size need parent (file path)
+            "Date": lambda file: 'TODO',  # TODO
         }
+        
         self.columnLabels = list(self.actions_library.keys())
-
+        
         self.setPageOffset(DEFAULT_PAGE_OFFSET, init=True)
         self.setPageSize(DEFAULT_PAGE_SIZE, init=True)
         self.setAscending(True)
-        self._catalog_length = 0
+        self.folderSize = 0
 
         super().__init__()
-
-        self.setCatalog(data)
-        self.setUidList(self._get_uidList())
+        
+        self.setFolder(data)
+        self.setFileList(self._get_fileList())
 
     # ------------ methods required by Qt's view
 
@@ -61,11 +61,11 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         # display data
         if role == QtCore.Qt.DisplayRole:
             # print("Display role:", index.row(), index.column())
-            uid = self.uidList()[index.row()]
-            run = self.catalog()[uid]
+            file = self.fileList()[index.row()]
+            content = self.folder()[file]
             label = self.columnLabels[index.column()]
             action = self.actions_library[label]
-            return action(run)
+            return action(content)
 
     def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
         if role == QtCore.Qt.DisplayRole:
@@ -74,181 +74,117 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
             else:
                 return str(section + 1)  # may want to alter at some point
             
-            
-    
+    # ------------ methods required by the results table
 
-    # # ------------ methods required by the results table
+    def doPager(self, action, value=None):
+        # print(f"doPager {action =}, {value =}")
 
-    # def doPager(self, action, value=None):
-    #     # print(f"doPager {action =}, {value =}")
+        folder_size = self.folderSize()
+        offset = self.pageOffset()
+        size = self.pageSize()
+        # print(f"{folder_size=} {offset=}  {size=}")
 
-    #     catalog_length = self.catalog_length()
-    #     offset = self.pageOffset()
-    #     size = self.pageSize()
-    #     # print(f"{catalog_length=} {offset=}  {size=}")
+        if action == "first":
+            self.setPageOffset(0)
+        elif action == "pageSize":
+            self.setPageSize(value)
+        elif action == "back":
+            value = offset - size
+            value = min(value, folder_size)
+            value = max(value, 0)
+            self.setPageOffset(value)
+        elif action == "next":
+            value = offset + size
+            value = min(value, folder_size - size)
+            value = max(value, 0)
+            self.setPageOffset(value)
+        elif action == "last":
+            value = folder_size - size
+            value = max(value, 0)
+            self.setPageOffset(value)
 
-    #     if action == "first":
-    #         self.setPageOffset(0)
-    #     elif action == "pageSize":
-    #         self.setPageSize(value)
-    #     elif action == "back":
-    #         value = offset - size
-    #         value = min(value, catalog_length)
-    #         value = max(value, 0)
-    #         self.setPageOffset(value)
-    #     elif action == "next":
-    #         value = offset + size
-    #         value = min(value, catalog_length - size)
-    #         value = max(value, 0)
-    #         self.setPageOffset(value)
-    #     elif action == "last":
-    #         value = catalog_length - size
-    #         value = max(value, 0)
-    #         self.setPageOffset(value)
+        self.setFileList(self._get_fileList())
+        # print(f"{self.pageOffset()=} {self.pageSize()=}")
 
-    #     self.setUidList(self._get_uidList())
-    #     # print(f"{self.pageOffset()=} {self.pageSize()=}")
+    def isPagerAtStart(self):
+        return self.pageOffset() == 0
 
-    # def isPagerAtStart(self):
-    #     return self.pageOffset() == 0
+    def isPagerAtEnd(self):
+        # number is zero-based
+        last_row_number = self.pageOffset() + len(self.fileList())
+        return last_row_number >= self.folderSize()
 
-    # def isPagerAtEnd(self):
-    #     # number is zero-based
-    #     last_row_number = self.pageOffset() + len(self.uidList())
-    #     return last_row_number >= self.catalog_length()
+    # ------------ local methods
 
-    # # ------------ local methods
-
-    # def _get_uidList(self):
-    #     cat = self.catalog()
-    #     start = self.pageOffset()
-    #     end = start + self.pageSize()
-    #     ascending = 1 if self.ascending() else -1
-    #     gen = cat._keys_slice(start, end, ascending)
-    #     return list(gen)  # FIXME: fails here with big catalogs, see issue #51
-
-    # def get_run_start_time(self, run):
-    #     """Return the run's start time as ISO8601 string."""
-    #     ts = utils.get_md(run, "start", "time", 0)
-    #     dt = datetime.datetime.fromtimestamp(round(ts))
-    #     return dt.isoformat(sep=" ")
-
-    # def get_run_uid7(self, run):
-    #     """Return the run's uid, truncated to the first 7 characters."""
-    #     uid = utils.get_md(run, "start", "uid")
-    #     return uid[:7]
-
-    # def get_str_list(self, run, doc, key):
-    #     """Return the document's key values as a list."""
-    #     items = utils.get_md(run, doc, key, [])
-    #     return ", ".join(items)
+    def _get_fileList(self):
+        folder = self.folder()
+        start = self.pageOffset()
+        end = start + self.pageSize()
+        ascending = 1 if self.ascending() else -1
+        gen = folder[start-1: end]
+        if not self.ascending():
+            gen.reverse()
+        return list(gen) 
 
     # # ------------ get & set methods
+    
+    
+    def folderPath(self):
+        return self.parent.folderPath()    
+    
+    def folder(self):   # in this case folder is the list of mda file name
+        return self._data
 
-    # def catalog(self):
-    #     return self._data
+    def folderSize(self):
+        return self._folderSize    
 
-    # def catalog_length(self):
-    #     return self._catalog_length
+    def setFolder(self,folder):
+        self._folder = folder
+        self._folderSize=len(folder)
+    
+    def fileList(self):  # truncated file list
+        return self._fileList
 
-    # def setCatalog(self, catalog):
-    #     self._data = catalog
-    #     self._catalog_length = len(catalog)
+    def setFileList(self, value):
+        self._fileList = value
 
-    # def uidList(self):
-    #     return self._uidList
+    def pageOffset(self):
+        return self._pageOffset
 
-    # def setUidList(self, value):
-    #     self._uidList = value
+    def pageSize(self):
+        return self._pageSize
 
-    # def pageOffset(self):
-    #     return self._pageOffset
+    def setPageOffset(self, offset, init=False):
+        """Set the pager offset."""
+        offset = int(offset)
+        if init:
+            self._pageOffset = offset
+        elif offset != self._pageOffset:
+            self._pageOffset = offset
+            self.layoutChanged.emit()
 
-    # def pageSize(self):
-    #     return self._pageSize
+    def setPageSize(self, value, init=False):
+        """Set the pager size."""
+        value = int(value)
+        if init:
+            self._pageSize = value
+        elif value != self._pageSize:
+            self._pageSize = value
+            self.layoutChanged.emit()
 
-    # def setPageOffset(self, offset, init=False):
-    #     """Set the pager offset."""
-    #     offset = int(offset)
-    #     if init:
-    #         self._pageOffset = offset
-    #     elif offset != self._pageOffset:
-    #         self._pageOffset = offset
-    #         self.layoutChanged.emit()
+    def ascending(self):
+        return self._ascending
 
-    # def setPageSize(self, value, init=False):
-    #     """Set the pager size."""
-    #     value = int(value)
-    #     if init:
-    #         self._pageSize = value
-    #     elif value != self._pageSize:
-    #         self._pageSize = value
-    #         self.layoutChanged.emit()
+    def setAscending(self, value):
+        self._ascending = value
 
-    # def ascending(self):
-    #     return self._ascending
+    def pagerStatus(self):
+        total = self.folderSize()
+        if total == 0:
+            text = "No files"
+        else:
+            start = self.pageOffset()
+            end = start + len(self.fileList())
+            text = f"{start + 1}-{end} of {total} files"
+        return text
 
-    # def setAscending(self, value):
-    #     self._ascending = value
-
-    # def pagerStatus(self):
-    #     total = self.catalog_length()
-    #     if total == 0:
-    #         text = "No runs"
-    #     else:
-    #         start = self.pageOffset()
-    #         end = start + len(self.uidList())
-    #         text = f"{start + 1}-{end} of {total} runs"
-    #     return text
-
-    # def index2run(self, index):
-    #     uid = self.uidList()[index.row()]
-    #     return self.catalog()[uid]
-
-    # def getMetadata(self, index):
-    #     """Provide a text view of the run metadata."""
-    #     run = self.index2run(index)
-    #     md = yaml.dump(dict(run.metadata), indent=4)
-    #     return md
-
-    # def getDataDescription(self, index):
-    #     """Provide text description of the data streams."""
-    #     run = self.index2run(index)
-
-    #     # Describe what will be plotted.
-    #     analysis = analyze_run.SignalAxesFields(run).to_dict()
-    #     table = pyRestTable.Table()
-    #     table.labels = "item description".split()
-    #     table.addRow(("scan", analysis["scan_id"]))
-    #     table.addRow(("plan", analysis["plan"]))
-    #     table.addRow(("chart", analysis["chart_type"]))
-    #     if analysis["plot_signal"] is not None:
-    #         table.addRow(("stream", analysis["stream"]))
-    #         table.addRow(("plot signal", analysis["plot_signal"]))
-    #         table.addRow(("plot axes", ", ".join(analysis["plot_axes"])))
-    #         table.addRow(("all detectors", ", ".join(analysis["detectors"])))
-    #         table.addRow(("all positioners", ", ".join(analysis["positioners"])))
-    #     text = "plot summary"
-    #     text += "\n" + "-" * len(text) + "\n" * 2
-    #     text += f"{table.reST()}\n"
-
-    #     # information about each stream
-    #     rows = []
-    #     for sname in run:
-    #         title = f"stream: {sname}"
-    #         rows.append(title)
-    #         rows.append("-" * len(title))
-    #         stream = run[sname]
-    #         data = stream["data"].read()
-    #         rows.append(str(data))
-    #         rows.append("")
-
-    #     text += "\n".join(rows).strip()
-    #     return text
-
-    # def getSummary(self, index):
-    #     run = self.index2run(index)
-    #     return (
-    #         f'#{utils.get_md(run, "start", "scan_id", "unknown")}'
-    #         f'  {utils.get_md(run, "start", "plan_name", "unknown")}'
-        )
