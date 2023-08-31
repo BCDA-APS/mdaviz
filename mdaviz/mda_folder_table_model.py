@@ -7,6 +7,7 @@ QAbstractTableModel of folder content.
 """
 
 from PyQt5 import QtCore
+from . import utils
 
 DEFAULT_PAGE_SIZE = 20
 DEFAULT_PAGE_OFFSET = 0
@@ -22,9 +23,9 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
             "Scan prefix": lambda file: file.rsplit('_', 1)[0],
             "Scan #": lambda file: file.rsplit('_', 1)[1].split('.')[0],
             "Points": lambda file: 'TODO',# TODO: get_file_pts
-            "Dim": lambda file: 'TODO',   # TODO: get_file_dim need to extract data from the file for that, will need parent (file path)
-            "Size": lambda file: 'TODO',  # TODO: get_size_size need parent (file path)
-            "Date": lambda file: 'TODO',  # TODO
+            "Dim": lambda file: 'TODO',   # TODO: get_file_dim need to extract data from the file for that
+            "Size": lambda file: self.get_file_size(file),  
+            "Date": lambda file: self.get_file_date(file),  
         }
         
         self.columnLabels = list(self.actions_library.keys())
@@ -122,21 +123,31 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         if ascending < 0:
             folder.reverse()
         return folder
+    
+    def get_file_path(self,file):
+        from mdaviz.mainwindow import folderPath
+        return folderPath() / file
+
+    def get_file_size(self,file):
+        filepath = self.get_file_path(file)
+        return utils.human_readable_size(filepath.stat().st_size)
+    
+    def get_file_date(self,file):
+        filepath = self.get_file_path(file)
+        return utils.utils.ts2iso(round(filepath.stat().st_ctime))
+    
+    
+
 
     # # ------------ get & set methods
     
     
-    def folderPath(self):
-        return self.parent.folderPath()    
     
     def folder(self):   # in this case folder is the list of mda file name
         return self._data
 
     def folderSize(self):
         return self._folderSize    
-
-    # def folderSize(self):
-    #     return self.parent.folderSize 
 
     def setFolder(self,folder):
         self._data = folder
