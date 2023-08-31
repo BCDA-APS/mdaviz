@@ -136,13 +136,8 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         filepath = self.get_file_path(file)
         return utils.ts2iso(round(filepath.stat().st_ctime))
     
-    
-
-
     # # ------------ get & set methods
-    
-    
-    
+     
     def folder(self):   # in this case folder is the list of mda file name
         return self._data
 
