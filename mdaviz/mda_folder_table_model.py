@@ -37,7 +37,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         super().__init__()
         
         self.setFolder(data)
-        self.setFileList(self._get_fileList())
+        self.setFileList(self._get_fileList())   # this return the truncated list of file in the pager 
 
     # ------------ methods required by Qt's view
 
@@ -57,10 +57,9 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
             # print("Display role:", index.row(), index.column())
             file = self.fileList()[index.row()]
             print(f"{file=}")
-            content = self.folder()[file]
             label = self.columnLabels[index.column()]
             action = self.actions_library[label]
-            return action(content)
+            return action(file)
 
     def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
         if role == QtCore.Qt.DisplayRole:
