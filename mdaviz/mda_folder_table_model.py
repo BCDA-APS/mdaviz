@@ -21,7 +21,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         self.parent = parent
         
         self.actions_library = {
-            "Scan prefix": lambda file: file.rsplit('_', 1)[0],
+            "Prefix": lambda file: file.rsplit('_', 1)[0],
             "Scan #": lambda file: int(file.rsplit('_', 1)[1].split('.')[0]),
             "Points": lambda file: 'TODO',# TODO: get_file_pts
             "Dim": lambda file: 'TODO',   # TODO: get_file_dim need to extract data from the file for that
