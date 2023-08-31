@@ -17,7 +17,8 @@ DEFAULT_PAGE_OFFSET = 0
 
 class MDAFolderTableModel(QtCore.QAbstractTableModel):
 
-    def __init__(self, data):
+    def __init__(self, data, parent):
+        self.parent = parent
         
         self.actions_library = {
             "Scan prefix": lambda file: file.rsplit('_', 1)[0],
@@ -125,10 +126,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         return folder
     
     def get_file_path(self,file):
-        from mdaviz.mainwindow import MainWindow
-        tmp = MainWindow()
-        folder_path = tmp.folderPath()
-        return folder_path / file
+        return self.folderPath() / file
 
     def get_file_size(self,file):
         filepath = self.get_file_path(file)
@@ -163,6 +161,9 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
     def setFileList(self, value):
         self._fileList = value
 
+    def folderPath(self):
+        return self.parent.folderPath()
+    
     # def pageOffset(self):
     #     return self._pageOffset
 

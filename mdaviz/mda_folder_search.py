@@ -138,10 +138,11 @@ class mdaFolderTableView(QtWidgets.QWidget):
     #     self.next.setEnabled(not atEnd)
     #     self.last.setEnabled(not atEnd)
 
-    def displayTable(self):
+    def displayTable(self, parent):
         from mdaviz.mda_folder_table_model import MDAFolderTableModel
         data = self.mdaFileList()
-        data_model = MDAFolderTableModel(data)
+        parent = self.parent
+        data_model = MDAFolderTableModel(data, parent)
         # print(f"{data_model=}")
         # page_size = self.pageSize.currentText()  # remember the current value
         # print(f"{page_size=}")
