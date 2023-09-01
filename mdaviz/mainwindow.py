@@ -97,12 +97,9 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.setServers(uri_list)
 
     def doRefresh(self):
-        current_folder = self.folderName()
-        current_subfolder = self.subFolderName()
-        current_data_folder = self.dataPath()
-        self.setStatus(f"Refreshing content: {current_data_folder!r}")
+        current_folder = self.folder.currentText()
+        self.setStatus(f"Refreshing content: {current_folder!r}")
         self.setFolderPath(current_folder)
-        self.subfolder.setCurrentText(current_subfolder)
         
     def dataPath(self):
         """
@@ -195,7 +192,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self._folderPath = ''
             self._folderName = ''
             self.setSubfolderList([])
-            comment=f"{folder_path!r} does not exist."
+            comment=f"{str(folder_path)!r} does not exist."
             self.folderNotValid(layout,comment)
 
             
