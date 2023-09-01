@@ -20,12 +20,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setup()
 
     def setup(self):
-        self._folderPath = None     # the full path obj
-        self._folderName = None     # the full path str
-        self._folderList = None     # the list of folder in the pull down
-        self._folderLength = None   # the number of mda files in the folder
+        self._dataPath = None       # the combined data path obj (folder+subfolder)
+        self._folderPath = None     # the path obj from pull down 1
+        self._folderName = None     # the path str from pull down 1
+        self._folderList = None     # the list of folder in from pull down 1
+        self._subFolderName = None  # the subfolder selected in pull down 2
         self._mdaFileList = None    # the list of mda file NAME str (name only)
         self._mdaFilePath = None    # the list of mda file PATH obj (full path)
+        self._mdaFileLen = None   # the number of mda files in the list
         self.mvc_folder = None
     
         self.setWindowTitle(APP_TITLE)
@@ -120,9 +122,9 @@ class MainWindow(QtWidgets.QMainWindow):
         """Full path (obj) of the selected folder."""
         return self._folderPath
     
-    def folderLength(self):
+    def mdaFileLen(self):
         """Number of mda files in the selected folder."""
-        return self._folderLength
+        return self._mdaFileLen
     
     def folderList(self):
         """Folder path (str) list in the pull down menu."""
@@ -200,8 +202,8 @@ class MainWindow(QtWidgets.QMainWindow):
             layout = self.groupbox.layout()   
             self._mdaFilePath = list(folder_path.glob("*.mda"))
             self.setmdaFileList(folder_path)
-            self._folderLength = len(self._mdaFilePath)
-            self.info.setText(f"{self._folderLength} mda files")        
+            self._mdaFileLen = len(self._mdaFilePath)
+            self.info.setText(f"{self._mdaFileLen} mda files")        
             if self._mdaFilePath:                              # folder contains mda
                 from .mda_folder import MDA_MVC 
                 self.setStatus(f"Folder path: {str(folder_path)!r}")
