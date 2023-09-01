@@ -196,7 +196,7 @@ class MainWindow(QtWidgets.QMainWindow):
             
     def setSubFolderPath(self,subfolder_name):
         if subfolder_name:
-            folder_path=self.folderRoot() / Path(subfolder_name)
+            folder_path=self.folderPath().parent / Path(subfolder_name)
             layout = self.groupbox.layout()   
             self._mdaFilePath = list(folder_path.glob("*.mda"))
             self.setmdaFileList(folder_path)
