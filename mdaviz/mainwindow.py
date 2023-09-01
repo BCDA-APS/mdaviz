@@ -129,7 +129,7 @@ class MainWindow(QtWidgets.QMainWindow):
             
             self._folderPath = folder_path
             self._folderName = folder_name
-            sub_list=[item.path for item in folder_path.iterdir()if item.is_dir()]
+            sub_list=[item.name for item in folder_path.iterdir()if item.is_dir()]
             self.setSubfolder(sub_list)
             
             mda_files_path = list(folder_path.glob("*.mda"))
