@@ -116,7 +116,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._folderLength = len(self._mdaFileList)
         self.info.setText(f"{self._folderLength} mda files")
     
-    def setFiles(self, files_list):
+    def setSubfolder(self, files_list):
         """Set the file names in the pop-up list."""
         self.subfolder.clear()
         self.subfolder.addItems(files_list)     
@@ -129,8 +129,10 @@ class MainWindow(QtWidgets.QMainWindow):
         layout = self.groupbox.layout()    
         # check for validity: folder exists and contains mda files.
         if folder_path.exists() and folder_path.is_dir():
+            print("pass test 1")
             mda_files_path = list(folder_path.glob("*.mda"))
             if mda_files_path:
+                print("pass test 2")
                 self._mdaFilePath = mda_files_path 
                 from .mda_folder import MDA_MVC
                 self.mvc_folder = MDA_MVC(self)
