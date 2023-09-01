@@ -116,7 +116,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def setmdaFileList(self,folder_path):
         self._mdaFileList = sorted([file.name for file in folder_path.glob('*.mda')])
             
-    def setSubfolder(self, subfolder_list):
+    def setSubfolderList(self, subfolder_list):
         """Set the subfolders path list in the pop-up list."""
         self.subfolder.clear()
         self.subfolder.addItems(subfolder_list)     
@@ -142,7 +142,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 return subfolder_list
 
             subfolder_list=get_all_subfolders(folder_path, parent_path="")
-            self.setSubfolder(subfolder_list)
+            self.setSubfolderList(subfolder_list)
             
             mda_files_path = list(folder_path.glob("*.mda"))
             self._folderLength = len(mda_files_path)
@@ -166,10 +166,6 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             comment=f"{folder_path} does not exist."
             self.folderNotValid(layout,comment)
-    
-    def setSubFolderPath(self,subfolder_path):
-        parent_folder=self.folder.currentText()
-        self.folder.insertItem(0, subfolder_path+"/"+parent_folder)
 
     def folderNotValid(self,layout,comment):
         """If folder not valid, display no MVC and indicates reason in app status."""

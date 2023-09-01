@@ -86,7 +86,9 @@ class MDA_MVC(QtWidgets.QWidget):
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
         return self.parent.mdaFileList()
-
+    
+    def setSubFolderPath(self,subfolder_path):
+        self.folder.insertItem(0, subfolder_path+"/"+self.folderName)
         
     def splitter_moved(self, key, *arg, **kwargs):
         thread = getattr(self, f"{key}_wait_thread", None)
