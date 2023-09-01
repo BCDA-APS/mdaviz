@@ -134,6 +134,12 @@ class MainWindow(QtWidgets.QMainWindow):
             if mda_files_path:
                 print("pass test 2")
                 self._mdaFilePath = mda_files_path 
+                print(f"{self._folderPath=}")
+                print(f"{self._folderName=}")
+                print(f"{self._folderList=}")
+                print(f"{self._folderLength=}")
+                print(f"{self._mdaFileList=}")
+                print(f"{self._mdaFilePath=}")
                 from .mda_folder import MDA_MVC
                 self.mvc_folder = MDA_MVC(self)
                 layout.addWidget(self.mvc_folder)
