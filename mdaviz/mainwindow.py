@@ -19,12 +19,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setup()
 
     def setup(self):
-        self._folderPath = None
-        self._folderName = None
-        self._folderList = None
-        self._folderLength = None
-        self._mdaFileList = None
-        self._mdaFilePath = None
+        self._folderPath = None     # the full path obj
+        self._folderName = None     # the full path str
+        self._folderRoot = None     # the toor path obj
+        self._folderList = None     # the list of folder in the pull down
+        self._folderLength = None   # the number of mda files in the folder
+        self._mdaFileList = None    # the list of mda file NAME str (name only)
+        self._mdaFilePath = None    # the list of mda file PATH obj (full path)
         self.mvc_folder = None
     
         self.setWindowTitle(APP_TITLE)
@@ -90,12 +91,16 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.setServers(uri_list)
 
     def folderName(self):
-        """Path (str) of the selected folder."""
+        """Full path (str) of the selected folder."""
         return self._folderName
     
     def folderPath(self):
-        """Path (obj) of the selected folder."""
+        """Full path (obj) of the selected folder."""
         return self._folderPath
+    
+    def folderRoot(self):
+        """Root path (obj) of the selected folder."""
+        return self._folderRoot
     
     def folderLength(self):
         """Number of mda files in the selected folder."""
@@ -131,13 +136,15 @@ class MainWindow(QtWidgets.QMainWindow):
             
             self._folderPath = folder_path
             self._folderName = folder_name
-            
+            self._folderRoot = folder_path.parent
+
             def get_all_subfolders(folder_path, parent_path=""):
                 subfolder_list = []
+                if parent_path:  # Don't add the root parent folder
+                    subfolder_list.append(parent_path)
                 for item in folder_path.iterdir():
                     if item.is_dir():
                         new_parent_path = f"{parent_path}/{item.name}" if parent_path else item.name
-                        subfolder_list.append(new_parent_path)
                         subfolder_list += get_all_subfolders(item, new_parent_path)
                 return subfolder_list
 
