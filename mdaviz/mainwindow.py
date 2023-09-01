@@ -163,7 +163,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.setSubfolderList(subfolder_list)
             
         else:
-            comment=f"{folder_path} does not exist."
+            comment=f"{folder_path!r} does not exist."
             self.folderNotValid(layout,comment)
 
             
