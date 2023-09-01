@@ -121,7 +121,7 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def setFolderPath(self, folder_name = DATA_FOLDER):
         """A folder was selected (from the open dialog)."""
-        
+
         folder_path = Path(folder_name)
         layout = self.groupbox.layout()    
 
@@ -129,8 +129,18 @@ class MainWindow(QtWidgets.QMainWindow):
             
             self._folderPath = folder_path
             self._folderName = folder_name
-            sub_list=[item.name for item in folder_path.iterdir()if item.is_dir()]
-            self.setSubfolder(sub_list)
+            
+            def get_all_subfolders(folder_path, parent_path=""):
+                subfolder_list = []
+                for item in folder_path.iterdir():
+                    if item.is_dir():
+                        new_parent_path = f"{parent_path}/{item.name}" if parent_path else item.name
+                        subfolder_list.append(new_parent_path)
+                        subfolder_list += get_all_subfolders(item, new_parent_path)
+                return subfolder_list
+
+            subfolder_list=get_all_subfolders(folder_path, parent_path="")
+            self.setSubfolder(subfolder_list)
             
             mda_files_path = list(folder_path.glob("*.mda"))
             self._folderLength = len(mda_files_path)
