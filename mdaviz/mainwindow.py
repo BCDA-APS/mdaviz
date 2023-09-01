@@ -77,7 +77,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         User chose to open (connect with) a tiled server.
         """
-        pass
+        self.clearContent()
         # can insert item in ComboBox with .insertItem(0,'something')
         # from .tiledserverdialog import TiledServerDialog
 
@@ -126,55 +126,6 @@ class MainWindow(QtWidgets.QMainWindow):
         """Set the subfolders path list in the pop-up list."""
         self.subfolder.clear()
         self.subfolder.addItems(subfolder_list)     
-    
-    # def setFolderPath(self, folder_name = DATA_FOLDER):
-    #     """A folder was selected (from the open dialog)."""
-
-    #     folder_path = Path(folder_name)
-    #     layout = self.groupbox.layout()    
-
-    #     if folder_path.exists() and folder_path.is_dir():   # folder exists
-            
-    #         self._folderPath = folder_path
-    #         self._folderName = folder_name
-    #         self._folderRoot = folder_path.parent
-
-    #         def get_all_subfolders(folder_path, parent_path=""):
-    #             subfolder_list = []
-    #             if parent_path:  # Don't add the root parent folder
-    #                 subfolder_list.append(parent_path)
-    #             for item in folder_path.iterdir():
-    #                 if item.is_dir():
-    #                     new_parent_path = f"{parent_path}/{item.name}" if parent_path else item.name
-    #                     subfolder_list += get_all_subfolders(item, new_parent_path)
-    #             return subfolder_list
-
-    #         subfolder_list=get_all_subfolders(folder_path, parent_path="")
-    #         self.setSubfolderList(subfolder_list)
-            
-    #         mda_files_path = list(folder_path.glob("*.mda"))
-    #         self._folderLength = len(mda_files_path)
-    #         self.info.setText(f"{self._folderLength} mda files")
-            
-            
-    #         if mda_files_path:                              # folder contains mda
-    #             from .mda_folder import MDA_MVC 
-                
-    #             self._mdaFilePath = mda_files_path 
-    #             self.setmdaFileList(folder_path)
-    #             self.setStatus(f"Folder path: {folder_name!r}")
-                
-    #             self.clearContent(clear_sub=False) 
-    #             self.mvc_folder = MDA_MVC(self)
-    #             layout.addWidget(self.mvc_folder)
-                
-    #         else:
-    #             comment=f"No mda files found in {folder_path}."
-    #             self.folderNotValid(layout,comment)
-    #     else:
-    #         comment=f"{folder_path} does not exist."
-    #         self.folderNotValid(layout,comment)
-
 
     def setFolderPath(self, folder_name = DATA_FOLDER):
         """A folder was selected (from the open dialog)."""
@@ -234,6 +185,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def folderNotValid(self,layout,comment):
         """If folder not valid, display no MVC and indicates reason in app status."""
+        self.clearContent()
         self.mvc_folder = None
         layout.addWidget(QtWidgets.QWidget())
         self.setStatus(comment)  
