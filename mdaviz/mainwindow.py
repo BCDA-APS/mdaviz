@@ -37,6 +37,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.folder.currentTextChanged.connect(self.setFolderPath)
         self.subfolder.currentTextChanged.connect(self.setSubFolderPath)
+        self.refresh.clicked.connect(self.setFolderPath)
         
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
 
