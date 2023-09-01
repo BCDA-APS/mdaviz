@@ -38,6 +38,8 @@ class MDA_MVC(QtWidgets.QWidget):
         layout = self.folder_groupbox.layout()
         layout.addWidget(self.mda_folder_tableview)
         self.mda_folder_tableview.displayTable()
+        
+        self.subfolder.currentTextChanged.connect(self.setSubFolderPath)
          
         # self.mda_tableview = mdaTableView(self)
         # layout = self.mda_groupbox.layout()
