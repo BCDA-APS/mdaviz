@@ -39,7 +39,7 @@ class MDA_MVC(QtWidgets.QWidget):
         layout.addWidget(self.mda_folder_tableview)
         self.mda_folder_tableview.displayTable()
         
-        self.parent.subfolder.currentTextChanged.connect(self.parent.setSubFolderPath)
+        # self.parent.subfolder.currentTextChanged.connect(self.parent.setSubFolderPath)
          
         # self.mda_tableview = mdaTableView(self)
         # layout = self.mda_groupbox.layout()
@@ -87,8 +87,10 @@ class MDA_MVC(QtWidgets.QWidget):
         """List of mda file (name only) in the selected folder."""
         return self.parent.mdaFileList()
     
-    def setSubFolderPath(self,subfolder_path):
-        self.folder.insertItem(0, subfolder_path+"/"+self.folderName)
+    # FIXME: this turn into an infinite loop, since updating the folder update 
+    # the subfolder combo box, which triggers the slot again
+    # def setSubFolderPath(self,subfolder_path):
+    #     self.folder.insertItem(0, subfolder_path+"/"+self.folderName)
         
     def splitter_moved(self, key, *arg, **kwargs):
         thread = getattr(self, f"{key}_wait_thread", None)
