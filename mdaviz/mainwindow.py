@@ -196,9 +196,13 @@ class MainWindow(QtWidgets.QMainWindow):
                     if item.is_dir():
                         new_parent_path = f"{parent_path}/{item.name}" if parent_path else item.name
                         subfolder_list += get_all_subfolders(item, new_parent_path)
+                print(f"{folder_path=}")
+                print(f"{parent_path=}")
+                print(f"{subfolder_list=}")
                 return subfolder_list
 
             subfolder_list=get_all_subfolders(folder_path, parent_path="")
+
             self.setSubfolderList(subfolder_list)
         else:
             comment=f"{folder_path} does not exist."
