@@ -187,7 +187,7 @@ class MainWindow(QtWidgets.QMainWindow):
             layout.addWidget(self.mvc_folder)
             
         else:
-            comment=f"No mda files found in {folder_path}."
+            comment=f"No mda files found in {folder_path!r}."
             self.folderNotValid(layout,comment,clear_sub=False)
 
     def folderNotValid(self,layout,comment,clear_sub=True):
