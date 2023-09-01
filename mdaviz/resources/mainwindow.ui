@@ -31,19 +31,19 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="server_label">
+       <widget class="QLabel" name="folder_label">
         <property name="toolTip">
-         <string>URL of the selected tiled server.</string>
+         <string>Recent folders.</string>
         </property>
         <property name="text">
-         <string>Tiled server:   </string>
+         <string>Folder path:   </string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="server_uri">
+       <widget class="QComboBox" name="folder">
         <property name="toolTip">
-         <string>Select tiled server URI</string>
+         <string>Selected path.</string>
         </property>
        </widget>
       </item>
@@ -61,16 +61,16 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="catalogs_label">
+       <widget class="QLabel" name="files_label">
         <property name="text">
-         <string>Catalogs:   </string>
+         <string>File:   </string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="catalogs">
+       <widget class="QComboBox" name="files">
         <property name="toolTip">
-         <string>Choose a catalog from this tiled server.</string>
+         <string>Choose a file from this folder.</string>
         </property>
        </widget>
       </item>
@@ -90,10 +90,10 @@
       <item>
        <widget class="QLabel" name="spec_name">
         <property name="toolTip">
-         <string>Selected catalog's type.</string>
+         <string>Selected folder type.</string>
         </property>
         <property name="text">
-         <string>Catalog type</string>
+         <string>Folder type</string>
         </property>
        </widget>
       </item>

@@ -45,6 +45,13 @@ class MDA_MVC(QtWidgets.QWidget):
         
         self.mda_folder_tableview = mdaFolderTableView(self)
         layout = self.folder_groupbox.layout()
+        #####
+        layout.addWidget(self.mda_folder_search_panel)
+        self.mda_folder_search_panel.setupFile(self.mdaFileName())
+        self.parent.files.currentTextChanged.connect(self.mda_folder_search_panel.setupFile)
+        self.mda_folder_search_panel.next.released.connect(self.mda_folder_search_panel.doNext)
+        self.mda_folder_search_panel.previous.released.connect(self.mda_folder_search_panel.doPrevious)
+        ####
         layout.addWidget(self.mda_folder_tableview)
         self.mda_folder_tableview.displayTable()
          
@@ -84,8 +91,8 @@ class MDA_MVC(QtWidgets.QWidget):
     def folderName(self):
         return self.parent.folderName()    
     
-    def mdaFilePath(self):
-        return self.parent.mdaFilePath()  
+    # def mdaFilePath(self):
+    #     return self.parent.mdaFilePath()  
 
     def mdaFileName(self):
         return self.parent.mdaFileName()  

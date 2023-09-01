@@ -89,7 +89,7 @@ class mdaFolderTableView(QtWidgets.QWidget):
 
     def __init__(self, parent):
         self.parent = parent
-        
+
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
@@ -178,8 +178,8 @@ class mdaFolderTableView(QtWidgets.QWidget):
     def folderName(self):
         return self.parent.folderName()    
     
-    def mdaFilePath(self):
-        return self.parent.mdaFilePath()  
+    # def mdaFilePath(self):
+    #     return self.parent.mdaFilePath()  
 
     def mdaFileName(self):
         return self.parent.mdaFileName()  
