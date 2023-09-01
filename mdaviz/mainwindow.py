@@ -9,6 +9,7 @@ from .app_settings import settings
 
 UI_FILE = utils.getUiFileName(__file__)
 DATA_FOLDER = Path(__file__).parent / "data"
+DATA_FOLDER_UNVALID = Path(__file__).parent / "fakedata"
 
 class MainWindow(QtWidgets.QMainWindow):
     """The main window of the app, built in Qt designer."""
@@ -195,7 +196,7 @@ class MainWindow(QtWidgets.QMainWindow):
         unique_paths = set()
         new_path_list = []
         if not folder_list: 
-            candidate_paths = ["", str(DATA_FOLDER), "Other..."]
+            candidate_paths = ["", str(DATA_FOLDER),str(DATA_FOLDER_UNVALID) "Other..."]
         else:
             candidate_paths = folder_list
         for p in candidate_paths:
