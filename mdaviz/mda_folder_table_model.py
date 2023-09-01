@@ -24,7 +24,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
             "Prefix": lambda file: file.rsplit('_', 1)[0],
             "Scan #": lambda file: int(file.rsplit('_', 1)[1].split('.')[0]),
             "Points": lambda file: 'TODO',# TODO: get_file_pts
-            "Dim": lambda file: 'TODO',   # TODO: get_file_dim need to extract data from the file for that
+            "Dim": lambda file: 'TODO',   # TODO: get_file_dim 
             "Size": lambda file: self.get_file_size(file),  
             "Date": lambda file: self.get_file_date(file),  
         }
@@ -34,7 +34,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         # self.setPageOffset(DEFAULT_PAGE_OFFSET, init=True)
         # self.setPageSize(DEFAULT_PAGE_SIZE, init=True)
         self.setAscending(True)
-        self.folderSize = 0   # FIXME: using parent.folderSize for debugging; will need to change that (if folder grows)
+        self.folderLength = 0   
 
         super().__init__()
         
@@ -74,7 +74,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
     # def doPager(self, action, value=None):
     #     # print(f"doPager {action =}, {value =}")
 
-    #     folder_size = self.folderSize()
+    #     folder_size = self.folderLength()
     #     offset = self.pageOffset()
     #     size = self.pageSize()
     #     # print(f"{folder_size=} {offset=}  {size=}")
@@ -107,7 +107,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
     # def isPagerAtEnd(self):
     #     # number is zero-based
     #     last_row_number = self.pageOffset() + len(self.fileList())
-    #     return last_row_number >= self.folderSize()
+    #     return last_row_number >= self.folderLength()
 
     # ------------ local methods
 
@@ -189,7 +189,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         self._ascending = value
 
     # def pagerStatus(self):
-    #     total = self.folderSize()
+    #     total = self.folderLength()
     #     if total == 0:
     #         text = "No files"
     #     else:

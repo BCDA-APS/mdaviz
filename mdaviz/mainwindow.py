@@ -8,7 +8,6 @@ from .app_settings import settings
 
 UI_FILE = utils.getUiFileName(__file__)
 DATA_FOLDER = Path(__file__).parent / "data"
-MDA_SPEC_NAME = "mda folder"
 
 class MainWindow(QtWidgets.QMainWindow):
     """The main window of the app, built in Qt designer."""
@@ -22,7 +21,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._folderPath = None
         self._folderName = None
         self._folderList = None
-        self._folderSize = None
+        self._folderLength = None
         self._mdaFileList = None
         self.mvc_folder = None
     
@@ -31,7 +30,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
-        # TODO: set up open dialog for folder
 
         self.folder.currentTextChanged.connect(self.setFolderPath)
         
@@ -44,7 +42,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def setStatus(self, text, timeout=0):
         """Write new status to the main window."""
         self.statusbar.showMessage(str(text), msecs=timeout)
-        # TODO: log the text
 
     def doAboutDialog(self, *args, **kw):
         """
@@ -72,7 +69,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.close()
 
-    # TODO: adapt doOpen to files and folders
     def doOpen(self, *args, **kw):
         """
         User chose to open (connect with) a tiled server.
@@ -98,9 +94,9 @@ class MainWindow(QtWidgets.QMainWindow):
         """Path (obj) of the selected folder."""
         return self._folderPath
     
-    def folderSize(self):
+    def folderLength(self):
         """Number of mda files in the selected folder."""
-        return self._folderSize
+        return self._folderLength
     
     def folderList(self):
         """Folder path (str) list in the pull down menu."""
@@ -113,10 +109,8 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def setmdaFileList(self,folder_path):
         self._mdaFileList = sorted([file.name for file in folder_path.glob('*.mda')])
-        self._folderSize = len(self._mdaFileList)
-        print(f"Number of files: {self._folderSize}")
-        # TODO: what if new file gets added to the directory, you want to append those to the list without the user having to reselect the file nor the entire MVC
-        # TODO: check for new file automatically (every x seconds)
+        self._folderLength = len(self._mdaFileList)
+        self.spec_name.setText(f"{self._folderLength} mda files")
     
     def setFiles(self, files_list):
         """Set the file names in the pop-up list."""
@@ -125,25 +119,15 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def setFolderPath(self, folder_name = DATA_FOLDER):
         """A folder was selected (from the open dialog)."""
-        # TODO: check for validity (does it has mda in there?)
-        # if len(catalog_name) == 0 or catalog_name not in self.server():
-        #     if len(catalog_name) > 0:
-        #         self.setStatus(f"Catalog {catalog_name!r} is not supported now.")
-        #     return
-
         folder_path = Path(folder_name)
-
         self._folderPath = folder_path
         self._folderName = folder_name
         
-        # FIXME the is bellow is not longer very relevant since we now convert the str to path just above; need to check for validity above
+        # FIXME the is bellow is not longer very relevant since we now convert the str to path 
+        # just above; need to check for validity instead
         if isinstance(folder_path,Path):   
             from .mda_folder import MDA_MVC
 
-            # TODO: check if the folder has mda files in it 
-            spec_name = MDA_SPEC_NAME
-            self.spec_name.setText(spec_name)
-            # TODO do we really want to display that or is there a more relevant message to display? (eg valid folder?)
             self.setStatus(f"Folder path: {folder_name!r}")
             
             self.setmdaFileList(folder_path)
@@ -166,11 +150,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """Set the list of recent folder and remove duplicate"""
         unique_paths = set()
         new_path_list = []
-        # TODO: save last folder in settings
         if not folder_list: 
-            # TODO: create KEY for recent folder
-            #previous_path = settings.getKey(TILED_SERVER_SETTINGS_KEY)
-            #candidate_paths = ["", str(DATA_FOLDER), previous_path, "Other..."]
             candidate_paths = ["", str(DATA_FOLDER), "Other..."]
         else:
             candidate_paths = folder_list
@@ -193,13 +173,6 @@ class MainWindow(QtWidgets.QMainWindow):
         if folder_path == "Other...":
             self.doOpen()  
         else:
-            # TODO: check that folder exist
-            # TODO: same folder path to settings 
-            # if url.isValid() and not url.isRelative():
-            #     settings.setKey(TILED_SERVER_SETTINGS_KEY, server_uri)
-            # else:
-            #     return
-            # previous_uri = settings.getKey(TILED_SERVER_SETTINGS_KEY) or ""
             if folder_path is None:
                 self.setStatus("No folder selected.")
                 return

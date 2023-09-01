@@ -18,7 +18,7 @@ class _AlignCenterDelegate(QtWidgets.QStyledItemDelegate):
         option.displayAlignment = QtCore.Qt.AlignCenter
         
 class MDAFolderTableView(QtWidgets.QWidget):
-    ui_file = utils.getUiFileName(__file__)  # WARNING no ui file, just a tab in mda_folder_search.ui
+    ui_file = utils.getUiFileName(__file__)  
 
     def __init__(self, parent):
         self.parent = parent
@@ -28,7 +28,7 @@ class MDAFolderTableView(QtWidgets.QWidget):
         self.setup()
         
     def setup(self):
-        header = self.tableView.horizontalHeader()   #tableview belong to mda_folder_search
+        header = self.tableView.horizontalHeader()  
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)        
         
         # for button_name in "first back next last".split():
@@ -106,7 +106,7 @@ class MDAFolderTableView(QtWidgets.QWidget):
     def doFileSelected(self, index):
         model = self.tableView.model()
         if model is not None:
-            self.setStatus(f"A file as been selected: {index!r}")
+            self.setStatus(f"A file as been selected.")
 
     def folderName(self):
         """Path (str) of the selected folder."""
@@ -116,9 +116,9 @@ class MDAFolderTableView(QtWidgets.QWidget):
         """Path (obj) of the selected folder."""
         return self.parent.folderPath()
     
-    def folderSize(self):
+    def folderLength(self):
         """Number of mda files in the selected folder."""
-        return self.parent.folderSize()
+        return self.parent.folderLength()
     
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""

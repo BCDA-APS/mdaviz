@@ -18,10 +18,9 @@ from . import utils
 
 class MDA_MVC(QtWidgets.QWidget):
     """MVC class for mda files."""
-    # UI file name matches this module, different extension
     ui_file = utils.getUiFileName(__file__)
-    motion_wait_time = 1  # wait for splitter motion to stop to update settings
-
+    motion_wait_time = 1  
+    
     def __init__(self, parent):
         self.parent = parent
 
@@ -78,9 +77,9 @@ class MDA_MVC(QtWidgets.QWidget):
         """Path (obj) of the selected folder."""
         return self.parent.folderPath()
     
-    def folderSize(self):
+    def folderLength(self):
         """Number of mda files in the selected folder."""
-        return self.parent.folderSize()
+        return self.parent.folderLength()
     
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
@@ -112,10 +111,6 @@ class MDA_MVC(QtWidgets.QWidget):
 
         splitter = getattr(self, key)
         while time.time() < getattr(self, f"{key}_deadline"):
-            # self.setStatus(
-            #     f"Wait: {time.time()=:.3f}"
-            #     f"  {getattr(self, f'{key}_deadline')=:.3f}"
-            # )
             time.sleep(self.motion_wait_time * 0.1)
 
         sname = self.splitter_settings_name(key)
