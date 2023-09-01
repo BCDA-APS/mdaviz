@@ -61,14 +61,14 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="files_label">
+       <widget class="QLabel" name="subfolder_label">
         <property name="text">
-         <string>File:   </string>
+         <string>Subfolder</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="files">
+       <widget class="QComboBox" name="subfolder">
         <property name="toolTip">
          <string>Choose a file from this folder.</string>
         </property>
@@ -88,12 +88,12 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="spec_name">
+       <widget class="QLabel" name="info">
         <property name="toolTip">
          <string>Selected folder type.</string>
         </property>
         <property name="text">
-         <string>Folder type</string>
+         <string>Folder info</string>
         </property>
        </widget>
       </item>

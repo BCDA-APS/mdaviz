@@ -110,12 +110,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def setmdaFileList(self,folder_path):
         self._mdaFileList = sorted([file.name for file in folder_path.glob('*.mda')])
         self._folderLength = len(self._mdaFileList)
-        self.spec_name.setText(f"{self._folderLength} mda files")
+        self.info.setText(f"{self._folderLength} mda files")
     
     def setFiles(self, files_list):
         """Set the file names in the pop-up list."""
-        self.files.clear()
-        self.files.addItems(files_list)     
+        self.subfolder.clear()
+        self.subfolder.addItems(files_list)     
     
     def setFolderPath(self, folder_name = DATA_FOLDER):
         """A folder was selected (from the open dialog)."""
@@ -132,10 +132,10 @@ class MainWindow(QtWidgets.QMainWindow):
             
             self.setmdaFileList(folder_path)
             mda_list = self.mdaFileList()
-            self.setFiles(mda_list)
+            #self.setFiles(mda_list)
 
             layout = self.groupbox.layout()
-            self.clearContent(clear_file=False)
+            self.clearContent(clear_sub=False)
                 
             self.mvc_folder = MDA_MVC(self)
             layout.addWidget(self.mvc_folder)
@@ -178,11 +178,11 @@ class MainWindow(QtWidgets.QMainWindow):
                 return
             self.setFolderPath(folder_path) 
 
-    def clearContent(self, clear_file=True):
+    def clearContent(self, clear_sub=True):
         layout = self.groupbox.layout()
         utils.removeAllLayoutWidgets(layout)
-        if clear_file:
-            self.files.clear()
+        if clear_sub:
+            self.subfolder.clear()
 
 
 

@@ -25,20 +25,20 @@
       </property>
       <widget class="QGroupBox" name="folder_groupbox">
        <property name="title">
-        <string>Search Terms</string>
+        <string/>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout"/>
       </widget>
       <widget class="QGroupBox" name="mda_groupbox">
        <property name="title">
-        <string>Matching Run(s)</string>
+        <string/>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_2"/>
       </widget>
      </widget>
      <widget class="QGroupBox" name="viz_groupbox">
       <property name="title">
-       <string>Visualization</string>
+       <string/>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout"/>
      </widget>
