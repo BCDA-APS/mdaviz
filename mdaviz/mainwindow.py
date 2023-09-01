@@ -9,7 +9,7 @@ from .app_settings import settings
 
 UI_FILE = utils.getUiFileName(__file__)
 DATA_FOLDER = Path(__file__).parent / "data"
-DATA_FOLDER_UNVALID = Path(__file__).parent / "fakedata"
+DATA_FOLDER_UNVALID = Path(__file__).parent / "fake_folder"
 
 class MainWindow(QtWidgets.QMainWindow):
     """The main window of the app, built in Qt designer."""
