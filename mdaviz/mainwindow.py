@@ -196,7 +196,7 @@ class MainWindow(QtWidgets.QMainWindow):
         unique_paths = set()
         new_path_list = []
         if not folder_list: 
-            candidate_paths = ["", str(DATA_FOLDER),str(DATA_FOLDER_UNVALID) "Other..."]
+            candidate_paths = ["", str(DATA_FOLDER),str(DATA_FOLDER_UNVALID), "Other..."]
         else:
             candidate_paths = folder_list
         for p in candidate_paths:
