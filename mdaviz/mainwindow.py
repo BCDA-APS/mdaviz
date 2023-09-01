@@ -199,7 +199,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
                 return subfolder_list
 
-            subfolder_list=get_all_subfolders(folder_path, parent_path="")
+            subfolder_list=get_all_subfolders(folder_path, folder_path.name)
             print(f"{folder_path=}")
             print(f"{subfolder_list=}")
             
