@@ -97,12 +97,9 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.setServers(uri_list)
 
     def doRefresh(self):
-        current_folder = self.folder.currentText()
-        current_subfolder = self.subfolder.currentText()
-        current_data_folder = str(Path(current_folder).parent)+current_subfolder
-        print(f"{current_folder=}")
-        print(f"{current_subfolder=}")
-        print(f"{current_data_folder=}")
+        current_folder = self.folderName()
+        current_subfolder = self.subFolderName()
+        current_data_folder = self.dataPath()
         self.setStatus(f"Refreshing content: {current_data_folder!r}")
         self.setFolderPath(current_folder)
         self.subfolder.setCurrentText(current_subfolder)
