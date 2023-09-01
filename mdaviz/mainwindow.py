@@ -98,7 +98,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def doRefresh(self):
         current_folder = self.folder.currentText()
-        self.setStatus(f"Refreshing content: {current_folder!r}")
+        self.setStatus("Refreshing folder...")
         self.setFolderPath(current_folder)
         
     def dataPath(self):
