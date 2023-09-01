@@ -99,7 +99,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setStatus(f"Refreshing content: {current_folder!r}")
         self.setFolderPath(current_folder)
 
-
     def folderName(self):
         """Full path (str) of the selected folder."""
         return self._folderName
@@ -120,21 +119,30 @@ class MainWindow(QtWidgets.QMainWindow):
         """Folder path (str) list in the pull down menu."""
         return self._folderList
     
+    def subFolderList(self):
+        """Subfolder path (str) list in the pull down menu."""
+        return self._subFolderList
+    
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
         return self._mdaFileList
     
     def mdaFilePath(self):
         """List of mda path (obj) in the selected folder."""
-        return self._mdaFileList    
+        return self._mdaFilePath    
     
     def setmdaFileList(self,folder_path):
-        self._mdaFileList = sorted([file.name for file in folder_path.glob('*.mda')])
+        if folder_path:
+            self._mdaFileList = sorted([file.name for file in folder_path.glob('*.mda')])
+        else:
+            self._mdaFileList = None
             
     def setSubfolderList(self, subfolder_list):
         """Set the subfolders path list in the pop-up list."""
-        self.subfolder.clear()
-        self.subfolder.addItems(subfolder_list)     
+        self._subFolderList = subfolder_list
+        if subfolder_list:
+            self.subfolder.clear()
+            self.subfolder.addItems(subfolder_list)     
 
     def setFolderPath(self, folder_name):
         """A folder was selected (from the open dialog)."""
@@ -157,12 +165,14 @@ class MainWindow(QtWidgets.QMainWindow):
                         new_parent_path = f"{parent_path}/{item.name}" if parent_path else item.name
                         subfolder_list += get_all_subfolders(item, new_parent_path)
 
-                return subfolder_list
-
-            subfolder_list=get_all_subfolders(folder_path, folder_path.name)          
-            self.setSubfolderList(subfolder_list)
+                return subfolder_list         
+            self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
             
         else:
+            self._folderPath = None
+            self._folderName = None
+            self._folderRoot = None
+            self.setSubfolderList()
             comment=f"{folder_path!r} does not exist."
             self.folderNotValid(layout,comment)
 
@@ -170,22 +180,16 @@ class MainWindow(QtWidgets.QMainWindow):
     def setSubFolderPath(self,subfolder_name):
         folder_path=self.folderRoot() / Path(subfolder_name)
         layout = self.groupbox.layout()   
-        
-        mda_files_path = list(folder_path.glob("*.mda"))
-        self._folderLength = len(mda_files_path)
-        self.info.setText(f"{self._folderLength} mda files")
-        
-        if mda_files_path:                              # folder contains mda
+        self._mdaFilePath = list(folder_path.glob("*.mda"))
+        self.setmdaFileList(folder_path)
+        self._folderLength = len(self._mdaFilePath)
+        self.info.setText(f"{self._folderLength} mda files")        
+        if self._mdaFilePath:                              # folder contains mda
             from .mda_folder import MDA_MVC 
-            
-            self._mdaFilePath = mda_files_path 
-            self.setmdaFileList(folder_path)
             self.setStatus(f"Folder path: {str(folder_path)!r}")
-            
             self.clearContent(clear_sub=False) 
             self.mvc_folder = MDA_MVC(self)
-            layout.addWidget(self.mvc_folder)
-            
+            layout.addWidget(self.mvc_folder)      
         else:
             comment=f"No mda files found in {folder_path!r}."
             self.folderNotValid(layout,comment,clear_sub=False)
