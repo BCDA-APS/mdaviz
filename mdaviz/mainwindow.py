@@ -115,7 +115,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._mdaFileList = sorted([file.name for file in folder_path.glob('*.mda')])
             
     def setSubfolder(self, subfolder_list):
-        """Set the file names in the pop-up list."""
+        """Set the subfolders path list in the pop-up list."""
         self.subfolder.clear()
         self.subfolder.addItems(subfolder_list)     
     
@@ -129,7 +129,7 @@ class MainWindow(QtWidgets.QMainWindow):
             
             self._folderPath = folder_path
             self._folderName = folder_name
-            sub_list=[str(item) for item in folder_path.iterdir()if item.is_dir()]
+            sub_list=[item.path for item in folder_path.iterdir()if item.is_dir()]
             self.setSubfolder(sub_list)
             
             mda_files_path = list(folder_path.glob("*.mda"))
