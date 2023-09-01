@@ -77,6 +77,7 @@ class MainWindow(QtWidgets.QMainWindow):
         User chose to open (connect with) a tiled server.
         """
         pass
+        # can insert item in ComboBox with .insertItem(0,'something')
         # from .tiledserverdialog import TiledServerDialog
 
         # server_uri = TiledServerDialog.getServer(self)
@@ -169,8 +170,8 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def setSubFolderPath(self,subfolder_path):
         parent_folder=self.folder.currentText()
-        self.setFolderPath(subfolder_path+"/"+parent_folder)
-    
+        self.folder.insertItem(0, subfolder_path+"/"+parent_folder)
+
     def folderNotValid(self,layout,comment):
         """If folder not valid, display no MVC and indicates reason in app status."""
         self.mvc_folder = None
