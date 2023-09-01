@@ -21,8 +21,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def setup(self):
         self._folderPath = None
         self._folderName = None
+        ###
         self._folderList = None
         self._mdaFileName = None
+        ###
+        self._folderSize = None
         self._mdaFileList = None
         self.mvc_folder = None
     
@@ -109,8 +112,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def mdaFileList(self):
         return self._mdaFileList
     
+    def folderSize(self):
+        return self._folderSize
+    
     def setmdaFileList(self,folder_path):
         self._mdaFileList = sorted([file.name for file in folder_path.glob('*.mda')])
+        self._folderSize = len(self._mdaFileList)
+        print(f"Number of files: {self._folderSize}")
         # TODO: what if new file gets added to the directory, you want to append those to the list without the user having to reselect the file nor the entire MVC
         # TODO: check for new file automatically (every x seconds)
     
