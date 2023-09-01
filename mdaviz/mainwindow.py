@@ -183,10 +183,12 @@ class MainWindow(QtWidgets.QMainWindow):
                     subfolder_list.append(parent_path)
                 for item in folder_path.iterdir():
                     if item.is_dir():
+                        if item.name.startswith('.'):
+                            continue   # skip hidden folders
                         new_parent_path = f"{parent_path}/{item.name}" if parent_path else item.name
                         subfolder_list += get_all_subfolders(item, new_parent_path)
-
-                return subfolder_list         
+                return subfolder_list 
+                    
             self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
             
         else:
@@ -212,7 +214,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.mvc_folder = MDA_MVC(self)
                 layout.addWidget(self.mvc_folder)      
             else:
-                comment=f"No mda files found in {folder_path!r}."
+                comment=f"No mda files found in {str(folder_path)!r}."
                 self.folderNotValid(layout,comment,clear_sub=False)
 
     def folderNotValid(self,layout,comment,clear_sub=True):
