@@ -37,7 +37,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.folder.currentTextChanged.connect(self.setFolderPath)
         self.subfolder.currentTextChanged.connect(self.setSubFolderPath)
-        self.refresh.clicked.connect(self.setFolderPath)
+        self.refresh.clicked.connect(self.doRefresh)
         
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
 
@@ -46,7 +46,8 @@ class MainWindow(QtWidgets.QMainWindow):
         return self.statusbar.currentMessage()
 
     def setStatus(self, text, timeout=0):
-        """Write new status to the main window."""
+        """Write new status to the main window and terminal output."""
+        print(text)
         self.statusbar.showMessage(str(text), msecs=timeout)
 
     def doAboutDialog(self, *args, **kw):
@@ -92,6 +93,12 @@ class MainWindow(QtWidgets.QMainWindow):
         # else:
         #     uri_list.insert(0, server_uri)
         # self.setServers(uri_list)
+
+    def doRefresh(self):
+        current_folder = self.folderName()
+        self.setStatus(f"Refreshing content: {current_folder!r}")
+        self.setFolderPath(current_folder)
+
 
     def folderName(self):
         """Full path (str) of the selected folder."""
