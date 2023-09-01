@@ -22,7 +22,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def setup(self):
         self._folderPath = None     # the full path obj
         self._folderName = None     # the full path str
-        self._folderRoot = None     # the toor path obj
         self._folderList = None     # the list of folder in the pull down
         self._folderLength = None   # the number of mda files in the folder
         self._mdaFileList = None    # the list of mda file NAME str (name only)
@@ -96,8 +95,22 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def doRefresh(self):
         current_folder = self.folderName()
-        self.setStatus(f"Refreshing content: {current_folder!r}")
+        current_subfolder = self.subFolderName()
+        current_data_folder = self.dataPath()
+        self.setStatus(f"Refreshing content: {current_data_folder!r}")
         self.setFolderPath(current_folder)
+        self.subfolder.setCurrentText(current_subfolder)
+        
+    def dataPath(self):
+        """
+        Full path object for the displayed data:
+            dataPath = folderPath.parent + Path(subFolderName)
+        """
+        return self._dataPath
+
+    def subFolderName(self):
+        """Subfolder name (str) of the selected subfolder."""
+        return self._subFolderName
 
     def folderName(self):
         """Full path (str) of the selected folder."""
@@ -106,10 +119,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def folderPath(self):
         """Full path (obj) of the selected folder."""
         return self._folderPath
-    
-    def folderRoot(self):
-        """Root path (obj) of the selected folder."""
-        return self._folderRoot
     
     def folderLength(self):
         """Number of mda files in the selected folder."""
@@ -137,6 +146,16 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self._mdaFileList = None
             
+    def setDataPath(self):
+        """
+        Full path object for the displayed data:
+            dataPath = folderPath.parent + Path(subFolderName)
+        """
+        self._dataPath = self.folderPath.parent + Path(self.subFolderName)
+
+    def setSubFolderName(self):
+        self._subFolderName = self.subfolder.currentText()
+            
     def setSubfolderList(self, subfolder_list):
         """Set the subfolders path list in the pop-up list."""
         self._subFolderList = subfolder_list
@@ -154,7 +173,6 @@ class MainWindow(QtWidgets.QMainWindow):
             
             self._folderPath = folder_path
             self._folderName = folder_name
-            self._folderRoot = folder_path.parent
 
             def get_all_subfolders(folder_path, parent_path=""):
                 subfolder_list = []
@@ -171,7 +189,6 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self._folderPath = ''
             self._folderName = ''
-            self._folderRoot = ''
             self.setSubfolderList([])
             comment=f"{folder_path!r} does not exist."
             self.folderNotValid(layout,comment)
