@@ -21,10 +21,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def setup(self):
         self._folderPath = None
         self._folderName = None
-        ###
         self._folderList = None
-        self._mdaFileName = None
-        ###
         self._folderSize = None
         self._mdaFileList = None
         self.mvc_folder = None
@@ -37,7 +34,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # TODO: set up open dialog for folder
 
         self.folder.currentTextChanged.connect(self.setFolderPath)
-        self.files.currentTextChanged.connect(self.setFile)
         
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
 
@@ -95,25 +91,25 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.setServers(uri_list)
 
     def folderName(self):
+        """Path (str) of the selected folder."""
         return self._folderName
     
     def folderPath(self):
+        """Path (obj) of the selected folder."""
         return self._folderPath
     
+    def folderSize(self):
+        """Number of mda files in the selected folder."""
+        return self._folderSize
+    
     def folderList(self):
+        """Folder path (str) list in the pull down menu."""
         return self._folderList
     
-    def mdaFileName(self):
-        return self._mdaFileName
-    
-    # def mdaFilePath(self):
-    #     return self._folderPath / self._mdaFileName
-    
     def mdaFileList(self):
+        """List of mda file (name only) in the selected folder."""
         return self._mdaFileList
     
-    def folderSize(self):
-        return self._folderSize
     
     def setmdaFileList(self,folder_path):
         self._mdaFileList = sorted([file.name for file in folder_path.glob('*.mda')])
@@ -125,13 +121,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def setFiles(self, files_list):
         """Set the file names in the pop-up list."""
         self.files.clear()
-        self.files.addItems(files_list)   
-        
-    def setFile(self,mda_file):
-        print(f"{mda_file=}")
-        full_path_str=self.folderName()+'/'+mda_file
-        self.setStatus(f"Selected file {full_path_str!r}.")      
-        self._mdaFileName=mda_file
+        self.files.addItems(files_list)     
     
     def setFolderPath(self, folder_name = DATA_FOLDER):
         """A folder was selected (from the open dialog)."""
