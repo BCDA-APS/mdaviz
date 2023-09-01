@@ -200,20 +200,25 @@ class MainWindow(QtWidgets.QMainWindow):
 
             subfolder_list=get_all_subfolders(folder_path, parent_path="")
             self.setSubfolderList(subfolder_list)
+        else:
+            comment=f"{folder_path} does not exist."
+            self.folderNotValid(layout,comment)
+
             
     def setSubFolderPath(self,subfolder_name):
         folder_path=self.folderRoot+Path(subfolder_name)
+        layout = self.groupbox.layout()   
+        
         mda_files_path = list(folder_path.glob("*.mda"))
         self._folderLength = len(mda_files_path)
         self.info.setText(f"{self._folderLength} mda files")
-        
         
         if mda_files_path:                              # folder contains mda
             from .mda_folder import MDA_MVC 
             
             self._mdaFilePath = mda_files_path 
             self.setmdaFileList(folder_path)
-            self.setStatus(f"Folder path: {folder_name!r}")
+            self.setStatus(f"Folder path: {str(folder_path)!r}")
             
             self.clearContent(clear_sub=False) 
             self.mvc_folder = MDA_MVC(self)
@@ -222,9 +227,6 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             comment=f"No mda files found in {folder_path}."
             self.folderNotValid(layout,comment)
-    else:
-        comment=f"{folder_path} does not exist."
-        self.folderNotValid(layout,comment)
 
     def folderNotValid(self,layout,comment):
         """If folder not valid, display no MVC and indicates reason in app status."""
