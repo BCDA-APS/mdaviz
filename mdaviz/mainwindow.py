@@ -181,11 +181,11 @@ class MainWindow(QtWidgets.QMainWindow):
             
         else:
             comment=f"No mda files found in {folder_path}."
-            self.folderNotValid(layout,comment)
+            self.folderNotValid(layout,comment,clear_sub=False)
 
-    def folderNotValid(self,layout,comment):
+    def folderNotValid(self,layout,comment,clear_sub=True):
         """If folder not valid, display no MVC and indicates reason in app status."""
-        self.clearContent()
+        self.clearContent(clear_sub)
         self.mvc_folder = None
         layout.addWidget(QtWidgets.QWidget())
         self.setStatus(comment)  
