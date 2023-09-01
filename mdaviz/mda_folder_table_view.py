@@ -108,22 +108,17 @@ class MDAFolderTableView(QtWidgets.QWidget):
         if model is not None:
             self.setStatus(f"A file has been selected.")
 
-    def folderName(self):
-        """Path (str) of the selected folder."""
-        return self.parent.folderName()
+    def dataPath(self):
+        """Path (obj) of the data folder."""
+        return self.parent.dataPath()
     
-    def folderPath(self):
-        """Path (obj) of the selected folder."""
-        return self.parent.folderPath()
-    
-    def folderLength(self):
+    def mdaFileLen(self):
         """Number of mda files in the selected folder."""
-        return self.parent.folderLength()
+        return self.parent.mdaFileLen()
     
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
         return self.parent.mdaFileList()
-
 
     def setStatus(self, text):
         self.parent.setStatus(text)

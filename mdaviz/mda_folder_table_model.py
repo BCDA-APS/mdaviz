@@ -126,7 +126,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         return folder
     
     def get_file_path(self,file):
-        return self.folderPath() / file
+        return self.dataPath() / file
 
     def get_file_size(self,file):
         filepath = self.get_file_path(file)
@@ -154,9 +154,9 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
     def setFileList(self, value):
         self._fileList = value
 
-    def folderPath(self):
+    def dataPath(self):
         """Path (obj) of the selected folder."""
-        return self.parent.folderPath()
+        return self.parent.dataPath()
     
     # def pageOffset(self):
     #     return self._pageOffset
