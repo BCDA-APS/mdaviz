@@ -23,6 +23,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._folderList = None
         self._folderLength = None
         self._mdaFileList = None
+        self._mdaFilePath = None
         self.mvc_folder = None
     
         self.setWindowTitle(APP_TITLE)
@@ -106,6 +107,9 @@ class MainWindow(QtWidgets.QMainWindow):
         """List of mda file (name only) in the selected folder."""
         return self._mdaFileList
     
+    def mdaFilePath(self):
+        """List of mda path (obj) in the selected folder."""
+        return self._mdaFileList    
     
     def setmdaFileList(self,folder_path):
         self._mdaFileList = sorted([file.name for file in folder_path.glob('*.mda')])
@@ -122,29 +126,30 @@ class MainWindow(QtWidgets.QMainWindow):
         folder_path = Path(folder_name)
         self._folderPath = folder_path
         self._folderName = folder_name
-        
-        # FIXME the is bellow is not longer very relevant since we now convert the str to path 
-        # just above; need to check for validity instead
-        if isinstance(folder_path,Path):   
-            from .mda_folder import MDA_MVC
-
-            self.setStatus(f"Folder path: {folder_name!r}")
-            
-            self.setmdaFileList(folder_path)
-            mda_list = self.mdaFileList()
-            #self.setFiles(mda_list)
-
-            layout = self.groupbox.layout()
-            self.clearContent(clear_sub=False)
-                
-            self.mvc_folder = MDA_MVC(self)
-            layout.addWidget(self.mvc_folder)
-
+        layout = self.groupbox.layout()    
+        # check for validity: folder exists and contains mda files.
+        if folder_path.exists() and folder_path.is_dir():
+            mda_files_path = list(folder_path.glob("*.mda"))
+            if mda_files_path:
+                self._mdaFilePath = mda_files_path 
+                from .mda_folder import MDA_MVC
+                self.mvc_folder = MDA_MVC(self)
+                layout.addWidget(self.mvc_folder)
+                self.setStatus(f"Folder path: {folder_name!r}")
+                self.setmdaFileList(folder_path)
+                self.clearContent(clear_sub=False) 
+            else:
+                comment=f"No mda files found in {folder_path}."
+                self.folderNotValid(layout,comment)
         else:
-            self.mvc_folder = None
-            layout.addWidget(QtWidgets.QWidget())  # nothing to show
-
+            comment=f"{folder_path} does not exist."
+            self.folderNotValid(layout,comment)
   
+    def folderNotValid(self,layout,comment):
+        """If folder not valid, display no MVC and indicates reason in app status."""
+        self.mvc_folder = None
+        layout.addWidget(QtWidgets.QWidget())
+        self.setStatus(comment)  
 
     def setFolderList(self,folder_list=None):
         """Set the list of recent folder and remove duplicate"""
@@ -155,7 +160,7 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             candidate_paths = folder_list
         for p in candidate_paths:
-            if p not in unique_paths:  # Check for duplicates
+            if p not in unique_paths:
                 unique_paths.add(p)
                 new_path_list.append(p)
         self._folderList = new_path_list            
