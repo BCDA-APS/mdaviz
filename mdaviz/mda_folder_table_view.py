@@ -106,7 +106,7 @@ class MDAFolderTableView(QtWidgets.QWidget):
     def doFileSelected(self, index):
         model = self.tableView.model()
         if model is not None:
-            self.setStatus(f"A file as been selected.")
+            self.setStatus(f"A file has been selected.")
 
     def folderName(self):
         """Path (str) of the selected folder."""
