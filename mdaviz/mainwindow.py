@@ -136,7 +136,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.subfolder.clear()
         self.subfolder.addItems(subfolder_list)     
 
-    def setFolderPath(self, folder_name = DATA_FOLDER):
+    def setFolderPath(self, folder_name):
         """A folder was selected (from the open dialog)."""
 
         folder_path = Path(folder_name)
