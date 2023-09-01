@@ -63,7 +63,7 @@
       <item>
        <widget class="QLabel" name="subfolder_label">
         <property name="text">
-         <string>Subfolders</string>
+         <string>Folder:</string>
         </property>
        </widget>
       </item>
