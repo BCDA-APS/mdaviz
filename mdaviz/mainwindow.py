@@ -1,4 +1,5 @@
 from pathlib import Path
+from functools import partial
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
@@ -33,6 +34,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionExit.triggered.connect(self.doClose)
 
         self.folder.currentTextChanged.connect(self.setFolderPath)
+        self.subfolder.currentTextChanged.connect(self.setSubFolderPath)
         
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
 
@@ -164,7 +166,11 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             comment=f"{folder_path} does not exist."
             self.folderNotValid(layout,comment)
-  
+    
+    def setSubFolderPath(self,subfolder_path):
+        parent_folder=self.folder.currentText()
+        self.setFolderPath(subfolder_path+"/"+parent_folder)
+    
     def folderNotValid(self,layout,comment):
         """If folder not valid, display no MVC and indicates reason in app status."""
         self.mvc_folder = None
