@@ -68,58 +68,11 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
                 return self.columnLabels[section]
             else:
                 return str(section + 1)  # may want to alter at some point
-            
-    # ------------ methods required by the results table
-
-    # def doPager(self, action, value=None):
-    #     # print(f"doPager {action =}, {value =}")
-
-    #     folder_size = self.folderLength()
-    #     offset = self.pageOffset()
-    #     size = self.pageSize()
-    #     # print(f"{folder_size=} {offset=}  {size=}")
-
-    #     if action == "first":
-    #         self.setPageOffset(0)
-    #     elif action == "pageSize":
-    #         self.setPageSize(value)
-    #     elif action == "back":
-    #         value = offset - size
-    #         value = min(value, folder_size)
-    #         value = max(value, 0)
-    #         self.setPageOffset(value)
-    #     elif action == "next":
-    #         value = offset + size
-    #         value = min(value, folder_size - size)
-    #         value = max(value, 0)
-    #         self.setPageOffset(value)
-    #     elif action == "last":
-    #         value = folder_size - size
-    #         value = max(value, 0)
-    #         self.setPageOffset(value)
-
-    #     self.setFileList(self._get_fileList())
-    #     # print(f"{self.pageOffset()=} {self.pageSize()=}")
-
-    # def isPagerAtStart(self):
-    #     return self.pageOffset() == 0
-
-    # def isPagerAtEnd(self):
-    #     # number is zero-based
-    #     last_row_number = self.pageOffset() + len(self.fileList())
-    #     return last_row_number >= self.folderLength()
 
     # ------------ local methods
 
     def _get_fileList(self):
         folder = self.folder()
-        # start = self.pageOffset()
-        # end = start + self.pageSize()
-        # gen = folder[start-1: end]
-        # ascending = 1 if self.ascending() else -1
-        # if ascending < 0:
-        #     gen.reverse()
-        # return list(gen) 
         ascending = 1 if self.ascending() else -1
         if ascending < 0:
             folder.reverse()
@@ -157,44 +110,10 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
     def dataPath(self):
         """Path (obj) of the selected data folder (folder + subfolder)."""
         return self.parent.dataPath()
-    
-    # def pageOffset(self):
-    #     return self._pageOffset
-
-    # def pageSize(self):
-    #     return self._pageSize
-
-    # def setPageOffset(self, offset, init=False):
-    #     """Set the pager offset."""
-    #     offset = int(offset)
-    #     if init:
-    #         self._pageOffset = offset
-    #     elif offset != self._pageOffset:
-    #         self._pageOffset = offset
-    #         self.layoutChanged.emit()
-
-    # def setPageSize(self, value, init=False):
-    #     """Set the pager size."""
-    #     value = int(value)
-    #     if init:
-    #         self._pageSize = value
-    #     elif value != self._pageSize:
-    #         self._pageSize = value
-    #         self.layoutChanged.emit()
 
     def ascending(self):
         return self._ascending
 
     def setAscending(self, value):
         self._ascending = value
-
-    # def pagerStatus(self):
-    #     total = self.folderLength()
-    #     if total == 0:
-    #         text = "No files"
-    #     else:
-    #         start = self.pageOffset()
-    #         end = start + len(self.fileList())
-    #         text = f"{start + 1}-{end} of {total} files"
-    #     return text
 
