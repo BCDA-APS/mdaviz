@@ -140,18 +140,11 @@ class MainWindow(QtWidgets.QMainWindow):
         """List of mda path (obj) in the selected folder."""
         return self._mdaFilePath    
     
-    def setmdaFileList(self,folder_path):
-        if folder_path:
-            self._mdaFileList = sorted([file.name for file in folder_path.glob('*.mda')])
+    def setmdaFileList(self,data_path):
+        if data_path:
+            self._mdaFileList = sorted([file.name for file in data_path.glob('*.mda')])
         else:
             self._mdaFileList = None
-            
-    def setDataPath(self):
-        """
-        Full path object for the displayed data:
-            dataPath = folderPath.parent + Path(subFolderName)
-        """
-        self._dataPath = self.folderPath.parent + Path(self.subFolderName)
 
     def setSubFolderName(self):
         self._subFolderName = self.subfolder.currentText()
@@ -191,27 +184,29 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self._folderPath = ''
             self._folderName = ''
+            self._dataPath = ''
             self.setSubfolderList([])
-            comment=f"{str(folder_path)!r} does not exist."
+            comment=f"{str(folder_path)!r} - invalid path."
             self.folderNotValid(layout,comment)
 
             
     def setSubFolderPath(self,subfolder_name):
         if subfolder_name:
-            folder_path=self.folderPath().parent / Path(subfolder_name)
+            data_path=self.folderPath().parent / Path(subfolder_name)
+            self._dataPath = data_path
             layout = self.groupbox.layout()   
-            self._mdaFilePath = list(folder_path.glob("*.mda"))
-            self.setmdaFileList(folder_path)
+            self._mdaFilePath = list(data_path.glob("*.mda"))
             self._mdaFileLen = len(self._mdaFilePath)
+            self.setmdaFileList(data_path)
             self.info.setText(f"{self._mdaFileLen} mda files")        
             if self._mdaFilePath:                              # folder contains mda
                 from .mda_folder import MDA_MVC 
-                self.setStatus(f"Folder path: {str(folder_path)!r}")
+                self.setStatus(f"Folder path: {str(data_path)!r}")
                 self.clearContent(clear_sub=False) 
                 self.mvc_folder = MDA_MVC(self)
                 layout.addWidget(self.mvc_folder)      
             else:
-                comment=f"No mda files found in {str(folder_path)!r}."
+                comment=f"No mda files found in {str(data_path)!r}."
                 self.folderNotValid(layout,comment,clear_sub=False)
 
     def folderNotValid(self,layout,comment,clear_sub=True):

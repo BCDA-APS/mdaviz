@@ -70,12 +70,8 @@ class MDA_MVC(QtWidgets.QWidget):
             splitter.splitterMoved.connect(partial(self.splitter_moved, key))
     
     def dataPath(self):
-        """Path (obj) of the data folder."""
+        """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
         return self.parent.dataPath()
-    
-    def folderPath(self):
-        """Path (obj) of the data folder."""
-        return self.parent.folderPath()
     
     def mdaFileLen(self):
         """Number of mda files in the selected folder."""
