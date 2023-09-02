@@ -39,7 +39,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.folder.currentTextChanged.connect(self.setFolderPath)
         self.subfolder.currentTextChanged.connect(self.setSubFolderPath)
-        self.refresh.clicked.connect(self.doRefresh)
         
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
 
@@ -96,11 +95,6 @@ class MainWindow(QtWidgets.QMainWindow):
         #     uri_list.insert(0, server_uri)
         # self.setServers(uri_list)
 
-    def doRefresh(self):
-        current_folder = self.folder.currentText()
-        self.setStatus("Refreshing folder...")
-        self.setFolderPath(current_folder)
-        
     def dataPath(self):
         """
         Full path object for the displayed data:
@@ -188,7 +182,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.setSubfolderList([])
             comment=f"{str(folder_path)!r} - invalid path."
             self.folderNotValid(layout,comment)
-
             
     def setSubFolderPath(self,subfolder_name):
         if subfolder_name:

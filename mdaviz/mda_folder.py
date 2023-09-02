@@ -39,6 +39,8 @@ class MDA_MVC(QtWidgets.QWidget):
         layout.addWidget(self.mda_folder_tableview)
         self.mda_folder_tableview.displayTable()
         
+        self.parent.refresh.released.connect(self.doRefresh)
+        
         # self.mda_tableview = mdaTableView(self)
         # layout = self.mda_groupbox.layout()
         # layout.addWidget(self.mda_tableview)
@@ -80,6 +82,24 @@ class MDA_MVC(QtWidgets.QWidget):
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
         return self.parent.mdaFileList()
+    
+    def doRefresh(self):
+        self.setStatus("Refreshing folder...")
+        current_folder = self.dataPath()
+        current_mdaFileList = self.mdaFileList()
+        self.parent.setmdaFileList(current_folder)
+        new_mdaFileList = self.mdaFileList()
+        if new_mdaFileList:
+            self.mda_folder_tableview.displayTable()
+            difference = [item for item in new_mdaFileList if item not in current_mdaFileList] 
+            if difference:
+                self.setStatus(f"Loading new files: {difference}")
+            else:
+                self.setStatus(f"No new files.")
+        else:
+            self.setStatus(f"Nothing to update.")
+
+            
         
     def splitter_moved(self, key, *arg, **kwargs):
         thread = getattr(self, f"{key}_wait_thread", None)
