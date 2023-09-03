@@ -34,6 +34,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
+        try:
+            self.open.released.disconnect()
+        except TypeError:  # No slots connected yet
+            pass
+        self.open.released.connect(self.doOpen)
 
         self.folder.currentTextChanged.connect(self.setFolderPath)
         self.subfolder.currentTextChanged.connect(self.setSubFolderPath)
@@ -83,13 +88,11 @@ class MainWindow(QtWidgets.QMainWindow):
         open_dialog = OpenDialog(self)
         dir_name = open_dialog.getExistingDirectory(self, "Select a Directory")
         if dir_name:
-            print(f"Selected folder: {dir_name=}")
             folder_list = self.folderList()
             if folder_list[0] == "":
                 folder_list[0] = dir_name
             else:
                 folder_list.insert(0, dir_name)
-            print(f"{folder_list=}")
             self.setRecent(folder_list)
 
         # can insert item in ComboBox with .insertItem(0,'something')
@@ -223,18 +226,7 @@ class MainWindow(QtWidgets.QMainWindow):
         folder_list = self.folderList()
         self.folder.clear()
         self.folder.addItems(folder_list)
-
-    # def connectFolder(self,folder_path):
-    #     """Connect to the server URI and return URI and client"""
-    #     self.clearContent()
-    #     if folder_path == "Other...":
-    #         self.doOpen()  
-    #     else:
-    #         if folder_path is None:
-    #             self.setStatus("No folder selected.")
-    #             return
-    #         self.setFolderPath(folder_path) 
-
+        
     def clearContent(self, clear_sub=True):
         layout = self.groupbox.layout()
         utils.removeAllLayoutWidgets(layout)

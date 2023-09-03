@@ -37,7 +37,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>back.png</normaloff>back.png</iconset>
+          <normaloff>open.png</normaloff>open.png</iconset>
         </property>
         <property name="iconSize">
          <size>
