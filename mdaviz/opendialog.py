@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QFileDialog
 from . import utils
 from .app_settings import settings
 
-# RECENT_DIRECTORY = from settings
+DIR_SETTINGS_KEY = "directory"
 
 class OpenDialog(QFileDialog):
     """Open a file dialog GUI window."""
@@ -20,6 +20,7 @@ class OpenDialog(QFileDialog):
 
     def setup(self):
         self.setModal(True)
-        # self.setDirectory(RECENT_DIRECTORY)
+        recent_directory = settings.getKey(DIR_SETTINGS_KEY) or ""
+        self.setDirectory(recent_directory)
         
         

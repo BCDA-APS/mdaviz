@@ -6,6 +6,7 @@ from PyQt5 import QtWidgets
 from . import APP_TITLE
 from . import utils
 from .app_settings import settings
+from .opendialog import DIR_SETTINGS_KEY
 
 UI_FILE = utils.getUiFileName(__file__)
 DATA_FOLDER = Path(__file__).parent / "data"
@@ -213,7 +214,11 @@ class MainWindow(QtWidgets.QMainWindow):
         unique_paths = set()
         new_path_list = []
         if not folder_list: 
-            candidate_paths = ["", str(DATA_FOLDER),str(DATA_FOLDER_UNVALID), "Other..."]
+            previous_folder = settings.getKey(DIR_SETTINGS_KEY)
+            if previous_folder:
+                candidate_paths = ["", previous_folder,str(DATA_FOLDER),str(DATA_FOLDER_UNVALID), "Other..."]
+            else:
+                candidate_paths = ["", str(DATA_FOLDER),str(DATA_FOLDER_UNVALID), "Other..."]
         else:
             candidate_paths = folder_list
         for p in candidate_paths:
