@@ -27,7 +27,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self._folderList = None     # the list of folder in pull down 1
         self._subFolderList = None  # the list of subfolder in pull down 2
         self._mdaFileList = None    # the list of mda file NAME str (name only)
-        self._mdaFilePath = None    # the list of mda file PATH obj (full path)
         self._mdaFileLen = None     # the number of mda files in the list
         self.mvc_folder = None
     
@@ -117,11 +116,7 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
-        return self._mdaFileList
-    
-    def mdaFilePath(self):
-        """List of mda path (obj) in the selected folder."""
-        return self._mdaFilePath    
+        return self._mdaFileList   
     
     def setmdaFileList(self,data_path):
         if data_path:
@@ -177,11 +172,11 @@ class MainWindow(QtWidgets.QMainWindow):
             data_path=self.folderPath().parent / Path(subfolder_name)
             self._dataPath = data_path
             layout = self.groupbox.layout()   
-            self._mdaFilePath = list(data_path.glob("*.mda"))
-            self._mdaFileLen = len(self._mdaFilePath)
+            mda_files_path = list(data_path.glob("*.mda"))
+            self._mdaFileLen = len(mda_files_path)
             self.setmdaFileList(data_path)
             self.info.setText(f"{self._mdaFileLen} mda files")        
-            if self._mdaFilePath:                              # folder contains mda
+            if mda_files_path:                              # folder contains mda
                 from .mda_folder import MDA_MVC 
                 self.setStatus(f"Folder path: {str(data_path)!r}")
                 self.clearContent(clear_sub=False) 
