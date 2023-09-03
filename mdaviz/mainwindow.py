@@ -173,7 +173,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 from .mda_folder import MDA_MVC 
                 self.setStatus(f"Folder path: {str(data_path)!r}")
                 self.clearContent(clear_sub=False) 
-                print("New instance of MDA_MVC")
                 self.mvc_folder = MDA_MVC(self)
                 layout.addWidget(self.mvc_folder)      
             else:
