@@ -21,9 +21,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def setup(self):
         self._dataPath = None       # the combined data path obj (folder+subfolder)
-        self._subFolderName = None  # the subfolder (str) selected in pull down 2
         self._folderPath = None     # the path obj from pull down 1
         self._folderList = None     # the list of folder in pull down 1
+        self._subFolderPath = None  # the subfolder path (obj) selected in pull down 2
         self._subFolderList = None  # the list of subfolder in pull down 2
         self._mdaFileList = None    # the list of mda file NAME str (name only)
         self._mdaFileLen = None     # the number of mda files in the list
@@ -85,13 +85,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def dataPath(self):
         """
         Full path object for the displayed data:
-            dataPath = folderPath.parent + Path(subFolderName)
+            dataPath = folderPath.parent + subFolderPath
         """
         return self._dataPath
 
-    def subFolderName(self):
+    def subFolderPath(self):
         """Subfolder name (str) of the selected subfolder."""
-        return self._subFolderName
+        return self._subFolderPath
     
     def folderPath(self):
         """Full path (obj) of the selected folder."""
@@ -120,7 +120,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self._mdaFileList = None
 
     def setSubFolderName(self):
-        self._subFolderName = self.subfolder.currentText()
+        self._subFolderPath = Path(self.subfolder.currentText())
             
     def setSubfolderList(self, subfolder_list):
         """Set the subfolders path list in the pop-up list."""
@@ -154,8 +154,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
             
         else:
-            self._folderPath = ''
-            self._dataPath = ''
+            self._folderPath = None
+            self._dataPath = None
             self.setSubfolderList([])
             comment=f"{str(folder_path)!r} - invalid path."
             self.folderNotValid(layout,comment)
