@@ -83,17 +83,6 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         self.clearContent()
         # can insert item in ComboBox with .insertItem(0,'something')
-        # from .tiledserverdialog import TiledServerDialog
-
-        # server_uri = TiledServerDialog.getServer(self)
-        # if not server_uri:
-        #     self.clearContent()
-        # uri_list = self.serverList()
-        # if uri_list[0] == "":
-        #     uri_list[0] = server_uri
-        # else:
-        #     uri_list.insert(0, server_uri)
-        # self.setServers(uri_list)
 
     def dataPath(self):
         """
