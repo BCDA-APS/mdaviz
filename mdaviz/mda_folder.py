@@ -40,29 +40,6 @@ class MDA_MVC(QtWidgets.QWidget):
         self.mda_folder_tableview.displayTable()
         
         self.parent.refresh.released.connect(self.doRefresh)
-        
-        # self.mda_tableview = mdaTableView(self)
-        # layout = self.mda_groupbox.layout()
-        # layout.addWidget(self.mda_tableview)
-        # self.mda_tableview.displayTable()
-
-        # self.mda_viz = mdaRunVisualization(self)
-        # layout = self.viz_groupbox.layout()
-        # layout.addWidget(self.mda_viz)
-
-        # # connect search signals with tableview update
-        # # fmt: off
-        # widgets = [
-        #     [self.brc_search_panel.plan_name, "returnPressed"],
-        #     [self.brc_search_panel.scan_id, "returnPressed"],
-        #     [self.brc_search_panel.status, "returnPressed"],
-        #     [self.brc_search_panel.positioners, "returnPressed"],
-        #     [self.brc_search_panel.detectors, "returnPressed"],
-        #     [self.brc_search_panel.date_time_widget.apply, "released"],
-        # ]
-        # # fmt: on
-        # for widget, signal in widgets:
-        #     getattr(widget, signal).connect(self.brc_tableview.displayTable)
 
         # save/restore splitter sizes in application settings
         for key in "hsplitter vsplitter".split():
