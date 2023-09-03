@@ -28,12 +28,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self._mdaFileList = None    # the list of mda file NAME str (name only)
         self._mdaFileLen = None     # the number of mda files in the list
         self.mvc_folder = None
+        self.checkMdaFiles = True
     
         self.setWindowTitle(APP_TITLE)
         self.setRecent(None)
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
+        try:
+            self.open.released.disconnect()
+        except TypeError:  # No slots connected yet
+            pass
+        self.open.released.connect(self.doOpen)
 
         self.folder.currentTextChanged.connect(self.setFolderPath)
         self.subfolder.currentTextChanged.connect(self.setSubFolderPath)
@@ -79,8 +85,19 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         User chose to open (connect with) a tiled server.
         """
-        self.clearContent()
-        # can insert item in ComboBox with .insertItem(0,'something')
+        from .opendialog import OpenDialog
+        self.setStatus("Please select a folder...")
+        open_dialog = OpenDialog(self)
+        dir_name = open_dialog.getExistingDirectory(self, "Select a Directory")
+        if dir_name:
+            folder_list = self.folderList()
+            if folder_list[0] == "":
+                folder_list[0] = dir_name
+            else:
+                folder_list.insert(0, dir_name)
+            self.setRecent(folder_list)
+            
+
 
     def dataPath(self):
         """
@@ -125,40 +142,44 @@ class MainWindow(QtWidgets.QMainWindow):
     def setSubfolderList(self, subfolder_list):
         """Set the subfolders path list in the pop-up list."""
         self._subFolderList = subfolder_list
-        if subfolder_list:
-            self.subfolder.clear()
-            self.subfolder.addItems(subfolder_list)     
+        self.subfolder.clear()
+        self.subfolder.addItems(subfolder_list)
 
     def setFolderPath(self, folder_name):
-        """A folder was selected (from the open dialog)."""
-
-        folder_path = Path(folder_name)
-        layout = self.groupbox.layout()    
-
-        if folder_path.exists() and folder_path.is_dir():   # folder exists
-            
-            self._folderPath = folder_path
-
-            def get_all_subfolders(folder_path, parent_path=""):
-                subfolder_list = []
-                if parent_path:  # Don't add the root parent folder
-                    subfolder_list.append(parent_path)
-                for item in folder_path.iterdir():
-                    if item.is_dir():
-                        if item.name.startswith('.'):
-                            continue   # skip hidden folders
-                        new_parent_path = f"{parent_path}/{item.name}" if parent_path else item.name
-                        subfolder_list += get_all_subfolders(item, new_parent_path)
-                return subfolder_list 
+        """A folder was selected (from the open dialog)."""   
+        
+        if folder_name == "Other...":
+            self.doOpen() 
                     
-            self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
-            
         else:
-            self._folderPath = None
-            self._dataPath = None
-            self.setSubfolderList([])
-            comment=f"{str(folder_path)!r} - invalid path."
-            self.folderNotValid(layout,comment)
+            
+            folder_path = Path(folder_name)
+            layout = self.groupbox.layout()    
+
+            if folder_path.exists() and folder_path.is_dir():   # folder exists
+                
+                self._folderPath = folder_path
+
+                def get_all_subfolders(folder_path, parent_path=""):
+                    subfolder_list = []
+                    if parent_path:  # Don't add the root parent folder
+                        subfolder_list.append(parent_path)
+                    for item in folder_path.iterdir():
+                        if item.is_dir():
+                            if item.name.startswith('.'):
+                                continue   # skip hidden folders
+                            new_parent_path = f"{parent_path}/{item.name}" if parent_path else item.name
+                            subfolder_list += get_all_subfolders(item, new_parent_path)
+                    return subfolder_list 
+                        
+                self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
+                
+            else:
+                self._folderPath = None
+                self._dataPath = None
+                self.setSubfolderList([])
+                comment=f"{str(folder_path)!r} - invalid path."
+                self.folderNotValid(layout,comment)
             
     def setSubFolderPath(self,subfolder_name):
         if subfolder_name:
@@ -176,8 +197,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.mvc_folder = MDA_MVC(self)
                 layout.addWidget(self.mvc_folder)      
             else:
-                comment=f"No mda files found in {str(data_path)!r}."
-                self.folderNotValid(layout,comment,clear_sub=False)
+                if self.checkMdaFiles == True:
+                    comment=f"No mda files found in {str(data_path)!r}."
+                    self.folderNotValid(layout,comment,clear_sub=False)
 
     def folderNotValid(self,layout,comment,clear_sub=True):
         """If folder not valid, display no MVC and indicates reason in app status."""
@@ -187,7 +209,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setStatus(comment)  
 
     def setFolderList(self,folder_list=None):
-        """Set the list of recent folder and remove duplicate"""
+        """Set the list of recent folder and remove duplicate"""   
         unique_paths = set()
         new_path_list = []
         if not folder_list: 
@@ -204,20 +226,11 @@ class MainWindow(QtWidgets.QMainWindow):
         """Set the server URIs in the pop-up list"""
         self.setFolderList(folder_list)
         folder_list = self.folderList()
+        self.checkMdaFiles = False
         self.folder.clear()
         self.folder.addItems(folder_list)
-
-    def connectFolder(self,folder_path):
-        """Connect to the server URI and return URI and client"""
-        self.clearContent()
-        if folder_path == "Other...":
-            self.doOpen()  
-        else:
-            if folder_path is None:
-                self.setStatus("No folder selected.")
-                return
-            self.setFolderPath(folder_path) 
-
+        self.checkMdaFiles = True
+        
     def clearContent(self, clear_sub=True):
         layout = self.groupbox.layout()
         utils.removeAllLayoutWidgets(layout)
