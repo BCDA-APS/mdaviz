@@ -20,10 +20,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setup()
 
     def setup(self):
-        self._dataPath = None       # the combined data path obj (folder+subfolder)
+        self._dataPath = None       # the combined data path obj (folder.parent + subfolder)
         self._folderPath = None     # the path obj from pull down 1
         self._folderList = None     # the list of folder in pull down 1
-        self._subFolderPath = None  # the subfolder path (obj) selected in pull down 2
+        self._subFolderPath = None  # the subfolder path obj selected in pull down 2
         self._subFolderList = None  # the list of subfolder in pull down 2
         self._mdaFileList = None    # the list of mda file NAME str (name only)
         self._mdaFileLen = None     # the number of mda files in the list
@@ -173,6 +173,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 from .mda_folder import MDA_MVC 
                 self.setStatus(f"Folder path: {str(data_path)!r}")
                 self.clearContent(clear_sub=False) 
+                print("New instance of MDA_MVC")
                 self.mvc_folder = MDA_MVC(self)
                 layout.addWidget(self.mvc_folder)      
             else:
