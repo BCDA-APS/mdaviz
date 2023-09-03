@@ -85,6 +85,7 @@ class MainWindow(QtWidgets.QMainWindow):
         User chose to open (connect with) a tiled server.
         """
         from .opendialog import OpenDialog
+        self.setStatus("Please select a folder...")
         open_dialog = OpenDialog(self)
         dir_name = open_dialog.getExistingDirectory(self, "Select a Directory")
         if dir_name:
@@ -94,8 +95,8 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 folder_list.insert(0, dir_name)
             self.setRecent(folder_list)
+            
 
-        # can insert item in ComboBox with .insertItem(0,'something')
 
     def dataPath(self):
         """
