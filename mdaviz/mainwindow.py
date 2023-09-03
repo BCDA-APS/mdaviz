@@ -28,6 +28,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._mdaFileList = None    # the list of mda file NAME str (name only)
         self._mdaFileLen = None     # the number of mda files in the list
         self.mvc_folder = None
+        self.checkMdaFiles = True
     
         self.setWindowTitle(APP_TITLE)
         self.setRecent(None)
@@ -141,16 +142,15 @@ class MainWindow(QtWidgets.QMainWindow):
     def setSubfolderList(self, subfolder_list):
         """Set the subfolders path list in the pop-up list."""
         self._subFolderList = subfolder_list
-        if subfolder_list:
-            self.subfolder.clear()
-            self.subfolder.addItems(subfolder_list)     
+        self.subfolder.clear()
+        self.subfolder.addItems(subfolder_list)
 
     def setFolderPath(self, folder_name):
-        """A folder was selected (from the open dialog)."""
+        """A folder was selected (from the open dialog)."""   
         
         if folder_name == "Other...":
-            self.doOpen()  
-            
+            self.doOpen() 
+                    
         else:
             
             folder_path = Path(folder_name)
@@ -197,8 +197,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.mvc_folder = MDA_MVC(self)
                 layout.addWidget(self.mvc_folder)      
             else:
-                comment=f"No mda files found in {str(data_path)!r}."
-                self.folderNotValid(layout,comment,clear_sub=False)
+                if self.checkMdaFiles == True:
+                    comment=f"No mda files found in {str(data_path)!r}."
+                    self.folderNotValid(layout,comment,clear_sub=False)
 
     def folderNotValid(self,layout,comment,clear_sub=True):
         """If folder not valid, display no MVC and indicates reason in app status."""
@@ -208,7 +209,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setStatus(comment)  
 
     def setFolderList(self,folder_list=None):
-        """Set the list of recent folder and remove duplicate"""
+        """Set the list of recent folder and remove duplicate"""   
         unique_paths = set()
         new_path_list = []
         if not folder_list: 
@@ -225,8 +226,10 @@ class MainWindow(QtWidgets.QMainWindow):
         """Set the server URIs in the pop-up list"""
         self.setFolderList(folder_list)
         folder_list = self.folderList()
+        self.checkMdaFiles = False
         self.folder.clear()
         self.folder.addItems(folder_list)
+        self.checkMdaFiles = True
         
     def clearContent(self, clear_sub=True):
         layout = self.groupbox.layout()
