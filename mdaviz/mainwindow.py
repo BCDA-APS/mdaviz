@@ -23,7 +23,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self._dataPath = None       # the combined data path obj (folder+subfolder)
         self._subFolderName = None  # the subfolder (str) selected in pull down 2
         self._folderPath = None     # the path obj from pull down 1
-        self._folderName = None     # the path str from pull down 1
         self._folderList = None     # the list of folder in pull down 1
         self._subFolderList = None  # the list of subfolder in pull down 2
         self._mdaFileList = None    # the list of mda file NAME str (name only)
@@ -93,18 +92,10 @@ class MainWindow(QtWidgets.QMainWindow):
     def subFolderName(self):
         """Subfolder name (str) of the selected subfolder."""
         return self._subFolderName
-
-    def folderName(self):
-        """Full path (str) of the selected folder."""
-        return self._folderName
     
     def folderPath(self):
         """Full path (obj) of the selected folder."""
         return self._folderPath
-    
-    def mdaFileLen(self):
-        """Number of mda files in the selected folder."""
-        return self._mdaFileLen
     
     def folderList(self):
         """Folder path (str) list in the pull down menu."""
@@ -117,6 +108,10 @@ class MainWindow(QtWidgets.QMainWindow):
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
         return self._mdaFileList   
+    
+    def mdaFileLen(self):
+        """Number of mda files in the selected folder."""
+        return self._mdaFileLen
     
     def setmdaFileList(self,data_path):
         if data_path:
@@ -143,7 +138,6 @@ class MainWindow(QtWidgets.QMainWindow):
         if folder_path.exists() and folder_path.is_dir():   # folder exists
             
             self._folderPath = folder_path
-            self._folderName = folder_name
 
             def get_all_subfolders(folder_path, parent_path=""):
                 subfolder_list = []
@@ -161,7 +155,6 @@ class MainWindow(QtWidgets.QMainWindow):
             
         else:
             self._folderPath = ''
-            self._folderName = ''
             self._dataPath = ''
             self.setSubfolderList([])
             comment=f"{str(folder_path)!r} - invalid path."
