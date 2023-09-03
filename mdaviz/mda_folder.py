@@ -39,6 +39,10 @@ class MDA_MVC(QtWidgets.QWidget):
         layout.addWidget(self.mda_folder_tableview)
         self.mda_folder_tableview.displayTable()
         
+        try:
+            self.parent.refresh.released.disconnect()
+        except TypeError:  # No slots connected yet
+            pass
         self.parent.refresh.released.connect(self.doRefresh)
 
         # save/restore splitter sizes in application settings
