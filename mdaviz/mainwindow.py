@@ -9,7 +9,7 @@ from .app_settings import settings
 from .opendialog import DIR_SETTINGS_KEY
 
 UI_FILE = utils.getUiFileName(__file__)
-DATA_FOLDER = Path(__file__).parent / "data"
+MAX_RECENT_DIRS = 5
 DATA_FOLDER_UNVALID = Path(__file__).parent / "fake_folder"
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -46,6 +46,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.subfolder.currentTextChanged.connect(self.setSubFolderPath)
         
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
+        print("Settings are saved in:", settings.fileName())
 
     @property
     def status(self):
@@ -158,7 +159,6 @@ class MainWindow(QtWidgets.QMainWindow):
             layout = self.groupbox.layout()    
 
             if folder_path.exists() and folder_path.is_dir():   # folder exists
-                
                 self._folderPath = folder_path
 
                 def get_all_subfolders(folder_path, parent_path=""):
@@ -174,6 +174,17 @@ class MainWindow(QtWidgets.QMainWindow):
                     return subfolder_list 
                         
                 self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
+                
+                # Update the list of recent directories in settings
+                recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)
+                recent_dirs = recent_dirs_str.split(',') if recent_dirs_str else []                
+                if folder_name in recent_dirs:
+                    recent_dirs.remove(folder_name)
+                recent_dirs.insert(0, str(folder_path))
+                recent_dirs = recent_dirs[:MAX_RECENT_DIRS]
+                recent_dirs = [dir for dir in recent_dirs if dir != '.']
+                settings.setKey(DIR_SETTINGS_KEY, ','.join(recent_dirs))
+                
                 
             else:
                 self._folderPath = None
@@ -213,12 +224,12 @@ class MainWindow(QtWidgets.QMainWindow):
         """Set the list of recent folder and remove duplicate"""   
         unique_paths = set()
         new_path_list = []
+        candidate_paths = ["",str(DATA_FOLDER_UNVALID), "Other..."]
         if not folder_list: 
-            previous_folder = settings.getKey(DIR_SETTINGS_KEY)
-            if previous_folder:
-                candidate_paths = ["", previous_folder,str(DATA_FOLDER),str(DATA_FOLDER_UNVALID), "Other..."]
-            else:
-                candidate_paths = ["", str(DATA_FOLDER),str(DATA_FOLDER_UNVALID), "Other..."]
+            recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)
+            recent_dirs = recent_dirs_str.split(',') if recent_dirs_str else []
+            if recent_dirs:
+                candidate_paths[1:1] = recent_dirs
         else:
             candidate_paths = folder_list
         for p in candidate_paths:
