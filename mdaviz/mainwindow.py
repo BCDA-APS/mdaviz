@@ -79,7 +79,19 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         User chose to open (connect with) a tiled server.
         """
-        self.clearContent()
+        from .opendialog import OpenDialog
+        open_dialog = OpenDialog(self)
+        dir_name = open_dialog.getExistingDirectory(self, "Select a Directory")
+        if dir_name:
+            print(f"Selected folder: {dir_name=}")
+            folder_list = self.folderList()
+            if folder_list[0] == "":
+                folder_list[0] = dir_name
+            else:
+                folder_list.insert(0, dir_name)
+            print(f"{folder_list=}")
+            self.setRecent(folder_list)
+
         # can insert item in ComboBox with .insertItem(0,'something')
 
     def dataPath(self):
@@ -131,34 +143,39 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def setFolderPath(self, folder_name):
         """A folder was selected (from the open dialog)."""
-
-        folder_path = Path(folder_name)
-        layout = self.groupbox.layout()    
-
-        if folder_path.exists() and folder_path.is_dir():   # folder exists
-            
-            self._folderPath = folder_path
-
-            def get_all_subfolders(folder_path, parent_path=""):
-                subfolder_list = []
-                if parent_path:  # Don't add the root parent folder
-                    subfolder_list.append(parent_path)
-                for item in folder_path.iterdir():
-                    if item.is_dir():
-                        if item.name.startswith('.'):
-                            continue   # skip hidden folders
-                        new_parent_path = f"{parent_path}/{item.name}" if parent_path else item.name
-                        subfolder_list += get_all_subfolders(item, new_parent_path)
-                return subfolder_list 
-                    
-            self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
+        
+        if folder_name == "Other...":
+            self.doOpen()  
             
         else:
-            self._folderPath = None
-            self._dataPath = None
-            self.setSubfolderList([])
-            comment=f"{str(folder_path)!r} - invalid path."
-            self.folderNotValid(layout,comment)
+            
+            folder_path = Path(folder_name)
+            layout = self.groupbox.layout()    
+
+            if folder_path.exists() and folder_path.is_dir():   # folder exists
+                
+                self._folderPath = folder_path
+
+                def get_all_subfolders(folder_path, parent_path=""):
+                    subfolder_list = []
+                    if parent_path:  # Don't add the root parent folder
+                        subfolder_list.append(parent_path)
+                    for item in folder_path.iterdir():
+                        if item.is_dir():
+                            if item.name.startswith('.'):
+                                continue   # skip hidden folders
+                            new_parent_path = f"{parent_path}/{item.name}" if parent_path else item.name
+                            subfolder_list += get_all_subfolders(item, new_parent_path)
+                    return subfolder_list 
+                        
+                self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
+                
+            else:
+                self._folderPath = None
+                self._dataPath = None
+                self.setSubfolderList([])
+                comment=f"{str(folder_path)!r} - invalid path."
+                self.folderNotValid(layout,comment)
             
     def setSubFolderPath(self,subfolder_name):
         if subfolder_name:
@@ -207,16 +224,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.folder.clear()
         self.folder.addItems(folder_list)
 
-    def connectFolder(self,folder_path):
-        """Connect to the server URI and return URI and client"""
-        self.clearContent()
-        if folder_path == "Other...":
-            self.doOpen()  
-        else:
-            if folder_path is None:
-                self.setStatus("No folder selected.")
-                return
-            self.setFolderPath(folder_path) 
+    # def connectFolder(self,folder_path):
+    #     """Connect to the server URI and return URI and client"""
+    #     self.clearContent()
+    #     if folder_path == "Other...":
+    #         self.doOpen()  
+    #     else:
+    #         if folder_path is None:
+    #             self.setStatus("No folder selected.")
+    #             return
+    #         self.setFolderPath(folder_path) 
 
     def clearContent(self, clear_sub=True):
         layout = self.groupbox.layout()

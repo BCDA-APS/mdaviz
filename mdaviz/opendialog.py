@@ -1,8 +1,11 @@
-from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QFileDialog
 
+from . import utils
+from .app_settings import settings
 
+# RECENT_DIRECTORY = from settings
 
-class OpenDialog(QtWidgets.QDialog.QFileDialog):
+class OpenDialog(QFileDialog):
     """Open a file dialog GUI window."""
 
     # UI file name matches this module, different extension
@@ -16,5 +19,7 @@ class OpenDialog(QtWidgets.QDialog.QFileDialog):
         self.setup()
 
     def setup(self):
-
         self.setModal(True)
+        # self.setDirectory(RECENT_DIRECTORY)
+        
+        
