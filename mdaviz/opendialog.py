@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QFileDialog
 
-import os
+from pathlib import Path
 from . import utils
 from .app_settings import settings
 
@@ -23,7 +23,7 @@ class OpenDialog(QFileDialog):
         self.setModal(True)
         recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)
         recent_dirs = recent_dirs_str.split(',') if recent_dirs_str else []
-        default_dir = recent_dirs[0] if recent_dirs else os.path.expanduser("~")
+        default_dir = recent_dirs[0] if recent_dirs else str(Path.home())
         self.setDirectory(default_dir)
         
         

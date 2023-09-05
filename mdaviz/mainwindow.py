@@ -1,6 +1,4 @@
 from pathlib import Path
-from functools import partial
-from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from . import APP_TITLE
@@ -10,7 +8,7 @@ from .opendialog import DIR_SETTINGS_KEY
 
 UI_FILE = utils.getUiFileName(__file__)
 MAX_RECENT_DIRS = 5
-DATA_FOLDER_UNVALID = Path(__file__).parent / "fake_folder"
+DATA_FOLDER_INVALID = Path(__file__).parent / "fake_folder"
 
 class MainWindow(QtWidgets.QMainWindow):
     """The main window of the app, built in Qt designer."""
@@ -224,7 +222,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """Set the list of recent folder and remove duplicate"""   
         unique_paths = set()
         new_path_list = []
-        candidate_paths = ["",str(DATA_FOLDER_UNVALID), "Other..."]
+        candidate_paths = ["",str(DATA_FOLDER_INVALID), "Other..."]
         if not folder_list: 
             recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)
             recent_dirs = recent_dirs_str.split(',') if recent_dirs_str else []
