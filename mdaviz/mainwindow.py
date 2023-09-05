@@ -130,11 +130,11 @@ class MainWindow(QtWidgets.QMainWindow):
         """Number of mda files in the selected folder."""
         return self._mdaFileCount
     
-    def setmdaFileList(self,data_path):
+    def setMdaFileList(self,data_path):
         if data_path:
             self._mdaFileList = sorted([file.name for file in data_path.glob('*.mda')])
         else:
-            self._mdaFileList = None
+            self._mdaFileList = []
 
     def setSubFolderName(self):
         self._subFolderPath = Path(self.subfolder.currentText())
@@ -158,7 +158,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
             if folder_path.exists() and folder_path.is_dir():   # folder exists
                 self._folderPath = folder_path
-
+                
                 def get_all_subfolders(folder_path, parent_path=""):
                     subfolder_list = []
                     if parent_path:  # Don't add the root parent folder
@@ -170,8 +170,10 @@ class MainWindow(QtWidgets.QMainWindow):
                             new_parent_path = f"{parent_path}/{item.name}" if parent_path else item.name
                             subfolder_list += get_all_subfolders(item, new_parent_path)
                     return subfolder_list 
-                        
                 self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
+                
+                # subfolder_list = [str(item) for item in folder_path.iterdir() if (item.is_dir() and not item.name.startswith("."))]                       
+                # self.setSubfolderList(subfolder_list)
                 
                 # Update the list of recent directories in settings
                 recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)
@@ -198,7 +200,7 @@ class MainWindow(QtWidgets.QMainWindow):
             layout = self.groupbox.layout()   
             mda_files_path = list(data_path.glob("*.mda"))
             self._mdaFileCount = len(mda_files_path)
-            self.setmdaFileList(data_path)
+            self.setMdaFileList(data_path)
             self.info.setText(f"{self._mdaFileCount} mda files")        
             if mda_files_path:                              # folder contains mda
                 from .mda_folder import MDA_MVC 

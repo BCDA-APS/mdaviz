@@ -68,7 +68,7 @@ class MDA_MVC(QtWidgets.QWidget):
         self.setStatus("Refreshing folder...")
         current_folder = self.dataPath()
         current_mdaFileList = self.mdaFileList()
-        self.parent.setmdaFileList(current_folder)
+        self.parent.setMdaFileList(current_folder)
         new_mdaFileList = self.mdaFileList()
         if new_mdaFileList:
             self.mda_folder_tableview.displayTable()
