@@ -16,11 +16,13 @@ from PyQt5 import QtWidgets
 
 from . import utils
 
+
 class MDA_MVC(QtWidgets.QWidget):
     """MVC class for mda files."""
+
     ui_file = utils.getUiFileName(__file__)
-    motion_wait_time = 1  
-    
+    motion_wait_time = 1
+
     def __init__(self, parent):
         self.parent = parent
 
@@ -31,14 +33,15 @@ class MDA_MVC(QtWidgets.QWidget):
     def setup(self):
         from .app_settings import settings
         from .mda_folder_table_view import MDAFolderTableView
+
         # from .mda_table_view import mdaTableView
         # from .mda_viz import mdaVisualization
-        
+
         self.mda_folder_tableview = MDAFolderTableView(self)
         layout = self.folder_groupbox.layout()
         layout.addWidget(self.mda_folder_tableview)
         self.mda_folder_tableview.displayTable()
-        
+
         try:
             self.parent.refresh.released.disconnect()
         except TypeError:  # No slots connected yet
@@ -51,19 +54,19 @@ class MDA_MVC(QtWidgets.QWidget):
             sname = self.splitter_settings_name(key)
             settings.restoreSplitter(splitter, sname)
             splitter.splitterMoved.connect(partial(self.splitter_moved, key))
-    
+
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
         return self.parent.dataPath()
-    
+
     def mdaFileCount(self):
         """Number of mda files in the selected folder."""
         return self.parent.mdaFileCount()
-    
+
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
         return self.parent.mdaFileList()
-    
+
     def doRefresh(self):
         self.setStatus("Refreshing folder...")
         current_folder = self.dataPath()
@@ -72,7 +75,9 @@ class MDA_MVC(QtWidgets.QWidget):
         new_mdaFileList = self.mdaFileList()
         if new_mdaFileList:
             self.mda_folder_tableview.displayTable()
-            difference = [item for item in new_mdaFileList if item not in current_mdaFileList] 
+            difference = [
+                item for item in new_mdaFileList if item not in current_mdaFileList
+            ]
             if difference:
                 self.setStatus(f"Loading new files: {difference}")
             else:
@@ -80,8 +85,6 @@ class MDA_MVC(QtWidgets.QWidget):
         else:
             self.setStatus(f"Nothing to update.")
 
-            
-        
     def splitter_moved(self, key, *arg, **kwargs):
         thread = getattr(self, f"{key}_wait_thread", None)
         setattr(self, f"{key}_deadline", time.time() + self.motion_wait_time)

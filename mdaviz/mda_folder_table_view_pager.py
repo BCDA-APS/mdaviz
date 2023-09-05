@@ -2,37 +2,41 @@ from functools import partial
 
 from PyQt5 import QtCore, QtWidgets
 
+
 class _AlignCenterDelegate(QtWidgets.QStyledItemDelegate):
     """https://stackoverflow.com/a/61722299"""
 
     def initStyleOption(self, option, index):
         super().initStyleOption(option, index)
         option.displayAlignment = QtCore.Qt.AlignCenter
-        
+
+
 class mdaFolderTableView(QtWidgets.QWidget):
     # ui_file = utils.getUiFileName(__file__)  # WARNING no ui file, just a tab in mda_folder_search.ui
 
     def __init__(self, parent):
         self.parent = parent
-        
+
         super().__init__()
         # utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
-        
+
     def setup(self):
-        header = self.parent.tableview.horizontalHeader()   #tableview belong to mda_folder_search
-        header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)        
-        
+        header = (
+            self.parent.tableview.horizontalHeader()
+        )  # tableview belong to mda_folder_search
+        header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+
         for button_name in "first back next last".split():
             button = getattr(self.parent, button_name)
             # custom: pass the button name to the receiver
             button.released.connect(partial(self.doPagerButtons, button_name))
-            
+
         self.parent.pageSize.currentTextChanged.connect(self.doPageSize)
         self.doButtonPermissions()
         self.setPagerStatus()
         self.parent.tableview.doubleClicked.connect(self.doFileSelected)
-        
+
     def doPagerButtons(self, action, **kwargs):
         # self.setStatus(f"{action=} {kwargs=}")
         model = self.parent.tableview.model()
@@ -71,7 +75,7 @@ class mdaFolderTableView(QtWidgets.QWidget):
         self.parent.tableview.setModel(data_model)
         self.doPageSize(page_size)  # restore
         self.setPagerStatus()
-        
+
         labels = data_model.columnLabels
 
         def centerColumn(label):
