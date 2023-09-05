@@ -21,11 +21,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def setup(self):
         self._dataPath = None       # the combined data path obj (folder.parent + subfolder)
         self._folderPath = None     # the path obj from pull down 1
-        self._folderList = None     # the list of folder in pull down 1
+        self._folderList = []       # the list of folder in pull down 1
         self._subFolderPath = None  # the subfolder path obj selected in pull down 2
-        self._subFolderList = None  # the list of subfolder in pull down 2
-        self._mdaFileList = None    # the list of mda file NAME str (name only)
-        self._mdaFileLen = None     # the number of mda files in the list
+        self._subFolderList = []    # the list of subfolder in pull down 2
+        self._mdaFileList = []      # the list of mda file NAME str (name only)
+        self._mdaFileCount = 0        # the number of mda files in the list
         self.mvc_folder = None
         self.checkMdaFiles = True
     
@@ -126,9 +126,9 @@ class MainWindow(QtWidgets.QMainWindow):
         """List of mda file (name only) in the selected folder."""
         return self._mdaFileList   
     
-    def mdaFileLen(self):
+    def mdaFileCount(self):
         """Number of mda files in the selected folder."""
-        return self._mdaFileLen
+        return self._mdaFileCount
     
     def setmdaFileList(self,data_path):
         if data_path:
@@ -197,9 +197,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self._dataPath = data_path
             layout = self.groupbox.layout()   
             mda_files_path = list(data_path.glob("*.mda"))
-            self._mdaFileLen = len(mda_files_path)
+            self._mdaFileCount = len(mda_files_path)
             self.setmdaFileList(data_path)
-            self.info.setText(f"{self._mdaFileLen} mda files")        
+            self.info.setText(f"{self._mdaFileCount} mda files")        
             if mda_files_path:                              # folder contains mda
                 from .mda_folder import MDA_MVC 
                 self.setStatus(f"Folder path: {str(data_path)!r}")

@@ -58,9 +58,9 @@ class MDAFolderTableView(QtWidgets.QWidget):
         """Path (obj) of the data folder."""
         return self.parent.dataPath()
         
-    def mdaFileLen(self):
+    def mdaFileCount(self):
         """Number of mda files in the selected folder."""
-        return self.parent.mdaFileLen()
+        return self.parent.mdaFileCount()
     
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
