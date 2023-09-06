@@ -25,6 +25,7 @@ class MDAFileTableView(QtWidgets.QWidget):
         from mdaviz.mda_file_table_model import MDAFileTableModel
 
         data = self.mdaFileList()[index.row()]
+        self.tabWidget.setTabText(0, data)
         data_model = MDAFileTableModel(data, self.parent)
         self.tableView.setModel(data_model)
 

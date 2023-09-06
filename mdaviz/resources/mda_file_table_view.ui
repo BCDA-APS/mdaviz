@@ -36,7 +36,7 @@
          </property>
          <widget class="QWidget" name="TabWidgetPage2">
           <attribute name="title">
-           <string>mda files</string>
+           <string>data</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
