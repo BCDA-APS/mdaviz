@@ -170,3 +170,6 @@ dev_*.py
 
 # Qt (on Windows)
 mdaviz/resources/*.py
+
+# temporary files from Microsoft
+~*

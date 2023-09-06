@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,1,0,0,1,0,0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,1,0,0,0,0,1,0,0,0">
       <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
@@ -24,7 +24,37 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>40</width>
+          <width>10</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="open">
+        <property name="toolTip">
+         <string>Show the previous page of runs.</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>open.png</normaloff>open.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_6">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>10</width>
           <height>20</height>
          </size>
         </property>
@@ -48,6 +78,36 @@
        </widget>
       </item>
       <item>
+       <spacer name="horizontalSpacer_5">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>5</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="refresh">
+        <property name="toolTip">
+         <string>Show the next page of runs.</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>refresh.png</normaloff>refresh.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -61,14 +121,14 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="files_label">
+       <widget class="QLabel" name="subfolder_label">
         <property name="text">
-         <string>File:   </string>
+         <string>Folder:</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="files">
+       <widget class="QComboBox" name="subfolder">
         <property name="toolTip">
          <string>Choose a file from this folder.</string>
         </property>
@@ -88,12 +148,12 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="spec_name">
+       <widget class="QLabel" name="info">
         <property name="toolTip">
          <string>Selected folder type.</string>
         </property>
         <property name="text">
-         <string>Folder type</string>
+         <string>Folder info</string>
         </property>
        </widget>
       </item>
@@ -104,7 +164,7 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>40</width>
+          <width>10</width>
           <height>20</height>
          </size>
         </property>

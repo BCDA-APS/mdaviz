@@ -16,11 +16,12 @@ from PyQt5 import QtWidgets
 
 from . import utils
 
+
 class MDA_MVC(QtWidgets.QWidget):
     """MVC class for mda files."""
-    # UI file name matches this module, different extension
+
     ui_file = utils.getUiFileName(__file__)
-    motion_wait_time = 1  # wait for splitter motion to stop to update settings
+    motion_wait_time = 1
 
     def __init__(self, parent):
         self.parent = parent
@@ -31,52 +32,21 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def setup(self):
         from .app_settings import settings
-        # from .mda_folder_search import mdaSearchPanel
-        from .mda_folder_search import mdaFolderTableView
+        from .mda_folder_table_view import MDAFolderTableView
+
         # from .mda_table_view import mdaTableView
         # from .mda_viz import mdaVisualization
-        
-        # self.mda_folder_search_panel = mdaSearchPanel(self)
-        # layout = self.folder_groupbox.layout()
-        # layout.addWidget(self.mda_folder_search_panel)
-        # self.parent.catalogs.currentTextChanged.connect(self.mda_folder_search_panel.setupFile)
-        # self.mda_folder_search_panel.next.released.connect(self.mda_folder_search_panel.doNext)
-        # self.mda_folder_search_panel.previous.released.connect(self.mda_folder_search_panel.doPrevious)
-        
-        self.mda_folder_tableview = mdaFolderTableView(self)
+
+        self.mda_folder_tableview = MDAFolderTableView(self)
         layout = self.folder_groupbox.layout()
-        #####
-        layout.addWidget(self.mda_folder_search_panel)
-        self.mda_folder_search_panel.setupFile(self.mdaFileName())
-        self.parent.files.currentTextChanged.connect(self.mda_folder_search_panel.setupFile)
-        self.mda_folder_search_panel.next.released.connect(self.mda_folder_search_panel.doNext)
-        self.mda_folder_search_panel.previous.released.connect(self.mda_folder_search_panel.doPrevious)
-        ####
         layout.addWidget(self.mda_folder_tableview)
         self.mda_folder_tableview.displayTable()
-         
-        # self.mda_tableview = mdaTableView(self)
-        # layout = self.mda_groupbox.layout()
-        # layout.addWidget(self.mda_tableview)
-        # self.mda_tableview.displayTable()
 
-        # self.mda_viz = mdaRunVisualization(self)
-        # layout = self.viz_groupbox.layout()
-        # layout.addWidget(self.mda_viz)
-
-        # # connect search signals with tableview update
-        # # fmt: off
-        # widgets = [
-        #     [self.brc_search_panel.plan_name, "returnPressed"],
-        #     [self.brc_search_panel.scan_id, "returnPressed"],
-        #     [self.brc_search_panel.status, "returnPressed"],
-        #     [self.brc_search_panel.positioners, "returnPressed"],
-        #     [self.brc_search_panel.detectors, "returnPressed"],
-        #     [self.brc_search_panel.date_time_widget.apply, "released"],
-        # ]
-        # # fmt: on
-        # for widget, signal in widgets:
-        #     getattr(widget, signal).connect(self.brc_tableview.displayTable)
+        try:
+            self.parent.refresh.released.disconnect()
+        except TypeError:  # No slots connected yet
+            pass
+        self.parent.refresh.released.connect(self.doRefresh)
 
         # save/restore splitter sizes in application settings
         for key in "hsplitter vsplitter".split():
@@ -85,24 +55,36 @@ class MDA_MVC(QtWidgets.QWidget):
             settings.restoreSplitter(splitter, sname)
             splitter.splitterMoved.connect(partial(self.splitter_moved, key))
 
-    def folderPath(self):
-        return self.parent.folderPath()
+    def dataPath(self):
+        """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
+        return self.parent.dataPath()
 
-    def folderName(self):
-        return self.parent.folderName()    
-    
-    # def mdaFilePath(self):
-    #     return self.parent.mdaFilePath()  
+    def mdaFileCount(self):
+        """Number of mda files in the selected folder."""
+        return self.parent.mdaFileCount()
 
-    def mdaFileName(self):
-        return self.parent.mdaFileName()  
-    
     def mdaFileList(self):
-        return self.parent.mdaFileList() 
-     
-    def mdaFileList(self):
-        return self.parent.mdaFileList()   
-        
+        """List of mda file (name only) in the selected folder."""
+        return self.parent.mdaFileList()
+
+    def doRefresh(self):
+        self.setStatus("Refreshing folder...")
+        current_folder = self.dataPath()
+        current_mdaFileList = self.mdaFileList()
+        self.parent.setMdaFileList(current_folder)
+        new_mdaFileList = self.mdaFileList()
+        if new_mdaFileList:
+            self.mda_folder_tableview.displayTable()
+            difference = [
+                item for item in new_mdaFileList if item not in current_mdaFileList
+            ]
+            if difference:
+                self.setStatus(f"Loading new files: {difference}")
+            else:
+                self.setStatus(f"No new files.")
+        else:
+            self.setStatus(f"Nothing to update.")
+
     def splitter_moved(self, key, *arg, **kwargs):
         thread = getattr(self, f"{key}_wait_thread", None)
         setattr(self, f"{key}_deadline", time.time() + self.motion_wait_time)
@@ -128,10 +110,6 @@ class MDA_MVC(QtWidgets.QWidget):
 
         splitter = getattr(self, key)
         while time.time() < getattr(self, f"{key}_deadline"):
-            # self.setStatus(
-            #     f"Wait: {time.time()=:.3f}"
-            #     f"  {getattr(self, f'{key}_deadline')=:.3f}"
-            # )
             time.sleep(self.motion_wait_time * 0.1)
 
         sname = self.splitter_settings_name(key)
