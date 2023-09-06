@@ -21,7 +21,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         self.parent = parent
 
         self.actions_library = {
-            "PV": lambda i: self.get_det_list(i),
+            "PV": lambda i: self.detList()[i],
             "x": lambda file: "TODO",
             "y": lambda file: "TODO",
             "Mon": lambda file: "TODO",
@@ -34,7 +34,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         super().__init__()
 
         self.setFile(data)  # here data is the file name
-        self.setDetList(data)
+        self.setDetList()
 
     # ------------ methods required by Qt's view
 

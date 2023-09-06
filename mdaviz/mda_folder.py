@@ -51,14 +51,13 @@ class MDA_MVC(QtWidgets.QWidget):
         self.parent.refresh.released.connect(self.doRefresh)
 
         self.mda_file_tableview = MDAFileTableView(self)
-        layout = self.file_groupbox.layout()
+        layout = self.mda_groupbox.layout()
         layout.addWidget(self.mda_file_tableview)
-        self.mda_file_tableview.displayTable()
 
         # connect folder tableview selection with tableview update
         # fmt:off
-        
-        self.mda_folder_tableview.doubleClicked.connect(self.mda_file_tableview.displayTable)
+
+        self.mda_folder_tableview.tableView.doubleClicked.connect(self.mda_file_tableview.displayTable)
 
         # fmt:on
 
