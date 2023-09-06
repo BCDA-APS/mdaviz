@@ -1,6 +1,5 @@
 """
 Search for mda files.
-
 """
 
 from PyQt5 import QtCore, QtWidgets
