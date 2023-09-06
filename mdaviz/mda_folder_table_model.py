@@ -31,7 +31,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         # self.setPageOffset(DEFAULT_PAGE_OFFSET, init=True)
         # self.setPageSize(DEFAULT_PAGE_SIZE, init=True)
         self.setAscending(True)
-        self.folderLength = 0
+        self.folderCount = 0
 
         super().__init__()
 
@@ -93,12 +93,12 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
     def folder(self):  # in this case folder is the list of mda file name
         return self._data
 
-    def folderLength(self):
-        return self._folderLength
+    def folderCount(self):
+        return self._folderCount
 
     def setFolder(self, folder):
         self._data = folder
-        self._folderLength = len(folder)
+        self._folderCount = len(folder)
 
     def fileList(self):  # truncated file list
         return self._fileList
