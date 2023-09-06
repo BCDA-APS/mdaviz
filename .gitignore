@@ -171,4 +171,5 @@ dev_*.py
 # Qt (on Windows)
 mdaviz/resources/*.py
 
-~$icons.pptx
+# temporary files from Microsoft
+~*
