@@ -3,32 +3,28 @@ QAbstractTableModel of folder content.
 
 .. autosummary::
 
-    ~MDAFolderTableModel
+    ~MDAFileTableModel
 """
 
 from PyQt5 import QtCore
 from . import utils
 
 
-class MDAFolderTableModel(QtCore.QAbstractTableModel):
+class MDAFileTableModel(QtCore.QAbstractTableModel):
     def __init__(self, data, parent):
         self.parent = parent
 
+        # for a given file, all the columns will display a check box
+        # the index column will display the list of positioners + detectors
         self.actions_library = {
-            "Prefix": lambda file: file.rsplit("_", 1)[0],
-            "Scan #": lambda file: int(file.rsplit("_", 1)[1].split(".")[0]),
-            "Points": lambda file: "TODO",  # TODO: get_file_pts
-            "Dim": lambda file: "TODO",  # TODO: get_file_dim
-            "Size": lambda file: self.get_file_size(file),
-            "Date": lambda file: self.get_file_date(file),
+            "x": lambda file: "TODO",  # TODO: get_all_signals,
+            "y": lambda file: "TODO",  # TODO: get_all_signals,
+            "Mon": lambda file: "TODO",  # TODO: get_all_signals
         }
 
         self.columnLabels = list(self.actions_library.keys())
-
-        # self.setPageOffset(DEFAULT_PAGE_OFFSET, init=True)
-        # self.setPageSize(DEFAULT_PAGE_SIZE, init=True)
         self.setAscending(True)
-        self.folderCount = 0
+        self.detCount = 0
 
         super().__init__()
 
