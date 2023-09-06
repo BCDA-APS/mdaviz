@@ -27,11 +27,12 @@ import tiled.queries
 
 
 def human_readable_size(size, decimal_places=2):
-    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+    for unit in ["B", "KB", "MB", "GB", "TB"]:
         if size < 1024.0:
             break
         size /= 1024.0
     return f"{size:.{decimal_places}f} {unit}"
+
 
 def iso2dt(iso_date_time):
     """Convert ISO8601 time string to datetime object."""
@@ -53,58 +54,30 @@ def ts2iso(timestamp):
     return ts2dt(timestamp).isoformat(sep=" ")
 
 
-def QueryTimeSince(isotime):
-    """Tiled client query: all runs since given date/time."""
-    return tiled.queries.Key("time") >= iso2ts(isotime)
+def byte2str(byte_literal):
+    """Convert byte literals to strings."""
+    return byte_literal.decode("utf-8")
 
 
-def QueryTimeUntil(isotime):
-    """Tiled client query: all runs until given date/time."""
-    return tiled.queries.Key("time") <= iso2ts(isotime)
+def byte2str_dict(byte_literal_dict):
+    """Convert dictionary of byte literals to strings."""
+    str_dict = {}
+    for key, value in byte_literal_dict.items():
+        new_key = key.decode("utf-8") if isinstance(key, bytes) else key
+        if isinstance(value, (list, tuple)):
+            new_value = tuple(
+                elem.decode("utf-8") if isinstance(elem, bytes) else elem
+                for elem in value
+            )
+        else:
+            new_value = value.decode("utf-8") if isinstance(value, bytes) else value
+        str_dict[new_key] = new_value
+    return str_dict
 
 
 def get_md(parent, doc, key, default=None):
     """Cautiously, get metadata from tiled object by document and key."""
     return (parent.metadata.get(doc) or {}).get(key) or default
-
-
-def get_tiled_runs(cat, since=None, until=None, text=[], text_case=[], **keys):
-    """
-    Return a new catalog, filtered by search terms.
-
-    Runs will be selected with start time `>=since` and `< until`.
-    If either is `None`, then the corresponding filter will not be
-    applied.
-
-    Parameters
-
-    `cat` obj :
-        This is the catalog to be searched.
-        `Node` object returned by tiled.client.
-    `since` str :
-        Earliest start date (& time), in ISO8601 format.
-    `until` str :
-        Latest start date (& time), in ISO8601 format.
-    `text` [str] :
-        List of full text searches.  Not sensitive to case.
-    `text_case` [str] :
-        List of full text searches.  Case sensitive.
-    `keys` dict :
-        Dictionary of metadata keys and values to be matched.
-    """
-    if since is not None:
-        cat = cat.search(QueryTimeSince(since))
-    if until is not None:
-        cat = cat.search(QueryTimeUntil(until))
-
-    for k, v in keys.items():
-        cat = cat.search(tiled.queries.Key(k) == v)
-
-    for v in text:
-        cat = cat.search(tiled.queries.FullText(v, case_sensitive=False))
-    for v in text_case:
-        cat = cat.search(tiled.queries.FullText(v, case_sensitive=True))
-    return cat
 
 
 def run_in_thread(func):
@@ -184,14 +157,6 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
 
     # print(f"myLoadUi({ui_file=})")
     return uic.loadUi(ui_file, baseinstance=baseinstance, **kw)
-
-
-def connect_tiled_server(uri):
-    from tiled.client import from_uri
-    from tiled.client.cache import Cache
-
-    client = from_uri(uri, "dask", cache=Cache.in_memory(2e9))
-    return client
 
 
 def getUiFileName(py_file_name):

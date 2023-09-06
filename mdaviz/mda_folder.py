@@ -16,6 +16,8 @@ from PyQt5 import QtWidgets
 
 from . import utils
 
+MYFILE = "mda_0001.mda"
+
 
 class MDA_MVC(QtWidgets.QWidget):
     """MVC class for mda files."""
@@ -33,8 +35,8 @@ class MDA_MVC(QtWidgets.QWidget):
     def setup(self):
         from .app_settings import settings
         from .mda_folder_table_view import MDAFolderTableView
+        from .mda_file_table_view import MDAFileTableView
 
-        # from .mda_table_view import mdaTableView
         # from .mda_viz import mdaVisualization
 
         self.mda_folder_tableview = MDAFolderTableView(self)
@@ -47,6 +49,18 @@ class MDA_MVC(QtWidgets.QWidget):
         except TypeError:  # No slots connected yet
             pass
         self.parent.refresh.released.connect(self.doRefresh)
+
+        self.mda_file_tableview = MDAFileTableView(self)
+        layout = self.file_groupbox.layout()
+        layout.addWidget(self.mda_file_tableview)
+        self.mda_file_tableview.displayTable()
+
+        # connect folder tableview selection with tableview update
+        # fmt:off
+        
+        self.mda_folder_tableview.doubleClicked.connect(self.mda_file_tableview.displayTable)
+
+        # fmt:on
 
         # save/restore splitter sizes in application settings
         for key in "hsplitter vsplitter".split():

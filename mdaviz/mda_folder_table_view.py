@@ -3,9 +3,7 @@ Search for mda files.
 """
 
 from PyQt5 import QtCore, QtWidgets
-from pathlib import Path
 from . import utils
-from functools import partial
 
 
 class _AlignCenterDelegate(QtWidgets.QStyledItemDelegate):

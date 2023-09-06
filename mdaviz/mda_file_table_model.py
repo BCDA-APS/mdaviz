@@ -6,38 +6,41 @@ QAbstractTableModel of folder content.
     ~MDAFileTableModel
 """
 
+from mda import readMDA
+from pathlib import Path
 from PyQt5 import QtCore
 from . import utils
+
+
+# For this purpose, p and d will all be called detectors
+# since you can plot d vs p, but also d vd d
 
 
 class MDAFileTableModel(QtCore.QAbstractTableModel):
     def __init__(self, data, parent):
         self.parent = parent
 
-        # for a given file, all the columns will display a check box
-        # the index column will display the list of positioners + detectors
         self.actions_library = {
-            "x": lambda file: "TODO",  # TODO: get_all_signals,
-            "y": lambda file: "TODO",  # TODO: get_all_signals,
-            "Mon": lambda file: "TODO",  # TODO: get_all_signals
+            "PV": lambda i: self.get_det_list(i),
+            "x": lambda file: "TODO",
+            "y": lambda file: "TODO",
+            "Mon": lambda file: "TODO",
         }
 
         self.columnLabels = list(self.actions_library.keys())
-        self.setAscending(True)
-        self.detCount = 0
+
+        self._detCount = 0
 
         super().__init__()
 
-        self.setFolder(data)
-        self.setFileList(
-            self._get_fileList()
-        )  # this return the truncated list of file in the pager
+        self.setFile(data)  # here data is the file name
+        self.setDetList(data)
 
     # ------------ methods required by Qt's view
 
     def rowCount(self, parent=None):
         # Want it to return the number of rows to be shown at a given time
-        value = len(self.fileList())
+        value = self.detCount()
         return value
 
     def columnCount(self, parent=None):
@@ -49,10 +52,9 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         # display data
         if role == QtCore.Qt.DisplayRole:
             # print("Display role:", index.row(), index.column())
-            file = self.fileList()[index.row()]
             label = self.columnLabels[index.column()]
             action = self.actions_library[label]
-            return action(file)
+            return action(index.row())
 
     def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
         if role == QtCore.Qt.DisplayRole:
@@ -63,48 +65,39 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
 
     # ------------ local methods
 
-    def _get_fileList(self):
-        folder = self.folder()
-        ascending = 1 if self.ascending() else -1
-        if ascending < 0:
-            folder.reverse()
-        return folder
-
     def get_file_path(self, file):
+        # here file is a Path obj Path('mda.0001.mda')
         return self.dataPath() / file
 
-    def get_file_size(self, file):
-        filepath = self.get_file_path(file)
-        return utils.human_readable_size(filepath.stat().st_size)
+    def get_file_data(self, file):
+        filepath = str(self.get_file_path(file))
+        return readMDA(filepath)[1]
 
-    def get_file_date(self, file):
-        filepath = self.get_file_path(file)
-        return utils.ts2iso(round(filepath.stat().st_ctime))
+    def get_det_list(self, file):
+        data = self.get_file_data(file)
+        p_list = [utils.byte2str(data.p[i].name) for i in range(0, data.np)]
+        d_list = [utils.byte2str(data.d[i].name) for i in range(0, data.nd)]
+        return p_list + d_list
 
     # # ------------ get & set methods
 
-    def folder(self):  # in this case folder is the list of mda file name
+    def file(self):
         return self._data
 
-    def folderCount(self):
-        return self._folderCount
+    def detCount(self):
+        return self._detCount
 
-    def setFolder(self, folder):
-        self._data = folder
-        self._folderCount = len(folder)
+    def detList(self):
+        return self._detList
 
-    def fileList(self):  # truncated file list
-        return self._fileList
+    def setFile(self, file):
+        self._data = file
 
-    def setFileList(self, value):
-        self._fileList = value
+    def setDetList(self):
+        file = self.file()
+        self._detList = self.get_det_list(file)
+        self._detCount = len(self._detList)
 
     def dataPath(self):
         """Path (obj) of the selected data folder (folder + subfolder)."""
         return self.parent.dataPath()
-
-    def ascending(self):
-        return self._ascending
-
-    def setAscending(self, value):
-        self._ascending = value
