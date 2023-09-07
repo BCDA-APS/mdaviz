@@ -7,6 +7,7 @@ QAbstractTableModel of folder content.
 """
 from mda import readMDA
 from PyQt5 import QtCore
+from functools import partial
 import yaml
 from . import utils
 
@@ -34,10 +35,13 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
 
         self.columnLabels = list(self.actions_library.keys())
 
-        self._checkbox_states = {}  # Key: (row, col), Value: Qt.Checked or Qt.Unchecked
+        # Key: (row, col), Value: Qt.Checked (2) or Qt.Unchecked (0)
+        self._checkbox_states = {}
         self._detCount = 0
 
-        self.checkboxToggled.connect(self.on_checkbox_toggled)
+        self.checkboxToggled.connect(
+            partial(self.on_checkbox_toggled, self._checkbox_states)
+        )  # TODO remove the partial + extra argument
 
         self.setFile(data)  # here data is the file name
         self.setDetDict()
@@ -98,11 +102,40 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
                 checked_boxes.append((row, col))
         return checked_boxes
 
-    def on_checkbox_toggled(self, row, col):
+    # def on_checkbox_toggled(self, row, col):
+    #     label = self.columnLabels[col]
+    #     det = self.detDict()[row]
+    #     file = self.file()
+    #     # self._dataToPlot = [file]
+    #     checkbox_state = self._checkbox_states[(row, col)]
+    #     if checkbox_state == QtCore.Qt.Checked:
+    #         # Code for when the checkbox is checked
+    #         self.setStatus(f"{file}: {label} = {det}")
+    #     elif checkbox_state == QtCore.Qt.Unchecked:
+    #         # Code for when the checkbox is unchecked
+    #         self.setStatus(f"{file}: {label} has been unchecked")
+    #     print(self._checkbox_states)
+    #     # {(2, 1): 0, (3, 2): 2, (4, 3): 2, (4, 1): 0}
+    #     # unchecked = 0 ; checked = 2
+
+    def on_checkbox_toggled(self, previous_status, row, col):
         label = self.columnLabels[col]
         det = self.detDict()[row]
         file = self.file()
-        self.setStatus(f"{file}: {label} = {det}")
+        # self._dataToPlot = [file]
+        print(
+            f"\nold dict: {previous_status}"
+        )  # this is not where I should do this! => data/setData
+        checkbox_state = self._checkbox_states[(row, col)]
+        if checkbox_state == QtCore.Qt.Checked:
+            # Code for when the checkbox is checked
+            self.setStatus(f"{file}: {label} = {det}")
+        elif checkbox_state == QtCore.Qt.Unchecked:
+            # Code for when the checkbox is unchecked
+            self.setStatus(f"{file}: {label} has been unchecked")
+        print(f"new dict: {self._checkbox_states}")
+        # {(2, 1): 0, (3, 2): 2, (4, 3): 2, (4, 1): 0}
+        # unchecked = 0 ; checked = 2
 
     # ------------ local methods
 
