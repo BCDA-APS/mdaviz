@@ -2,19 +2,14 @@
 Support functions for this demo project.
 
 .. autosummary::
-
-    ~connect_tiled_server
-    ~get_tiled_runs
+    ~byte2str
     ~getUiFileName
-    ~get_md
+    ~human_readable_size
     ~iso2dt
     ~iso2ts
     ~myLoadUi
-    ~QueryTimeSince
-    ~QueryTimeUntil
     ~removeAllLayoutWidgets
     ~run_in_thread
-    ~run_summary_table
     ~ts2dt
     ~ts2iso
 """
@@ -63,22 +58,6 @@ def byte2str(byte_literal):
     )
 
 
-def byte2str_dict(byte_literal_dict):
-    """Convert dictionary of byte literals to strings."""
-    str_dict = {}
-    for key, value in byte_literal_dict.items():
-        new_key = key.decode("utf-8") if isinstance(key, bytes) else key
-        if isinstance(value, (list, tuple)):
-            new_value = tuple(
-                elem.decode("utf-8") if isinstance(elem, bytes) else elem
-                for elem in value
-            )
-        else:
-            new_value = value.decode("utf-8") if isinstance(value, bytes) else value
-        str_dict[new_key] = new_value
-    return str_dict
-
-
 def get_md(parent, doc, key, default=None):
     """Cautiously, get metadata from tiled object by document and key."""
     return (parent.metadata.get(doc) or {}).get(key) or default
@@ -107,30 +86,6 @@ def run_in_thread(func):
         return thread
 
     return wrapper
-
-
-def run_summary_table(runs):
-    import pyRestTable
-
-    table = pyRestTable.Table()
-    table.labels = "# uid7 scan# plan #points exit started streams".split()
-    for i, uid in enumerate(runs, start=1):
-        run = runs[uid]
-        md = run.metadata
-        t0 = md["start"].get("time")
-        table.addRow(
-            (
-                i,
-                uid[:7],
-                md["summary"].get("scan_id"),
-                md["summary"].get("plan_name"),
-                md["start"].get("num_points"),
-                (md["stop"] or {}).get("exit_status"),  # if no stop document!
-                datetime.datetime.fromtimestamp(t0).isoformat(sep=" "),
-                ", ".join(md["summary"].get("stream_names")),
-            )
-        )
-    return table
 
 
 def removeAllLayoutWidgets(layout):
