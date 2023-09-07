@@ -27,7 +27,6 @@ class MDAFolderTableView(QtWidgets.QWidget):
     def setup(self):
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
-        self.tableView.doubleClicked.connect(self.doFileSelected)
 
     def displayTable(self):
         from mdaviz.mda_folder_table_model import MDAFolderTableModel
@@ -46,11 +45,6 @@ class MDAFolderTableView(QtWidgets.QWidget):
         centerColumn("Scan #")
         centerColumn("Points")
         centerColumn("Dim")
-
-    def doFileSelected(self, index):
-        model = self.tableView.model()
-        if model is not None:
-            self.setStatus(f"Selected file: {self.mdaFileList()[index.row()]}")
 
     def dataPath(self):
         """Path (obj) of the data folder."""

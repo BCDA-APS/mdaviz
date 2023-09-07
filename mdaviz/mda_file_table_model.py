@@ -5,10 +5,9 @@ QAbstractTableModel of folder content.
 
     ~MDAFileTableModel
 """
-
 from mda import readMDA
-from pathlib import Path
 from PyQt5 import QtCore
+import yaml
 from . import utils
 
 
@@ -74,60 +73,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
             else:
                 return str(section + 1)  # may want to alter at some point
 
-    # ------------ local methods
-
-    def get_file_path(self, file):
-        # here file is a Path obj Path('mda.0001.mda')
-        return self.dataPath() / file
-
-    def get_file_data(self, file):
-        filepath = str(self.get_file_path(file))
-        return readMDA(filepath)[1]
-
-    def get_det_dict(self, file):
-        """det_dict = { index: [fieldname, name, desc, unit]}"""
-        D = {}
-        data = self.get_file_data(file)
-        p_list = [data.p[i] for i in range(0, data.np)]
-        d_list = [data.d[i] for i in range(0, data.nd)]
-        for e, p in enumerate(p_list):
-            D[e] = [
-                utils.byte2str(p.fieldName),
-                utils.byte2str(p.name),
-                utils.byte2str(p.desc),
-                utils.byte2str(p.unit),
-            ]
-        for e, d in enumerate(d_list):
-            D[e + len(p_list)] = [
-                utils.byte2str(d.fieldName),
-                utils.byte2str(d.name),
-                utils.byte2str(d.desc),
-                utils.byte2str(d.unit),
-            ]
-        return D
-
-    # # ------------ get & set methods
-
-    def file(self):
-        return self._data
-
-    def detCount(self):
-        return self._detCount
-
-    def detDict(self):
-        return self._detDict
-
-    def dataPath(self):
-        """Path (obj) of the selected data folder (folder + subfolder)."""
-        return self.parent.dataPath()
-
-    def setFile(self, file):
-        self._data = file
-
-    def setDetDict(self):
-        file = self.file()
-        self._detDict = self.get_det_dict(file)
-        self._detCount = len(self._detDict)
+    # # ------------ checkbox methods
 
     def setData(self, index, value, role):
         row, col = index.row(), index.column()
@@ -157,6 +103,116 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         det = self.detDict()[row]
         file = self.file()
         self.setStatus(f"{file}: {label} = {det}")
+
+    # ------------ local methods
+
+    def get_file_path(self, file):
+        # here file is a Path obj Path('mda.0001.mda')
+        return self.dataPath() / file
+
+    def get_file_data(self, file):
+        filepath = str(self.get_file_path(file))
+        return readMDA(filepath)[1]
+
+    def get_file_metadata(self, file):
+        filepath = str(self.get_file_path(file))
+        return readMDA(filepath)[0]
+
+    def get_det_dict(self, file):
+        """det_dict = { index: [fieldname, name, desc, unit]}"""
+        D = {}
+        data = self.get_file_data(file)
+        p_list = [data.p[i] for i in range(0, data.np)]
+        d_list = [data.d[i] for i in range(0, data.nd)]
+        for e, p in enumerate(p_list):
+            D[e] = [
+                utils.byte2str(p.fieldName),
+                utils.byte2str(p.name),
+                utils.byte2str(p.desc),
+                utils.byte2str(p.unit),
+            ]
+        for e, d in enumerate(d_list):
+            D[e + len(p_list)] = [
+                utils.byte2str(d.fieldName),
+                utils.byte2str(d.name),
+                utils.byte2str(d.desc),
+                utils.byte2str(d.unit),
+            ]
+        return D
+
+    # # ------------ get & set methods
+
+    def dataPath(self):
+        """Path (obj) of the selected data folder (folder + subfolder)."""
+        return self.parent.dataPath()
+
+    def file(self):
+        return self._data
+
+    def detCount(self):
+        return self._detCount
+
+    def detDict(self):
+        return self._detDict
+
+    def setFile(self, file):
+        self._data = file
+
+    def setDetDict(self):
+        file = self.file()
+        self._detDict = self.get_det_dict(file)
+        self._detCount = len(self._detDict)
+
+    def getMetadata(self):
+        """Provide a text view of the file metadata."""
+        from collections import OrderedDict
+
+        file = self.file()
+        metadata = self.get_file_metadata(file)
+
+        def transform_metadata_full(metadata):
+            new_metadata = OrderedDict()  # Initialize an empty ordered dictionary
+            for key, value in metadata.items():
+                # Convert binary keys to string
+                if isinstance(key, bytes):
+                    key = key.decode("utf-8", "ignore")
+
+                if isinstance(value, tuple):
+                    new_metadata[key] = {
+                        "description": utils.byte2str(value[0]),
+                        "unit": utils.byte2str(value[1]),
+                        "value": utils.byte2str(value[2]),
+                        "EPICS_type": utils.byte2str(value[3]),
+                        "count": utils.byte2str(value[4]),
+                    }
+                else:
+                    new_metadata[key] = value
+            return new_metadata  # Don't forget to return new_metadata
+
+        from collections import OrderedDict
+
+        def transform_metadata(metadata):
+            new_metadata = OrderedDict()
+            for key, value in metadata.items():
+                if isinstance(key, bytes):
+                    key = key.decode("utf-8", "ignore")
+
+                if isinstance(value, tuple):
+                    # Exclude unwanted keys like EPICS_type
+                    new_metadata[key] = {
+                        k: utils.byte2str(v)
+                        for k, v in zip(
+                            ["description", "unit", "value", "EPICS_type", "count"],
+                            value,
+                        )
+                        if k not in ["EPICS_type", "count"]
+                    }
+                else:
+                    new_metadata[key] = value
+            return new_metadata
+
+        new_metadata = transform_metadata(metadata)
+        return yaml.dump(new_metadata, default_flow_style=False)
 
     def setStatus(self, text):
         self.parent.setStatus(text)

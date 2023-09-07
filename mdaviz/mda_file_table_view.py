@@ -21,13 +21,33 @@ class MDAFileTableView(QtWidgets.QWidget):
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
 
-    def displayTable(self, index):
+    def data(self):
+        return self._data
+
+    def dataModel(self):
+        return self._dataModel
+
+    def setData(self, index):
+        data = self.mdaFileList()[index]
+        self._data = data
+
+    def setDataModel(self, index):
         from mdaviz.mda_file_table_model import MDAFileTableModel
 
-        data = self.mdaFileList()[index.row()]
-        self.tabWidget.setTabText(0, data)
-        data_model = MDAFileTableModel(data, self.parent)
-        self.tableView.setModel(data_model)
+        self.setData(index)
+        data = self.data()
+        self._dataModel = MDAFileTableModel(data, self.parent)
+
+    def displayTable(self, index):
+        self.setDataModel(index)
+        model = self.dataModel()
+        self.tabWidget.setTabText(0, self.data())
+        self.tableView.setModel(model)
+
+    def displayMetadata(self, index):
+        self.setDataModel(index)
+        model = self.dataModel()
+        self.parent.mda_file_visualization.setMetadata(model.getMetadata())
 
     def dataPath(self):
         """Path (obj) of the data folder."""

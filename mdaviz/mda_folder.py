@@ -36,8 +36,7 @@ class MDA_MVC(QtWidgets.QWidget):
         from .app_settings import settings
         from .mda_folder_table_view import MDAFolderTableView
         from .mda_file_table_view import MDAFileTableView
-
-        # from .mda_viz import mdaVisualization
+        from .mda_file_viz import MDAFileVisualization
 
         self.mda_folder_tableview = MDAFolderTableView(self)
         layout = self.folder_groupbox.layout()
@@ -54,10 +53,15 @@ class MDA_MVC(QtWidgets.QWidget):
         layout = self.mda_groupbox.layout()
         layout.addWidget(self.mda_file_tableview)
 
+        self.mda_file_visualization = MDAFileVisualization(self)
+        layout = self.viz_groupbox.layout()
+        layout.addWidget(self.mda_file_visualization)
+
         # connect folder tableview selection with tableview update
         # fmt:off
 
-        self.mda_folder_tableview.tableView.doubleClicked.connect(self.mda_file_tableview.displayTable)
+        # self.mda_folder_tableview.tableView.doubleClicked.connect(self.mda_file_tableview.displayTable)
+        self.mda_folder_tableview.tableView.doubleClicked.connect(self.doFileSelected)
 
         # fmt:on
 
@@ -67,6 +71,13 @@ class MDA_MVC(QtWidgets.QWidget):
             sname = self.splitter_settings_name(key)
             settings.restoreSplitter(splitter, sname)
             splitter.splitterMoved.connect(partial(self.splitter_moved, key))
+
+    def doFileSelected(self, index):
+        model = self.mda_folder_tableview.tableView.model()
+        if model is not None:
+            self.mda_file_tableview.displayMetadata(index.row())
+            self.mda_file_tableview.displayTable(index.row())
+            self.setStatus(f"Selected file: {self.mdaFileList()[index.row()]}")
 
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
