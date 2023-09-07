@@ -56,7 +56,11 @@ def ts2iso(timestamp):
 
 def byte2str(byte_literal):
     """Convert byte literals to strings."""
-    return byte_literal.decode("utf-8")
+    return (
+        byte_literal.decode("utf-8")
+        if isinstance(byte_literal, bytes)
+        else byte_literal
+    )
 
 
 def byte2str_dict(byte_literal_dict):

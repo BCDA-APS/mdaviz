@@ -24,10 +24,13 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         super().__init__()
 
         self.actions_library = {
-            "PV": lambda i: self.detList()[i],
+            "#": lambda i: self.detDict()[i][0],
             "x": lambda file: "TODO",
             "y": lambda file: "TODO",
             "Mon": lambda file: "TODO",
+            "PV": lambda i: self.detDict()[i][1],
+            "desc": lambda i: self.detDict()[i][2],
+            "unit": lambda i: self.detDict()[i][3],
         }
 
         self.columnLabels = list(self.actions_library.keys())
@@ -38,7 +41,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         self.checkboxToggled.connect(self.on_checkbox_toggled)
 
         self.setFile(data)  # here data is the file name
-        self.setDetList()
+        self.setDetDict()
 
     # ------------ methods required by Qt's view
 
@@ -81,11 +84,27 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         filepath = str(self.get_file_path(file))
         return readMDA(filepath)[1]
 
-    def get_det_list(self, file):
+    def get_det_dict(self, file):
+        """det_dict = { index: [fieldname, name, desc, unit]}"""
+        D = {}
         data = self.get_file_data(file)
-        p_list = [utils.byte2str(data.p[i].name) for i in range(0, data.np)]
-        d_list = [utils.byte2str(data.d[i].name) for i in range(0, data.nd)]
-        return p_list + d_list
+        p_list = [data.p[i] for i in range(0, data.np)]
+        d_list = [data.d[i] for i in range(0, data.nd)]
+        for e, p in enumerate(p_list):
+            D[e] = [
+                utils.byte2str(p.fieldName),
+                utils.byte2str(p.name),
+                utils.byte2str(p.desc),
+                utils.byte2str(p.unit),
+            ]
+        for e, d in enumerate(d_list):
+            D[e + len(p_list)] = [
+                utils.byte2str(d.fieldName),
+                utils.byte2str(d.name),
+                utils.byte2str(d.desc),
+                utils.byte2str(d.unit),
+            ]
+        return D
 
     # # ------------ get & set methods
 
@@ -95,16 +114,20 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
     def detCount(self):
         return self._detCount
 
-    def detList(self):
-        return self._detList
+    def detDict(self):
+        return self._detDict
+
+    def dataPath(self):
+        """Path (obj) of the selected data folder (folder + subfolder)."""
+        return self.parent.dataPath()
 
     def setFile(self, file):
         self._data = file
 
-    def setDetList(self):
+    def setDetDict(self):
         file = self.file()
-        self._detList = self.get_det_list(file)
-        self._detCount = len(self._detList)
+        self._detDict = self.get_det_dict(file)
+        self._detCount = len(self._detDict)
 
     def setData(self, index, value, role):
         row, col = index.row(), index.column()
@@ -131,13 +154,9 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
 
     def on_checkbox_toggled(self, row, col):
         label = self.columnLabels[col]
-        det = self.detList()[row]
+        det = self.detDict()[row]
         file = self.file()
         self.setStatus(f"{file}: {label} = {det}")
-
-    def dataPath(self):
-        """Path (obj) of the selected data folder (folder + subfolder)."""
-        return self.parent.dataPath()
 
     def setStatus(self, text):
         self.parent.setStatus(text)
