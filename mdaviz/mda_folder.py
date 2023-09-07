@@ -33,7 +33,7 @@ class MDA_MVC(QtWidgets.QWidget):
         self.setup()
 
     def setup(self):
-        from .app_settings import settings
+        from .user_settings import settings
         from .mda_folder_table_view import MDAFolderTableView
         from .mda_file_table_view import MDAFileTableView
         from .mda_file_viz import MDAFileVisualization
@@ -126,7 +126,7 @@ class MDA_MVC(QtWidgets.QWidget):
         key *str*:
             Name of splitter (either 'hsplitter' or 'vsplitter')
         """
-        from .app_settings import settings
+        from .user_settings import settings
 
         splitter = getattr(self, key)
         while time.time() < getattr(self, f"{key}_deadline"):
