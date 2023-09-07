@@ -170,28 +170,29 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         file = self.file()
         metadata = self.get_file_metadata(file)
 
-        def transform_metadata_full(metadata):
-            new_metadata = OrderedDict()  # Initialize an empty ordered dictionary
-            for key, value in metadata.items():
-                # Convert binary keys to string
-                if isinstance(key, bytes):
-                    key = key.decode("utf-8", "ignore")
+        # def transform_metadata_full(metadata):
+        #     from collections import OrderedDict
+        #     new_metadata = OrderedDict()  # Initialize an empty ordered dictionary
+        #     for key, value in metadata.items():
+        #         # Convert binary keys to string
+        #         if isinstance(key, bytes):
+        #             key = key.decode("utf-8", "ignore")
 
-                if isinstance(value, tuple):
-                    new_metadata[key] = {
-                        "description": utils.byte2str(value[0]),
-                        "unit": utils.byte2str(value[1]),
-                        "value": utils.byte2str(value[2]),
-                        "EPICS_type": utils.byte2str(value[3]),
-                        "count": utils.byte2str(value[4]),
-                    }
-                else:
-                    new_metadata[key] = value
-            return new_metadata  # Don't forget to return new_metadata
-
-        from collections import OrderedDict
+        #         if isinstance(value, tuple):
+        #             new_metadata[key] = {
+        #                 "description": utils.byte2str(value[0]),
+        #                 "unit": utils.byte2str(value[1]),
+        #                 "value": utils.byte2str(value[2]),
+        #                 "EPICS_type": utils.byte2str(value[3]),
+        #                 "count": utils.byte2str(value[4]),
+        #             }
+        #         else:
+        #             new_metadata[key] = value
+        #     return new_metadata  # Don't forget to return new_metadata
 
         def transform_metadata(metadata):
+            from collections import OrderedDict
+
             new_metadata = OrderedDict()
             for key, value in metadata.items():
                 if isinstance(key, bytes):

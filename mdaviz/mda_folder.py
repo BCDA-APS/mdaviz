@@ -57,13 +57,7 @@ class MDA_MVC(QtWidgets.QWidget):
         layout = self.viz_groupbox.layout()
         layout.addWidget(self.mda_file_visualization)
 
-        # connect folder tableview selection with tableview update
-        # fmt:off
-
-        # self.mda_folder_tableview.tableView.doubleClicked.connect(self.mda_file_tableview.displayTable)
         self.mda_folder_tableview.tableView.doubleClicked.connect(self.doFileSelected)
-
-        # fmt:on
 
         # save/restore splitter sizes in application settings
         for key in "hsplitter vsplitter".split():
@@ -108,6 +102,8 @@ class MDA_MVC(QtWidgets.QWidget):
                 self.setStatus(f"No new files.")
         else:
             self.setStatus(f"Nothing to update.")
+
+    # # ------------ splitter methods
 
     def splitter_moved(self, key, *arg, **kwargs):
         thread = getattr(self, f"{key}_wait_thread", None)
