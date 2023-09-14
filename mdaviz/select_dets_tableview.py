@@ -14,7 +14,7 @@ from PyQt5 import QtWidgets
 from . import utils
 
 
-class SelectFieldsTableView(QtWidgets.QWidget):
+class SelectDetsTableView(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
     selected = QtCore.pyqtSignal(str, dict)
 
@@ -36,9 +36,9 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self.replaceButton.clicked.connect(partial(self.responder, "replace"))
 
     def displayTable(self, columns, fields):
-        from .select_fields_tablemodel import SelectFieldsTableModel
+        from .select_dets_tablemodel import SelectDetsTableModel
 
-        data_model = SelectFieldsTableModel(columns, fields)
+        data_model = SelectDetsTableModel(columns, fields)
         self.tableView.setModel(data_model)
 
     def responder(self, action):

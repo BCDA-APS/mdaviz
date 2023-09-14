@@ -118,7 +118,7 @@ MDAVIZ_FIELDS = [
 # fmt: on
 
 
-class SelectFieldsTableModel(QtCore.QAbstractTableModel):
+class SelectDetsTableModel(QtCore.QAbstractTableModel):
     """
     Select fields for plots.
 

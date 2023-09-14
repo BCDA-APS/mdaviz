@@ -13,11 +13,11 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from . import utils
-from .select_det_tablemodel import ColumnDataType
-from .select_det_tablemodel import FieldRuleType
-from .select_det_tablemodel import TableColumn
-from .select_det_tablemodel import TableField
-from .select_det_tablemodel import SelectFieldsTableView
+from .select_dets_tablemodel import ColumnDataType
+from .select_dets_tablemodel import FieldRuleType
+from .select_dets_tablemodel import TableColumn
+from .select_dets_tablemodel import TableField
+from .select_dets_tablemodel import SelectFieldsTableView
 
 logger = logging.getLogger(__name__)
 DEFAULT_STREAM = "primary"
