@@ -112,8 +112,8 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
     https://doc.qt.io/qtforpython-5/PySide2/QtCore/QAbstractTableModel.html
     """
 
-    def __init__(self, columns, fields, parent=None):
-        self.selections = {}  # dict(row_number=column number}
+    def __init__(self, columns, fields, first_pos, first_det, parent=None):
+        self.selections = {first_pos: "X", first_det: "Y"} if first_det else {}
 
         self._columns_locked, self._fields_locked = False, False
         self.setColumns(columns)
@@ -219,6 +219,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         self.selections = {
             k: v for k, v in self.selections.items() if v is not None
         }
+        print(f"{self.selections=}")
         # fmt: on
 
     def logCheckboxSelections(self):

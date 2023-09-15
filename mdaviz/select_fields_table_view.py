@@ -65,9 +65,9 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         from .select_fields_table_model import SelectFieldsTableModel
 
         self.setData(index)
-        data = self.data()
+        data, first_pos, first_det = self.data()
         data_model = SelectFieldsTableModel(
-            COLUMNS, data, self.parent
+            COLUMNS, data, first_pos, first_det, self.parent
         )  # here data is a list of TableField object
         self.tableView.setModel(data_model)
         self.parent.mda_file_visualization.setMetadata(self.getMetadata())
@@ -77,12 +77,12 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         file_path = self.dataPath() / file_name
         file_data = readMDA(file_path)[1]
         file_metadata = readMDA(file_path)[0]
-        dets = utils.get_det(file_data)
+        dets, first_pos, first_det = utils.get_det(file_data)
         fields = [
             TableField(v[0], selection=None, pv=v[1], desc=v[2], unit=v[3])
             for k, v in dets.items()
         ]
-        self._data = fields
+        self._data = fields, first_pos, first_det
         self._metadata = file_metadata
 
     def getMetadata(self):

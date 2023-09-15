@@ -60,24 +60,27 @@ def byte2str(byte_literal):
 
 def get_det(mda_file_data):
     """det_dict = { index: [fieldname, pv, desc, unit]}"""
-    D = {}
+    D = {0: ["IND", "", "index", ""]}
     p_list = [mda_file_data.p[i] for i in range(0, mda_file_data.np)]
     d_list = [mda_file_data.d[i] for i in range(0, mda_file_data.nd)]
+    first_pos = 1 if p_list else 0
+    first_det = 1 + len(p_list) if p_list else None
     for e, p in enumerate(p_list):
-        D[e] = [
+        D[e + 1] = [
             byte2str(p.fieldName),
             byte2str(p.name),
             byte2str(p.desc),
             byte2str(p.unit),
         ]
     for e, d in enumerate(d_list):
-        D[e + len(p_list)] = [
+        D[e + len(p_list) + 1] = [
             byte2str(d.fieldName),
             byte2str(d.name),
             byte2str(d.desc),
             byte2str(d.unit),
         ]
-    return D
+    P0 = []
+    return D, first_pos, first_det
 
 
 def get_md(mda_file_metadata):
