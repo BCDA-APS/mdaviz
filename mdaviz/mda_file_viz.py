@@ -32,8 +32,11 @@ class MDAFileVisualization(QtWidgets.QWidget):
     def setData(self, text, *args, **kwargs):
         self.data.setText(text)
 
-    def setPlot(self, *args, **kwargs):
-        pass
+    def setPlot(self, plot_widget):
+        layout = self.plotPage.layout()
+        utils.removeAllLayoutWidgets(layout)
+        layout.addWidget(plot_widget)
+        self.tabWidget.setCurrentWidget(self.plotPage)
 
     def setStatus(self, text):
         self.parent.setStatus(text)

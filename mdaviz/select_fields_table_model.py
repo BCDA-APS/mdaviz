@@ -313,12 +313,11 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         """
         choices = dict(Y=[])
         for row, column_name in self.selections.items():
-            field_name = self.fieldName(row)
             column_number = self.columnNumber(column_name)
             if column_number in self.uniqueSelectionColumns:
-                choices[column_name] = field_name
+                choices[column_name] = row
             elif column_number in self.multipleSelectionColumns:
-                choices[column_name].append(field_name)
+                choices[column_name].append(row)
         return choices
 
     def setStatus(self, text):

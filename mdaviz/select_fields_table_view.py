@@ -60,6 +60,9 @@ class SelectFieldsTableView(QtWidgets.QWidget):
     def metadata(self):
         return self._metadata
 
+    def detsDict(self):
+        return self._detsDict
+
     def responder(self, action):
         """Modify the plot with the described action."""
         self.selected.emit(action, self.tableView.model().plotFields())
@@ -69,26 +72,35 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
         self.setData(index)
         # here data is a list of TableField objects
-        data, first_pos, first_det = self.data()
+        fields, first_pos, first_det = self.data()
         data_model = SelectFieldsTableModel(
-            COLUMNS, data, first_pos, first_det, self.parent
+            COLUMNS, fields, first_pos, first_det, self.parent
         )
         self.tableView.setModel(data_model)
-        self.parent.mda_file_visualization.setMetadata(self.getMetadata())
         # sets the tab label to be the file name
         self.tabWidget.setTabText(0, self.file().name)
+
+    def displayMetadata(self, index):
+        self.parent.mda_file_visualization.setMetadata(self.getMetadata())
 
     def setData(self, index):
         file_name = self.mdaFileList()[index]
         file_path = self.dataPath() / file_name
         file_data = readMDA(file_path)[1]
         file_metadata = readMDA(file_path)[0]
-        dets, first_pos, first_det = utils.get_det(file_data)
+        detsDict, first_pos, first_det = utils.get_det(file_data)
         fields = [
-            TableField(v[0], selection=None, pv=v[1], desc=v[2], unit=v[3])
-            for k, v in dets.items()
+            TableField(
+                utils.byte2str(v.fieldName),
+                selection=None,
+                pv=utils.byte2str(v.name),
+                desc=utils.byte2str(v.desc),
+                unit=utils.byte2str(v.unit),
+            )
+            for v in detsDict.values()
         ]
         self._file = file_path
+        self._detsDict = detsDict
         self._data = fields, first_pos, first_det
         self._metadata = file_metadata
 
@@ -107,3 +119,53 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def setStatus(self, text):
         self.parent.setStatus(text)
+
+
+def to_datasets(detsDict, selections):
+    """Prepare datasets and options for plotting."""
+
+    from . import chartview
+
+    print(f"{selections=}")
+    datasets = []
+    x_axis = selections.get("X")
+    x_datetime = False  # special scaling using datetime: is it applicable for mda?
+    if x_axis is None:
+        x_data = None
+        x_units = ""
+        x_axis = "index"
+    else:
+        x = detsDict[x_axis]
+        x_data = x.data
+        x_units = utils.byte2str(x.unit)
+
+    for y_axis in selections.get("Y", []):
+        y = detsDict[y_axis]
+        y_data = y.data
+        y_units = utils.byte2str(y.unit)
+
+        ds, ds_options = [], {}
+        color = next(chartview.auto_pen)
+        symbol = next(chartview.auto_symbol)
+        ds_options["name"] = f"{y.name})"
+        ds_options["pen"] = color  # line color
+        ds_options["symbol"] = symbol
+        ds_options["symbolBrush"] = color  # fill color
+        ds_options["symbolPen"] = color  # outline color
+        # size in pixels (if pxMode==True, then data coordinates.)
+        ds_options["symbolSize"] = 10  # default: 10
+
+        if x_data is None:
+            ds = [y_data]  # , title=f"{y_axis} v index"
+        else:
+            ds = [x_data, y_data]
+        datasets.append((ds, ds_options))
+    plot_options = {
+        "x_datetime": x_datetime,
+        "x_units": x_units,
+        "x": x_axis,
+        "y_units": y_units,
+        # "y": ", ".join(selections.get("Y", [])),
+    }
+
+    return datasets, plot_options
