@@ -55,11 +55,11 @@ class ChartView(QtWidgets.QWidget):
         self.plot_widget.plotItem.showAxes(True)
         self.plot_widget.plotItem.showGrid(x=True, y=True, alpha=GRID_OPACITY)
         # see: https://stackoverflow.com/a/70200326
-        label = pg.LabelItem(
-            f"plot: {datetime.datetime.now()}", color="lightgrey", size="8pt"
-        )
-        label.setParentItem(self.plot_widget.plotItem)
-        label.anchor(itemPos=(0, 1), parentPos=(0, 1))
+        # label = pg.LabelItem(
+        #     f"plot: {datetime.datetime.now()}", color="lightgrey", size="8pt"
+        # )
+        # label.setParentItem(self.plot_widget.plotItem)
+        # label.anchor(itemPos=(0, 1), parentPos=(0, 1))
 
         config = {
             "title": self.setPlotTitle,

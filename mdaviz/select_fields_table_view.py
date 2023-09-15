@@ -65,7 +65,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def responder(self, action):
         """Modify the plot with the described action."""
-        self.selected.emit(action, self.tableView.model().plotFields())
+        self.selected.emit(action, self.tableView.model().plotFields()[0])
 
     def displayTable(self, index):
         from .select_fields_table_model import SelectFieldsTableModel
@@ -126,7 +126,6 @@ def to_datasets(detsDict, selections):
 
     from . import chartview
 
-    print(f"{selections=}")
     datasets = []
     x_axis = selections.get("X")
     x_datetime = False  # special scaling using datetime: is it applicable for mda?
@@ -138,16 +137,18 @@ def to_datasets(detsDict, selections):
         x = detsDict[x_axis]
         x_data = x.data
         x_units = utils.byte2str(x.unit)
-
+        x_name = utils.byte2str(x.name)
+    y_names = []
     for y_axis in selections.get("Y", []):
         y = detsDict[y_axis]
         y_data = y.data
         y_units = utils.byte2str(y.unit)
-
+        y_name = utils.byte2str(y.name)
+        y_names.append(y_name)
         ds, ds_options = [], {}
         color = next(chartview.auto_pen)
         symbol = next(chartview.auto_symbol)
-        ds_options["name"] = f"{y.name})"
+        ds_options["name"] = f"{y_name})"
         ds_options["pen"] = color  # line color
         ds_options["symbol"] = symbol
         ds_options["symbolBrush"] = color  # fill color
@@ -163,9 +164,9 @@ def to_datasets(detsDict, selections):
     plot_options = {
         "x_datetime": x_datetime,
         "x_units": x_units,
-        "x": x_axis,
+        "x": x_name,
         "y_units": y_units,
-        # "y": ", ".join(selections.get("Y", [])),
+        "y": ",\t".join(y_names),
     }
 
     return datasets, plot_options

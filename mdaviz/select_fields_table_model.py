@@ -187,8 +187,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         if changes:
             self.updateCheckboxes()
         # self.logCheckboxSelections()
-        print(self.plotFields())  # plotter should call plotFields()
-        self.setStatus(self.plotFields())  # plotter should call plotFields()
+        self.setStatus(self.plotFields()[1])  # plotter should call plotFields()
 
     def applySelectionRules(self, index, changes=False):
         """Apply selection rules 2-4."""
@@ -219,7 +218,6 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         self.selections = {
             k: v for k, v in self.selections.items() if v is not None
         }
-        print(f"{self.selections=}")
         # fmt: on
 
     def logCheckboxSelections(self):
@@ -309,16 +307,20 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         """
         Returns a dictionary with the selected fields to be plotted.
 
-        key=column_name, value=field_name(s)
+        key=column_name, value= row_number(s) or fieldName(s)
         """
         choices = dict(Y=[])
+        choices_pretty = dict(Y=[])
         for row, column_name in self.selections.items():
+            field_name = self.fieldName(row)
             column_number = self.columnNumber(column_name)
             if column_number in self.uniqueSelectionColumns:
                 choices[column_name] = row
+                choices_pretty[column_name] = field_name
             elif column_number in self.multipleSelectionColumns:
                 choices[column_name].append(row)
-        return choices
+                choices_pretty[column_name].append(field_name)
+        return choices, choices_pretty
 
     def setStatus(self, text):
         self.parent.setStatus(text)
