@@ -44,6 +44,7 @@ class MDAFolderTableView(QtWidgets.QWidget):
 
         centerColumn("Scan #")
         centerColumn("Points")
+        centerColumn("Positioner")
         centerColumn("Dim")
 
     def dataPath(self):

@@ -58,9 +58,49 @@ def byte2str(byte_literal):
     )
 
 
-def get_md(parent, doc, key, default=None):
-    """Cautiously, get metadata from tiled object by document and key."""
-    return (parent.metadata.get(doc) or {}).get(key) or default
+def get_det(mda_file_data):
+    """det_dict = { index: [fieldname, pv, desc, unit]}"""
+    D = {}
+    p_list = [mda_file_data.p[i] for i in range(0, mda_file_data.np)]
+    d_list = [mda_file_data.d[i] for i in range(0, mda_file_data.nd)]
+    for e, p in enumerate(p_list):
+        D[e] = [
+            byte2str(p.fieldName),
+            byte2str(p.name),
+            byte2str(p.desc),
+            byte2str(p.unit),
+        ]
+    for e, d in enumerate(d_list):
+        D[e + len(p_list)] = [
+            byte2str(d.fieldName),
+            byte2str(d.name),
+            byte2str(d.desc),
+            byte2str(d.unit),
+        ]
+    return D
+
+
+def get_md(mda_file_metadata):
+    from collections import OrderedDict
+
+    new_metadata = OrderedDict()
+    for key, value in mda_file_metadata.items():
+        if isinstance(key, bytes):
+            key = key.decode("utf-8", "ignore")
+
+        if isinstance(value, tuple):
+            # Exclude unwanted keys like EPICS_type
+            new_metadata[key] = {
+                k: byte2str(v)
+                for k, v in zip(
+                    ["description", "unit", "value", "EPICS_type", "count"],
+                    value,
+                )
+                if k not in ["EPICS_type", "count"]
+            }
+        else:
+            new_metadata[key] = value
+    return new_metadata
 
 
 def run_in_thread(func):

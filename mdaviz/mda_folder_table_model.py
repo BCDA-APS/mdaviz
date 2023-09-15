@@ -21,8 +21,9 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
             "Scan #": lambda file: int(file.rsplit("_", 1)[1].split(".")[0]),
             "Points": lambda file: self.get_file_pts(file),
             "Dim": lambda file: self.get_file_dim(file),
-            "Size": lambda file: self.get_file_size(file),
+            "Positioner": lambda file: self.get_file_pos(file),
             "Date": lambda file: self.get_file_date(file),
+            "Size": lambda file: self.get_file_size(file),
         }
 
         self.columnLabels = list(self.actions_library.keys())
@@ -83,7 +84,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
 
     def get_file_date(self, file):
         filepath = self.get_file_path(file)
-        return utils.ts2iso(round(filepath.stat().st_ctime))
+        return utils.byte2str(readMDA(str(filepath))[1].time).split(".")[0]
 
     def get_file_pts(self, file):
         filepath = self.get_file_path(file)
@@ -92,6 +93,12 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
     def get_file_dim(self, file):
         filepath = self.get_file_path(file)
         return readMDA(str(filepath))[1].dim
+
+    def get_file_pos(self, file):
+        filepath = self.get_file_path(file)
+        pv = utils.byte2str(readMDA(str(filepath))[1].p[0].name)
+        desc = utils.byte2str(readMDA(str(filepath))[1].p[0].desc)
+        return desc if desc else pv
 
     # # ------------ get & set methods
 

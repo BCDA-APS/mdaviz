@@ -77,29 +77,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         file_path = self.dataPath() / file_name
         file_data = readMDA(file_path)[1]
         file_metadata = readMDA(file_path)[0]
-
-        def get_det_dict(file_data):
-            """det_dict = { index: [fieldname, pv, desc, unit]}"""
-            D = {}
-            p_list = [file_data.p[i] for i in range(0, file_data.np)]
-            d_list = [file_data.d[i] for i in range(0, file_data.nd)]
-            for e, p in enumerate(p_list):
-                D[e] = [
-                    utils.byte2str(p.fieldName),
-                    utils.byte2str(p.name),
-                    utils.byte2str(p.desc),
-                    utils.byte2str(p.unit),
-                ]
-            for e, d in enumerate(d_list):
-                D[e + len(p_list)] = [
-                    utils.byte2str(d.fieldName),
-                    utils.byte2str(d.name),
-                    utils.byte2str(d.desc),
-                    utils.byte2str(d.unit),
-                ]
-            return D
-
-        dets = get_det_dict(file_data)
+        dets = utils.get_det(file_data)
         fields = [
             TableField(v[0], selection=None, pv=v[1], desc=v[2], unit=v[3])
             for k, v in dets.items()
@@ -109,34 +87,8 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def getMetadata(self):
         """Provide a text view of the file metadata."""
-        from collections import OrderedDict
-
-        metadata = self.metadata()
-
-        def transform_metadata(metadata):
-            from collections import OrderedDict
-
-            new_metadata = OrderedDict()
-            for key, value in metadata.items():
-                if isinstance(key, bytes):
-                    key = key.decode("utf-8", "ignore")
-
-                if isinstance(value, tuple):
-                    # Exclude unwanted keys like EPICS_type
-                    new_metadata[key] = {
-                        k: utils.byte2str(v)
-                        for k, v in zip(
-                            ["description", "unit", "value", "EPICS_type", "count"],
-                            value,
-                        )
-                        if k not in ["EPICS_type", "count"]
-                    }
-                else:
-                    new_metadata[key] = value
-            return new_metadata
-
-        new_metadata = transform_metadata(metadata)
-        return yaml.dump(new_metadata, default_flow_style=False)
+        metadata = utils.get_md(self.metadata())
+        return yaml.dump(metadata, default_flow_style=False)
 
     def dataPath(self):
         """Path (obj) of the data folder."""
