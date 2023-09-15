@@ -35,7 +35,6 @@ class MDA_MVC(QtWidgets.QWidget):
     def setup(self):
         from .user_settings import settings
         from .mda_folder_table_view import MDAFolderTableView
-        from .mda_file_table_view import MDAFileTableView
         from .mda_file_viz import MDAFileVisualization
         from .select_fields_table_view import SelectFieldsTableView
 
