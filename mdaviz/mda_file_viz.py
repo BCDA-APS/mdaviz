@@ -3,8 +3,8 @@ from PyQt5.QtGui import QFont
 
 from . import utils
 
-MD_FONT = "Courier"
-MD_FONT_SIZE = 13
+MD_FONT = "Monospace"
+MD_FONT_SIZE = 12
 
 
 class MDAFileVisualization(QtWidgets.QWidget):

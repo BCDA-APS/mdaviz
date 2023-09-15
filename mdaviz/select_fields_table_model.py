@@ -8,8 +8,8 @@ Data Field Selection Rules:
 
 1. A data field selection could have one of four states:
     * unselected (`None`)
-    * `"X"`: ordinate (independent axis)
-    * `"Y"` : abcissae (dependent axes)
+    * `"X"`: abscissa (independent axis)
+    * `"Y"` : ordinate (dependent axes)
     * `"Mon"` : divide this array into each Y
 2. Only zero or one data field can be selected as `"X"`.
 3. Only zero or one data field can be selected as `"Mon"`.
@@ -30,13 +30,10 @@ such a 'list(object)' or 'dict(str=object)', then change both 'columns()' and
     ~TableField
 """
 
-import logging
 from dataclasses import KW_ONLY
 from dataclasses import dataclass
 
 from PyQt5 import QtCore
-
-logger = logging.getLogger(__name__)
 
 
 class ColumnDataType:
@@ -64,6 +61,9 @@ class TableColumn:
     column_type: ColumnDataType
     _: KW_ONLY  # all parameters below are specified by keyword
     rule: (FieldRuleType, None) = None
+    # This is an optional attribute.
+    # It can either be an instance of FieldRuleType or None.
+    # Its default value is None.
 
 
 @dataclass(frozen=True)
@@ -75,50 +75,15 @@ class TableField:
     using `cname.lower()`.  (FIXME: This could break.  Easily.)
     """
 
-    name: str  # the "Field" column
+    name: str  # the "D#" column
     selection: (str, None) = None  # either of these, selection rule 1.
     _: KW_ONLY  # all parameters below are specified by keyword
-    description: str = ""  # the "Description" column
+    desc: str = ""  # the "desc" column
     pv: str = ""  # the "PV" column
-    shape: tuple = ()  # the "Shape" column
+    unit: str = ""  # the "unit" column
 
 
-# fmt: off
-# Example lists of columns & fields.
-XY_COLUMNS = [
-    TableColumn("Field", ColumnDataType.text),
-    TableColumn("X", ColumnDataType.checkbox, rule=FieldRuleType.unique),
-    TableColumn("Y", ColumnDataType.checkbox, rule=FieldRuleType.multiple),
-]
-MDAVIZ_COLUMNS = XY_COLUMNS + [
-    TableColumn("Mon", ColumnDataType.checkbox, rule=FieldRuleType.unique),
-    TableColumn("Description", ColumnDataType.text),
-    TableColumn("PV", ColumnDataType.text),
-]
-XY_FIELDS = [
-    TableField("motor", "X", description="some motor"),
-    TableField("I", "Y"),
-    TableField("I00", "Y"),
-    TableField("scint"),
-    TableField("diode"),
-]
-MDAVIZ_FIELDS = [
-    TableField("time", description="epoch"),
-    TableField("motor", "X", pv="ioc:m1"),
-    TableField("I", "Y"),
-    TableField("I0", "Mon", description="use as monitor", pv="ioc:I0"),
-    TableField("I00", "Y"),
-    TableField("I000"),
-    TableField("scint"),
-    TableField("diode"),
-    TableField("ROI1"),
-    TableField("ROI2"),
-    TableField("ROI3"),
-]
-# fmt: on
-
-
-class SelectDetsTableModel(QtCore.QAbstractTableModel):
+class SelectFieldsTableModel(QtCore.QAbstractTableModel):
     """
     Select fields for plots.
 
@@ -147,7 +112,7 @@ class SelectDetsTableModel(QtCore.QAbstractTableModel):
     https://doc.qt.io/qtforpython-5/PySide2/QtCore/QAbstractTableModel.html
     """
 
-    def __init__(self, columns, fields):
+    def __init__(self, columns, fields, parent=None):
         self.selections = {}  # dict(row_number=column number}
 
         self._columns_locked, self._fields_locked = False, False
@@ -155,6 +120,7 @@ class SelectDetsTableModel(QtCore.QAbstractTableModel):
         self.setFields(fields)
         self._columns_locked, self._fields_locked = True, True
 
+        self.parent = parent
         super().__init__()
         self.updateCheckboxes()
 
@@ -204,7 +170,7 @@ class SelectDetsTableModel(QtCore.QAbstractTableModel):
     # ------------ checkbox methods
 
     def checkbox(self, index):
-        """Return the checkbox state."""
+        """Return the checkbox state for a given cell: (row, column) = (index.row(), index.column())."""
         nm = self.columnName(index.column())  # selection name of THIS column
         selection = self.selections.get(index.row())  # user selection
         return QtCore.Qt.Checked if selection == nm else QtCore.Qt.Unchecked
@@ -217,15 +183,12 @@ class SelectDetsTableModel(QtCore.QAbstractTableModel):
         prior = self.selections.get(row)
         self.selections[row] = column_name if checked else None  # Rule 1
         changes = self.selections[row] != prior
-        logger.debug("selections: %s", self.selections)
-
         changes = self.applySelectionRules(index, changes)
-
         if changes:
             self.updateCheckboxes()
-
-        self.logCheckboxSelections()
-        logger.debug(self.plotFields())  # plotter should call plotFields()
+        # self.logCheckboxSelections()
+        print(self.plotFields())  # plotter should call plotFields()
+        self.setStatus(self.plotFields())  # plotter should call plotFields()
 
     def applySelectionRules(self, index, changes=False):
         """Apply selection rules 2-4."""
@@ -246,13 +209,11 @@ class SelectDetsTableModel(QtCore.QAbstractTableModel):
         else:
             top, bottom = 0, self.rowCount() - 1
         left, right = min(self.checkboxColumns), max(self.checkboxColumns)
-        logger.debug("corners: (%d,%d)  (%d,%d)", top, left, bottom, right)
-
+        # logger.debug("corners: (%d,%d)  (%d,%d)", top, left, bottom, right)
         # Re-evaluate the checkboxes bounded by the two corners (inclusive).
         corner1 = self.index(top, left)
         corner2 = self.index(bottom, right)
         self.dataChanged.emit(corner1, corner2, [QtCore.Qt.CheckStateRole])
-
         # prune empty data from self.selections
         # fmt: off
         self.selections = {
@@ -261,7 +222,7 @@ class SelectDetsTableModel(QtCore.QAbstractTableModel):
         # fmt: on
 
     def logCheckboxSelections(self):
-        logger.debug("checkbox selections:")
+        print("checkbox selections:")
         for r in range(self.rowCount()):
             text = ""
             for c in self.checkboxColumns:
@@ -269,7 +230,7 @@ class SelectDetsTableModel(QtCore.QAbstractTableModel):
                 choices = {QtCore.Qt.Checked: "*", QtCore.Qt.Unchecked: "-"}
                 text += choices[state]
             text += f" {self.fieldName(r)}"
-            logger.debug(text)
+            print(text)
 
     # ------------ local methods
 
@@ -318,11 +279,9 @@ class SelectDetsTableModel(QtCore.QAbstractTableModel):
     def fieldText(self, index):
         row, column = index.row(), index.column()
         assert column in self.textColumns, f"{column=} is not text"
-
         fname = self.fieldName(row)
         if column == 0:
             return fname  # special case
-
         cname = self.columnName(column)
         text = str(getattr(self._fields[fname], cname.lower(), ""))
         return text
@@ -336,7 +295,6 @@ class SelectDetsTableModel(QtCore.QAbstractTableModel):
         if self._fields_locked:
             raise RuntimeError("Once defined, cannot change fields.")
         self._fields = {field.name: field for field in fields}
-
         # Pre-select fields with columns, where fields is list(Field).
         for row, field in enumerate(fields):
             if field.selection is not None:
@@ -361,3 +319,6 @@ class SelectDetsTableModel(QtCore.QAbstractTableModel):
             elif column_number in self.multipleSelectionColumns:
                 choices[column_name].append(field_name)
         return choices
+
+    def setStatus(self, text):
+        self.parent.setStatus(text)

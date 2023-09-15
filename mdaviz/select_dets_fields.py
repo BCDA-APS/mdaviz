@@ -6,69 +6,46 @@ QWidget to select stream data fields for plotting.
     ~SelectStreamsWidget
 """
 
-import logging
-from dataclasses import dataclass
-
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from . import utils
-from .select_dets_tablemodel import ColumnDataType
-from .select_dets_tablemodel import FieldRuleType
-from .select_dets_tablemodel import TableColumn
-from .select_dets_tablemodel import TableField
-from .select_dets_tablemodel import SelectFieldsTableView
+from .select_fields_table_model import ColumnDataType
+from .select_fields_table_model import FieldRuleType
+from .select_fields_table_model import TableColumn
+from .select_fields_table_model import TableField
+from .select_fields_table_view import SelectFieldsTableView
 
-logger = logging.getLogger(__name__)
-DEFAULT_STREAM = "primary"
-
-STREAM_COLUMNS = [
+COLUMNS = [
     TableColumn("Field", ColumnDataType.text),
     TableColumn("X", ColumnDataType.checkbox, rule=FieldRuleType.unique),
     TableColumn("Y", ColumnDataType.checkbox, rule=FieldRuleType.multiple),
-    TableColumn("Shape", ColumnDataType.text),
+    TableColumn("I0", ColumnDataType.checkbox, rule=FieldRuleType.unique),
+    TableColumn("PV", ColumnDataType.text),
+    TableColumn("DESC", ColumnDataType.text),
 ]
 
+# WARNING: who loads the ui? select dets ot table view?
 
-class SelectStreamsWidget(QtWidgets.QWidget):
+
+class SelectDetsWidget(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
     selected = QtCore.pyqtSignal(str, str, dict)
 
-    def __init__(self, parent, run, default_stream=DEFAULT_STREAM):
+    def __init__(self, parent, file):
         self.parent = parent
-        self.run = run
-        self.analysis = SignalAxesFields(run)
-        self.stream_name = default_stream
-
+        self.file = file
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
 
     def setup(self):
-        self.run_summary.setText(tapi.run_summary(self.run))
-
-        stream_list = list(self.run)
-        if self.stream_name in stream_list:
-            # Move the default stream to the first position.
-            stream_list.remove(self.stream_name)
-            stream_list.insert(0, self.stream_name)
-
-        if len(stream_list) > 0:
-            self.setStream(stream_list[0])
-
-            self.streams.clear()
-            self.streams.addItems(stream_list)
-            self.streams.currentTextChanged.connect(self.setStream)
+        pass
 
     def setStream(self, stream_name):
         from functools import partial
 
-        self.stream_name = stream_name
-        stream = self.run[stream_name]
-        logger.debug("stream_name=%s, stream=%s", stream_name, stream)
-
         # TODO: This is for 1-D.  Generalize for multi-dimensional.
-        # hint: Checkbox column in the columns table might provide.
         x_name = None
         y_name = None
         if stream_name == self.analysis.stream_name:
@@ -87,11 +64,11 @@ class SelectStreamsWidget(QtWidgets.QWidget):
             shape = tapi.stream_data_field_shape(stream, field_name)
             field = TableField(field_name, selection=selection, shape=shape)
             fields.append(field)
-        logger.debug("fields=%s", fields)
+        print("fields=%s", fields)
 
         # build the view of this stream
         view = SelectFieldsTableView(self)
-        view.displayTable(STREAM_COLUMNS, fields)
+        view.displayTable(COLUMNS, fields)
         view.selected.connect(partial(self.relayPlotSelections, stream_name))
 
         layout = self.groupbox.layout()

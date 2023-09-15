@@ -37,6 +37,7 @@ class MDA_MVC(QtWidgets.QWidget):
         from .mda_folder_table_view import MDAFolderTableView
         from .mda_file_table_view import MDAFileTableView
         from .mda_file_viz import MDAFileVisualization
+        from .select_fields_table_view import SelectFieldsTableView
 
         self.mda_folder_tableview = MDAFolderTableView(self)
         layout = self.folder_groupbox.layout()
@@ -49,13 +50,19 @@ class MDA_MVC(QtWidgets.QWidget):
             pass
         self.parent.refresh.released.connect(self.doRefresh)
 
-        self.mda_file_tableview = MDAFileTableView(self)
+        self.select_fields_tableview = SelectFieldsTableView(self)
         layout = self.mda_groupbox.layout()
-        layout.addWidget(self.mda_file_tableview)
+        layout.addWidget(self.select_fields_tableview)
 
-        self.mda_file_visualization = MDAFileVisualization(self)
-        layout = self.viz_groupbox.layout()
-        layout.addWidget(self.mda_file_visualization)
+        # self.mda_file_tableview = MDAFileTableView(self)
+        # layout = self.mda_groupbox.layout()
+        # layout.addWidget(self.mda_file_tableview)
+
+        # self.mda_file_visualization = MDAFileVisualization(self)
+        # layout = self.viz_groupbox.layout()
+        # layout.addWidget(self.mda_file_visualization)
+
+        # self.mda_folder_tableview.tableView.doubleClicked.connect(self.doFileSelected)
 
         self.mda_folder_tableview.tableView.doubleClicked.connect(self.doFileSelected)
 
@@ -69,8 +76,9 @@ class MDA_MVC(QtWidgets.QWidget):
     def doFileSelected(self, index):
         model = self.mda_folder_tableview.tableView.model()
         if model is not None:
-            self.mda_file_tableview.displayMetadata(index.row())
-            self.mda_file_tableview.displayTable(index.row())
+            # self.mda_file_tableview.displayMetadata(index.row())
+            # self.mda_file_tableview.displayTable(index.row())
+            self.select_fields_tableview.displayTable(index.row())
             self.setStatus(f"Selected file: {self.mdaFileList()[index.row()]}")
 
     def dataPath(self):
