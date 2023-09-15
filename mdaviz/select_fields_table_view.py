@@ -57,6 +57,21 @@ class SelectFieldsTableView(QtWidgets.QWidget):
     def metadata(self):
         return self._metadata
 
+    def responder(self, action):
+        """Modify the plot with the described action."""
+        self.selected.emit(action, self.tableView.model().plotFields())
+
+    def displayTable(self, index):
+        from .select_fields_table_model import SelectFieldsTableModel
+
+        self.setData(index)
+        data = self.data()
+        data_model = SelectFieldsTableModel(
+            COLUMNS, data, self.parent
+        )  # here data is a list of TableField object
+        self.tableView.setModel(data_model)
+        self.parent.mda_file_visualization.setMetadata(self.getMetadata())
+
     def setData(self, index):
         file_name = self.mdaFileList()[index]
         file_path = self.dataPath() / file_name
@@ -92,63 +107,36 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self._data = fields
         self._metadata = file_metadata
 
-    def responder(self, action):
-        """Modify the plot with the described action."""
-        self.selected.emit(action, self.tableView.model().plotFields())
+    def getMetadata(self):
+        """Provide a text view of the file metadata."""
+        from collections import OrderedDict
 
-    def displayTable(self, index):
-        from .select_fields_table_model import SelectFieldsTableModel
+        metadata = self.metadata()
 
-        self.setData(index)
-        data = self.data()
-        data_model = SelectFieldsTableModel(
-            COLUMNS, data, self.parent
-        )  # here data is a list of TableField object
-        self.tableView.setModel(data_model)
-        # self.parent.mda_file_visualization.setMetadata(self.metadata())
+        def transform_metadata(metadata):
+            from collections import OrderedDict
 
-    # def displayMetadata(self, index):
-    #     self.setDataModel(index)
-    #     model = self.dataModel()
-    #     self.parent.mda_file_visualization.setMetadata(model.getMetadata())
+            new_metadata = OrderedDict()
+            for key, value in metadata.items():
+                if isinstance(key, bytes):
+                    key = key.decode("utf-8", "ignore")
 
-    #################
+                if isinstance(value, tuple):
+                    # Exclude unwanted keys like EPICS_type
+                    new_metadata[key] = {
+                        k: utils.byte2str(v)
+                        for k, v in zip(
+                            ["description", "unit", "value", "EPICS_type", "count"],
+                            value,
+                        )
+                        if k not in ["EPICS_type", "count"]
+                    }
+                else:
+                    new_metadata[key] = value
+            return new_metadata
 
-    # def get_file_path(self, file):
-    #     # here file is a Path obj Path('mda.0001.mda')
-    #     return self.dataPath() / file
-
-    # def get_file_data(self, file):
-    #     filepath = str(self.get_file_path(file))
-    #     return readMDA(filepath)[1]
-
-    # def get_file_metadata(self, file):
-    #     filepath = str(self.get_file_path(file))
-    #     return readMDA(filepath)[0]
-
-    # def get_det_dict(self, file):
-    #     """det_dict = { index: [fieldname, pv, desc, unit]}"""
-    #     D = {}
-    #     data = self.get_file_data(file)
-    #     p_list = [data.p[i] for i in range(0, data.np)]
-    #     d_list = [data.d[i] for i in range(0, data.nd)]
-    #     for e, p in enumerate(p_list):
-    #         D[e] = [
-    #             utils.byte2str(p.fieldName),
-    #             utils.byte2str(p.name),
-    #             utils.byte2str(p.desc),
-    #             utils.byte2str(p.unit),
-    #         ]
-    #     for e, d in enumerate(d_list):
-    #         D[e + len(p_list)] = [
-    #             utils.byte2str(d.fieldName),
-    #             utils.byte2str(d.name),
-    #             utils.byte2str(d.desc),
-    #             utils.byte2str(d.unit),
-    #         ]
-    #     return D
-
-    ####################
+        new_metadata = transform_metadata(metadata)
+        return yaml.dump(new_metadata, default_flow_style=False)
 
     def dataPath(self):
         """Path (obj) of the data folder."""

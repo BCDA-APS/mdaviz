@@ -58,9 +58,9 @@ class MDA_MVC(QtWidgets.QWidget):
         # layout = self.mda_groupbox.layout()
         # layout.addWidget(self.mda_file_tableview)
 
-        # self.mda_file_visualization = MDAFileVisualization(self)
-        # layout = self.viz_groupbox.layout()
-        # layout.addWidget(self.mda_file_visualization)
+        self.mda_file_visualization = MDAFileVisualization(self)
+        layout = self.viz_groupbox.layout()
+        layout.addWidget(self.mda_file_visualization)
 
         # self.mda_folder_tableview.tableView.doubleClicked.connect(self.doFileSelected)
 
