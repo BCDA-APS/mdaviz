@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>701</width>
-    <height>227</height>
+    <height>826</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,15 +24,15 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>681</width>
-        <height>207</height>
+        <width>675</width>
+        <height>800</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <widget class="QTabWidget" name="tabWidget_2">
          <property name="currentIndex">
-          <number>2</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="plotPage">
           <attribute name="title">

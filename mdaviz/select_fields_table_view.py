@@ -51,6 +51,9 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self.removeButton.clicked.connect(partial(self.responder, "remove"))
         self.replaceButton.clicked.connect(partial(self.responder, "replace"))
 
+    def file(self):
+        return self._file
+
     def data(self):
         return self._data
 
@@ -65,12 +68,15 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         from .select_fields_table_model import SelectFieldsTableModel
 
         self.setData(index)
+        # here data is a list of TableField objects
         data, first_pos, first_det = self.data()
         data_model = SelectFieldsTableModel(
             COLUMNS, data, first_pos, first_det, self.parent
-        )  # here data is a list of TableField object
+        )
         self.tableView.setModel(data_model)
         self.parent.mda_file_visualization.setMetadata(self.getMetadata())
+        # sets the tab label to be the file name
+        self.tabWidget.setTabText(0, self.file().name)
 
     def setData(self, index):
         file_name = self.mdaFileList()[index]
@@ -82,6 +88,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
             TableField(v[0], selection=None, pv=v[1], desc=v[2], unit=v[3])
             for k, v in dets.items()
         ]
+        self._file = file_path
         self._data = fields, first_pos, first_det
         self._metadata = file_metadata
 
