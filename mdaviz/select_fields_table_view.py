@@ -127,19 +127,19 @@ def to_datasets(detsDict, selections):
     from . import chartview
 
     datasets = []
-    x_axis = selections.get("X")
+    x_axis = selections.get("X")  # x_axis is the row number
     x_datetime = False  # special scaling using datetime: is it applicable for mda?
     if x_axis is None:
         x_data = None
         x_units = ""
-        x_axis = "index"
+        x_name = "index"
     else:
         x = detsDict[x_axis]
         x_data = x.data
         x_units = utils.byte2str(x.unit)
         x_name = utils.byte2str(x.name)
     y_names = []
-    for y_axis in selections.get("Y", []):
+    for y_axis in selections.get("Y", []):  # x_axis is the list of row number
         y = detsDict[y_axis]
         y_data = y.data
         y_units = utils.byte2str(y.unit)
@@ -157,7 +157,7 @@ def to_datasets(detsDict, selections):
         ds_options["symbolSize"] = 10  # default: 10
 
         if x_data is None:
-            ds = [y_data]  # , title=f"{y_axis} v index"
+            ds = [y_data]  # , title=f"{y_name} v index"
         else:
             ds = [x_data, y_data]
         datasets.append((ds, ds_options))
