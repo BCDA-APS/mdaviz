@@ -146,8 +146,8 @@ def to_datasets(detsDict, selections):
         y_name = utils.byte2str(y.name)
         y_names.append(y_name)
         ds, ds_options = [], {}
-        color = next(chartview.auto_pen)
-        symbol = next(chartview.auto_symbol)
+        color = chartview.auto_color()
+        symbol = chartview.auto_symbol()
         ds_options["name"] = f"{y_name})"
         ds_options["pen"] = color  # line color
         ds_options["symbol"] = symbol
@@ -155,6 +155,7 @@ def to_datasets(detsDict, selections):
         ds_options["symbolPen"] = color  # outline color
         # size in pixels (if pxMode==True, then data coordinates.)
         ds_options["symbolSize"] = 10  # default: 10
+        ds_options["width"] = 2
 
         if x_data is None:
             ds = [y_data]  # , title=f"{y_name} v index"
