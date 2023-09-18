@@ -16,6 +16,8 @@ from PyQt5 import QtWidgets
 
 from . import utils
 
+MYFILE = "mda_0001.mda"
+
 
 class MDA_MVC(QtWidgets.QWidget):
     """MVC class for mda files."""
@@ -31,11 +33,10 @@ class MDA_MVC(QtWidgets.QWidget):
         self.setup()
 
     def setup(self):
-        from .app_settings import settings
+        from .user_settings import settings
         from .mda_folder_table_view import MDAFolderTableView
-
-        # from .mda_table_view import mdaTableView
-        # from .mda_viz import mdaVisualization
+        from .mda_file_viz import MDAFileVisualization
+        from .select_fields_table_view import SelectFieldsTableView
 
         self.mda_folder_tableview = MDAFolderTableView(self)
         layout = self.folder_groupbox.layout()
@@ -48,12 +49,32 @@ class MDA_MVC(QtWidgets.QWidget):
             pass
         self.parent.refresh.released.connect(self.doRefresh)
 
+        self.select_fields_tableview = SelectFieldsTableView(self)
+        layout = self.mda_groupbox.layout()
+        layout.addWidget(self.select_fields_tableview)
+
+        self.mda_file_visualization = MDAFileVisualization(self)
+        layout = self.viz_groupbox.layout()
+        layout.addWidget(self.mda_file_visualization)
+
+        self.mda_folder_tableview.tableView.doubleClicked.connect(self.doFileSelected)
+
         # save/restore splitter sizes in application settings
         for key in "hsplitter vsplitter".split():
             splitter = getattr(self, key)
             sname = self.splitter_settings_name(key)
             settings.restoreSplitter(splitter, sname)
             splitter.splitterMoved.connect(partial(self.splitter_moved, key))
+
+    # # ------------ Folder & file selection methods:
+
+    def doFileSelected(self, index):
+        model = self.mda_folder_tableview.tableView.model()
+        if model is not None:
+            self.select_fields_tableview.displayTable(index.row())
+            self.select_fields_tableview.displayMetadata(index.row())
+            self.select_fields_tableview.selected.connect(self.doPlot)
+            self.setStatus(f"Selected file: {self.mdaFileList()[index.row()]}")
 
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
@@ -85,6 +106,41 @@ class MDA_MVC(QtWidgets.QWidget):
         else:
             self.setStatus(f"Nothing to update.")
 
+    # # ------------ Plot methods:
+
+    def doPlot(self, *args):
+        """Slot: data field selected (for plotting) button is clicked."""
+        from .chartview import ChartView
+        from .select_fields_table_view import to_datasets
+
+        action = args[0]
+        selections = args[1]
+
+        detsDict = self.select_fields_tableview.detsDict()
+
+        # setup datasets
+        datasets, options = to_datasets(detsDict, selections)
+
+        # get the chartview widget, if exists
+        layout = self.mda_file_visualization.plotPage.layout()
+        if layout.count() != 1:  # in case something changes ...
+            raise RuntimeError("Expected exactly one widget in this layout!")
+        widget = layout.itemAt(0).widget()
+        if not isinstance(widget, ChartView) or action == "replace":
+            widget = ChartView(self, **options)  # Make a blank chart.
+            if action == "add":
+                action == "replace"
+
+        if action in ("remove"):  # TODO: implement "remove"
+            raise ValueError(f"Unsupported action: {action=}")
+
+        if action in ("replace", "add"):
+            for ds, ds_options in datasets:
+                widget.plot(*ds, **ds_options)
+            self.mda_file_visualization.setPlot(widget)
+
+    # # ------------ splitter methods
+
     def splitter_moved(self, key, *arg, **kwargs):
         thread = getattr(self, f"{key}_wait_thread", None)
         setattr(self, f"{key}_deadline", time.time() + self.motion_wait_time)
@@ -106,7 +162,7 @@ class MDA_MVC(QtWidgets.QWidget):
         key *str*:
             Name of splitter (either 'hsplitter' or 'vsplitter')
         """
-        from .app_settings import settings
+        from .user_settings import settings
 
         splitter = getattr(self, key)
         while time.time() < getattr(self, f"{key}_deadline"):

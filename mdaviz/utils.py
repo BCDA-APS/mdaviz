@@ -2,19 +2,14 @@
 Support functions for this demo project.
 
 .. autosummary::
-
-    ~connect_tiled_server
-    ~get_tiled_runs
+    ~byte2str
     ~getUiFileName
-    ~get_md
+    ~human_readable_size
     ~iso2dt
     ~iso2ts
     ~myLoadUi
-    ~QueryTimeSince
-    ~QueryTimeUntil
     ~removeAllLayoutWidgets
     ~run_in_thread
-    ~run_summary_table
     ~ts2dt
     ~ts2iso
 """
@@ -27,11 +22,12 @@ import tiled.queries
 
 
 def human_readable_size(size, decimal_places=2):
-    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+    for unit in ["B", "KB", "MB", "GB", "TB"]:
         if size < 1024.0:
             break
         size /= 1024.0
     return f"{size:.{decimal_places}f} {unit}"
+
 
 def iso2dt(iso_date_time):
     """Convert ISO8601 time string to datetime object."""
@@ -53,58 +49,50 @@ def ts2iso(timestamp):
     return ts2dt(timestamp).isoformat(sep=" ")
 
 
-def QueryTimeSince(isotime):
-    """Tiled client query: all runs since given date/time."""
-    return tiled.queries.Key("time") >= iso2ts(isotime)
+def byte2str(byte_literal):
+    """Convert byte literals to strings."""
+    return (
+        byte_literal.decode("utf-8")
+        if isinstance(byte_literal, bytes)
+        else byte_literal
+    )
 
 
-def QueryTimeUntil(isotime):
-    """Tiled client query: all runs until given date/time."""
-    return tiled.queries.Key("time") <= iso2ts(isotime)
+def get_det(mda_file_data):
+    """det_dict = { index: [fieldname, pv, desc, unit]}"""
+    D = {}
+    p_list = [mda_file_data.p[i] for i in range(0, mda_file_data.np)]
+    d_list = [mda_file_data.d[i] for i in range(0, mda_file_data.nd)]
+    first_pos = 0
+    first_det = len(p_list) if p_list else None
+    for e, p in enumerate(p_list):
+        D[e] = p
+    for e, d in enumerate(d_list):
+        D[e + len(p_list)] = d
+    return D, first_pos, first_det
 
 
-def get_md(parent, doc, key, default=None):
-    """Cautiously, get metadata from tiled object by document and key."""
-    return (parent.metadata.get(doc) or {}).get(key) or default
+def get_md(mda_file_metadata):
+    from collections import OrderedDict
 
+    new_metadata = OrderedDict()
+    for key, value in mda_file_metadata.items():
+        if isinstance(key, bytes):
+            key = key.decode("utf-8", "ignore")
 
-def get_tiled_runs(cat, since=None, until=None, text=[], text_case=[], **keys):
-    """
-    Return a new catalog, filtered by search terms.
-
-    Runs will be selected with start time `>=since` and `< until`.
-    If either is `None`, then the corresponding filter will not be
-    applied.
-
-    Parameters
-
-    `cat` obj :
-        This is the catalog to be searched.
-        `Node` object returned by tiled.client.
-    `since` str :
-        Earliest start date (& time), in ISO8601 format.
-    `until` str :
-        Latest start date (& time), in ISO8601 format.
-    `text` [str] :
-        List of full text searches.  Not sensitive to case.
-    `text_case` [str] :
-        List of full text searches.  Case sensitive.
-    `keys` dict :
-        Dictionary of metadata keys and values to be matched.
-    """
-    if since is not None:
-        cat = cat.search(QueryTimeSince(since))
-    if until is not None:
-        cat = cat.search(QueryTimeUntil(until))
-
-    for k, v in keys.items():
-        cat = cat.search(tiled.queries.Key(k) == v)
-
-    for v in text:
-        cat = cat.search(tiled.queries.FullText(v, case_sensitive=False))
-    for v in text_case:
-        cat = cat.search(tiled.queries.FullText(v, case_sensitive=True))
-    return cat
+        if isinstance(value, tuple):
+            # Exclude unwanted keys like EPICS_type
+            new_metadata[key] = {
+                k: byte2str(v)
+                for k, v in zip(
+                    ["description", "unit", "value", "EPICS_type", "count"],
+                    value,
+                )
+                if k not in ["EPICS_type", "count"]
+            }
+        else:
+            new_metadata[key] = value
+    return new_metadata
 
 
 def run_in_thread(func):
@@ -130,30 +118,6 @@ def run_in_thread(func):
         return thread
 
     return wrapper
-
-
-def run_summary_table(runs):
-    import pyRestTable
-
-    table = pyRestTable.Table()
-    table.labels = "# uid7 scan# plan #points exit started streams".split()
-    for i, uid in enumerate(runs, start=1):
-        run = runs[uid]
-        md = run.metadata
-        t0 = md["start"].get("time")
-        table.addRow(
-            (
-                i,
-                uid[:7],
-                md["summary"].get("scan_id"),
-                md["summary"].get("plan_name"),
-                md["start"].get("num_points"),
-                (md["stop"] or {}).get("exit_status"),  # if no stop document!
-                datetime.datetime.fromtimestamp(t0).isoformat(sep=" "),
-                ", ".join(md["summary"].get("stream_names")),
-            )
-        )
-    return table
 
 
 def removeAllLayoutWidgets(layout):
@@ -184,14 +148,6 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
 
     # print(f"myLoadUi({ui_file=})")
     return uic.loadUi(ui_file, baseinstance=baseinstance, **kw)
-
-
-def connect_tiled_server(uri):
-    from tiled.client import from_uri
-    from tiled.client.cache import Cache
-
-    client = from_uri(uri, "dask", cache=Cache.in_memory(2e9))
-    return client
 
 
 def getUiFileName(py_file_name):

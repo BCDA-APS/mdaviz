@@ -6,11 +6,10 @@ QAbstractTableModel of folder content.
     ~MDAFolderTableModel
 """
 
+from mda import readMDA
+from pathlib import Path
 from PyQt5 import QtCore
 from . import utils
-
-DEFAULT_PAGE_SIZE = 20
-DEFAULT_PAGE_OFFSET = 0
 
 
 class MDAFolderTableModel(QtCore.QAbstractTableModel):
@@ -20,25 +19,24 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         self.actions_library = {
             "Prefix": lambda file: file.rsplit("_", 1)[0],
             "Scan #": lambda file: int(file.rsplit("_", 1)[1].split(".")[0]),
-            "Points": lambda file: "TODO",  # TODO: get_file_pts
-            "Dim": lambda file: "TODO",  # TODO: get_file_dim
-            "Size": lambda file: self.get_file_size(file),
+            "Points": lambda file: self.get_file_pts(file),
+            "Dim": lambda file: self.get_file_dim(file),
+            "Positioner": lambda file: self.get_file_pos(file),
             "Date": lambda file: self.get_file_date(file),
+            "Size": lambda file: self.get_file_size(file),
         }
 
         self.columnLabels = list(self.actions_library.keys())
 
-        # self.setPageOffset(DEFAULT_PAGE_OFFSET, init=True)
-        # self.setPageSize(DEFAULT_PAGE_SIZE, init=True)
         self.setAscending(True)
-        self.folderCount = 0
+        self._folderCount = 0
 
         super().__init__()
 
         self.setFolder(data)
-        self.setFileList(
-            self._get_fileList()
-        )  # this return the truncated list of file in the pager
+        self.setFileList(self._get_fileList())
+        # this return the truncated list of file in the pager
+        # TODO: this could probably go away while there is no pager
 
     # ------------ methods required by Qt's view
 
@@ -86,7 +84,21 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
 
     def get_file_date(self, file):
         filepath = self.get_file_path(file)
-        return utils.ts2iso(round(filepath.stat().st_ctime))
+        return utils.byte2str(readMDA(str(filepath))[1].time).split(".")[0]
+
+    def get_file_pts(self, file):
+        filepath = self.get_file_path(file)
+        return readMDA(str(filepath))[1].curr_pt
+
+    def get_file_dim(self, file):
+        filepath = self.get_file_path(file)
+        return readMDA(str(filepath))[1].dim
+
+    def get_file_pos(self, file):
+        filepath = self.get_file_path(file)
+        pv = utils.byte2str(readMDA(str(filepath))[1].p[0].name)
+        desc = utils.byte2str(readMDA(str(filepath))[1].p[0].desc)
+        return desc if desc else pv
 
     # # ------------ get & set methods
 

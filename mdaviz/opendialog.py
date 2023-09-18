@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QFileDialog
 
 from pathlib import Path
 from . import utils
-from .app_settings import settings
+from .user_settings import settings
 
 DIR_SETTINGS_KEY = "directory"
 

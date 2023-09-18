@@ -3,7 +3,7 @@ from PyQt5 import QtWidgets
 
 from . import APP_TITLE
 from . import utils
-from .app_settings import settings
+from .user_settings import settings
 from .opendialog import DIR_SETTINGS_KEY
 
 UI_FILE = utils.getUiFileName(__file__)
