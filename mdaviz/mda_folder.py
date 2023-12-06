@@ -132,7 +132,7 @@ class MDA_MVC(QtWidgets.QWidget):
                 action == "replace"
 
         if action in ("remove"):  # TODO: implement "remove"
-            raise ValueError(f"Unsupported action: {action=}")
+            widget.clearPlot()
 
         if action in ("replace", "add"):
             for ds, ds_options in datasets:

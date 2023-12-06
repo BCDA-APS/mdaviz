@@ -117,3 +117,6 @@ class ChartView(QtWidgets.QWidget):
 
     def setPlotTitle(self, text):
         self.plot_widget.plotItem.setTitle(text)
+
+    def clearPlot(self):
+        self.plot_widget.clear()
