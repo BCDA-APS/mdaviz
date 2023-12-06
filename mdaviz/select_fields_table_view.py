@@ -57,6 +57,12 @@ class SelectFieldsTableView(QtWidgets.QWidget):
     def data(self):
         return self._data
 
+    def firstPos(self):
+        return self._firstPos
+
+    def firstDet(self):
+        return self._firstDet
+
     def metadata(self):
         return self._metadata
 
@@ -99,6 +105,8 @@ class SelectFieldsTableView(QtWidgets.QWidget):
             )
             for v in detsDict.values()
         ]
+        self._firstPos = first_pos
+        self._firstDet = first_det
         self._file = file_path
         self._detsDict = detsDict
         self._data = fields, first_pos, first_det
