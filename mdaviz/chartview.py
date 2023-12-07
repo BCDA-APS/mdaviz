@@ -120,3 +120,7 @@ class ChartView(QtWidgets.QWidget):
 
     def clearPlot(self):
         self.plot_widget.clear()
+
+    def hasDataItems(self):
+        # Check if the plot widget has any plot data items
+        return len(self.plot_widget.plotItem.items) > 0

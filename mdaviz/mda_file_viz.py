@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import QFont
 
 from . import utils
+from .chartview import ChartView
 
 MD_FONT = "Monospace"
 MD_FONT_SIZE = 12
@@ -37,6 +38,16 @@ class MDAFileVisualization(QtWidgets.QWidget):
         utils.removeAllLayoutWidgets(layout)
         layout.addWidget(plot_widget)
         self.tabWidget.setCurrentWidget(self.plotPage)
+
+    def isPlotBlank(self):
+        layout = self.plotPage.layout()
+        if layout.count() == 0:
+            return True
+        plot_widget = layout.itemAt(0).widget()
+        # Check if the plot widget is an instance of ChartView and has data items
+        if isinstance(plot_widget, ChartView):
+            return not plot_widget.hasDataItems()
+        return True  # If not a ChartView instance, consider it as blank
 
     def setStatus(self, text):
         self.parent.setStatus(text)
