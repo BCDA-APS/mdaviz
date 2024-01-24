@@ -129,7 +129,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self.parent.setStatus(text)
 
 
-def to_datasets(detsDict, selections):
+def to_datasets_qt(detsDict, selections):
     """Prepare datasets and options for plotting."""
 
     from . import chartview
@@ -176,6 +176,34 @@ def to_datasets(detsDict, selections):
         "x": x_name,
         "y_units": y_units,
         "y": ",\t".join(y_names),
+    }
+
+    return datasets, plot_options
+
+
+def to_datasets_mpl(detsDict, selections):
+    """Prepare datasets and options for plotting with Matplotlib."""
+
+    datasets = []
+    x_axis = selections.get("X")  # x_axis is the row number
+    if x_axis is None:
+        x_data = None
+    else:
+        x = detsDict[x_axis]
+        x_data = x.data
+
+    for y_axis in selections.get("Y", []):  # y_axis is the list of row numbers
+        y = detsDict[y_axis]
+        y_data = y.data
+        y_name = utils.byte2str(y.name)
+
+        ds = {"x": x_data, "y": y_data, "label": y_name}
+        datasets.append(ds)
+
+    plot_options = {
+        "xlabel": utils.byte2str(detsDict[x_axis].name) if x_axis else "Index",
+        "ylabel": "Values",
+        # Add other Matplotlib specific plot options here
     }
 
     return datasets, plot_options
