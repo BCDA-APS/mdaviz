@@ -220,9 +220,9 @@ def to_datasets_mpl(detsDict, selections):
     if len(y_names) == 1:
         title = f"{y_name} vs {x_name}"
     elif len(y_names) <= 3:
-        title = "[" + " ,  ".join(y_names) + f"]\n vs {x_name}"
+        title = "(" + " ,  ".join(y_names) + f")\n vs {x_name}"
     else:
-        title = "[" + " ,  ".join(y_names[0:3]) + f", ...]\n vs {x_name}"
+        title = "(" + " ,  ".join(y_names[0:3]) + f", ...)\n vs {x_name}"
 
     plot_options = {
         "x": x_name,  # label for x axis
