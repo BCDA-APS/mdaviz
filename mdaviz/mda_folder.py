@@ -127,49 +127,49 @@ class MDA_MVC(QtWidgets.QWidget):
 
         action = args[0]
         selections = args[1]
+        print(f"doPlot called with action: {action}, args: {args}")
 
         detsDict = self.select_fields_tableview.detsDict()
 
         # setup datasets
         datasets_qt, options_qt = to_datasets_qt(detsDict, selections)
         datasets_mpl, options_mpl = to_datasets_mpl(detsDict, selections)
-        print(options_mpl)
 
-        # get the pyQtchart chartview widget, if exists
-        layout = self.mda_file_visualization.plotPageQt.layout()
-        if layout.count() != 1:  # in case something changes ...
+        # # get the pyQtchart chartview widget, if exists:
+        layoutQt = self.mda_file_visualization.plotPageQt.layout()
+        if layoutQt.count() != 1:  # in case something changes ...
             raise RuntimeError("Expected exactly one widget in this layout!")
-        widget = layout.itemAt(0).widget()
-        if not isinstance(widget, ChartViewQt) or action == "replace":
-            widget = ChartViewQt(self, **options_qt)  # Make a blank chart.
+        widgetQt = layoutQt.itemAt(0).widget()
+        if not isinstance(widgetQt, ChartViewQt) or action == "replace":
+            widgetQt = ChartViewQt(self, **options_qt)  # Make a blank chart.
             if action == "add":
                 action == "replace"
 
+        # # get the matplotlib chartview widget, if exists:
+        layoutMpl = self.mda_file_visualization.plotPageMpl.layout()
+        if layoutMpl.count() != 1:  # in case something changes ...
+            raise RuntimeError("Expected exactly one widget in this layout!")
+        widgetMpl = layoutMpl.itemAt(0).widget()
+        if not isinstance(widgetMpl, ChartViewMpl) or action == "replace":
+            widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
+            if action == "add":
+                action == "replace"
+
+        if action in ("clear"):
+            widgetQt.clearPlot()
+            widgetMpl.clearPlot()
+
         if action in ("remove"):  # TODO: implement "remove"
-            widget.clearPlot()
+            widgetQt.clearPlot()
+            widgetMpl.clearPlot()
 
         if action in ("replace", "add"):
             for ds, ds_options in datasets_qt:
-                widget.plot(*ds, **ds_options)
-            self.mda_file_visualization.setPlotQt(widget)
-
-        # get the matplotlib chartview widget, if exists
-        layout = self.mda_file_visualization.plotPageMpl.layout()
-        if layout.count() != 1:  # in case something changes ...
-            raise RuntimeError("Expected exactly one widget in this layout!")
-        widget = layout.itemAt(0).widget()
-        if not isinstance(widget, ChartViewMpl) or action == "replace":
-            widget = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
-            if action == "add":
-                action == "replace"
-
-        if action in ("remove"):  # TODO: implement "remove"
-            widget.clearPlot()
-
-        if action in ("replace", "add"):
+                widgetQt.plot(*ds, **ds_options)
+            self.mda_file_visualization.setPlotQt(widgetQt)
             for ds, ds_options in datasets_mpl:
-                widget.plot(*ds, **ds_options)
-            self.mda_file_visualization.setPlotMpl(widget)
+                widgetMpl.plot(*ds, **ds_options)
+            self.mda_file_visualization.setPlotMpl(widgetMpl)
 
     # # ------------ splitter methods
 

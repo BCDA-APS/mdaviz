@@ -36,7 +36,7 @@
          </property>
          <widget class="QWidget" name="plotPageMpl">
           <attribute name="title">
-           <string>PLotMPL</string>
+           <string>PlotMPL</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>

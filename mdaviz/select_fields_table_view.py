@@ -48,6 +48,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
 
         self.addButton.clicked.connect(partial(self.responder, "add"))
+        self.clearButton.clicked.connect(partial(self.responder, "clear"))
         self.removeButton.clicked.connect(partial(self.responder, "remove"))
         self.replaceButton.clicked.connect(partial(self.responder, "replace"))
 
@@ -71,7 +72,15 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def responder(self, action):
         """Modify the plot with the described action."""
+        # print(f"Responder action: {action}, Widget state: {self.checkWidgetState()}")
         self.selected.emit(action, self.tableView.model().plotFields()[0])
+
+    def checkWidgetState(self):
+        # for debugging purposes
+        return {
+            "isVisible": self.isVisible(),
+            "isEnabled": self.isEnabled(),
+        }
 
     def displayTable(self, index):
         from .select_fields_table_model import SelectFieldsTableModel

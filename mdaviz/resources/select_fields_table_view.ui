@@ -64,6 +64,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="replaceButton">
+            <property name="text">
+             <string>Replace</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="removeButton">
             <property name="text">
              <string>Remove</string>
@@ -71,9 +78,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="replaceButton">
+           <widget class="QPushButton" name="clearButton">
             <property name="text">
-             <string>Replace</string>
+             <string>Clear</string>
             </property>
            </widget>
           </item>

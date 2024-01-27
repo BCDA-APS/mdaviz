@@ -165,24 +165,14 @@ class ChartViewMpl(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(self)
         layout.addWidget(self.toolbar)
         layout.addWidget(self.canvas)
-        self.setLayout(layout)  # Apply the QVBoxLayout to the ChartViewMpl widget
+        # Apply the QVBoxLayout to the ChartViewMpl widget
+        self.setLayout(layout)
 
         # Connect the click event to a handler
         self.cid = self.figure.canvas.mpl_connect("button_press_event", self.onclick)
         self.cursor_positions = [None, None]
         self.red_cursor = None
         self.blue_cursor = None
-
-        # # Add an information panel as an inset axes at the bottom
-        # self.info_panel_axes = inset_axes(
-        #     self.axes,
-        #     width="100%",  # panel width = 100% of the parent axes
-        #     height="15%",  # panel height = 15% of the parent axes
-        #     loc="lower center",
-        #     bbox_to_anchor=(0, -0.1, 1, 1),
-        #     bbox_transform=self.axes.transAxes,
-        #     borderpad=0,
-        # )
 
         # Plot configuration
         config = {
