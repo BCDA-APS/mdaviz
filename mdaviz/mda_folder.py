@@ -120,10 +120,9 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def doPlot(self, *args):
         """Slot: data field selected (for plotting) button is clicked."""
-        from .chartview import ChartView
-        from .chartview_mpl import ChartViewMpl
+        from .chartview import ChartViewQt
+        from .chartview import ChartViewMpl
         from .select_fields_table_view import to_datasets_qt
-
         from .select_fields_table_view import to_datasets_mpl
 
         action = args[0]
@@ -134,14 +133,15 @@ class MDA_MVC(QtWidgets.QWidget):
         # setup datasets
         datasets_qt, options_qt = to_datasets_qt(detsDict, selections)
         datasets_mpl, options_mpl = to_datasets_mpl(detsDict, selections)
+        print(options_mpl)
 
         # get the pyQtchart chartview widget, if exists
         layout = self.mda_file_visualization.plotPageQt.layout()
         if layout.count() != 1:  # in case something changes ...
             raise RuntimeError("Expected exactly one widget in this layout!")
         widget = layout.itemAt(0).widget()
-        if not isinstance(widget, ChartView) or action == "replace":
-            widget = ChartView(self, **options_qt)  # Make a blank chart.
+        if not isinstance(widget, ChartViewQt) or action == "replace":
+            widget = ChartViewQt(self, **options_qt)  # Make a blank chart.
             if action == "add":
                 action == "replace"
 
