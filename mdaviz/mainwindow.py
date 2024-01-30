@@ -162,16 +162,21 @@ class MainWindow(QtWidgets.QMainWindow):
                     subfolder_list = []
                     if parent_path:  # Don't add the root parent folder
                         subfolder_list.append(parent_path)
-                    for item in folder_path.iterdir():
-                        if item.is_dir():
-                            if item.name.startswith("."):
-                                continue  # skip hidden folders
-                            new_parent_path = (
-                                f"{parent_path}/{item.name}"
-                                if parent_path
-                                else item.name
-                            )
-                            subfolder_list += get_all_subfolders(item, new_parent_path)
+                    try:
+                        for item in folder_path.iterdir():
+                            if item.is_dir():
+                                if item.name.startswith("."):
+                                    continue  # skip hidden folders
+                                new_parent_path = (
+                                    f"{parent_path}/{item.name}"
+                                    if parent_path
+                                    else item.name
+                                )
+                                subfolder_list += get_all_subfolders(
+                                    item, new_parent_path
+                                )
+                    except PermissionError:
+                        print(f"Permission denied for folder: {folder_path}")
                     return subfolder_list
 
                 self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
