@@ -101,7 +101,11 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
             if len(readMDA(str(filepath))[1].p)
             else "index"
         )
-        desc = utils.byte2str(readMDA(str(filepath))[1].p[0].desc)
+        desc = (
+            utils.byte2str(readMDA(str(filepath))[1].p[0].desc)
+            if len(readMDA(str(filepath))[1].p)
+            else "index"
+        )
         return desc if desc else pv
 
     # # ------------ get & set methods
