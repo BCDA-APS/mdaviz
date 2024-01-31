@@ -96,8 +96,16 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
 
     def get_file_pos(self, file):
         filepath = self.get_file_path(file)
-        pv = utils.byte2str(readMDA(str(filepath))[1].p[0].name)
-        desc = utils.byte2str(readMDA(str(filepath))[1].p[0].desc)
+        pv = (
+            utils.byte2str(readMDA(str(filepath))[1].p[0].name)
+            if len(readMDA(str(filepath))[1].p)
+            else "index"
+        )
+        desc = (
+            utils.byte2str(readMDA(str(filepath))[1].p[0].desc)
+            if len(readMDA(str(filepath))[1].p)
+            else "index"
+        )
         return desc if desc else pv
 
     # # ------------ get & set methods

@@ -34,9 +34,19 @@
          <property name="currentIndex">
           <number>0</number>
          </property>
-         <widget class="QWidget" name="plotPage">
+         <widget class="QWidget" name="plotPageMpl">
           <attribute name="title">
-           <string>Plot</string>
+           <string>PlotMPL</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <widget class="QWidget" name="plotMPL" native="true"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="plotPageQt">
+          <attribute name="title">
+           <string>PlotQt</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>

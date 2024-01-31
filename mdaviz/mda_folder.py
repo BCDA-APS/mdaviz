@@ -76,6 +76,22 @@ class MDA_MVC(QtWidgets.QWidget):
             self.select_fields_tableview.selected.connect(self.doPlot)
             self.setStatus(f"Selected file: {self.mdaFileList()[index.row()]}")
 
+            # if the graph(s) is(are) blank ( as of now, Qt blank = Mpl blank), selecting a file automatically plots the first pos. vs first det.
+            # TODO: this should depend on the selection: auto-replace vs auto-add; if auto-replace, will plot even if graph is not blank.
+            if (
+                self.mda_file_visualization.isPlotBlankQt()
+                or self.mda_file_visualization.isPlotBlankMpl()
+            ):
+                first_pos_idx = self.select_fields_tableview.firstPos()
+                first_det_idx = self.select_fields_tableview.firstDet()
+                if first_pos_idx is not None and first_det_idx is not None:
+                    first_selections = {"X": first_pos_idx, "Y": [first_det_idx]}
+                    self.doPlot("replace", first_selections)
+                else:
+                    self.setStatus(
+                        "Could not find a (positioner,detector) pair to plot."
+                    )
+
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
         return self.parent.dataPath()
@@ -110,34 +126,56 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def doPlot(self, *args):
         """Slot: data field selected (for plotting) button is clicked."""
-        from .chartview import ChartView
-        from .select_fields_table_view import to_datasets
+        from .chartview import ChartViewQt
+        from .chartview import ChartViewMpl
+        from .select_fields_table_view import to_datasets_qt
+        from .select_fields_table_view import to_datasets_mpl
 
         action = args[0]
         selections = args[1]
+        print(f"doPlot called with action: {action}, args: {args}")
 
         detsDict = self.select_fields_tableview.detsDict()
 
         # setup datasets
-        datasets, options = to_datasets(detsDict, selections)
+        datasets_qt, options_qt = to_datasets_qt(detsDict, selections)
+        datasets_mpl, options_mpl = to_datasets_mpl(detsDict, selections)
 
-        # get the chartview widget, if exists
-        layout = self.mda_file_visualization.plotPage.layout()
-        if layout.count() != 1:  # in case something changes ...
+        # get the pyQtchart chartview widget, if exists:
+        layoutQt = self.mda_file_visualization.plotPageQt.layout()
+        if layoutQt.count() != 1:  # in case something changes ...
             raise RuntimeError("Expected exactly one widget in this layout!")
-        widget = layout.itemAt(0).widget()
-        if not isinstance(widget, ChartView) or action == "replace":
-            widget = ChartView(self, **options)  # Make a blank chart.
+        widgetQt = layoutQt.itemAt(0).widget()
+        if not isinstance(widgetQt, ChartViewQt) or action == "replace":
+            widgetQt = ChartViewQt(self, **options_qt)  # Make a blank chart.
             if action == "add":
                 action == "replace"
 
+        # # get the matplotlib chartview widget, if exists:
+        layoutMpl = self.mda_file_visualization.plotPageMpl.layout()
+        if layoutMpl.count() != 1:  # in case something changes ...
+            raise RuntimeError("Expected exactly one widget in this layout!")
+        widgetMpl = layoutMpl.itemAt(0).widget()
+        if not isinstance(widgetMpl, ChartViewMpl) or action == "replace":
+            widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
+            if action == "add":
+                action == "replace"
+
+        if action in ("clear"):
+            widgetQt.clearPlot()
+            widgetMpl.clearPlot()
+
         if action in ("remove"):  # TODO: implement "remove"
-            raise ValueError(f"Unsupported action: {action=}")
+            widgetQt.clearPlot()
+            widgetMpl.clearPlot()
 
         if action in ("replace", "add"):
-            for ds, ds_options in datasets:
-                widget.plot(*ds, **ds_options)
-            self.mda_file_visualization.setPlot(widget)
+            for ds, ds_options in datasets_qt:
+                widgetQt.plot(*ds, **ds_options)
+            self.mda_file_visualization.setPlotQt(widgetQt)
+            for ds, ds_options in datasets_mpl:
+                widgetMpl.plot(*ds, **ds_options)
+            self.mda_file_visualization.setPlotMpl(widgetMpl)
 
     # # ------------ splitter methods
 
