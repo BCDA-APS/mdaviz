@@ -76,15 +76,21 @@ class MDA_MVC(QtWidgets.QWidget):
             self.select_fields_tableview.selected.connect(self.doPlot)
             self.setStatus(f"Selected file: {self.mdaFileList()[index.row()]}")
 
-            if self.mda_file_visualization.isPlotBlankQt():  # TODO what about MPL?
-                # TODO: this should depend on the selection: auto-replace vs auto-add
+            # if the graph(s) is(are) blank ( as of now, Qt blank = Mpl blank), selecting a file automatically plots the first pos. vs first det.
+            # TODO: this should depend on the selection: auto-replace vs auto-add; if auto-replace, will plot even if graph is not blank.
+            if (
+                self.mda_file_visualization.isPlotBlankQt()
+                or self.mda_file_visualization.isPlotBlankMpl()
+            ):
                 first_pos_idx = self.select_fields_tableview.firstPos()
                 first_det_idx = self.select_fields_tableview.firstDet()
                 if first_pos_idx is not None and first_det_idx is not None:
                     first_selections = {"X": first_pos_idx, "Y": [first_det_idx]}
                     self.doPlot("replace", first_selections)
                 else:
-                    self.setStatus("Could not find a positioner or detector to plot.")
+                    self.setStatus(
+                        "Could not find a (positioner,detector) pair to plot."
+                    )
 
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
@@ -135,7 +141,7 @@ class MDA_MVC(QtWidgets.QWidget):
         datasets_qt, options_qt = to_datasets_qt(detsDict, selections)
         datasets_mpl, options_mpl = to_datasets_mpl(detsDict, selections)
 
-        # # get the pyQtchart chartview widget, if exists:
+        # get the pyQtchart chartview widget, if exists:
         layoutQt = self.mda_file_visualization.plotPageQt.layout()
         if layoutQt.count() != 1:  # in case something changes ...
             raise RuntimeError("Expected exactly one widget in this layout!")
