@@ -14,6 +14,9 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 FONTSIZE = 11
+LEFT_BUTTON = 1
+MIDDLE_BUTTON = 2
+RIGHT_BUTTON = 3
 TIMESTAMP_LIMIT = datetime.datetime.fromisoformat("1990-01-01").timestamp()
 
 # https://pyqtgraph.readthedocs.io/en/latest/api_reference/graphicsItems/scatterplotitem.html#pyqtgraph.ScatterPlotItem.setSymbol
@@ -169,10 +172,12 @@ class ChartViewMpl(QtWidgets.QWidget):
         # Connect the click event to a handler
         self.cid = self.figure.canvas.mpl_connect("button_press_event", self.onclick)
         self.cursors = {
-            1: False,
+            1: None,
             "pos1": None,
-            2: False,
+            "text1": "Cursor 1: press middle click",
+            2: None,
             "pos2": None,
+            "text2": "Cursor 2: press right click",
         }
 
         # Plot configuration
@@ -203,21 +208,22 @@ class ChartViewMpl(QtWidgets.QWidget):
 
     def clearPlot(self):
         self.main_axes.clear()
-        self.cursors[1] = False
-        self.cursors[2] = False
+        self.cursors[1] = None
+        self.cursors[2] = None
+        self.cursors["pos1"] = None
+        self.cursors["pos2"] = None
+        self.cursors["text1"] = "Cursor 1: press middle click"
+        self.cursors["text2"] = "Cursor 2: press right click"
         self.info_panel_axes.clear()
         self.canvas.draw()
 
     # Additional methods:
 
-    # TODO: use a dictionary to track the cursors
-    # TODO: allow a blue cursor to be placed without the presence of a red cursor
-
     def onclick(self, event):
         # Check if the click was in the main_axes
         if event.inaxes is self.main_axes:
             # Middle click for red cursor
-            if event.button == 2:
+            if event.button == MIDDLE_BUTTON:
                 if self.cursors[1]:
                     self.cursors[1].remove()  # Remove existing red cursor
                 (self.cursors[1],) = self.main_axes.plot(
@@ -227,7 +233,7 @@ class ChartViewMpl(QtWidgets.QWidget):
                 self.cursors["pos1"] = (event.xdata, event.ydata)
 
             # Right click for blue cursor
-            elif event.button == 3:
+            elif event.button == RIGHT_BUTTON:
                 if self.cursors[2]:
                     self.cursors[2].remove()  # Remove existing blue cursor
                 (self.cursors[2],) = self.main_axes.plot(
@@ -244,51 +250,61 @@ class ChartViewMpl(QtWidgets.QWidget):
             self.canvas.draw()
 
     def update_info_panel(self):
+        """
+        Update cursor information in info panel subplot.
+        """
+
         # Clear the info panel by removing each text artist
         while len(self.info_panel_axes.texts) > 0:
             for text in self.info_panel_axes.texts:
                 text.remove()
 
-        # Initialize text variables
-        cursor1_text = "Cursor 1: press middle click"
-        cursor2_text = "Cursor 2: press right click"
-        diff_text = "Difference: n/a"
-        midpoint_text = "Midpoint: n/a"
-        fwhm_text = "FWHM: n/a"
-        center_text = "Center: n/a"
+        # Initialize text variables dictionary
+        info_panel_text = {
+            "diff": "Difference: n/a",
+            "midpoint": "Midpoint: n/a",
+            "fwhm": "FWHM: n/a",
+            "center": "Center: n/a",
+        }
 
         # Check for the first cursor and update text accordingly
         if self.cursors[1]:
             x1, y1 = self.cursors["pos1"]
-            cursor1_text = f"Cursor 1: ({x1:.3f}, {y1:.3f})"
+            self.cursors["text1"] = f"Cursor 1: ({x1:.3f}, {y1:.3f})"
 
         # Check for the second cursor and update text accordingly
         if self.cursors[2]:
             x2, y2 = self.cursors["pos2"]
-            cursor2_text = f"Cursor 2: ({x2:.3f}, {y2:.3f})"
+            self.cursors["text2"] = f"Cursor 2: ({x2:.3f}, {y2:.3f})"
 
         if self.cursors[1] and self.cursors[2]:
             # Calculate differences and midpoints only if both cursors are present
             delta_x = x2 - x1
             delta_y = y2 - y1
-            average_x = (x1 + x2) / 2
-            average_y = (y1 + y2) / 2
-            diff_text = f"Difference: ({delta_x:.3f}, {delta_y:.3f})"
-            midpoint_text = f"Midpoint: ({average_x:.3f}, {average_y:.3f})"
+            midpoint_x = (x1 + x2) / 2
+            midpoint_y = (y1 + y2) / 2
+            info_panel_text["diff"] = f"Difference: ({delta_x:.3f}, {delta_y:.3f})"
+            info_panel_text[
+                "midpoint"
+            ] = f"Midpoint: ({midpoint_x:.3f}, {midpoint_y:.3f})"
 
         self.adjust_info_panel_text(
-            cursor1_text,
-            cursor2_text,
-            diff_text,
-            midpoint_text,
-            fwhm_text,
-            center_text,
+            self.cursors["text1"],
+            self.cursors["text2"],
+            info_panel_text["diff"],
+            info_panel_text["midpoint"],
+            info_panel_text["fwhm"],
+            info_panel_text["center"],
         )
 
         # Redraw the canvas to update the panel
         self.canvas.draw()
 
     def adjust_info_panel_text(self, *args):
+        """
+        Place info each info panel element in the rigft place.
+        """
+
         # Clear the info panel by removing each text artist
         self.info_panel_axes.clear()
 
