@@ -12,8 +12,6 @@ import pyqtgraph as pg
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from matplotlib.gridspec import GridSpec
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 FONTSIZE = 11
 TIMESTAMP_LIMIT = datetime.datetime.fromisoformat("1990-01-01").timestamp()
