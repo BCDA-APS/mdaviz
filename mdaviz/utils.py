@@ -65,6 +65,14 @@ def get_det(mda_file_data):
     d_list = [mda_file_data.d[i] for i in range(0, mda_file_data.nd)]
     first_pos = 0
     first_det = len(p_list) if p_list else None
+    print(f"{mda_file_data.np=}")
+    print(f"{mda_file_data.nd=}")
+    print(f"{first_pos=}")
+    print(f"{first_det=}")
+    print(f"{len(p_list)=}")
+    print(f"{first_pos=}")
+    print(f"{first_det=}")
+
     for e, p in enumerate(p_list):
         D[e] = p
     for e, d in enumerate(d_list):
