@@ -82,7 +82,7 @@ def get_det(mda_file_data):
         D[e + 1] = p
     print(f"{D=}")
     print(f"{mda_file_data.p[0].data}")
-    print(f"{list(range(0,mda_file_data.curr_pt))}"
+    print(f"{list(range(0,mda_file_data.curr_pt))}")
     for e, d in enumerate(d_list):
         D[e + 1 + mda_file_data.np] = d
     return D, first_pos, first_det
