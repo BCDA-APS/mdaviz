@@ -60,8 +60,12 @@ def byte2str(byte_literal):
 def get_det(mda_file_data):
     """det_dict = { index: [fieldname, pv, desc, unit]}"""
     D = {}
-    p_list = [mda_file_data.p[i] for i in range(0, mda_file_data.np)]
-    d_list = [mda_file_data.d[i] for i in range(0, mda_file_data.nd)]
+    p_list = [
+        mda_file_data.p[i] for i in range(0, mda_file_data.np)
+    ]  # mda_file_data.np = number of positioners
+    d_list = [
+        mda_file_data.d[i] for i in range(0, mda_file_data.nd)
+    ]  # mda_file_data.nd = number of detectors
     first_pos = 1 if mda_file_data.np else 0
     first_det = mda_file_data.np + 1
 
