@@ -9,6 +9,8 @@ from .opendialog import DIR_SETTINGS_KEY
 UI_FILE = utils.getUiFileName(__file__)
 MAX_RECENT_DIRS = 5
 DATA_FOLDER_INVALID = Path(__file__).parent / "fake_folder"
+MAX_DEPTH = 4
+MAX_SUBFOLDER = 10
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -158,25 +160,28 @@ class MainWindow(QtWidgets.QMainWindow):
             if folder_path.exists() and folder_path.is_dir():  # folder exists
                 self._folderPath = folder_path
 
-                def get_all_subfolders(folder_path, parent_path=""):
+                def get_all_subfolders(folder_path, parent_path="", current_depth=0):
                     subfolder_list = []
                     if parent_path:  # Don't add the root parent folder
                         subfolder_list.append(parent_path)
-                    try:
-                        for item in folder_path.iterdir():
-                            if item.is_dir():
-                                if item.name.startswith("."):
-                                    continue  # skip hidden folders
-                                new_parent_path = (
-                                    f"{parent_path}/{item.name}"
-                                    if parent_path
-                                    else item.name
-                                )
-                                subfolder_list += get_all_subfolders(
-                                    item, new_parent_path
-                                )
-                    except PermissionError:
-                        print(f"Permission denied for folder: {folder_path}")
+                    if (
+                        current_depth < MAX_DEPTH
+                    ):  # Check if current depth is within limit
+                        try:
+                            for item in folder_path.iterdir():
+                                if item.is_dir():
+                                    if item.name.startswith("."):
+                                        continue  # skip hidden folders
+                                    new_parent_path = (
+                                        f"{parent_path}/{item.name}"
+                                        if parent_path
+                                        else item.name
+                                    )
+                                    subfolder_list += get_all_subfolders(
+                                        item, new_parent_path, current_depth + 1
+                                    )
+                        except PermissionError:
+                            print(f"Permission denied for folder: {folder_path}")
                     return subfolder_list
 
                 self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
