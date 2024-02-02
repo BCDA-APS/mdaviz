@@ -64,27 +64,27 @@ def get_det(mda_file_data):
     d_list = [mda_file_data.d[i] for i in range(0, mda_file_data.nd)]
     first_pos = 1 if mda_file_data.np else 0
     first_det = mda_file_data.np + 1
-    # P0 = scanPositionner()
-    # P0.number = 0				# positioner number in sscan record
-    # P0.fieldName = "P0"   	# name of sscanRecord PV
-    # P0.name = "index"			# name of EPICS PV this positioner wrote to
-    # P0.desc = "index"			# description of 'name' PV
-    # P0.step_mode = ""			# 'LINEAR', 'TABLE', or 'FLY'
-    # P0.unit = "a.u"				# units of 'name' PV
-    # P0.readback_name = ""		# name of EPICS PV this positioner read from, if any
-    # P0.readback_desc = ""		# description of 'readback_name' PV
-    # P0.readback_unit = ""		# units of 'readback_name' PV
-    # P0.data = list(range(0,mda_file_data.curr_pt))				# list of values written to 'name' PV.  If rank==2, lists of lists, etc.
 
-    # self.
-    # D[0] = list(range(0, mda_file_data.curr_pt))
+    P0 = scanPositioner()
+    P0.number = 0  # positioner number in sscan record
+    P0.fieldName = "P0"  # name of sscanRecord PV
+    P0.name = "Index"  # name of EPICS PV this positioner wrote to
+    P0.desc = "Index"  # description of 'name' PV
+    P0.step_mode = ""  # 'LINEAR', 'TABLE', or 'FLY'
+    P0.unit = "a.u"  # units of 'name' PV
+    P0.readback_name = ""  # name of EPICS PV this positioner read from, if any
+    P0.readback_desc = ""  # description of 'readback_name' PV
+    P0.readback_unit = ""  # units of 'readback_name' PV
+    P0.data = list(
+        range(0, mda_file_data.curr_pt)
+    )  # list of values written to 'name' PV.  If rank==2, lists of lists, etc.
+
+    D[0] = P0
     for e, p in enumerate(p_list):
         D[e + 1] = p
-    print(f"{D=}")
-    print(f"{mda_file_data.p[0].data}")
-    print(f"{list(range(0,mda_file_data.curr_pt))}")
     for e, d in enumerate(d_list):
         D[e + 1 + mda_file_data.np] = d
+    print(f"{D=}")
     return D, first_pos, first_det
 
 
