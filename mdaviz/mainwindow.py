@@ -10,7 +10,7 @@ UI_FILE = utils.getUiFileName(__file__)
 MAX_RECENT_DIRS = 5
 DATA_FOLDER_INVALID = Path(__file__).parent / "fake_folder"
 MAX_DEPTH = 4
-MAX_SUBFOLDER = 10
+MAX_SUBFOLDERS = 10
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -159,6 +159,54 @@ class MainWindow(QtWidgets.QMainWindow):
 
             if folder_path.exists() and folder_path.is_dir():  # folder exists
                 self._folderPath = folder_path
+
+                # def get_all_subfolders(
+                #     folder_path, parent_path="", current_depth=0, collected_folders=None
+                # ):
+                #     if collected_folders is None:
+                #         collected_folders = []
+
+                #     if (
+                #         parent_path and current_depth == 1
+                #     ):  # Add only at depth=1 to avoid duplication
+                #         collected_folders.append((parent_path, current_depth))
+
+                #     if current_depth < MAX_DEPTH:
+                #         try:
+                #             for item in folder_path.iterdir():
+                #                 if item.is_dir() and not item.name.startswith("."):
+                #                     new_parent_path = (
+                #                         f"{parent_path}/{item.name}"
+                #                         if parent_path
+                #                         else item.name
+                #                     )
+                #                     # Collect folder with depth information
+                #                     collected_folders.append(
+                #                         (new_parent_path, current_depth + 1)
+                #                     )
+                #                     get_all_subfolders(
+                #                         item,
+                #                         new_parent_path,
+                #                         current_depth + 1,
+                #                         collected_folders,
+                #                     )
+                #         except PermissionError:
+                #             print(f"Permission denied for folder: {folder_path}")
+
+                #     return collected_folders
+
+                # # When calling get_all_subfolders, process the result to sort by depth and limit the number
+                # def process_subfolders(folder_path, max_subfolders=MAX_SUBFOLDERS):
+                #     collected_folders = get_all_subfolders(folder_path)
+                #     # Sort by depth and then limit the total number of subfolders
+                #     sorted_and_limited_folders = sorted(
+                #         collected_folders, key=lambda x: x[1]
+                #     )[:max_subfolders]
+                #     # Extract folder paths, excluding depth
+                #     subfolder_list = [
+                #         path for path, depth in sorted_and_limited_folders
+                #     ]
+                #     return subfolder_list
 
                 def get_all_subfolders(folder_path, parent_path="", current_depth=0):
                     subfolder_list = []
