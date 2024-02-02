@@ -182,6 +182,11 @@ class MainWindow(QtWidgets.QMainWindow):
                                     )
                         except PermissionError:
                             print(f"Permission denied for folder: {folder_path}")
+                    else:
+                        print(
+                            f"Maximum folder depth of {MAX_DEPTH} has been reached. Further subfolders won't be displayed in the Folder menu (right hand side)."
+                        )
+                        print(f"{subfolder_list=}")
                     return subfolder_list
 
                 self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
@@ -224,7 +229,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 layout.addWidget(self.mvc_folder)
             else:
                 if self.hasMdaFiles == True:
-                    comment = f"No mda files found in {str(data_path)!r}."
+                    comment = f"No mda files found in {str(data_path)!r}.\nPick a different folder path (left hand side pull-down menu) or a subfolder (right hand side pull-down menu)."
                     self.folderNotValid(layout, comment, clear_sub=False)
 
     def folderNotValid(self, layout, comment, clear_sub=True):
