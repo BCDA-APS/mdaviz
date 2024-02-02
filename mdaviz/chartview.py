@@ -339,3 +339,8 @@ class ChartViewMpl(QtWidgets.QWidget):
 
         # Redraw the canvas to update the panel
         self.canvas.draw()
+
+    def hasDataItems(self):
+        # Check if the plot widget has any plot data items
+        print(f"{self.figure.axes=}")
+        return len(self.figure.axes) > 0
