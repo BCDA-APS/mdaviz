@@ -151,13 +151,7 @@ class ChartViewMpl(QtWidgets.QWidget):
         # Create the main plot subplot (flexible size)
         self.main_axes = self.figure.add_subplot(111)
         # Adjust margins
-        self.figure.subplots_adjust(bottom=0.16, top=0.92, right=0.92)
-
-        # Create the info panel subplot (fixed size)
-        self.info_panel_axes = self.figure.add_axes([0.1, 0.01, 0.8, 0.1])
-        self.info_panel_axes.set_frame_on(False)
-        self.info_panel_axes.get_xaxis().set_visible(False)
-        self.info_panel_axes.get_yaxis().set_visible(False)
+        self.figure.subplots_adjust(bottom=0.1, top=0.9, right=0.92)
 
         # Create the navigation toolbar
         self.toolbar = NavigationToolbar(self.canvas, self)
@@ -174,10 +168,12 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.cursors = {
             1: None,
             "pos1": None,
-            "text1": "Cursor 1: press middle click",
+            "text1": "press middle click",
             2: None,
             "pos2": None,
-            "text2": "Cursor 2: press right click",
+            "text2": "press right click",
+            "diff": "n/a",
+            "midpoint": "n/a",
         }
 
         # Plot configuration
@@ -212,10 +208,12 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.cursors[2] = None
         self.cursors["pos1"] = None
         self.cursors["pos2"] = None
-        self.cursors["text1"] = "Cursor 1: press middle click"
-        self.cursors["text2"] = "Cursor 2: press right click"
-        self.info_panel_axes.clear()
+        self.cursors["text1"] = "press middle click"
+        self.cursors["text2"] = "press right click"
+        self.cursors["diff"] = "n/a"
+        self.cursors["midpoint"] = "n/a"
         self.canvas.draw()
+        self.clear_cursor_info_panel()
 
     # Additional methods:
 
@@ -251,31 +249,17 @@ class ChartViewMpl(QtWidgets.QWidget):
 
     def update_info_panel(self):
         """
-        Update cursor information in info panel subplot.
+        Update cursor information in info panel widget.
         """
-
-        # Clear the info panel by removing each text artist
-        while len(self.info_panel_axes.texts) > 0:
-            for text in self.info_panel_axes.texts:
-                text.remove()
-
-        # Initialize text variables dictionary
-        info_panel_text = {
-            "diff": "Difference: n/a",
-            "midpoint": "Midpoint: n/a",
-            "fwhm": "FWHM: n/a",
-            "center": "Center: n/a",
-        }
-
         # Check for the first cursor and update text accordingly
         if self.cursors[1]:
             x1, y1 = self.cursors["pos1"]
-            self.cursors["text1"] = f"Cursor 1: ({x1:.3f}, {y1:.3f})"
+            self.cursors["text1"] = f"({x1:.2f}, {y1:.2f})"
 
         # Check for the second cursor and update text accordingly
         if self.cursors[2]:
             x2, y2 = self.cursors["pos2"]
-            self.cursors["text2"] = f"Cursor 2: ({x2:.3f}, {y2:.3f})"
+            self.cursors["text2"] = f"({x2:.2f}, {y2:.2f})"
 
         if self.cursors[1] and self.cursors[2]:
             # Calculate differences and midpoints only if both cursors are present
@@ -283,59 +267,31 @@ class ChartViewMpl(QtWidgets.QWidget):
             delta_y = y2 - y1
             midpoint_x = (x1 + x2) / 2
             midpoint_y = (y1 + y2) / 2
-            info_panel_text["diff"] = f"Difference: ({delta_x:.3f}, {delta_y:.3f})"
-            info_panel_text[
-                "midpoint"
-            ] = f"Midpoint: ({midpoint_x:.3f}, {midpoint_y:.3f})"
+            self.cursors["diff"] = f"({delta_x:.2f}, {delta_y:.2f})"
+            self.cursors["midpoint"] = f"({midpoint_x:.2f}, {midpoint_y:.2f})"
 
-        self.adjust_info_panel_text(
-            self.cursors["text1"],
-            self.cursors["text2"],
-            info_panel_text["diff"],
-            info_panel_text["midpoint"],
-            info_panel_text["fwhm"],
-            info_panel_text["center"],
+        self.update_cursor_info_panel()
+
+    def update_cursor_info_panel(self):
+        self.parent.findChild(QtWidgets.QLineEdit, "pos1_text").setText(
+            self.cursors["text1"]
+        )
+        self.parent.findChild(QtWidgets.QLineEdit, "pos2_text").setText(
+            self.cursors["text2"]
+        )
+        self.parent.findChild(QtWidgets.QLineEdit, "diff_text").setText(
+            self.cursors["diff"]
+        )
+        self.parent.findChild(QtWidgets.QLineEdit, "midpoint_text").setText(
+            self.cursors["midpoint"]
         )
 
-        # Redraw the canvas to update the panel
-        self.canvas.draw()
-
-    def adjust_info_panel_text(self, *args):
-        """
-        Place info each info panel element in the rigft place.
-        """
-
-        # Clear the info panel by removing each text artist
-        self.info_panel_axes.clear()
-
-        # Define the font size
-        font_size = FONTSIZE - 1.5
-
-        # Starting positions for the columns and rows
-        columns = [-0.05, 0.35, 0.75]  # x positions for each of the 3 columns
-        rows = [0.6, 0.3]  # y positions for each of the 2 rows
-
-        # Text entries in order of appearance
-        text_positions = [
-            (columns[0], rows[0]),  # Position for cursor1_text
-            (columns[0], rows[1]),  # Position for cursor2_text
-            (columns[1], rows[0]),  # Position for diff_text
-            (columns[1], rows[1]),  # Position for midpoint_text
-            (columns[2], rows[0]),  # Position for fwhm_text
-            (columns[2], rows[1]),  # Position for center_text
-        ]
-
-        # Iterate over args and text_positions
-        for text, (x_pos, y_pos) in zip(args, text_positions):
-            self.info_panel_axes.text(
-                x_pos,
-                y_pos,
-                text,
-                verticalalignment="top",
-                horizontalalignment="left",
-                transform=self.info_panel_axes.transAxes,
-                fontsize=font_size,
-            )
-
-        # Redraw the canvas to update the panel
-        self.canvas.draw()
+    def clear_cursor_info_panel(self):
+        self.parent.findChild(QtWidgets.QLineEdit, "pos1_text").setText(
+            "press middle click"
+        )
+        self.parent.findChild(QtWidgets.QLineEdit, "pos2_text").setText(
+            "press middle click"
+        )
+        self.parent.findChild(QtWidgets.QLineEdit, "diff_text").setText("n/a")
+        self.parent.findChild(QtWidgets.QLineEdit, "midpoint_text").setText("n/a")

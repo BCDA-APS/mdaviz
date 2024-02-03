@@ -91,7 +91,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="widget" native="true">
+        <widget class="QWidget" name="infoPanel" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
            <horstretch>0</horstretch>
@@ -106,7 +106,7 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <widget class="QGroupBox" name="groupBox">
+           <widget class="QGroupBox" name="cursorInfo">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>1</horstretch>
@@ -138,7 +138,7 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QLineEdit" name="pos_text"/>
+                 <widget class="QLineEdit" name="pos2_text"/>
                 </item>
                </layout>
               </widget>
@@ -157,14 +157,14 @@
                  <widget class="QLineEdit" name="diff_text"/>
                 </item>
                 <item row="1" column="0">
-                 <widget class="QLabel" name="midpt_label">
+                 <widget class="QLabel" name="midpoint_label">
                   <property name="text">
                    <string>Midpoint</string>
                   </property>
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QLineEdit" name="midpt_txt"/>
+                 <widget class="QLineEdit" name="midpoint_text"/>
                 </item>
                </layout>
               </widget>
@@ -173,7 +173,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QTabWidget" name="tabWidget_2">
+           <widget class="QTabWidget" name="graphInfo">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>1</horstretch>
