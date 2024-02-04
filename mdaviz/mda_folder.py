@@ -8,7 +8,6 @@ MVC implementation of mda files.
     ~MDA_MVC
 """
 
-
 import time
 from functools import partial
 
@@ -136,10 +135,11 @@ class MDA_MVC(QtWidgets.QWidget):
         print(f"doPlot called with action: {action}, args: {args}")
 
         detsDict = self.select_fields_tableview.detsDict()
+        fileName = self.select_fields_tableview.fileName()
 
         # setup datasets
         datasets_qt, options_qt = to_datasets_qt(detsDict, selections)
-        datasets_mpl, options_mpl = to_datasets_mpl(detsDict, selections)
+        datasets_mpl, options_mpl = to_datasets_mpl(fileName, detsDict, selections)
 
         # get the pyQtchart chartview widget, if exists:
         layoutQt = self.mda_file_visualization.plotPageQt.layout()

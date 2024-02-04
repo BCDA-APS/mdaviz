@@ -13,7 +13,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
-FONTSIZE = 11
+FONTSIZE = 10
 LEFT_BUTTON = 1
 MIDDLE_BUTTON = 2
 RIGHT_BUTTON = 3

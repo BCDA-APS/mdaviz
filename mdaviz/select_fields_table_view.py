@@ -55,6 +55,10 @@ class SelectFieldsTableView(QtWidgets.QWidget):
     def file(self):
         return self._file
 
+    def fileName(self):
+        # File name without the .mda extension
+        return self._fileName
+
     def data(self):
         return self._data
 
@@ -117,6 +121,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self._firstPos = first_pos
         self._firstDet = first_det
         self._file = file_path
+        self._fileName = file_name.rsplit(".mda", 1)[0]
         self._detsDict = detsDict
         self._data = fields, first_pos, first_det
         self._metadata = file_metadata
@@ -187,9 +192,9 @@ def to_datasets_qt(detsDict, selections):
     return datasets, plot_options
 
 
-def to_datasets_mpl(detsDict, selections):
+def to_datasets_mpl(fileName, detsDict, selections):
     """Prepare datasets and options for plotting with Matplotlib."""
-
+    print(f"{fileName}")
     datasets = []
 
     # x_axis is the row number
@@ -204,15 +209,20 @@ def to_datasets_mpl(detsDict, selections):
 
     # y_axis is the list of row numbers
     y_names = []
+    y_names_with_units = []
+
     for y_axis in selections.get("Y", []):
         y = detsDict[y_axis]
         y_data = y.data
         y_units = utils.byte2str(y.unit) if y.unit else "a.u."
-        y_name = utils.byte2str(y.name) + f" ({y_units})"
+        y_name = utils.byte2str(y.name)
+        y_name_with_units = y_name + y_units
+        y_name_with_file = fileName + ": " + y_name
         y_names.append(y_name)
+        y_names_with_units.append(y_name_with_units)
 
         ds, ds_options = [], {}
-        ds_options["label"] = f"{y_name}"
+        ds_options["label"] = y_name_with_file
         ds = [x_data, y_data] if x_data is not None else [y_data]
         datasets.append((ds, ds_options))
 
@@ -227,7 +237,7 @@ def to_datasets_mpl(detsDict, selections):
     plot_options = {
         "x": x_name,  # label for x axis
         "x_units": x_units,
-        "y": ", ".join(y_names[0:3]),  # label for y axis
+        "y": ", ".join(y_names_with_units[0:3]),  # label for y axis
         "y_units": y_units,
         "title": title,
     }
