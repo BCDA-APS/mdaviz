@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>764</width>
+    <width>1358</width>
     <height>710</height>
    </rect>
   </property>
@@ -24,7 +24,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>738</width>
+        <width>1332</width>
         <height>684</height>
        </rect>
       </property>
@@ -93,7 +93,7 @@
        <item>
         <widget class="QWidget" name="infoPanel" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -101,6 +101,12 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
+           <height>200</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
            <height>150</height>
           </size>
          </property>
@@ -119,17 +125,7 @@
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
               <widget class="QWidget" name="leftCol" native="true">
-               <layout class="QFormLayout" name="leftFormLayout">
-                <item row="0" column="0">
-                 <widget class="QLabel" name="cursor1_label">
-                  <property name="text">
-                   <string>Cursor 1</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QLineEdit" name="pos1_text"/>
-                </item>
+               <layout class="QGridLayout" name="gridLayout">
                 <item row="1" column="0">
                  <widget class="QLabel" name="cursor2_label">
                   <property name="text">
@@ -137,15 +133,59 @@
                   </property>
                  </widget>
                 </item>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="pos1_text"/>
+                </item>
                 <item row="1" column="1">
                  <widget class="QLineEdit" name="pos2_text"/>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="cursor1_label">
+                  <property name="text">
+                   <string>Cursor 1</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QPushButton" name="curveRemove_2">
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset>
+                    <normaloff>delete.png</normaloff>delete.png</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>14</width>
+                    <height>14</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2">
+                 <widget class="QPushButton" name="curveRemove_1">
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset>
+                    <normaloff>delete.png</normaloff>delete.png</iconset>
+                  </property>
+                  <property name="iconSize">
+                   <size>
+                    <width>14</width>
+                    <height>14</height>
+                   </size>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </widget>
              </item>
              <item>
               <widget class="QWidget" name="rightCol" native="true">
-               <layout class="QFormLayout" name="rightFormLayout">
+               <layout class="QGridLayout" name="gridLayout_2">
                 <item row="0" column="0">
                  <widget class="QLabel" name="diff_label">
                   <property name="text">
@@ -183,44 +223,103 @@
             <property name="currentIndex">
              <number>0</number>
             </property>
-            <widget class="QWidget" name="tab">
+            <widget class="QWidget" name="basicTab">
              <attribute name="title">
-              <string>Tab 1</string>
+              <string>Basic</string>
              </attribute>
-             <widget class="QComboBox" name="curveBox">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>20</y>
-                <width>311</width>
-                <height>32</height>
-               </rect>
-              </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="curveRemove">
-              <property name="geometry">
-               <rect>
-                <x>60</x>
-                <y>50</y>
-                <width>113</width>
-                <height>32</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Remove</string>
-              </property>
-             </widget>
+             <layout class="QGridLayout" name="gridlayout_1">
+              <item row="0" column="1">
+               <widget class="QPushButton" name="curveRemove">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>delete.png</normaloff>delete.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>14</width>
+                  <height>14</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QComboBox" name="curveBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QWidget" name="basixStats" native="true">
+                <layout class="QGridLayout" name="gridlayout_2">
+                 <item row="0" column="0">
+                  <widget class="QWidget" name="minMax" native="true">
+                   <layout class="QGridLayout" name="gridLayout_3">
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="min_label">
+                      <property name="text">
+                       <string>Min</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QLineEdit" name="min_text"/>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QLabel" name="max_label">
+                      <property name="text">
+                       <string>Max</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QLineEdit" name="max_text"/>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QWidget" name="comMean" native="true">
+                   <layout class="QGridLayout" name="gridLayout_4">
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="com_label">
+                      <property name="text">
+                       <string>COM</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QLineEdit" name="com_text"/>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QLabel" name="Mean_label">
+                      <property name="text">
+                       <string>Mean</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QLineEdit" name="mean_text"/>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
             </widget>
-            <widget class="QWidget" name="tab_2">
+            <widget class="QWidget" name="advancedTab">
              <attribute name="title">
-              <string>Tab 2</string>
+              <string>Advanced</string>
              </attribute>
+             <layout class="QGridLayout" name="gridlayout_3"/>
             </widget>
            </widget>
           </item>
