@@ -207,7 +207,7 @@ def to_datasets_mpl(fileName, detsDict, selections):
         y_data = y.data
         y_units = utils.byte2str(y.unit) if y.unit else "a.u."
         y_name = utils.byte2str(y.name)
-        y_name_with_units = y_name + y_units
+        y_name_with_units = y_name + "  (" + y_units + ")"
         y_name_with_file = fileName + ": " + y_name
         y_names.append(y_name)
         y_names_with_units.append(y_name_with_units)
