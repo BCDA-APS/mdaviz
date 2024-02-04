@@ -199,8 +199,8 @@ def to_datasets_mpl(fileName, detsDict, selections):
     )
 
     # y_axis is the list of row numbers
-    y_names = []
     y_names_with_units = []
+    y_names_with_file_units = []
 
     for y_axis in selections.get("Y", []):
         y = detsDict[y_axis]
@@ -208,12 +208,12 @@ def to_datasets_mpl(fileName, detsDict, selections):
         y_units = utils.byte2str(y.unit) if y.unit else "a.u."
         y_name = utils.byte2str(y.name)
         y_name_with_units = y_name + "  (" + y_units + ")"
-        y_name_with_file = fileName + ": " + y_name
-        y_names.append(y_name)
+        y_name_with_file_units = fileName + ": " + y_name + "  (" + y_units + ")"
         y_names_with_units.append(y_name_with_units)
+        y_names_with_file_units.append(y_name_with_file_units)
 
         ds, ds_options = [], {}
-        ds_options["label"] = y_name_with_file
+        ds_options["label"] = y_name_with_file_units
         ds = [x_data, y_data] if x_data is not None else [y_data]
         datasets.append((ds, ds_options))
 
@@ -229,7 +229,7 @@ def to_datasets_mpl(fileName, detsDict, selections):
     plot_options = {
         "x": x_name,  # label for x axis
         "x_units": x_units,
-        "y": ", ".join(y_names_with_units[0:3]),  # label for y axis
+        "y": ", ".join(y_names_with_units[0:1]),  # label for y axis
         "y_units": y_units,
         "title": title,
     }
