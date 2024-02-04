@@ -3,6 +3,7 @@ Charting widget
 """
 
 import datetime
+from functools import partial
 from itertools import cycle
 
 from PyQt5 import QtWidgets
@@ -186,7 +187,16 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.line2D = {}  # all the Line2D on the graph, key = label
         self.curveBox = self.parent.findChild(QtWidgets.QComboBox, "curveBox")
         self.removeButton = self.parent.findChild(QtWidgets.QPushButton, "curveRemove")
+        self.removeCursor1 = self.parent.findChild(
+            QtWidgets.QPushButton, "cursor1_remove"
+        )
+        self.removeCursor2 = self.parent.findChild(
+            QtWidgets.QPushButton, "cursor2_remove"
+        )
+
         self.removeButton.clicked.connect(self.remove_curve)
+        self.removeCursor1.clicked.connect(partial(self.remove_cursor, cursor_num=1))
+        self.removeCursor2.clicked.connect(partial(self.remove_cursor, cursor_num=2))
 
     def setPlotTitle(self, text):
         self.main_axes.set_title(text, fontsize=FONTSIZE, y=1.03)
@@ -202,12 +212,13 @@ class ChartViewMpl(QtWidgets.QWidget):
         plot_obj = self.main_axes.plot(*args, **kwargs)
         self.main_axes.legend()
         self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
-        self.update_info_panel()
+        self.update_cursor_math()
         self.canvas.draw()
         self.line2D[label] = plot_obj
         self.update_curveBox()
 
     def remove_curve(self, *args, **kwargs):
+        print(f"{self.line2D}")
         label = self.curveBox.currentText()
         if label in self.line2D:
             line = self.line2D[label][0]
@@ -257,7 +268,31 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.curveBox.clear()
         self.curveBox.addItems(list(self.line2D.keys()))
 
+    # def update_curve_basic(self)
+    #     self.curveMin
+    #     self.curveMax
+    #     self.curveCom
+    #     self.curveMean
+
     # Cursors methods:
+
+    def remove_cursor(self, cursor_num):
+        cross = self.cursors[cursor_num]
+        if cross:
+            cross.remove()
+            self.cursors[cursor_num] = None
+            if cursor_num == 1:
+                self.cursors["pos1"] = None
+                self.cursors["text1"] = "press middle click"
+            else:
+                self.cursors["pos2"] = None
+                self.cursors["text2"] = "press right click"
+            self.cursors["diff"] = "n/a"
+            self.cursors["midpoint"] = "n/a"
+            self.main_axes.relim()  # Recompute the axes limits
+            self.main_axes.autoscale_view()  # Autoscale the view based on the remaining data
+            self.update_cursor_info_panel()
+            self.canvas.draw()
 
     def onclick(self, event):
         # Check if the click was in the main_axes
@@ -284,12 +319,12 @@ class ChartViewMpl(QtWidgets.QWidget):
                 self.cursors["pos2"] = (event.xdata, event.ydata)
 
             # Update the info panel with cursor positions
-            self.update_info_panel()
+            self.update_cursor_math()
 
             # Redraw the canvas to display the new markers
             self.canvas.draw()
 
-    def update_info_panel(self):
+    def update_cursor_math(self):
         """
         Update cursor information in info panel widget.
         """
