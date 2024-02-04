@@ -135,7 +135,7 @@ class ChartViewQt(QtWidgets.QWidget):
         return len(self.plot_widget.plotItem.items) > 0
 
 
-######################################################
+############################################################################################################
 
 
 class ChartViewMpl(QtWidgets.QWidget):
@@ -146,9 +146,6 @@ class ChartViewMpl(QtWidgets.QWidget):
         # Create a Matplotlib figure and canvas
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
-        # Adjust layout to fit the size and position of the axes within the figure
-        # self.figure.tight_layout(pad=2.0, w_pad=0.5, h_pad=0.5)
-        # Create the main plot subplot (flexible size)
         self.main_axes = self.figure.add_subplot(111)
         # Adjust margins
         self.figure.subplots_adjust(bottom=0.1, top=0.9, right=0.92)
@@ -187,6 +184,18 @@ class ChartViewMpl(QtWidgets.QWidget):
 
         # Track curves
         self.labels = {}
+        self.curveBox = self.parent.findChild(QtWidgets.QComboBox, "curveBox")
+        self.removeButton = self.parent.findChild(QtWidgets.QPushButton, "curveRemove")
+        self.removeButton.clicked.connect(self.remove_curve)
+
+    def setPlotTitle(self, text):
+        self.main_axes.set_title(text, fontsize=FONTSIZE, y=1.03)
+
+    def setBottomAxisText(self, text):
+        self.main_axes.set_xlabel(text, fontsize=FONTSIZE, labelpad=10)
+
+    def setLeftAxisText(self, text):
+        self.main_axes.set_ylabel(text, fontsize=FONTSIZE, labelpad=20)
 
     def add_curve(self, *args, **kwargs):
         label = kwargs.get("label", None)
@@ -196,13 +205,24 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.update_info_panel()
         self.canvas.draw()
         self.labels[label] = plot_obj
+        self.update_curveBox()
 
     def remove_curve(self, *args, **kwargs):
-        label = kwargs.get("label", None)
+        label = self.curveBox.currentText()
         if label in self.labels:
-            self.main_axes.lines.remove(self.labels[label][0])
+            line = self.labels[label][0]
+            line.remove()
             del self.labels[label]  # Remove the label from the dictionary
+            self.main_axes.relim()  # Recompute the axes limits
+            self.main_axes.autoscale_view()  # Autoscale the view based on the remaining data
+            # TODO:
+            # self.update_legend()
+            # self.update_title()
+            # self.update_labels()
+            # Remove cursors (messes up the scale)
+            # Remove last curve from self.labels clears the graph
             self.canvas.draw()  # Redraw the canvas
+            self.update_curveBox()
         else:
             print(f"No curve found with label {label}.")
 
@@ -213,28 +233,11 @@ class ChartViewMpl(QtWidgets.QWidget):
             if label not in self.labels:
                 # Plot the curve
                 self.add_curve(*args, **kwargs)
+
             else:
                 print(f"Curve with label {label} already exists.")
         else:
             print(f"Can't plot curves without a label.")
-
-    # def plot(self, *args, **kwargs):
-    #     # Plot data on the axes
-    #     self.main_axes.plot(*args, **kwargs)
-    #     self.labels = {}
-    #     self.main_axes.legend()
-    #     self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
-    #     self.update_info_panel()
-    #     self.canvas.draw()
-
-    def setPlotTitle(self, text):
-        self.main_axes.set_title(text, fontsize=FONTSIZE, y=1.03)
-
-    def setBottomAxisText(self, text):
-        self.main_axes.set_xlabel(text, fontsize=FONTSIZE, labelpad=10)
-
-    def setLeftAxisText(self, text):
-        self.main_axes.set_ylabel(text, fontsize=FONTSIZE, labelpad=20)
 
     def clearPlot(self):
         self.main_axes.clear()
@@ -250,7 +253,11 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.clear_cursor_info_panel()
         self.labels = {}
 
-    # Additional methods:
+    def update_curveBox(self):
+        self.curveBox.clear()
+        self.curveBox.addItems(list(self.labels.keys()))
+
+    # Cursors methods:
 
     def onclick(self, event):
         # Check if the click was in the main_axes
@@ -290,21 +297,18 @@ class ChartViewMpl(QtWidgets.QWidget):
         if self.cursors[1]:
             x1, y1 = self.cursors["pos1"]
             self.cursors["text1"] = f"({x1:.2f}, {y1:.2f})"
-
         # Check for the second cursor and update text accordingly
         if self.cursors[2]:
             x2, y2 = self.cursors["pos2"]
             self.cursors["text2"] = f"({x2:.2f}, {y2:.2f})"
-
+        # Calculate differences and midpoints only if both cursors are present
         if self.cursors[1] and self.cursors[2]:
-            # Calculate differences and midpoints only if both cursors are present
             delta_x = x2 - x1
             delta_y = y2 - y1
             midpoint_x = (x1 + x2) / 2
             midpoint_y = (y1 + y2) / 2
             self.cursors["diff"] = f"({delta_x:.2f}, {delta_y:.2f})"
             self.cursors["midpoint"] = f"({midpoint_x:.2f}, {midpoint_y:.2f})"
-
         self.update_cursor_info_panel()
 
     def update_cursor_info_panel(self):
