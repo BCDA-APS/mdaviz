@@ -185,13 +185,50 @@ class ChartViewMpl(QtWidgets.QWidget):
         for k, func in config.items():
             func(kwargs.get(k))
 
+        # Track curves
+        self.labels = {}
+
+    def add_curve(self, *args, **kwargs):
+        label = kwargs.get("label", None)
+        # Check if the label already exists to avoid duplicates
+
+    def remove_curve(self, label):
+        # Check if the curve exists
+        if label in self.labels:
+            # Remove the curve from the plot if necessary, e.g., using plot object stored in self.labels
+            self.main_axes.lines.remove(self.labels[label][0])
+            del self.labels[label]  # Remove the label from the dictionary
+            self.canvas.draw()  # Redraw the canvas
+        else:
+            print(f"No curve found with label {label}.")
+
     def plot(self, *args, **kwargs):
-        # Plot data on the axes
-        self.main_axes.plot(*args, **kwargs)
-        self.main_axes.legend()
-        self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
-        self.update_info_panel()
-        self.canvas.draw()
+        # Extract label from kwargs, default to None if not present
+        label = kwargs.get("label", None)
+        if label:
+            if label not in self.labels:
+                # Plot the curve
+                plot_obj = self.main_axes.plot(*args, **kwargs)
+                self.main_axes.legend()
+                self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
+                self.update_info_panel()
+                self.canvas.draw()
+                # Store the label with its plot object or any relevant details
+                self.labels[label] = plot_obj
+                print(f"{self.labels}")
+            else:
+                print(f"Curve with label {label} already exists.")
+        else:
+            print(f"Can't plot curves without a label.")
+
+    # def plot(self, *args, **kwargs):
+    #     # Plot data on the axes
+    #     self.main_axes.plot(*args, **kwargs)
+    #     self.labels = {}
+    #     self.main_axes.legend()
+    #     self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
+    #     self.update_info_panel()
+    #     self.canvas.draw()
 
     def setPlotTitle(self, text):
         self.main_axes.set_title(text, fontsize=FONTSIZE, y=1.03)
@@ -214,6 +251,7 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.cursors["midpoint"] = "n/a"
         self.canvas.draw()
         self.clear_cursor_info_panel()
+        self.labels = {}
 
     # Additional methods:
 
