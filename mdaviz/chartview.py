@@ -220,6 +220,8 @@ class ChartViewMpl(QtWidgets.QWidget):
     def remove_curve(self, *args, **kwargs):
         print(f"{self.line2D}")
         label = self.curveBox.currentText()
+        if label in self.line2D and len(self.line2D) == 1:
+            self.clearPlot()
         if label in self.line2D:
             line = self.line2D[label][0]
             line.remove()
@@ -231,7 +233,6 @@ class ChartViewMpl(QtWidgets.QWidget):
             # self.update_line2D()
             # or redo the graph entirely with the content of self.line2D? plot is called in line 177 of mda_folder
             # Remove cursors (messes up the scale)
-            # Remove last curve from self.line2D clears the graph
             self.canvas.draw()  # Redraw the canvas
             self.update_curveBox()
         else:
@@ -252,17 +253,11 @@ class ChartViewMpl(QtWidgets.QWidget):
 
     def clearPlot(self):
         self.main_axes.clear()
-        self.cursors[1] = None
-        self.cursors[2] = None
-        self.cursors["pos1"] = None
-        self.cursors["pos2"] = None
-        self.cursors["text1"] = "press middle click"
-        self.cursors["text2"] = "press right click"
-        self.cursors["diff"] = "n/a"
-        self.cursors["midpoint"] = "n/a"
+        self.clear_cursors()
         self.canvas.draw()
         self.clear_cursor_info_panel()
         self.line2D = {}
+        self.update_curveBox()
 
     def update_curveBox(self):
         self.curveBox.clear()
@@ -274,7 +269,17 @@ class ChartViewMpl(QtWidgets.QWidget):
     #     self.curveCom
     #     self.curveMean
 
-    # Cursors methods:
+    ########################################## Cursors methods:
+
+    def clear_cursors(self):
+        self.cursors[1] = None
+        self.cursors[2] = None
+        self.cursors["pos1"] = None
+        self.cursors["pos2"] = None
+        self.cursors["text1"] = "press middle click"
+        self.cursors["text2"] = "press right click"
+        self.cursors["diff"] = "n/a"
+        self.cursors["midpoint"] = "n/a"
 
     def remove_cursor(self, cursor_num):
         cross = self.cursors[cursor_num]
