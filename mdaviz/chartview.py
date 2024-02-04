@@ -193,7 +193,12 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.removeCursor2 = self.parent.findChild(
             QtWidgets.QPushButton, "cursor2_remove"
         )
-
+        # NOTE: remove button triggers remove_curve twice: once when pushed, once when released.
+        # This try-except solves the problem.
+        try:
+            self.removeButton.clicked.disconnect()
+        except TypeError:
+            pass  # No connection exists
         self.removeButton.clicked.connect(self.remove_curve)
         self.removeCursor1.clicked.connect(partial(self.remove_cursor, cursor_num=1))
         self.removeCursor2.clicked.connect(partial(self.remove_cursor, cursor_num=2))
@@ -210,46 +215,31 @@ class ChartViewMpl(QtWidgets.QWidget):
     def add_curve(self, *args, **kwargs):
         label = kwargs.get("label", None)
         plot_obj = self.main_axes.plot(*args, **kwargs)
-        self.main_axes.legend()
         self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
         self.update_cursor_math()
-        self.canvas.draw()
+        self.update_plot_and_ui()
         self.line2D[label] = plot_obj
         self.update_curveBox()
 
     def remove_curve(self, *args, **kwargs):
-        print(f"{self.line2D}")
         label = self.curveBox.currentText()
         if label in self.line2D and len(self.line2D) == 1:
             self.clearPlot()
         if label in self.line2D:
             line = self.line2D[label][0]
             line.remove()
-            del self.line2D[label]  # Remove the label from the dictionary
-            self.main_axes.relim()  # Recompute the axes limits
-            self.main_axes.autoscale_view()  # Autoscale the view based on the remaining data
-            self.main_axes.legend()
+            del self.line2D[label]  # Remove the label/curve pair from the dictionary
+            self.update_plot_and_ui()
             # TODO:
-            # self.update_line2D()
-            # or redo the graph entirely with the content of self.line2D? plot is called in line 177 of mda_folder
-            # Remove cursors (messes up the scale)
-            self.canvas.draw()  # Redraw the canvas
+            # update ylabel?
             self.update_curveBox()
-        else:
-            print(f"No curve found with label {label}.")
 
     def plot(self, *args, **kwargs):
         # Extract label from kwargs, default to None if not present
         label = kwargs.get("label", None)
         if label:
             if label not in self.line2D:
-                # Plot the curve
                 self.add_curve(*args, **kwargs)
-
-            else:
-                print(f"Curve with label {label} already exists.")
-        else:
-            print(f"Can't plot curves without a label.")
 
     def clearPlot(self):
         self.main_axes.clear()
@@ -263,6 +253,23 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.curveBox.clear()
         self.curveBox.addItems(list(self.line2D.keys()))
 
+    def update_plot_and_ui(self):
+        self.main_axes.relim()  # Recompute the axes limits
+        self.main_axes.autoscale_view()  # Autoscale the view based on the remaining data
+        self.add_legend_if_possible()
+        self.canvas.draw()
+
+    def add_legend_if_possible(self):
+        handles, labels = self.main_axes.get_legend_handles_labels()
+        # Filter out labels that start with '_' or are '_nolegend_'
+        valid_labels = [
+            label
+            for label, handle in zip(labels, handles)
+            if label and not label.startswith("_")
+        ]
+        if valid_labels:
+            self.main_axes.legend()
+
     # def update_curve_basic(self)
     #     self.curveMin
     #     self.curveMax
@@ -271,33 +278,23 @@ class ChartViewMpl(QtWidgets.QWidget):
 
     ########################################## Cursors methods:
 
-    def clear_cursors(self):
-        self.cursors[1] = None
-        self.cursors[2] = None
-        self.cursors["pos1"] = None
-        self.cursors["pos2"] = None
-        self.cursors["text1"] = "press middle click"
-        self.cursors["text2"] = "press right click"
-        self.cursors["diff"] = "n/a"
-        self.cursors["midpoint"] = "n/a"
-
     def remove_cursor(self, cursor_num):
-        cross = self.cursors[cursor_num]
+        cross = self.cursors.get(cursor_num)
         if cross:
             cross.remove()
             self.cursors[cursor_num] = None
-            if cursor_num == 1:
-                self.cursors["pos1"] = None
-                self.cursors["text1"] = "press middle click"
-            else:
-                self.cursors["pos2"] = None
-                self.cursors["text2"] = "press right click"
-            self.cursors["diff"] = "n/a"
-            self.cursors["midpoint"] = "n/a"
-            self.main_axes.relim()  # Recompute the axes limits
-            self.main_axes.autoscale_view()  # Autoscale the view based on the remaining data
-            self.update_cursor_info_panel()
-            self.canvas.draw()
+            self.cursors[f"pos{cursor_num}"] = None
+            self.cursors[f"text{cursor_num}"] = (
+                "press middle click" if cursor_num == 1 else "press right click"
+            )
+        self.cursors["diff"] = "n/a"
+        self.cursors["midpoint"] = "n/a"
+        self.update_plot_and_ui()
+        self.update_cursor_info_panel()
+
+    def clear_cursors(self):
+        self.remove_cursor(1)
+        self.remove_cursor(2)
 
     def onclick(self, event):
         # Check if the click was in the main_axes
