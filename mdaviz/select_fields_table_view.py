@@ -76,15 +76,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def responder(self, action):
         """Modify the plot with the described action."""
-        # print(f"Responder action: {action}, Widget state: {self.checkWidgetState()}")
         self.selected.emit(action, self.tableView.model().plotFields()[0])
-
-    def checkWidgetState(self):
-        # for debugging purposes
-        return {
-            "isVisible": self.isVisible(),
-            "isEnabled": self.isEnabled(),
-        }
 
     def displayTable(self, index):
         from .select_fields_table_model import SelectFieldsTableModel
@@ -194,7 +186,6 @@ def to_datasets_qt(detsDict, selections):
 
 def to_datasets_mpl(fileName, detsDict, selections):
     """Prepare datasets and options for plotting with Matplotlib."""
-    print(f"{fileName}")
     datasets = []
 
     # x_axis is the row number

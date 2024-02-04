@@ -219,6 +219,7 @@ class ChartViewMpl(QtWidgets.QWidget):
             # self.update_legend()
             # self.update_title()
             # self.update_labels()
+            # or redo the graph entirely with the content of self.labels? plot is called in line 177 of mda_folder
             # Remove cursors (messes up the scale)
             # Remove last curve from self.labels clears the graph
             self.canvas.draw()  # Redraw the canvas
