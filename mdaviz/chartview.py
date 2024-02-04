@@ -229,10 +229,8 @@ class ChartViewMpl(QtWidgets.QWidget):
             line = self.line2D[label][0]
             line.remove()
             del self.line2D[label]  # Remove the label/curve pair from the dictionary
+            self.update_curveBox()  # Update the pull down menu with new 2Dline list
             self.update_plot_and_ui()
-            # TODO:
-            # update ylabel?
-            self.update_curveBox()
 
     def plot(self, *args, **kwargs):
         # Extract label from kwargs, default to None if not present
@@ -252,6 +250,11 @@ class ChartViewMpl(QtWidgets.QWidget):
     def update_curveBox(self):
         self.curveBox.clear()
         self.curveBox.addItems(list(self.line2D.keys()))
+        # New ylabel is the first curve on the menu
+        if len(self.line2D):
+            new_ylabel = self.curveBox.currentText().split(" ", 1)[1]
+            self.main_axes.set_ylabel(new_ylabel)
+            self.canvas.draw()
 
     def update_plot_and_ui(self):
         self.main_axes.relim()  # Recompute the axes limits
