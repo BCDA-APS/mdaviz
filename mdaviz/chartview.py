@@ -183,7 +183,7 @@ class ChartViewMpl(QtWidgets.QWidget):
             func(kwargs.get(k))
 
         # Track curves
-        self.labels = {}
+        self.line2D = {}  # all the Line2D on the graph, key = label
         self.curveBox = self.parent.findChild(QtWidgets.QComboBox, "curveBox")
         self.removeButton = self.parent.findChild(QtWidgets.QPushButton, "curveRemove")
         self.removeButton.clicked.connect(self.remove_curve)
@@ -204,24 +204,23 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
         self.update_info_panel()
         self.canvas.draw()
-        self.labels[label] = plot_obj
+        self.line2D[label] = plot_obj
         self.update_curveBox()
 
     def remove_curve(self, *args, **kwargs):
         label = self.curveBox.currentText()
-        if label in self.labels:
-            line = self.labels[label][0]
+        if label in self.line2D:
+            line = self.line2D[label][0]
             line.remove()
-            del self.labels[label]  # Remove the label from the dictionary
+            del self.line2D[label]  # Remove the label from the dictionary
             self.main_axes.relim()  # Recompute the axes limits
             self.main_axes.autoscale_view()  # Autoscale the view based on the remaining data
+            self.main_axes.legend()
             # TODO:
-            # self.update_legend()
-            # self.update_title()
-            # self.update_labels()
-            # or redo the graph entirely with the content of self.labels? plot is called in line 177 of mda_folder
+            # self.update_line2D()
+            # or redo the graph entirely with the content of self.line2D? plot is called in line 177 of mda_folder
             # Remove cursors (messes up the scale)
-            # Remove last curve from self.labels clears the graph
+            # Remove last curve from self.line2D clears the graph
             self.canvas.draw()  # Redraw the canvas
             self.update_curveBox()
         else:
@@ -231,7 +230,7 @@ class ChartViewMpl(QtWidgets.QWidget):
         # Extract label from kwargs, default to None if not present
         label = kwargs.get("label", None)
         if label:
-            if label not in self.labels:
+            if label not in self.line2D:
                 # Plot the curve
                 self.add_curve(*args, **kwargs)
 
@@ -252,11 +251,11 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.cursors["midpoint"] = "n/a"
         self.canvas.draw()
         self.clear_cursor_info_panel()
-        self.labels = {}
+        self.line2D = {}
 
     def update_curveBox(self):
         self.curveBox.clear()
-        self.curveBox.addItems(list(self.labels.keys()))
+        self.curveBox.addItems(list(self.line2D.keys()))
 
     # Cursors methods:
 
