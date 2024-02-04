@@ -190,12 +190,16 @@ class ChartViewMpl(QtWidgets.QWidget):
 
     def add_curve(self, *args, **kwargs):
         label = kwargs.get("label", None)
-        # Check if the label already exists to avoid duplicates
+        plot_obj = self.main_axes.plot(*args, **kwargs)
+        self.main_axes.legend()
+        self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
+        self.update_info_panel()
+        self.canvas.draw()
+        self.labels[label] = plot_obj
 
-    def remove_curve(self, label):
-        # Check if the curve exists
+    def remove_curve(self, *args, **kwargs):
+        label = kwargs.get("label", None)
         if label in self.labels:
-            # Remove the curve from the plot if necessary, e.g., using plot object stored in self.labels
             self.main_axes.lines.remove(self.labels[label][0])
             del self.labels[label]  # Remove the label from the dictionary
             self.canvas.draw()  # Redraw the canvas
@@ -208,14 +212,7 @@ class ChartViewMpl(QtWidgets.QWidget):
         if label:
             if label not in self.labels:
                 # Plot the curve
-                plot_obj = self.main_axes.plot(*args, **kwargs)
-                self.main_axes.legend()
-                self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
-                self.update_info_panel()
-                self.canvas.draw()
-                # Store the label with its plot object or any relevant details
-                self.labels[label] = plot_obj
-                print(f"{self.labels}")
+                self.add_curve(*args, **kwargs)
             else:
                 print(f"Curve with label {label} already exists.")
         else:
