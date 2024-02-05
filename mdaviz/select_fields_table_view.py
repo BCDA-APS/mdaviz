@@ -8,6 +8,7 @@ Uses :class:`select_fields_tablemodel.SelectFieldsTableModel`.
     ~SelectFieldsTableView
 """
 
+import datetime
 from mda import readMDA
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
@@ -55,7 +56,6 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
         self.addButton.clicked.connect(partial(self.responder, "add"))
         self.clearButton.clicked.connect(partial(self.responder, "clear"))
-        self.removeButton.clicked.connect(partial(self.responder, "remove"))
         self.replaceButton.clicked.connect(partial(self.responder, "replace"))
 
     def file(self):
@@ -222,15 +222,8 @@ def to_datasets_mpl(fileName, detsDict, selections):
         ds_options["label"] = y_name_with_file_units
         ds = [x_data, y_data] if x_data is not None else [y_data]
         datasets.append((ds, ds_options))
-
-    title = ""
-    # NOTE: Leave title for the user to decide?  Can be set directly from Matplotlib toolbar
-    # if len(y_names) == 1:
-    #     title = f"{y_name} vs {x_name}"
-    # elif len(y_names) <= 3:
-    #     title = "(" + " ,  ".join(y_names) + f")\n vs {x_name}"
-    # else:
-    #     title = "(" + " ,  ".join(y_names[0:3]) + f", ...)\n vs {x_name}"
+    now = str(datetime.datetime.now()).rsplit(".")[0]
+    title = f"Plot Date & Time: {now}"
 
     plot_options = {
         "x": x_name,  # label for x axis
