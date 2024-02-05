@@ -5,11 +5,10 @@ Charting widget
 import datetime
 from functools import partial
 from itertools import cycle
-
 import numpy
 from PyQt5 import QtWidgets
-
 import pyqtgraph as pg
+from . import utils
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -309,9 +308,9 @@ class ChartViewMpl(QtWidgets.QWidget):
             stats = self.calculate_basic_math(x, y)
             for i, txt in zip(stats, ["min_text", "max_text", "com_text", "mean_text"]):
                 if isinstance(i, tuple):
-                    result = f"({i[0]:.3g}, {i[1]:.3g})"
+                    result = f"({utils.num2fstr(i[0])}, {utils.num2fstr(i[1])})"
                 else:
-                    result = f"{i:.3g}" if i else "n/a"
+                    result = f"{utils.num2fstr(i)}" if i else "n/a"
                 self.parent.findChild(QtWidgets.QLineEdit, txt).setText(result)
 
     def clear_basic_math(self):
@@ -375,19 +374,23 @@ class ChartViewMpl(QtWidgets.QWidget):
         # Check for the first cursor and update text accordingly
         if self.cursors[1]:
             x1, y1 = self.cursors["pos1"]
-            self.cursors["text1"] = f"({x1:.3g}, {y1:.3g})"
+            self.cursors["text1"] = f"({utils.num2fstr(x1)}, {utils.num2fstr(y1)})"
         # Check for the second cursor and update text accordingly
         if self.cursors[2]:
             x2, y2 = self.cursors["pos2"]
-            self.cursors["text2"] = f"({x2:.3g}, {y2:.3g})"
+            self.cursors["text2"] = f"({utils.num2fstr(x2)}, {utils.num2fstr(y2)})"
         # Calculate differences and midpoints only if both cursors are present
         if self.cursors[1] and self.cursors[2]:
             delta_x = x2 - x1
             delta_y = y2 - y1
             midpoint_x = (x1 + x2) / 2
             midpoint_y = (y1 + y2) / 2
-            self.cursors["diff"] = f"({delta_x:.3g}, {delta_y:.3g})"
-            self.cursors["midpoint"] = f"({midpoint_x:.3g}, {midpoint_y:.3g})"
+            self.cursors["diff"] = (
+                f"({utils.num2fstr(delta_x)}, {utils.num2fstr(delta_y)})"
+            )
+            self.cursors["midpoint"] = (
+                f"({utils.num2fstr(midpoint_x)}, {utils.num2fstr(midpoint_y)})"
+            )
         self.update_cursor_info_panel()
 
     def update_cursor_info_panel(self):

@@ -49,6 +49,11 @@ def ts2iso(timestamp):
     return ts2dt(timestamp).isoformat(sep=" ")
 
 
+def num2fstr(x):
+    """Return a string with the adequate precision and format"""
+    return f"{x:.3e}" if abs(x) < 1e-3 else f"{x:.3f}"
+
+
 def byte2str(byte_literal):
     """Convert byte literals to strings."""
     return (
