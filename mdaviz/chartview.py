@@ -183,11 +183,18 @@ class ChartViewMpl(QtWidgets.QWidget):
         for k, func in config.items():
             func(kwargs.get(k))
 
-        # Track curves
+        # Track curves and display in QComboBox:
         self.line2D = {}  # all the Line2D on the graph, key = label
         self.curveBox = self.parent.findChild(QtWidgets.QComboBox, "curveBox")
-        # need to initiate curveBox/line2D with first_det?
-        self.curveBox.currentTextChanged.connect(self.update_basic_math)
+        # try:
+        #     self.curveBox.currentTextChanged.disconnect(self.updateBasicMathInfo)
+        # except TypeError:
+        #     # If there was no connection, this will catch the exception
+        #     pass
+        # self.curveBox.currentTextChanged.connect(self.updateBasicMathInfo)
+        # TODO #63: why is updateBasicMathInfo triggered more and more each time Replace button is pushed?
+        self.isCurveBoxConnected = False
+        self.setupConnections()
 
         # Remove buttons
         self.removeButton = self.parent.findChild(QtWidgets.QPushButton, "curveRemove")
@@ -197,15 +204,15 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.removeCursor2 = self.parent.findChild(
             QtWidgets.QPushButton, "cursor2_remove"
         )
-        # NOTE: remove button triggers remove_curve twice: once when pushed, once when released.
+        # NOTE: remove button triggers removeCurve twice: once when pushed, once when released.
         # This try-except solves the problem.
         try:
             self.removeButton.clicked.disconnect()
         except TypeError:
             pass  # No connection exists
-        self.removeButton.clicked.connect(self.remove_curve)
-        self.removeCursor1.clicked.connect(partial(self.remove_cursor, cursor_num=1))
-        self.removeCursor2.clicked.connect(partial(self.remove_cursor, cursor_num=2))
+        self.removeButton.clicked.connect(self.removeCurve)
+        self.removeCursor1.clicked.connect(partial(self.removeCursor, cursor_num=1))
+        self.removeCursor2.clicked.connect(partial(self.removeCursor, cursor_num=2))
 
     def setPlotTitle(self, text):
         self.main_axes.set_title(text, fontsize=FONTSIZE, y=1.03)
@@ -216,16 +223,16 @@ class ChartViewMpl(QtWidgets.QWidget):
     def setLeftAxisText(self, text):
         self.main_axes.set_ylabel(text, fontsize=FONTSIZE, labelpad=20)
 
-    def add_curve(self, *args, **kwargs):
+    def addCurve(self, *args, **kwargs):
         plot_obj = self.main_axes.plot(*args, **kwargs)
         self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
-        self.update_cursor_math()
-        self.update_plot_and_ui()
+        self.calculateCursors()
+        self.updatePlot()
         label = kwargs.get("label", None)
         self.line2D[label] = plot_obj[0], args[0], args[1]
-        self.update_curveBox()
+        self.updateCurveBox()
 
-    def remove_curve(self, *args, **kwargs):
+    def removeCurve(self, *args, **kwargs):
         label = self.curveBox.currentText()
         if label in self.line2D and len(self.line2D) == 1:
             self.clearPlot()
@@ -233,26 +240,26 @@ class ChartViewMpl(QtWidgets.QWidget):
             line = self.line2D[label][0]
             line.remove()
             del self.line2D[label]  # Remove the label/curve pair from the dictionary
-            self.update_curveBox()  # Update the pull down menu with new 2Dline list
-            self.update_plot_and_ui()
+            self.updateCurveBox()  # Update the pull down menu with new 2Dline list
+            self.updatePlot()
 
     def plot(self, *args, **kwargs):
         # Extract label from kwargs, default to None if not present
         label = kwargs.get("label", None)
         if label:
             if label not in self.line2D:
-                self.add_curve(*args, **kwargs)
+                self.addCurve(*args, **kwargs)
 
     def clearPlot(self):
         self.main_axes.clear()
-        self.clear_cursors()
+        self.clearCursors()
         self.canvas.draw()
-        self.clear_cursor_info_panel()
-        self.clear_basic_math()
+        self.clearCursorInfo()
+        self.clearBasicMath()
         self.line2D = {}
-        self.update_curveBox()
+        self.updateCurveBox()
 
-    def update_curveBox(self):
+    def updateCurveBox(self):
         self.curveBox.clear()
         self.curveBox.addItems(list(self.line2D.keys()))
         # New ylabel is the first curve on the menu
@@ -261,13 +268,13 @@ class ChartViewMpl(QtWidgets.QWidget):
             self.main_axes.set_ylabel(new_ylabel)
             self.canvas.draw()
 
-    def update_plot_and_ui(self):
+    def updatePlot(self):
         self.main_axes.relim()  # Recompute the axes limits
         self.main_axes.autoscale_view()  # Autoscale the view based on the remaining data
-        self.add_legend_if_possible()
+        self.updateLegend()
         self.canvas.draw()
 
-    def add_legend_if_possible(self):
+    def updateLegend(self):
         handles, labels = self.main_axes.get_legend_handles_labels()
         # Filter out labels that start with '_' or are '_nolegend_'
         valid_labels = [
@@ -278,7 +285,13 @@ class ChartViewMpl(QtWidgets.QWidget):
         if valid_labels:
             self.main_axes.legend()
 
-    def calculate_basic_math(self, x_data, y_data):
+    def setupConnections(self):
+        # Ensure the signal is connected only once
+        if not self.isCurveBoxConnected:
+            self.curveBox.currentTextChanged.connect(self.updateBasicMathInfo)
+            self.isCurveBoxConnected = True
+
+    def calculateBasicMath(self, x_data, y_data):
         x_array = numpy.array(x_data)
         y_array = numpy.array(y_data)
         # Find y_min and y_max
@@ -299,13 +312,13 @@ class ChartViewMpl(QtWidgets.QWidget):
         y_mean = numpy.mean(y_array)
         return (x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean
 
-    def update_basic_math(self, *args):
-        if self.curveBox.count():
+    def updateBasicMathInfo(self, *args):
+        if self.curveBox.count() and list(self.line2D.keys()):
             current_label = self.curveBox.currentText()
             print(f"{list(self.line2D.keys())}")
             x = self.line2D[current_label][1]
             y = self.line2D[current_label][2]
-            stats = self.calculate_basic_math(x, y)
+            stats = self.calculateBasicMath(x, y)
             for i, txt in zip(stats, ["min_text", "max_text", "com_text", "mean_text"]):
                 if isinstance(i, tuple):
                     result = f"({utils.num2fstr(i[0])}, {utils.num2fstr(i[1])})"
@@ -313,13 +326,13 @@ class ChartViewMpl(QtWidgets.QWidget):
                     result = f"{utils.num2fstr(i)}" if i else "n/a"
                 self.parent.findChild(QtWidgets.QLineEdit, txt).setText(result)
 
-    def clear_basic_math(self):
+    def clearBasicMath(self):
         for txt in ["min_text", "max_text", "com_text", "mean_text"]:
             self.parent.findChild(QtWidgets.QLineEdit, txt).setText("n/a")
 
     ########################################## Cursors methods:
 
-    def remove_cursor(self, cursor_num):
+    def removeCursor(self, cursor_num):
         cross = self.cursors.get(cursor_num)
         if cross:
             cross.remove()
@@ -330,12 +343,12 @@ class ChartViewMpl(QtWidgets.QWidget):
             )
         self.cursors["diff"] = "n/a"
         self.cursors["midpoint"] = "n/a"
-        self.update_plot_and_ui()
-        self.update_cursor_info_panel()
+        self.updatePlot()
+        self.updateCursorInfo()
 
-    def clear_cursors(self):
-        self.remove_cursor(1)
-        self.remove_cursor(2)
+    def clearCursors(self):
+        self.removeCursor(1)
+        self.removeCursor(2)
 
     def onclick(self, event):
         # Check if the click was in the main_axes
@@ -362,12 +375,12 @@ class ChartViewMpl(QtWidgets.QWidget):
                 self.cursors["pos2"] = (event.xdata, event.ydata)
 
             # Update the info panel with cursor positions
-            self.update_cursor_math()
+            self.calculateCursors()
 
             # Redraw the canvas to display the new markers
             self.canvas.draw()
 
-    def update_cursor_math(self):
+    def calculateCursors(self):
         """
         Update cursor information in info panel widget.
         """
@@ -391,9 +404,9 @@ class ChartViewMpl(QtWidgets.QWidget):
             self.cursors["midpoint"] = (
                 f"({utils.num2fstr(midpoint_x)}, {utils.num2fstr(midpoint_y)})"
             )
-        self.update_cursor_info_panel()
+        self.updateCursorInfo()
 
-    def update_cursor_info_panel(self):
+    def updateCursorInfo(self):
         self.parent.findChild(QtWidgets.QLineEdit, "pos1_text").setText(
             self.cursors["text1"]
         )
@@ -407,7 +420,7 @@ class ChartViewMpl(QtWidgets.QWidget):
             self.cursors["midpoint"]
         )
 
-    def clear_cursor_info_panel(self):
+    def clearCursorInfo(self):
         self.parent.findChild(QtWidgets.QLineEdit, "pos1_text").setText(
             "press middle click"
         )
