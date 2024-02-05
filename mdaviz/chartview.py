@@ -6,6 +6,7 @@ import datetime
 from functools import partial
 from itertools import cycle
 
+import numpy
 from PyQt5 import QtWidgets
 
 import pyqtgraph as pg
@@ -186,6 +187,10 @@ class ChartViewMpl(QtWidgets.QWidget):
         # Track curves
         self.line2D = {}  # all the Line2D on the graph, key = label
         self.curveBox = self.parent.findChild(QtWidgets.QComboBox, "curveBox")
+        # need to initiate curveBox/line2D with first_det?
+        self.curveBox.currentTextChanged.connect(self.update_basic_math)
+
+        # Remove buttons
         self.removeButton = self.parent.findChild(QtWidgets.QPushButton, "curveRemove")
         self.removeCursor1 = self.parent.findChild(
             QtWidgets.QPushButton, "cursor1_remove"
@@ -213,12 +218,12 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.main_axes.set_ylabel(text, fontsize=FONTSIZE, labelpad=20)
 
     def add_curve(self, *args, **kwargs):
-        label = kwargs.get("label", None)
         plot_obj = self.main_axes.plot(*args, **kwargs)
         self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
         self.update_cursor_math()
         self.update_plot_and_ui()
-        self.line2D[label] = plot_obj
+        label = kwargs.get("label", None)
+        self.line2D[label] = plot_obj[0], args[0], args[1]
         self.update_curveBox()
 
     def remove_curve(self, *args, **kwargs):
@@ -244,6 +249,7 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.clear_cursors()
         self.canvas.draw()
         self.clear_cursor_info_panel()
+        self.clear_basic_math()
         self.line2D = {}
         self.update_curveBox()
 
@@ -273,11 +279,44 @@ class ChartViewMpl(QtWidgets.QWidget):
         if valid_labels:
             self.main_axes.legend()
 
-    # def update_curve_basic(self)
-    #     self.curveMin
-    #     self.curveMax
-    #     self.curveCom
-    #     self.curveMean
+    def calculate_basic_math(self, x_data, y_data):
+        x_array = numpy.array(x_data)
+        y_array = numpy.array(y_data)
+        # Find y_min and y_max
+        y_min = numpy.min(y_array)
+        y_max = numpy.max(y_array)
+        # Find the indices of the min and max y value
+        y_min_index = numpy.argmin(y_array)
+        y_max_index = numpy.argmax(y_array)
+        # Find the corresponding x values for y_min and y_max
+        x_at_y_min = x_array[y_min_index]
+        x_at_y_max = x_array[y_max_index]
+        # Calculate x_com and y_mean
+        x_com = (
+            numpy.sum(x_array * y_array) / numpy.sum(y_array)
+            if numpy.sum(y_array) != 0
+            else None
+        )
+        y_mean = numpy.mean(y_array)
+        return (x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean
+
+    def update_basic_math(self, *args):
+        if self.curveBox.count():
+            current_label = self.curveBox.currentText()
+            print(f"{list(self.line2D.keys())}")
+            x = self.line2D[current_label][1]
+            y = self.line2D[current_label][2]
+            stats = self.calculate_basic_math(x, y)
+            for i, txt in zip(stats, ["min_text", "max_text", "com_text", "mean_text"]):
+                if isinstance(i, tuple):
+                    result = f"({i[0]:.3g}, {i[1]:.3g})"
+                else:
+                    result = f"{i:.3g}" if i else "n/a"
+                self.parent.findChild(QtWidgets.QLineEdit, txt).setText(result)
+
+    def clear_basic_math(self):
+        for txt in ["min_text", "max_text", "com_text", "mean_text"]:
+            self.parent.findChild(QtWidgets.QLineEdit, txt).setText("n/a")
 
     ########################################## Cursors methods:
 
@@ -336,19 +375,19 @@ class ChartViewMpl(QtWidgets.QWidget):
         # Check for the first cursor and update text accordingly
         if self.cursors[1]:
             x1, y1 = self.cursors["pos1"]
-            self.cursors["text1"] = f"({x1:.2f}, {y1:.2f})"
+            self.cursors["text1"] = f"({x1:.3g}, {y1:.3g})"
         # Check for the second cursor and update text accordingly
         if self.cursors[2]:
             x2, y2 = self.cursors["pos2"]
-            self.cursors["text2"] = f"({x2:.2f}, {y2:.2f})"
+            self.cursors["text2"] = f"({x2:.3g}, {y2:.3g})"
         # Calculate differences and midpoints only if both cursors are present
         if self.cursors[1] and self.cursors[2]:
             delta_x = x2 - x1
             delta_y = y2 - y1
             midpoint_x = (x1 + x2) / 2
             midpoint_y = (y1 + y2) / 2
-            self.cursors["diff"] = f"({delta_x:.2f}, {delta_y:.2f})"
-            self.cursors["midpoint"] = f"({midpoint_x:.2f}, {midpoint_y:.2f})"
+            self.cursors["diff"] = f"({delta_x:.3g}, {delta_y:.3g})"
+            self.cursors["midpoint"] = f"({midpoint_x:.3g}, {midpoint_y:.3g})"
         self.update_cursor_info_panel()
 
     def update_cursor_info_panel(self):

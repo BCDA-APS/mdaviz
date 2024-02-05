@@ -13,6 +13,7 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 import yaml
 
+
 from . import utils
 from .select_fields_table_model import ColumnDataType
 from .select_fields_table_model import FieldRuleType
@@ -46,6 +47,11 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         # since we cannot set header's ResizeMode in Designer ...
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+
+        # try:
+        #     self.replaceButton.clicked.disconnect()
+        # except TypeError:
+        #     pass  # No connection exists
 
         self.addButton.clicked.connect(partial(self.responder, "add"))
         self.clearButton.clicked.connect(partial(self.responder, "clear"))
@@ -201,17 +207,17 @@ def to_datasets_mpl(fileName, detsDict, selections):
     # y_axis is the list of row numbers
     y_names_with_units = []
     y_names_with_file_units = []
-
     for y_axis in selections.get("Y", []):
         y = detsDict[y_axis]
         y_data = y.data
+        # y labels:
         y_units = utils.byte2str(y.unit) if y.unit else "a.u."
         y_name = utils.byte2str(y.name)
         y_name_with_units = y_name + "  (" + y_units + ")"
         y_name_with_file_units = fileName + ": " + y_name + "  (" + y_units + ")"
         y_names_with_units.append(y_name_with_units)
         y_names_with_file_units.append(y_name_with_file_units)
-
+        # append to dataset:
         ds, ds_options = [], {}
         ds_options["label"] = y_name_with_file_units
         ds = [x_data, y_data] if x_data is not None else [y_data]
