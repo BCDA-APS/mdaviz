@@ -165,10 +165,6 @@ class MDA_MVC(QtWidgets.QWidget):
             widgetQt.clearPlot()
             widgetMpl.clearPlot()
 
-        if action in ("remove"):  # TODO: implement "remove"
-            widgetQt.clearPlot()
-            widgetMpl.clearPlot()
-
         if action in ("replace", "add"):
             for ds, ds_options in datasets_qt:
                 widgetQt.plot(*ds, **ds_options)
