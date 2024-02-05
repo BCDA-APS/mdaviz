@@ -42,6 +42,7 @@ class MDA_MVC(QtWidgets.QWidget):
         layout.addWidget(self.mda_folder_tableview)
         self.mda_folder_tableview.displayTable()
 
+        # Refreshing folder content:
         try:
             self.parent.refresh.released.disconnect()
         except TypeError:  # No slots connected yet
@@ -75,7 +76,7 @@ class MDA_MVC(QtWidgets.QWidget):
             self.select_fields_tableview.selected.connect(self.doPlot)
             self.setStatus(f"Selected file: {self.mdaFileList()[index.row()]}")
 
-            # if the graph(s) is(are) blank ( as of now, Qt blank = Mpl blank), selecting a file automatically plots the first pos. vs first det.
+            # If the graph(s) is(are) blank ( as of now, Qt blank = Mpl blank), selecting a file automatically plots the first pos. vs first det.
             # TODO: this should depend on the selection: auto-replace vs auto-add; if auto-replace, will plot even if graph is not blank.
             if (
                 self.mda_file_visualization.isPlotBlankQt()
@@ -137,11 +138,11 @@ class MDA_MVC(QtWidgets.QWidget):
         detsDict = self.select_fields_tableview.detsDict()
         fileName = self.select_fields_tableview.fileName()
 
-        # setup datasets
+        # Setup datasets
         datasets_qt, options_qt = to_datasets_qt(detsDict, selections)
         datasets_mpl, options_mpl = to_datasets_mpl(fileName, detsDict, selections)
 
-        # get the pyQtchart chartview widget, if exists:
+        # Get the pyQtchart chartview widget, if exists:
         layoutQt = self.mda_file_visualization.plotPageQt.layout()
         if layoutQt.count() != 1:  # in case something changes ...
             raise RuntimeError("Expected exactly one widget in this layout!")
@@ -151,15 +152,15 @@ class MDA_MVC(QtWidgets.QWidget):
             if action == "add":
                 action == "replace"
 
-        # # get the matplotlib chartview widget, if exists:
+        # Get the matplotlib chartview widget, if exists:
         layoutMpl = self.mda_file_visualization.plotPageMpl.layout()
         if layoutMpl.count() != 1:  # in case something changes ...
             raise RuntimeError("Expected exactly one widget in this layout!")
         widgetMpl = layoutMpl.itemAt(0).widget()
-        if not isinstance(widgetMpl, ChartViewMpl) or action == "replace":
-            widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
-            if action == "add":
-                action == "replace"
+
+        # Make a blank chart.
+        if not isinstance(widgetMpl, ChartViewMpl):
+            widgetMpl = ChartViewMpl(self, **options_mpl)
 
         if action in ("clear"):
             widgetQt.clearPlot()
