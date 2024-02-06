@@ -7,7 +7,6 @@ from functools import partial
 from itertools import cycle
 import numpy
 from PyQt5 import QtWidgets
-import pyqtgraph as pg
 from . import utils
 
 from matplotlib.figure import Figure
@@ -39,11 +38,6 @@ PLOT_COLORS = """
     salmon
 """.split()
 PLOT_SYMBOLS = """o + x star s d t t2 t3""".split()
-
-pg.setConfigOption("background", "w")
-pg.setConfigOption("foreground", "k")
-GRID_OPACITY = 0.1
-
 _AUTO_COLOR_CYCLE = cycle(PLOT_COLORS)
 _AUTO_SYMBOL_CYCLE = cycle(PLOT_SYMBOLS)
 
@@ -56,87 +50,6 @@ def auto_color():
 def auto_symbol():
     """Returns next symbol for scatter plots."""
     return next(_AUTO_SYMBOL_CYCLE)
-
-
-class ChartViewQt(QtWidgets.QWidget):
-    def __init__(self, parent, **kwargs):
-        self.parent = parent
-
-        super().__init__()
-
-        size = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
-        )
-
-        self.plot_widget = pg.PlotWidget()
-        self.plot_widget.addLegend()
-        self.plot_widget.plotItem.showAxes(True)
-        self.plot_widget.plotItem.showGrid(x=True, y=True, alpha=GRID_OPACITY)
-        # see: https://stackoverflow.com/a/70200326
-        # label = pg.LabelItem(
-        #     f"plot: {datetime.datetime.now()}", color="lightgrey", size="8pt"
-        # )
-        # label.setParentItem(self.plot_widget.plotItem)
-        # label.anchor(itemPos=(0, 1), parentPos=(0, 1))
-
-        config = {
-            "title": self.setPlotTitle,
-            "y": self.setLeftAxisText,
-            "x": self.setBottomAxisText,
-            "x_units": self.setBottomAxisUnits,
-            "y_units": self.setLeftAxisUnits,
-            "x_datetime": self.setAxisDateTime,
-        }
-        for k, func in config.items():
-            func(kwargs.get(k))
-
-        # QWidget Layout
-        layout = QtWidgets.QHBoxLayout()
-        self.setLayout(layout)
-
-        ## plot
-        size.setHorizontalStretch(4)
-        self.plot_widget.setSizePolicy(size)
-        layout.addWidget(self.plot_widget)
-
-    def plot(self, *args, **kwargs):
-        return self.plot_widget.plot(*args, **kwargs)
-
-    def setAxisDateTime(self, choice):
-        if choice:
-            item = pg.DateAxisItem(orientation="bottom")
-            self.plot_widget.setAxisItems({"bottom": item})
-
-    def setAxisLabel(self, axis, text):
-        self.plot_widget.plotItem.setLabel(axis, text)
-
-    def setAxisUnits(self, axis, text):
-        self.plot_widget.plotItem.axes[axis]["item"].labelUnits = text
-
-    def setBottomAxisText(self, text):
-        self.setAxisLabel("bottom", text)
-
-    def setBottomAxisUnits(self, text):
-        self.setAxisUnits("bottom", text)
-
-    def setLeftAxisText(self, text):
-        self.setAxisLabel("left", text)
-
-    def setLeftAxisUnits(self, text):
-        self.setAxisUnits("left", text)
-
-    def setPlotTitle(self, text):
-        self.plot_widget.plotItem.setTitle(text)
-
-    def clearPlot(self):
-        self.plot_widget.clear()
-
-    def hasDataItems(self):
-        # Check if the plot widget has any plot data items
-        return len(self.plot_widget.plotItem.items) > 0
-
-
-############################################################################################################
 
 
 class ChartViewMpl(QtWidgets.QWidget):
@@ -196,7 +109,7 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.removeCursor2 = self.parent.findChild(
             QtWidgets.QPushButton, "cursor2_remove"
         )
-        # NOTE: remove button triggers removeCurve twice: once when pushed, once when released.
+        # Remove button triggers removeCurve twice: once when pushed, once when released.
         # This try-except solves the problem.
         try:
             self.removeButton.clicked.disconnect()
@@ -216,25 +129,30 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.main_axes.set_ylabel(text, fontsize=FONTSIZE, labelpad=20)
 
     def addCurve(self, *args, **kwargs):
+        # Add to graph
         plot_obj = self.main_axes.plot(*args, **kwargs)
-        self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
-        # self.calculateCursors()  # NOTE: why???
         self.updatePlot()
+        # Add to the dictionary
         label = kwargs.get("label", None)
         self.line2D[label] = plot_obj[0], args[0], args[1]
         print(f"Updating dict: {list(self.line2D.keys())}")
+        # Add to the comboBox
         self.addIemCurveBox(label)
 
     def removeCurve(self, *args, **kwargs):
         label = self.curveBox.currentText()
+        # If removing the last curve, clear plot:
         if label in self.line2D and len(self.line2D) == 1:
             self.clearPlot()
         if label in self.line2D:
+            # Remove curve from graph
             line = self.line2D[label][0]
             line.remove()
-            self.removeItemCurveBox(label)  # Remove curve from the pull down menu
-            del self.line2D[label]  # Remove the label/curve pair from the dictionary
             self.updatePlot()
+            # Remove curve from dictionary
+            del self.line2D[label]
+            # Remove curve from comboBox
+            self.removeItemCurveBox(label)
 
     def plot(self, *args, **kwargs):
         # Extract label from kwargs, default to None if not present
@@ -272,6 +190,7 @@ class ChartViewMpl(QtWidgets.QWidget):
         ):  # New ylabel is the first curve on the pull down menu
             new_ylabel = self.curveBox.currentText().split(" ", 1)[1]
             self.main_axes.set_ylabel(new_ylabel)
+        self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
         self.canvas.draw()
 
     def updateLegend(self):
@@ -323,6 +242,10 @@ class ChartViewMpl(QtWidgets.QWidget):
     def clearBasicMath(self):
         for txt in ["min_text", "max_text", "com_text", "mean_text"]:
             self.parent.findChild(QtWidgets.QLineEdit, txt).setText("n/a")
+
+    def hasDataItems(self):
+        # Return whether any artists have been added to the Axes (bool)
+        return self.main_axes.has_data()
 
     ########################################## Cursors methods:
 
