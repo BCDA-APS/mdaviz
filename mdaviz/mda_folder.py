@@ -131,7 +131,7 @@ class MDA_MVC(QtWidgets.QWidget):
 
         action = args[0]
         selections = args[1]
-        print(f"doPlot called with action: {action}, args: {args}")
+        print(f"\ndoPlot called with action: {action}, args: {args}")
 
         detsDict = self.select_fields_tableview.detsDict()
         fileName = self.select_fields_tableview.fileName()
@@ -145,19 +145,29 @@ class MDA_MVC(QtWidgets.QWidget):
             raise RuntimeError("Expected exactly one widget in this layout!")
         widgetMpl = layoutMpl.itemAt(0).widget()
 
-        # Make a blank chart.
-        if not isinstance(widgetMpl, ChartViewMpl) or action == "replace":
-            widgetMpl = ChartViewMpl(self, **options_mpl)
-            if action == "add":
-                action = "replace"
+        # if not isinstance(widgetMpl, ChartViewMpl):  # NOTE : is this necessary?
+        #     widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
+        #     if action == "add":
+        #         action = "replace"
 
-        if action in ("clear"):
-            widgetMpl.clearPlot()
-
-        if action in ("replace", "add"):
+        if action in ("replace"):
+            if not isinstance(widgetMpl, ChartViewMpl):
+                widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
+            else:
+                widgetMpl.clearPlot()
             for ds, ds_options in datasets_mpl:
+                print(f"{ds_options=}")
                 widgetMpl.plot(*ds, **ds_options)
             self.mda_file_visualization.setPlotMpl(widgetMpl)
+
+        elif action in ("add"):
+            for ds, ds_options in datasets_mpl:
+                print(f"{ds_options=}")
+                widgetMpl.plot(*ds, **ds_options)
+            self.mda_file_visualization.setPlotMpl(widgetMpl)
+
+        elif action in ("clear"):
+            widgetMpl.clearPlot()
 
     # def doPlot(self, *args):
     #     """Slot: data field selected (for plotting) button is clicked."""

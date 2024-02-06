@@ -186,15 +186,7 @@ class ChartViewMpl(QtWidgets.QWidget):
         # Track curves and display in QComboBox:
         self.line2D = {}  # all the Line2D on the graph, key = label
         self.curveBox = self.parent.findChild(QtWidgets.QComboBox, "curveBox")
-        # try:
-        #     self.curveBox.currentTextChanged.disconnect(self.updateBasicMathInfo)
-        # except TypeError:
-        #     # If there was no connection, this will catch the exception
-        #     pass
-        # self.curveBox.currentTextChanged.connect(self.updateBasicMathInfo)
-        # TODO #63: why is updateBasicMathInfo triggered more and more each time Replace button is pushed?
-        self.isCurveBoxConnected = False
-        self.setupConnections()
+        self.curveBox.currentTextChanged.connect(self.updateBasicMathInfo)
 
         # Remove buttons
         self.removeButton = self.parent.findChild(QtWidgets.QPushButton, "curveRemove")
@@ -226,10 +218,11 @@ class ChartViewMpl(QtWidgets.QWidget):
     def addCurve(self, *args, **kwargs):
         plot_obj = self.main_axes.plot(*args, **kwargs)
         self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
-        self.calculateCursors()
+        # self.calculateCursors()  # NOTE: why???
         self.updatePlot()
         label = kwargs.get("label", None)
         self.line2D[label] = plot_obj[0], args[0], args[1]
+        print(f"Updating dict: {list(self.line2D.keys())}")
         self.updateCurveBox()
 
     def removeCurve(self, *args, **kwargs):
@@ -260,7 +253,9 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.updateCurveBox()
 
     def updateCurveBox(self):
-        self.curveBox.clear()
+        print(f"Clear QComboBox")
+        self.curveBox.clear()  # NOTE: that could be a bad idea, should just append new items
+        print(f"Add items to QComboBox")
         self.curveBox.addItems(list(self.line2D.keys()))
         # New ylabel is the first curve on the menu
         if len(self.line2D):
@@ -275,21 +270,10 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.canvas.draw()
 
     def updateLegend(self):
-        handles, labels = self.main_axes.get_legend_handles_labels()
-        # Filter out labels that start with '_' or are '_nolegend_'
-        valid_labels = [
-            label
-            for label, handle in zip(labels, handles)
-            if label and not label.startswith("_")
-        ]
+        labels = self.main_axes.get_legend_handles_labels()[1]
+        valid_labels = [label for label in labels if not label.startswith("_")]
         if valid_labels:
             self.main_axes.legend()
-
-    def setupConnections(self):
-        # Ensure the signal is connected only once
-        if not self.isCurveBoxConnected:
-            self.curveBox.currentTextChanged.connect(self.updateBasicMathInfo)
-            self.isCurveBoxConnected = True
 
     def calculateBasicMath(self, x_data, y_data):
         x_array = numpy.array(x_data)
@@ -313,11 +297,16 @@ class ChartViewMpl(QtWidgets.QWidget):
         return (x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean
 
     def updateBasicMathInfo(self, *args):
-        if self.curveBox.count() and list(self.line2D.keys()):
-            current_label = self.curveBox.currentText()
-            print(f"{list(self.line2D.keys())}")
-            x = self.line2D[current_label][1]
-            y = self.line2D[current_label][2]
+        print(f"{args=}")
+        if args and args[0] != "":
+            current_label = args[0]
+            charlie = self.line2D.get(current_label)
+            if charlie is None:
+                print("charlie is NOne")
+                return
+            print(f"{charlie[0]}")
+            x = charlie[1]
+            y = charlie[2]
             stats = self.calculateBasicMath(x, y)
             for i, txt in zip(stats, ["min_text", "max_text", "com_text", "mean_text"]):
                 if isinstance(i, tuple):
