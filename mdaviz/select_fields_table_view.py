@@ -59,8 +59,9 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self.replaceButton.clicked.connect(partial(self.responder, "replace"))
 
         options = ["Auto-off", "Auto-add", "Auto-replace"]
-
+        self.mode = options[0]
         self.autoBox.addItems(options)
+        self.autoBox.currentTextChanged.connect(self.setMode)
 
     def file(self):
         return self._file
@@ -83,6 +84,12 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def detsDict(self):
         return self._detsDict
+
+    def mode(self):
+        return self._mode
+
+    def setMode(self, *args):
+        self._mode = args[0]
 
     def responder(self, action):
         """Modify the plot with the described action."""
