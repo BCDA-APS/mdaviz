@@ -29,6 +29,12 @@
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>12</number>
+       </property>
        <item>
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
@@ -59,7 +65,19 @@
           <property name="leftMargin">
            <number>0</number>
           </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
           <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="horizontalSpacing">
+           <number>5</number>
+          </property>
+          <property name="verticalSpacing">
            <number>0</number>
           </property>
           <item row="0" column="1">
@@ -84,6 +102,12 @@
        </item>
        <item>
         <widget class="QPushButton" name="clearButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="text">
           <string>Clear Graph</string>
          </property>

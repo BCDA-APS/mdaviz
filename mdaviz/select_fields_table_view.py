@@ -58,6 +58,10 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self.clearButton.clicked.connect(partial(self.responder, "clear"))
         self.replaceButton.clicked.connect(partial(self.responder, "replace"))
 
+        options = ["Auto-off", "Auto-add", "Auto-replace"]
+
+        self.autoBox.addItems(options)
+
     def file(self):
         return self._file
 
