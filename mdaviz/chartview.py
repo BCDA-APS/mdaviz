@@ -223,7 +223,7 @@ class ChartViewMpl(QtWidgets.QWidget):
         label = kwargs.get("label", None)
         self.line2D[label] = plot_obj[0], args[0], args[1]
         print(f"Updating dict: {list(self.line2D.keys())}")
-        self.updateCurveBox()
+        self.addIemCurveBox(label)
 
     def removeCurve(self, *args, **kwargs):
         label = self.curveBox.currentText()
@@ -232,8 +232,8 @@ class ChartViewMpl(QtWidgets.QWidget):
         if label in self.line2D:
             line = self.line2D[label][0]
             line.remove()
+            self.removeItemCurveBox(label)  # Remove curve from the pull down menu
             del self.line2D[label]  # Remove the label/curve pair from the dictionary
-            self.updateCurveBox()  # Update the pull down menu with new 2Dline list
             self.updatePlot()
 
     def plot(self, *args, **kwargs):
@@ -250,23 +250,28 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.clearCursorInfo()
         self.clearBasicMath()
         self.line2D = {}
-        self.updateCurveBox()
+        self.curveBox.clear()
 
-    def updateCurveBox(self):
-        print(f"Clear QComboBox")
-        self.curveBox.clear()  # NOTE: that could be a bad idea, should just append new items
-        print(f"Add items to QComboBox")
-        self.curveBox.addItems(list(self.line2D.keys()))
-        # New ylabel is the first curve on the menu
-        if len(self.line2D):
-            new_ylabel = self.curveBox.currentText().split(" ", 1)[1]
-            self.main_axes.set_ylabel(new_ylabel)
-            self.canvas.draw()
+    def addIemCurveBox(self, label):  # TODO: removeItemCurveBox
+        next_index = self.curveBox.count() + 1
+        self.curveBox.addItem(label, next_index)
+
+    def removeItemCurveBox(self, label):  # TODO: removeItemCurveBox
+        i = self.curveBox.findText(
+            label
+        )  # Returns the index of the item containing the given text ; otherwise returns -1.
+        if i >= 0:
+            self.curveBox.removeItem(i)
 
     def updatePlot(self):
         self.main_axes.relim()  # Recompute the axes limits
         self.main_axes.autoscale_view()  # Autoscale the view based on the remaining data
         self.updateLegend()
+        if (
+            self.curveBox.count() > 0
+        ):  # New ylabel is the first curve on the pull down menu
+            new_ylabel = self.curveBox.currentText().split(" ", 1)[1]
+            self.main_axes.set_ylabel(new_ylabel)
         self.canvas.draw()
 
     def updateLegend(self):
