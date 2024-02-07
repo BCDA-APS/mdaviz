@@ -59,6 +59,9 @@ class MDA_MVC(QtWidgets.QWidget):
 
         self.mda_folder_tableview.tableView.doubleClicked.connect(self.doFileSelected)
 
+        self._action = None
+        self._selection = None
+
         # save/restore splitter sizes in application settings
         for key in "hsplitter vsplitter".split():
             splitter = getattr(self, key)
@@ -74,6 +77,8 @@ class MDA_MVC(QtWidgets.QWidget):
             self.select_fields_tableview.displayTable(index.row())
             self.select_fields_tableview.displayMetadata(index.row())
             self.select_fields_tableview.selected.connect(self.doPlot)
+            # Try something else:
+            self.select_fields_tableview.selected.connect(self.emittedArgs)
             self.setStatus(f"Selected file: {self.mdaFileList()[index.row()]}")
 
             # If the graph is blank, selecting a file:
@@ -97,6 +102,18 @@ class MDA_MVC(QtWidgets.QWidget):
                     self.setStatus("Mode is set to Auto-off")
             else:
                 self.setStatus("Could not find a (positioner,detector) pair to plot.")
+
+    def emittedArgs(self, *args):
+        self._action = args[0]
+        self._selection = args[1]
+        print(f"{self.action()=}")
+        print(f"{self.selection()=}")
+
+    def action(self):
+        return self._action
+
+    def selection(self):
+        return self._selection
 
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
