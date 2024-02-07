@@ -57,6 +57,11 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self._mode = options[0]
         self.autoBox.addItems(options)
         self.autoBox.currentTextChanged.connect(self.setMode)
+        
+    def responder(self, action):
+        """Modify the plot with the described action."""
+        print(f"/nResponder: {action=}")
+        self.selected.emit(action, self.tableView.model().plotFields()[0])
 
     def file(self):
         return self._file
@@ -86,9 +91,6 @@ class SelectFieldsTableView(QtWidgets.QWidget):
     def setMode(self, *args):
         self._mode = args[0]
 
-    def responder(self, action):
-        """Modify the plot with the described action."""
-        self.selected.emit(action, self.tableView.model().plotFields()[0])
 
     def displayTable(self, index):
         from .select_fields_table_model import SelectFieldsTableModel
