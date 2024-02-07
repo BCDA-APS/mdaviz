@@ -221,14 +221,11 @@ class ChartViewMpl(QtWidgets.QWidget):
         return (x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean
 
     def updateBasicMathInfo(self, *args):
-        print(f"{args=}")
         if args and args[0] != "":
             current_label = args[0]
             charlie = self.line2D.get(current_label)
             if charlie is None:
-                print("charlie is NOne")
                 return
-            print(f"{charlie[0]}")
             x = charlie[1]
             y = charlie[2]
             stats = self.calculateBasicMath(x, y)
