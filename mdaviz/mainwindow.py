@@ -9,6 +9,8 @@ from .opendialog import DIR_SETTINGS_KEY
 UI_FILE = utils.getUiFileName(__file__)
 MAX_RECENT_DIRS = 5
 DATA_FOLDER_INVALID = Path(__file__).parent / "fake_folder"
+MAX_DEPTH = 4
+MAX_SUBFOLDERS_PER_DEPTH = 10
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -158,25 +160,57 @@ class MainWindow(QtWidgets.QMainWindow):
             if folder_path.exists() and folder_path.is_dir():  # folder exists
                 self._folderPath = folder_path
 
-                def get_all_subfolders(folder_path, parent_path=""):
+                def get_all_subfolders(
+                    folder_path,
+                    parent_path="",
+                    current_depth=0,
+                    max_depth=MAX_DEPTH,
+                    max_subfolders_per_depth=MAX_SUBFOLDERS_PER_DEPTH,
+                    depth_counter=None,
+                ):
+                    if depth_counter is None:
+                        depth_counter = {depth: 0 for depth in range(1, max_depth + 1)}
+
                     subfolder_list = []
                     if parent_path:  # Don't add the root parent folder
                         subfolder_list.append(parent_path)
+
+                    if current_depth >= max_depth:
+                        print(f"{current_depth=}")
+                        return subfolder_list
+
                     try:
                         for item in folder_path.iterdir():
-                            if item.is_dir():
-                                if item.name.startswith("."):
-                                    continue  # skip hidden folders
-                                new_parent_path = (
+                            # Check if we have collected enough subfolders for the current depth
+                            if (
+                                depth_counter[current_depth + 1]
+                                >= max_subfolders_per_depth
+                            ):
+                                break
+
+                            if item.is_dir() and not item.name.startswith("."):
+                                full_path = (
                                     f"{parent_path}/{item.name}"
                                     if parent_path
                                     else item.name
                                 )
-                                subfolder_list += get_all_subfolders(
-                                    item, new_parent_path
+                                subfolder_list.append(full_path)
+                                # Addition of a subfolder that exists at one level deeper than the current level
+                                depth_counter[current_depth + 1] += 1
+                                # Recursively collect subfolders, passing the updated depth_counter
+                                subfolder_list.extend(
+                                    get_all_subfolders(
+                                        item,
+                                        full_path,
+                                        current_depth + 1,
+                                        max_depth,
+                                        max_subfolders_per_depth,
+                                        depth_counter,
+                                    )
                                 )
                     except PermissionError:
                         print(f"Permission denied for folder: {folder_path}")
+
                     return subfolder_list
 
                 self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
@@ -219,7 +253,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 layout.addWidget(self.mvc_folder)
             else:
                 if self.hasMdaFiles == True:
-                    comment = f"No mda files found in {str(data_path)!r}."
+                    comment = f"No mda files found in {str(data_path)!r}.\nPick a different folder path (left hand side pull-down menu) or a subfolder (right hand side pull-down menu)."
                     self.folderNotValid(layout, comment, clear_sub=False)
 
     def folderNotValid(self, layout, comment, clear_sub=True):

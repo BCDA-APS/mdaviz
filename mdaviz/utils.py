@@ -17,8 +17,7 @@ Support functions for this demo project.
 import datetime
 import pathlib
 import threading
-
-import tiled.queries
+from mda import scanPositioner
 
 
 def human_readable_size(size, decimal_places=2):
@@ -61,14 +60,34 @@ def byte2str(byte_literal):
 def get_det(mda_file_data):
     """det_dict = { index: [fieldname, pv, desc, unit]}"""
     D = {}
-    p_list = [mda_file_data.p[i] for i in range(0, mda_file_data.np)]
-    d_list = [mda_file_data.d[i] for i in range(0, mda_file_data.nd)]
-    first_pos = 0
-    first_det = len(p_list) if p_list else None
+    p_list = [
+        mda_file_data.p[i] for i in range(0, mda_file_data.np)
+    ]  # mda_file_data.np = number of positioners
+    d_list = [
+        mda_file_data.d[i] for i in range(0, mda_file_data.nd)
+    ]  # mda_file_data.nd = number of detectors
+    first_pos = 1 if mda_file_data.np else 0
+    first_det = mda_file_data.np + 1
+
+    P0 = scanPositioner()
+    P0.number = 0  # positioner number in sscan record
+    P0.fieldName = "P0"  # name of sscanRecord PV
+    P0.name = "Index"  # name of EPICS PV this positioner wrote to
+    P0.desc = "Index"  # description of 'name' PV
+    P0.step_mode = ""  # 'LINEAR', 'TABLE', or 'FLY'
+    P0.unit = "a.u"  # units of 'name' PV
+    P0.readback_name = ""  # name of EPICS PV this positioner read from, if any
+    P0.readback_desc = ""  # description of 'readback_name' PV
+    P0.readback_unit = ""  # units of 'readback_name' PV
+    P0.data = list(
+        range(0, mda_file_data.curr_pt)
+    )  # list of values written to 'name' PV.  If rank==2, lists of lists, etc.
+
+    D[0] = P0
     for e, p in enumerate(p_list):
-        D[e] = p
+        D[e + 1] = p
     for e, d in enumerate(d_list):
-        D[e + len(p_list)] = d
+        D[e + 1 + mda_file_data.np] = d
     return D, first_pos, first_det
 
 
