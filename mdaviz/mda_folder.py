@@ -72,24 +72,36 @@ class MDA_MVC(QtWidgets.QWidget):
     # # ------------ Folder & file selection methods:
 
     def doFileSelected(self, index):
+        """
+        Display field table view, file metadata, and plot first pos & det depending on mode. 
+        
+        If the graph is blank, selecting a file:
+                - auto-add: automatically plots the 1st pos/det
+                - auto-replace : same
+                - auto-off: nothing happens
+        If the graph is NOT blank, selecting a file:
+                - auto-add: automatically add to plot the same pos/det that was already plotted
+                - auto-replace : automatically replace plot wiht the same pos/det that was already plotted
+                - auto-off: nothing happens
+                
+        Args:
+            index (int): file index
+        """
+        
+        
         model = self.mda_folder_tableview.tableView.model()
         if model is not None:
             self.select_fields_tableview.displayTable(index.row())
             self.select_fields_tableview.displayMetadata(index.row())
-            self.select_fields_tableview.selected.connect(self.doPlot)
+            # Disconnect previous subcription:
+            try:
+                self.select_fields_tableview.selected.disconnect()
+            except TypeError:  # No slots connected yet
+                pass
+            self.select_fields_tableview.selected.connect(partial(self.doPlot,comment="Button triggered."))
             # Try something else:
-            self.select_fields_tableview.selected.connect(self.emittedArgs)
-            self.setStatus(f"Selected file: {self.mdaFileList()[index.row()]}")
-
-            # If the graph is blank, selecting a file:
-            #       - auto-add: automatically plots the 1st pos/det
-            #       - auto-replace : same
-            #       - auto-off: nothing happens
-            # If the graph is NOT blank, selecting a file:
-            #       - auto-add: automatically add to plot the same pos/det that was already plotted
-            #       - auto-replace : automatically replace plot wiht the same pos/det that was already plotted
-            #       - auto-off: nothing happens
-
+            self.setStatus(f"\n\n======== Selected file: {self.mdaFileList()[index.row()]}")
+            
             first_pos_idx = self.select_fields_tableview.firstPos()
             first_det_idx = self.select_fields_tableview.firstDet()
             if first_pos_idx is not None and first_det_idx is not None:
@@ -147,14 +159,14 @@ class MDA_MVC(QtWidgets.QWidget):
 
     # # ------------ Plot methods:
 
-    def doPlot(self, *args):
+    def doPlot(self, *args,**kwargs):
         """Slot: data field selected (for plotting) button is clicked."""
         from .chartview import ChartViewMpl
         from .select_fields_table_view import to_datasets_mpl
-
+        
         action = args[0]
         selections = args[1]
-        print(f"\ndoPlot called with action: {action}, args: {args}")
+        print(f"\ndoPlot called: {args=}; {kwargs=}")
 
         detsDict = self.select_fields_tableview.detsDict()
         fileName = self.select_fields_tableview.fileName()
