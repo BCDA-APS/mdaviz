@@ -57,7 +57,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self._mode = options[0]
         self.autoBox.addItems(options)
         self.autoBox.currentTextChanged.connect(self.setMode)
-        
+
     def responder(self, action):
         """Modify the plot with the described action."""
         print(f"/nResponder: {action=}")
@@ -90,7 +90,6 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def setMode(self, *args):
         self._mode = args[0]
-
 
     def displayTable(self, index):
         from .select_fields_table_model import SelectFieldsTableModel
@@ -181,7 +180,7 @@ def to_datasets_mpl(fileName, detsDict, selections):
         ds_options["label"] = y_name_with_file_units
         ds = [x_data, y_data] if x_data is not None else [y_data]
         datasets.append((ds, ds_options))
-    now = str(datetime.datetime.now()).rsplit(".")[0]
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     title = f"Plot Date & Time: {now}"
 
     plot_options = {
