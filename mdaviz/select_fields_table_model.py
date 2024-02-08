@@ -187,7 +187,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         if changes:
             self.updateCheckboxes()
         # self.logCheckboxSelections()
-        self.setStatus(self.plotFields()[1])  # plotter should call plotFields()
+        # self.setStatus(self.plotFields()[1])  # plotter should call plotFields()
 
     def applySelectionRules(self, index, changes=False):
         """Apply selection rules 2-4."""

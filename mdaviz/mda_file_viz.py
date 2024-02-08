@@ -2,7 +2,6 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import QFont
 
 from . import utils
-from .chartview import ChartViewQt
 from .chartview import ChartViewMpl
 
 MD_FONT = "Monospace"
@@ -34,33 +33,21 @@ class MDAFileVisualization(QtWidgets.QWidget):
     def setData(self, text, *args, **kwargs):
         self.data.setText(text)
 
-    def setPlot(self, plotPage, plot_widget):
-        layout = plotPage.layout()
+    def setPlot(self, plot_widget):
+        layout = self.plotPageMpl.layout()
         utils.removeAllLayoutWidgets(layout)
         layout.addWidget(plot_widget)
-        self.tabWidget.setCurrentWidget(plotPage)
+        self.tabWidget.setCurrentWidget(self.plotPageMpl)
 
-    def setPlotQt(self, plot_widget):
-        self.setPlot(self.plotPageQt, plot_widget)
-
-    def setPlotMpl(self, plot_widget):
-        self.setPlot(self.plotPageMpl, plot_widget)
-
-    def isPlotBlank(self, plotPage, chartView):
-        layout = plotPage.layout()
+    def isPlotBlank(self):
+        layout = self.plotPageMpl.layout()
         if layout.count() == 0:
             return True
         plot_widget = layout.itemAt(0).widget()
         # Check if the plot widget is an instance of chartView and has data items
-        if isinstance(plot_widget, chartView):
+        if isinstance(plot_widget, ChartViewMpl):
             return not plot_widget.hasDataItems()
         return True  # If not a chartView instance, consider it as blank
-
-    def isPlotBlankQt(self):
-        return self.isPlotBlank(self.plotPageQt, ChartViewQt)
-
-    def isPlotBlankMpl(self):
-        return self.isPlotBlank(self.plotPageMpl, ChartViewMpl)
 
     def setStatus(self, text):
         self.parent.setStatus(text)

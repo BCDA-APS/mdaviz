@@ -8,10 +8,12 @@ Uses :class:`select_fields_tablemodel.SelectFieldsTableModel`.
     ~SelectFieldsTableView
 """
 
+import datetime
 from mda import readMDA
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 import yaml
+
 
 from . import utils
 from .select_fields_table_model import ColumnDataType
@@ -49,11 +51,24 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
         self.addButton.clicked.connect(partial(self.responder, "add"))
         self.clearButton.clicked.connect(partial(self.responder, "clear"))
-        self.removeButton.clicked.connect(partial(self.responder, "remove"))
         self.replaceButton.clicked.connect(partial(self.responder, "replace"))
+
+        options = ["Auto-add", "Auto-replace", "Auto-off"]
+        self._mode = options[0]
+        self.autoBox.addItems(options)
+        self.autoBox.currentTextChanged.connect(self.setMode)
+
+    def responder(self, action):
+        """Modify the plot with the described action."""
+        print(f"/nResponder: {action=}")
+        self.selected.emit(action, self.tableView.model().plotFields()[0])
 
     def file(self):
         return self._file
+
+    def fileName(self):
+        # File name without the .mda extension
+        return self._fileName
 
     def data(self):
         return self._data
@@ -70,17 +85,11 @@ class SelectFieldsTableView(QtWidgets.QWidget):
     def detsDict(self):
         return self._detsDict
 
-    def responder(self, action):
-        """Modify the plot with the described action."""
-        # print(f"Responder action: {action}, Widget state: {self.checkWidgetState()}")
-        self.selected.emit(action, self.tableView.model().plotFields()[0])
+    def mode(self):
+        return self._mode
 
-    def checkWidgetState(self):
-        # for debugging purposes
-        return {
-            "isVisible": self.isVisible(),
-            "isEnabled": self.isEnabled(),
-        }
+    def setMode(self, *args):
+        self._mode = args[0]
 
     def displayTable(self, index):
         from .select_fields_table_model import SelectFieldsTableModel
@@ -117,6 +126,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self._firstPos = first_pos
         self._firstDet = first_det
         self._file = file_path
+        self._fileName = file_name.rsplit(".mda", 1)[0]
         self._detsDict = detsDict
         self._data = fields, first_pos, first_det
         self._metadata = file_metadata
@@ -138,58 +148,8 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self.parent.setStatus(text)
 
 
-def to_datasets_qt(detsDict, selections):
-    """Prepare datasets and options for plotting."""
-
-    from . import chartview
-
-    datasets = []
-    x_axis = selections.get("X")  # x_axis is the row number
-    x_datetime = False  # special scaling using datetime: is it applicable for mda?
-    if x_axis is None:
-        x_data = None
-    else:
-        x = detsDict[x_axis]
-        x_data = x.data
-    y_names = []
-    for y_axis in selections.get("Y", []):  # x_axis is the list of row number
-        y = detsDict[y_axis]
-        y_data = y.data
-        y_units = utils.byte2str(y.unit)
-        y_name = utils.byte2str(y.name)
-        y_names.append(y_name)
-        ds, ds_options = [], {}
-        color = chartview.auto_color()
-        symbol = chartview.auto_symbol()
-        ds_options["name"] = f"{y_name})"  # label for this curve
-        ds_options["pen"] = color  # line color                 $ color for this curve
-        ds_options["symbol"] = symbol
-        ds_options["symbolBrush"] = color  # fill color
-        ds_options["symbolPen"] = color  # outline color
-        # size in pixels (if pxMode==True, then data coordinates.)
-        ds_options["symbolSize"] = 10  # default: 10
-        ds_options["width"] = 2
-
-        if x_data is None:
-            ds = [y_data]  # , title=f"{y_name} v index"
-        else:
-            ds = [x_data, y_data]
-        datasets.append((ds, ds_options))
-    plot_options = {
-        "x_datetime": x_datetime,
-        "x_units": utils.byte2str(x.unit) if x_axis else "",
-        "x": utils.byte2str(x.name) if x_axis else "Index",  # label for x axis
-        "y_units": y_units,
-        "y": ",\t".join(y_names),  # label for y axis
-        "title": f"{y_names} v index",  # TODO: To be confirmed, is that a correct title?
-    }
-
-    return datasets, plot_options
-
-
-def to_datasets_mpl(detsDict, selections):
+def to_datasets_mpl(fileName, detsDict, selections):
     """Prepare datasets and options for plotting with Matplotlib."""
-
     datasets = []
 
     # x_axis is the row number
@@ -203,31 +163,30 @@ def to_datasets_mpl(detsDict, selections):
     )
 
     # y_axis is the list of row numbers
-    y_names = []
+    y_names_with_units = []
+    y_names_with_file_units = []
     for y_axis in selections.get("Y", []):
         y = detsDict[y_axis]
         y_data = y.data
+        # y labels:
         y_units = utils.byte2str(y.unit) if y.unit else "a.u."
-        y_name = utils.byte2str(y.name) + f" ({y_units})"
-        y_names.append(y_name)
-
+        y_name = utils.byte2str(y.name)
+        y_name_with_units = y_name + "  (" + y_units + ")"
+        y_name_with_file_units = fileName + ": " + y_name + "  (" + y_units + ")"
+        y_names_with_units.append(y_name_with_units)
+        y_names_with_file_units.append(y_name_with_file_units)
+        # append to dataset:
         ds, ds_options = [], {}
-        ds_options["label"] = f"{y_name}"
+        ds_options["label"] = y_name_with_file_units
         ds = [x_data, y_data] if x_data is not None else [y_data]
         datasets.append((ds, ds_options))
-
-    title = ""
-    if len(y_names) == 1:
-        title = f"{y_name} vs {x_name}"
-    elif len(y_names) <= 3:
-        title = "(" + " ,  ".join(y_names) + f")\n vs {x_name}"
-    else:
-        title = "(" + " ,  ".join(y_names[0:3]) + f", ...)\n vs {x_name}"
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    title = f"Plot Date & Time: {now}"
 
     plot_options = {
         "x": x_name,  # label for x axis
         "x_units": x_units,
-        "y": ", ".join(y_names[0:3]),  # label for y axis
+        "y": ", ".join(y_names_with_units[0:1]),  # label for y axis
         "y_units": y_units,
         "title": title,
     }
