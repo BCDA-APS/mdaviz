@@ -193,6 +193,56 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
             self.updateCheckboxes()
             self.checkboxStateChanged.emit(self.plotFields()[0])
 
+    # def uncheckCheckBox(self, row, column_name):
+    #     col = self.columnNumber(column_name)
+    #     index = self.index(row, col)
+
+    #     if 0 <= row < len(self._fields):
+    #         field = self._fields[row]
+    #         field.selection = (QtCore.Qt.Unchecked)
+    #         # Notify views that the data has been updated.
+    #         self.dataChanged.emit(index, index, [QtCore.Qt.CheckStateRole])
+
+    def checkCheckBox(self, row, column_name):
+        self.selections[row] = (
+            column_name  # Mark the checkbox as checked by updating 'selections'
+        )
+        col = self.columnNumber(column_name)  # Translate column name to its index
+        index = self.index(row, col)
+        self.dataChanged.emit(index, index, [QtCore.Qt.CheckStateRole])  # Update view
+
+    def uncheckCheckBox(self, row):
+        if row in self.selections:
+            col = self.columnNumber(
+                self.selections[row]
+            )  # Get the column index of the checkbox being unchecked
+            del self.selections[row]  # Remove the selection
+            index = self.index(row, col)
+            self.dataChanged.emit(
+                index, index, [QtCore.Qt.CheckStateRole]
+            )  # Update view
+
+    def clearAllCheckboxes(self):
+        """
+        Clears (unchecks) all checkboxes in the model.
+        """
+        # Check if there are any selections to clear
+        if not self.selections:
+            return  # No selections to clear
+        # Clear all selections
+        self.selections.clear()
+        # Emit the dataChanged signal for the entire table to update the view.
+        # Assuming you have methods to get the index of the first and last items in the model for full refresh.
+        topLeftIndex = self.index(0, 0)
+        bottomRightIndex = self.index(self.rowCount() - 1, self.columnCount() - 1)
+        self.dataChanged.emit(
+            topLeftIndex, bottomRightIndex, [QtCore.Qt.CheckStateRole]
+        )
+
+        # Optionally, emit a custom signal to notify other parts of your application that all selections have been cleared.
+        # This is useful if other UI elements or logic depend on the selection state.
+        self.checkboxStateChanged.emit({})
+
     def applySelectionRules(self, index, changes=False):
         """Apply selection rules 2-4."""
         row = index.row()

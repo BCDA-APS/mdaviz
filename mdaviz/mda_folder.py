@@ -70,63 +70,6 @@ class MDA_MVC(QtWidgets.QWidget):
 
     # # ------------ Folder & file selection methods:
 
-    def onCheckboxStateChange(self, selection):
-        """Slot: data field (for plotting) changes."""
-        from .chartview import ChartViewMpl
-        from .select_fields_table_view import to_datasets_mpl
-
-        previous_selection = self.selection()
-
-        # Get the matplotlib chartview widget, if exists:
-        layoutMpl = self.mda_file_visualization.plotPageMpl.layout()
-        if layoutMpl.count() != 1:  # in case something changes ...
-            raise RuntimeError("Expected exactly one widget in this layout!")
-        widgetMpl = layoutMpl.itemAt(0).widget()
-
-        mode = self.select_fields_tableview.mode()
-
-        # Exceptions:
-        if not selection.get("Y"):  # no DET selected
-            widgetMpl.clearPlot()
-            return
-        if not selection.get("X"):  # if no POS, default to index
-            widgetMpl.clearPlot()
-            selection["X"] = 0
-
-        if previous_selection:
-            if previous_selection.get("X") != selection.get(
-                "X"
-            ):  # if changing POS, clear
-                widgetMpl.clearPlot()  #
-            if len(previous_selection.get("Y")) > len(selection.get("Y")):
-                widgetMpl.clearPlot()  # TODO: what if there are DET from other file? We will need to keep track of them too in selection to add them back to the plot
-
-        # Get info for the file & POS/DET selection:
-        detsDict = self.select_fields_tableview.detsDict()
-        fileName = self.select_fields_tableview.fileName()
-        datasets_mpl, options_mpl = to_datasets_mpl(fileName, detsDict, selection)
-        self._selection = selection
-        print(f"\nonCheckboxStateChange called:  {mode} {fileName} with {selection}")
-
-        if mode in ("Auto-replace"):
-            if not isinstance(widgetMpl, ChartViewMpl):
-                widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
-            else:
-                widgetMpl.clearPlot()
-            for ds, ds_options in datasets_mpl:
-                widgetMpl.plot(*ds, **ds_options)
-            self.mda_file_visualization.setPlot(widgetMpl)
-
-        elif mode in ("Auto-add"):
-            if not isinstance(widgetMpl, ChartViewMpl):
-                widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
-            for ds, ds_options in datasets_mpl:
-                widgetMpl.plot(*ds, **ds_options)
-            self.mda_file_visualization.setPlot(widgetMpl)
-
-        elif mode in ("Auto-off"):
-            return
-
     def doFileSelected(self, index):
         """
         Display field table view, file metadata, and plot first pos & det depending on mode.
@@ -263,6 +206,66 @@ class MDA_MVC(QtWidgets.QWidget):
 
         elif action in ("clear"):
             widgetMpl.clearPlot()
+
+    # # ------------ Checkbox methods:
+
+    def onCheckboxStateChange(self, selection):
+        """Slot: data field (for plotting) changes."""
+        from .chartview import ChartViewMpl
+        from .select_fields_table_view import to_datasets_mpl
+
+        previous_selection = self.selection()
+
+        # Get the matplotlib chartview widget, if exists:
+        layoutMpl = self.mda_file_visualization.plotPageMpl.layout()
+        if layoutMpl.count() != 1:  # in case something changes ...
+            raise RuntimeError("Expected exactly one widget in this layout!")
+        widgetMpl = layoutMpl.itemAt(0).widget()
+
+        mode = self.select_fields_tableview.mode()
+
+        # Exceptions:
+        if not selection.get("Y"):  # no DET selected
+            widgetMpl.clearPlot()
+            return
+        if not selection.get("X"):  # if no POS, default to index
+            widgetMpl.clearPlot()
+            selection["X"] = 0
+            self.select_fields_tableview.tableView.model().checkCheckBox(0, "X")
+
+        if previous_selection:
+            # if changing POS, clear the graph:
+            if previous_selection.get("X") != selection.get("X"):
+                widgetMpl.clearPlot()  #
+            # if removing DET, clear the graph:
+            if len(previous_selection.get("Y")) > len(selection.get("Y")):
+                widgetMpl.clearPlot()
+
+        # Get info for the file & POS/DET selection:
+        detsDict = self.select_fields_tableview.detsDict()
+        fileName = self.select_fields_tableview.fileName()
+        datasets_mpl, options_mpl = to_datasets_mpl(fileName, detsDict, selection)
+        self._selection = selection
+        print(f"\nonCheckboxStateChange called:  {mode} {fileName} with {selection}")
+
+        if mode in ("Auto-replace"):
+            if not isinstance(widgetMpl, ChartViewMpl):
+                widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
+            else:
+                widgetMpl.clearPlot()
+            for ds, ds_options in datasets_mpl:
+                widgetMpl.plot(*ds, **ds_options)
+            self.mda_file_visualization.setPlot(widgetMpl)
+
+        elif mode in ("Auto-add"):
+            if not isinstance(widgetMpl, ChartViewMpl):
+                widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
+            for ds, ds_options in datasets_mpl:
+                widgetMpl.plot(*ds, **ds_options)
+            self.mda_file_visualization.setPlot(widgetMpl)
+
+        elif mode in ("Auto-off"):
+            return
 
     # # ------------ splitter methods
 
