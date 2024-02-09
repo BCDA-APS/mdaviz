@@ -26,6 +26,7 @@ COLUMNS = [
     TableColumn("X", ColumnDataType.checkbox, rule=FieldRuleType.unique),
     TableColumn("Y", ColumnDataType.checkbox, rule=FieldRuleType.multiple),
     TableColumn("I0", ColumnDataType.checkbox, rule=FieldRuleType.unique),
+    TableColumn("Unscale", ColumnDataType.checkbox, rule=FieldRuleType.multiple),
     TableColumn("PV", ColumnDataType.text),
     TableColumn("DESC", ColumnDataType.text),
     TableColumn("Unit", ColumnDataType.text),
