@@ -59,7 +59,6 @@ class MDA_MVC(QtWidgets.QWidget):
 
         self.mda_folder_tableview.tableView.doubleClicked.connect(self.doFileSelected)
 
-        self._action = None
         self._selection = None
 
         # save/restore splitter sizes in application settings
@@ -71,10 +70,12 @@ class MDA_MVC(QtWidgets.QWidget):
 
     # # ------------ Folder & file selection methods:
 
-    def onCheckboxStateChange(self, selections):
+    def onCheckboxStateChange(self, selection):
         """Slot: data field (for plotting) changes."""
         from .chartview import ChartViewMpl
         from .select_fields_table_view import to_datasets_mpl
+
+        previous_selection = self.selection()
 
         # Get the matplotlib chartview widget, if exists:
         layoutMpl = self.mda_file_visualization.plotPageMpl.layout()
@@ -85,18 +86,27 @@ class MDA_MVC(QtWidgets.QWidget):
         mode = self.select_fields_tableview.mode()
 
         # Exceptions:
-        if not selections.get("Y"):  # no DET selected
+        if not selection.get("Y"):  # no DET selected
             widgetMpl.clearPlot()
             return
-        if not selections.get("X"):  # if no POS, default to index
-            selections["X"] = 0
+        if not selection.get("X"):  # if no POS, default to index
+            widgetMpl.clearPlot()
+            selection["X"] = 0
+
+        if previous_selection:
+            if previous_selection.get("X") != selection.get(
+                "X"
+            ):  # if changing POS, clear
+                widgetMpl.clearPlot()  #
+            if len(previous_selection.get("Y")) > len(selection.get("Y")):
+                widgetMpl.clearPlot()  # TODO: what if there are DET from other file? We will need to keep track of them too in selection to add them back to the plot
 
         # Get info for the file & POS/DET selection:
         detsDict = self.select_fields_tableview.detsDict()
         fileName = self.select_fields_tableview.fileName()
-        datasets_mpl, options_mpl = to_datasets_mpl(fileName, detsDict, selections)
-
-        print(f"\nonCheckboxStateChange called:  {mode} {fileName} with {selections}")
+        datasets_mpl, options_mpl = to_datasets_mpl(fileName, detsDict, selection)
+        self._selection = selection
+        print(f"\nonCheckboxStateChange called:  {mode} {fileName} with {selection}")
 
         if mode in ("Auto-replace"):
             if not isinstance(widgetMpl, ChartViewMpl):
@@ -162,24 +172,15 @@ class MDA_MVC(QtWidgets.QWidget):
             first_pos_idx = self.select_fields_tableview.firstPos()
             first_det_idx = self.select_fields_tableview.firstDet()
             if first_pos_idx is not None and first_det_idx is not None:
-                first_selections = {"X": first_pos_idx, "Y": [first_det_idx]}
+                first_selection = {"X": first_pos_idx, "Y": [first_det_idx]}
                 if self.select_fields_tableview.mode() == "Auto-add":
-                    self.doPlot("add", first_selections)
+                    self.doPlot("add", first_selection)
                 elif self.select_fields_tableview.mode() == "Auto-replace":
-                    self.doPlot("replace", first_selections)
+                    self.doPlot("replace", first_selection)
                 else:
                     self.setStatus("Mode is set to Auto-off")
             else:
                 self.setStatus("Could not find a (positioner,detector) pair to plot.")
-
-    def emittedArgs(self, *args):
-        self._action = args[0]
-        self._selection = args[1]
-        print(f"{self.action()=}")
-        print(f"{self.selection()=}")
-
-    def action(self):
-        return self._action
 
     def selection(self):
         return self._selection
@@ -222,14 +223,16 @@ class MDA_MVC(QtWidgets.QWidget):
         from .select_fields_table_view import to_datasets_mpl
 
         action = args[0]
-        selections = args[1]
+        self._selection = args[1]
         print(f"\ndoPlot called: {args=}; {kwargs=}")
 
         detsDict = self.select_fields_tableview.detsDict()
         fileName = self.select_fields_tableview.fileName()
 
         # Get dataset for the positioner/detector selection:
-        datasets_mpl, options_mpl = to_datasets_mpl(fileName, detsDict, selections)
+        datasets_mpl, options_mpl = to_datasets_mpl(
+            fileName, detsDict, self.selection()
+        )
 
         # Get the matplotlib chartview widget, if exists:
         layoutMpl = self.mda_file_visualization.plotPageMpl.layout()
