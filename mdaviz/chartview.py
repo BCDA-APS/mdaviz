@@ -141,17 +141,21 @@ class ChartViewMpl(QtWidgets.QWidget):
     def removeCurve(self, *args, **kwargs):
         label = self.curveBox.currentText()
         # If removing the last curve, clear plot:
-        if label in self.line2D and len(self.line2D) == 1:
-            self.clearPlot()
         if label in self.line2D:
-            # Remove curve from graph
-            line = self.line2D[label][0]
-            line.remove()
-            self.updatePlot()
-            # Remove curve from dictionary
-            del self.line2D[label]
-            # Remove curve from comboBox
-            self.removeItemCurveBox(label)
+            if len(self.line2D) == 1:
+                self.clearPlot()
+                self.parent.select_fields_tableview.tableView.model().clearAllCheckboxes()
+            else:
+                # Remove curve from graph
+                line = self.line2D[label][0]
+                line.remove()
+                self.updatePlot()
+                # Remove curve from dictionary
+                del self.line2D[label]
+                # Remove curve from comboBox
+                self.removeItemCurveBox(label)
+            # TODO: uncheck corresponding checkbox
+            # self.parent.select_fields_tableview.tableView.model().uncheckCheckBox(0, "X")
 
     def plot(self, *args, **kwargs):
         # Extract label from kwargs, default to None if not present
