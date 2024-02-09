@@ -135,7 +135,6 @@ class ChartViewMpl(QtWidgets.QWidget):
         # Add to the dictionary
         label = kwargs.get("label", None)
         self.line2D[label] = plot_obj[0], args[0], args[1]
-        print(f"Updating dict: {list(self.line2D.keys())}")
         # Add to the comboBox
         self.addIemCurveBox(label)
 

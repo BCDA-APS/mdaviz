@@ -36,6 +36,7 @@ COLUMNS = [
 class SelectFieldsTableView(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
     selected = QtCore.pyqtSignal(str, dict)
+    fieldchange = QtCore.pyqtSignal(str, dict)
 
     def __init__(self, parent):
         self.parent = parent
@@ -54,6 +55,11 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self.clearButton.clicked.connect(partial(self.responder, "clear"))
         self.replaceButton.clicked.connect(partial(self.responder, "replace"))
 
+        # model = self.parent.select_fields_tableview.tableView.model()
+        # if model is not None:
+        #     print("\nModel is not None")
+        #     model.checkboxStateChanged.connect(self.onCheckboxStateChange)
+
         options = ["Auto-add", "Auto-replace", "Auto-off"]
         self._mode = options[0]
         self.autoBox.addItems(options)
@@ -61,7 +67,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def responder(self, action):
         """Modify the plot with the described action."""
-        print(f"/nResponder: {action=}")
+        print(f"\nResponder: {action=}")
         self.selected.emit(action, self.tableView.model().plotFields()[0])
 
     def file(self):

@@ -112,6 +112,11 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
     https://doc.qt.io/qtforpython-5/PySide2/QtCore/QAbstractTableModel.html
     """
 
+    # Signals in PyQt5 should be class attributes, not instance attributes, to work properly.
+    # They need to be defined at the class level so that PyQt can set them up correctly when instances of the class are created.
+
+    checkboxStateChanged = QtCore.pyqtSignal(dict)  # emit field selection
+
     def __init__(self, columns, fields, first_pos, first_det, parent=None):
         self.selections = {first_pos: "X", first_det: "Y"} if first_det else {}
 
@@ -186,8 +191,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         changes = self.applySelectionRules(index, changes)
         if changes:
             self.updateCheckboxes()
-        # self.logCheckboxSelections()
-        # self.setStatus(self.plotFields()[1])  # plotter should call plotFields()
+            self.checkboxStateChanged.emit(self.plotFields()[0])
 
     def applySelectionRules(self, index, changes=False):
         """Apply selection rules 2-4."""

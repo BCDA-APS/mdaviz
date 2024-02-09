@@ -71,10 +71,56 @@ class MDA_MVC(QtWidgets.QWidget):
 
     # # ------------ Folder & file selection methods:
 
+    def onCheckboxStateChange(self, selections):
+        """Slot: data field (for plotting) changes."""
+        from .chartview import ChartViewMpl
+        from .select_fields_table_view import to_datasets_mpl
+
+        # Get the matplotlib chartview widget, if exists:
+        layoutMpl = self.mda_file_visualization.plotPageMpl.layout()
+        if layoutMpl.count() != 1:  # in case something changes ...
+            raise RuntimeError("Expected exactly one widget in this layout!")
+        widgetMpl = layoutMpl.itemAt(0).widget()
+
+        mode = self.select_fields_tableview.mode()
+
+        # Exceptions:
+        if not selections.get("Y"):  # no DET selected
+            widgetMpl.clearPlot()
+            return
+        if not selections.get("X"):  # if no POS, default to index
+            selections["X"] = 0
+
+        # Get info for the file & POS/DET selection:
+        detsDict = self.select_fields_tableview.detsDict()
+        fileName = self.select_fields_tableview.fileName()
+        datasets_mpl, options_mpl = to_datasets_mpl(fileName, detsDict, selections)
+
+        print(f"\nonCheckboxStateChange called:  {mode} {fileName} with {selections}")
+
+        if mode in ("Auto-replace"):
+            if not isinstance(widgetMpl, ChartViewMpl):
+                widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
+            else:
+                widgetMpl.clearPlot()
+            for ds, ds_options in datasets_mpl:
+                widgetMpl.plot(*ds, **ds_options)
+            self.mda_file_visualization.setPlot(widgetMpl)
+
+        elif mode in ("Auto-add"):
+            if not isinstance(widgetMpl, ChartViewMpl):
+                widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
+            for ds, ds_options in datasets_mpl:
+                widgetMpl.plot(*ds, **ds_options)
+            self.mda_file_visualization.setPlot(widgetMpl)
+
+        elif mode in ("Auto-off"):
+            return
+
     def doFileSelected(self, index):
         """
-        Display field table view, file metadata, and plot first pos & det depending on mode. 
-        
+        Display field table view, file metadata, and plot first pos & det depending on mode.
+
         If the graph is blank, selecting a file:
                 - auto-add: automatically plots the 1st pos/det
                 - auto-replace : same
@@ -83,12 +129,11 @@ class MDA_MVC(QtWidgets.QWidget):
                 - auto-add: automatically add to plot the same pos/det that was already plotted
                 - auto-replace : automatically replace plot wiht the same pos/det that was already plotted
                 - auto-off: nothing happens
-                
+
         Args:
             index (int): file index
         """
-        
-        
+
         model = self.mda_folder_tableview.tableView.model()
         if model is not None:
             self.select_fields_tableview.displayTable(index.row())
@@ -98,10 +143,22 @@ class MDA_MVC(QtWidgets.QWidget):
                 self.select_fields_tableview.selected.disconnect()
             except TypeError:  # No slots connected yet
                 pass
-            self.select_fields_tableview.selected.connect(partial(self.doPlot,comment="Button triggered."))
+            self.select_fields_tableview.selected.connect(
+                partial(self.doPlot, comment="Button triggered.")
+            )
+            try:
+                self.select_fields_tableview.tableView.model().checkboxStateChanged.disconnect()
+            except TypeError:  # No slots connected yet
+                pass
+            self.select_fields_tableview.tableView.model().checkboxStateChanged.connect(
+                self.onCheckboxStateChange
+            )
+
             # Try something else:
-            self.setStatus(f"\n\n======== Selected file: {self.mdaFileList()[index.row()]}")
-            
+            self.setStatus(
+                f"\n\n======== Selected file: {self.mdaFileList()[index.row()]}"
+            )
+
             first_pos_idx = self.select_fields_tableview.firstPos()
             first_det_idx = self.select_fields_tableview.firstDet()
             if first_pos_idx is not None and first_det_idx is not None:
@@ -159,11 +216,11 @@ class MDA_MVC(QtWidgets.QWidget):
 
     # # ------------ Plot methods:
 
-    def doPlot(self, *args,**kwargs):
+    def doPlot(self, *args, **kwargs):
         """Slot: data field selected (for plotting) button is clicked."""
         from .chartview import ChartViewMpl
         from .select_fields_table_view import to_datasets_mpl
-        
+
         action = args[0]
         selections = args[1]
         print(f"\ndoPlot called: {args=}; {kwargs=}")
@@ -191,7 +248,6 @@ class MDA_MVC(QtWidgets.QWidget):
             else:
                 widgetMpl.clearPlot()
             for ds, ds_options in datasets_mpl:
-                print(f"{ds_options=}")
                 widgetMpl.plot(*ds, **ds_options)
             self.mda_file_visualization.setPlot(widgetMpl)
 
@@ -199,7 +255,6 @@ class MDA_MVC(QtWidgets.QWidget):
             if not isinstance(widgetMpl, ChartViewMpl):
                 widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
             for ds, ds_options in datasets_mpl:
-                print(f"{ds_options=}")
                 widgetMpl.plot(*ds, **ds_options)
             self.mda_file_visualization.setPlot(widgetMpl)
 
