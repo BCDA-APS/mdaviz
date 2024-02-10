@@ -183,9 +183,8 @@ def to_datasets_mpl(fileName, detsDict, selections):
         y_names_with_units.append(y_name_with_units)
         y_names_with_file_units.append(y_name_with_file_units)
         # append to dataset:
-        ds, ds_options, ds_row = [], {}, None
+        ds, ds_options = [], {}
         ds_options["label"] = y_name_with_file_units
-        ds_row = y_axis
         ds = [x_data, y_data] if x_data is not None else [y_data]
         datasets.append((ds, ds_options))
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -199,4 +198,4 @@ def to_datasets_mpl(fileName, detsDict, selections):
         "title": title,
     }
 
-    return datasets, plot_options, ds_row
+    return datasets, plot_options

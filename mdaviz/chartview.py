@@ -134,8 +134,8 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.updatePlot()
         # Add to the dictionary
         label = kwargs.get("label", None)
-        row = kwargs.get("row", None)
         self.line2D[label] = plot_obj[0], args[0], args[1], row
+        print(f"Calling addCurve: row={self.line2D[label][3]}")
         # Add to the comboBox
         self.addIemCurveBox(label)
 
@@ -155,15 +155,15 @@ class ChartViewMpl(QtWidgets.QWidget):
                 # Remove curve from dictionary
                 del self.line2D[label]
                 # Remove curve from comboBox
+                print(f"Calling removeCurve: {row=}")
                 self.removeItemCurveBox(label)
-                print(f"{row}, Y")
                 self.parent.select_fields_tableview.tableView.model().uncheckCheckBox(
-                    row, "Y"
+                    row
                 )
 
     def plot(self, row, *args, **kwargs):
         # Extract label from kwargs, default to None if not present
-        print(f"{row=}")
+        print(f"calling PLot, {row=}")
         label = kwargs.get("label", None)
         if label:
             if label not in self.line2D:

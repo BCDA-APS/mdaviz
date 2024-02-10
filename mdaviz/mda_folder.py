@@ -166,13 +166,14 @@ class MDA_MVC(QtWidgets.QWidget):
 
         action = args[0]
         self._selection = args[1]
+        y_rows = self._selection.get("Y", [])
         print(f"\ndoPlot called: {args=}")
 
         detsDict = self.select_fields_tableview.detsDict()
         fileName = self.select_fields_tableview.fileName()
 
         # Get dataset for the positioner/detector selection:
-        datasets_mpl, options_mpl, ds_row = to_datasets_mpl(
+        datasets_mpl, options_mpl = to_datasets_mpl(
             fileName, detsDict, self.selection()
         )
 
@@ -182,25 +183,20 @@ class MDA_MVC(QtWidgets.QWidget):
             raise RuntimeError("Expected exactly one widget in this layout!")
         widgetMpl = layoutMpl.itemAt(0).widget()
 
-        # if not isinstance(widgetMpl, ChartViewMpl):  # NOTE : is this necessary?
-        #     widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
-        #     if action == "add":
-        #         action = "replace"
-
         if action in ("replace"):
             if not isinstance(widgetMpl, ChartViewMpl):
                 widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
             else:
                 widgetMpl.clearPlot()
-            for ds, ds_options in datasets_mpl:
-                widgetMpl.plot(ds_row, *ds, **ds_options)
+            for row, (ds, ds_options) in zip(y_rows, datasets_mpl):
+                widgetMpl.plot(row, *ds, **ds_options)
             self.mda_file_visualization.setPlot(widgetMpl)
 
         elif action in ("add"):
             if not isinstance(widgetMpl, ChartViewMpl):
                 widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
-            for ds, ds_options in datasets_mpl:
-                widgetMpl.plot(ds_row, *ds, **ds_options)
+            for row, (ds, ds_options) in zip(y_rows, datasets_mpl):
+                widgetMpl.plot(row, *ds, **ds_options)
             self.mda_file_visualization.setPlot(widgetMpl)
 
         elif action in ("clear"):
@@ -244,10 +240,9 @@ class MDA_MVC(QtWidgets.QWidget):
         # Get info for the file & POS/DET selection:
         detsDict = self.select_fields_tableview.detsDict()
         fileName = self.select_fields_tableview.fileName()
-        datasets_mpl, options_mpl, ds_row = to_datasets_mpl(
-            fileName, detsDict, selection
-        )
+        datasets_mpl, options_mpl = to_datasets_mpl(fileName, detsDict, selection)
         self._selection = selection
+        y_rows = selection.get("Y", [])
         print(f"\nonCheckboxStateChange called:  {mode} {fileName} with {selection}")
 
         if mode in ("Auto-replace"):
@@ -255,15 +250,15 @@ class MDA_MVC(QtWidgets.QWidget):
                 widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
             else:
                 widgetMpl.clearPlot()
-            for ds, ds_options in datasets_mpl:
-                widgetMpl.plot(ds_row, *ds, **ds_options)
+            for row, (ds, ds_options) in zip(y_rows, datasets_mpl):
+                widgetMpl.plot(row, *ds, **ds_options)
             self.mda_file_visualization.setPlot(widgetMpl)
 
         elif mode in ("Auto-add"):
             if not isinstance(widgetMpl, ChartViewMpl):
                 widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
-            for ds, ds_options in datasets_mpl:
-                widgetMpl.plot(ds_row, *ds, **ds_options)
+            for row, (ds, ds_options) in zip(y_rows, datasets_mpl):
+                widgetMpl.plot(row, *ds, **ds_options)
             self.mda_file_visualization.setPlot(widgetMpl)
 
         elif mode in ("Auto-off"):
