@@ -51,19 +51,17 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
 
+        self.addButton.hide()
+        self.replaceButton.hide()
         self.addButton.clicked.connect(partial(self.responder, "add"))
         self.clearButton.clicked.connect(partial(self.responder, "clear"))
         self.replaceButton.clicked.connect(partial(self.responder, "replace"))
-
-        # model = self.parent.select_fields_tableview.tableView.model()
-        # if model is not None:
-        #     print("\nModel is not None")
-        #     model.checkboxStateChanged.connect(self.onCheckboxStateChange)
 
         options = ["Auto-add", "Auto-replace", "Auto-off"]
         self._mode = options[0]
         self.autoBox.addItems(options)
         self.autoBox.currentTextChanged.connect(self.setMode)
+        self.autoBox.currentTextChanged.connect(self.updateButtonVisibility)
 
     def responder(self, action):
         """Modify the plot with the described action."""
@@ -97,6 +95,15 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def setMode(self, *args):
         self._mode = args[0]
+
+    def updateButtonVisibility(self):
+        # Check the current text and show/hide buttons accordingly
+        if self.autoBox.currentText() == "Auto-off":
+            self.addButton.show()
+            self.replaceButton.show()
+        else:
+            self.addButton.hide()
+            self.replaceButton.hide()
 
     def displayTable(self, index):
         from .select_fields_table_model import SelectFieldsTableModel
