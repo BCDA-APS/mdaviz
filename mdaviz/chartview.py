@@ -128,13 +128,14 @@ class ChartViewMpl(QtWidgets.QWidget):
     def setLeftAxisText(self, text):
         self.main_axes.set_ylabel(text, fontsize=FONTSIZE, labelpad=20)
 
-    def addCurve(self, *args, **kwargs):
+    def addCurve(self, row, *args, **kwargs):
         # Add to graph
         plot_obj = self.main_axes.plot(*args, **kwargs)
         self.updatePlot()
         # Add to the dictionary
         label = kwargs.get("label", None)
-        self.line2D[label] = plot_obj[0], args[0], args[1]
+        row = kwargs.get("row", None)
+        self.line2D[label] = plot_obj[0], args[0], args[1], row
         # Add to the comboBox
         self.addIemCurveBox(label)
 
@@ -147,6 +148,7 @@ class ChartViewMpl(QtWidgets.QWidget):
                 self.parent.select_fields_tableview.tableView.model().clearAllCheckboxes()
             else:
                 # Remove curve from graph
+                row = self.line2D[label][3]
                 line = self.line2D[label][0]
                 line.remove()
                 self.updatePlot()
@@ -154,15 +156,18 @@ class ChartViewMpl(QtWidgets.QWidget):
                 del self.line2D[label]
                 # Remove curve from comboBox
                 self.removeItemCurveBox(label)
-            # TODO: uncheck corresponding checkbox
-            # self.parent.select_fields_tableview.tableView.model().uncheckCheckBox(0, "X")
+                print(f"{row}, Y")
+                self.parent.select_fields_tableview.tableView.model().uncheckCheckBox(
+                    row, "Y"
+                )
 
-    def plot(self, *args, **kwargs):
+    def plot(self, row, *args, **kwargs):
         # Extract label from kwargs, default to None if not present
+        print(f"{row=}")
         label = kwargs.get("label", None)
         if label:
             if label not in self.line2D:
-                self.addCurve(*args, **kwargs)
+                self.addCurve(row, *args, **kwargs)
 
     def clearPlot(self):
         self.main_axes.clear()
@@ -173,11 +178,11 @@ class ChartViewMpl(QtWidgets.QWidget):
         self.line2D = {}
         self.curveBox.clear()
 
-    def addIemCurveBox(self, label):  # TODO: removeItemCurveBox
+    def addIemCurveBox(self, label):
         next_index = self.curveBox.count() + 1
         self.curveBox.addItem(label, next_index)
 
-    def removeItemCurveBox(self, label):  # TODO: removeItemCurveBox
+    def removeItemCurveBox(self, label):
         i = self.curveBox.findText(
             label
         )  # Returns the index of the item containing the given text ; otherwise returns -1.

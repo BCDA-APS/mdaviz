@@ -91,14 +91,13 @@ class MDA_MVC(QtWidgets.QWidget):
         if model is not None:
             self.select_fields_tableview.displayTable(index.row())
             self.select_fields_tableview.displayMetadata(index.row())
-            # Disconnect previous subcription:
+            # Disconnect previous subcription from the signal emitted when selecting a new file:
             try:
                 self.select_fields_tableview.selected.disconnect()
             except TypeError:  # No slots connected yet
                 pass
-            self.select_fields_tableview.selected.connect(
-                partial(self.doPlot, comment="Button triggered.")
-            )
+            self.select_fields_tableview.selected.connect(self.doPlot)
+            # Disconnect previous subcription from the signal emitted when selecting a new field:
             try:
                 self.select_fields_tableview.tableView.model().checkboxStateChanged.disconnect()
             except TypeError:  # No slots connected yet
@@ -167,13 +166,13 @@ class MDA_MVC(QtWidgets.QWidget):
 
         action = args[0]
         self._selection = args[1]
-        print(f"\ndoPlot called: {args=}; {kwargs=}")
+        print(f"\ndoPlot called: {args=}")
 
         detsDict = self.select_fields_tableview.detsDict()
         fileName = self.select_fields_tableview.fileName()
 
         # Get dataset for the positioner/detector selection:
-        datasets_mpl, options_mpl = to_datasets_mpl(
+        datasets_mpl, options_mpl, ds_row = to_datasets_mpl(
             fileName, detsDict, self.selection()
         )
 
@@ -194,18 +193,19 @@ class MDA_MVC(QtWidgets.QWidget):
             else:
                 widgetMpl.clearPlot()
             for ds, ds_options in datasets_mpl:
-                widgetMpl.plot(*ds, **ds_options)
+                widgetMpl.plot(ds_row, *ds, **ds_options)
             self.mda_file_visualization.setPlot(widgetMpl)
 
         elif action in ("add"):
             if not isinstance(widgetMpl, ChartViewMpl):
                 widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
             for ds, ds_options in datasets_mpl:
-                widgetMpl.plot(*ds, **ds_options)
+                widgetMpl.plot(ds_row, *ds, **ds_options)
             self.mda_file_visualization.setPlot(widgetMpl)
 
         elif action in ("clear"):
             widgetMpl.clearPlot()
+            self.select_fields_tableview.tableView.model().clearAllCheckboxes()
 
     # # ------------ Checkbox methods:
 
@@ -244,7 +244,9 @@ class MDA_MVC(QtWidgets.QWidget):
         # Get info for the file & POS/DET selection:
         detsDict = self.select_fields_tableview.detsDict()
         fileName = self.select_fields_tableview.fileName()
-        datasets_mpl, options_mpl = to_datasets_mpl(fileName, detsDict, selection)
+        datasets_mpl, options_mpl, ds_row = to_datasets_mpl(
+            fileName, detsDict, selection
+        )
         self._selection = selection
         print(f"\nonCheckboxStateChange called:  {mode} {fileName} with {selection}")
 
@@ -254,14 +256,14 @@ class MDA_MVC(QtWidgets.QWidget):
             else:
                 widgetMpl.clearPlot()
             for ds, ds_options in datasets_mpl:
-                widgetMpl.plot(*ds, **ds_options)
+                widgetMpl.plot(ds_row, *ds, **ds_options)
             self.mda_file_visualization.setPlot(widgetMpl)
 
         elif mode in ("Auto-add"):
             if not isinstance(widgetMpl, ChartViewMpl):
                 widgetMpl = ChartViewMpl(self, **options_mpl)  # Make a blank chart.
             for ds, ds_options in datasets_mpl:
-                widgetMpl.plot(*ds, **ds_options)
+                widgetMpl.plot(ds_row, *ds, **ds_options)
             self.mda_file_visualization.setPlot(widgetMpl)
 
         elif mode in ("Auto-off"):
