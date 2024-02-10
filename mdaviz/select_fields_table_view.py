@@ -57,7 +57,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self.clearButton.clicked.connect(partial(self.responder, "clear"))
         self.replaceButton.clicked.connect(partial(self.responder, "replace"))
 
-        options = ["Auto-add", "Auto-replace", "Auto-off"]
+        options = ["Auto-replace", "Auto-add", "Auto-off"]
         self._mode = options[0]
         self.autoBox.addItems(options)
         self.autoBox.currentTextChanged.connect(self.setMode)

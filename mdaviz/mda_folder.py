@@ -12,6 +12,9 @@ import time
 from functools import partial
 
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import QItemSelectionModel
+from PyQt5.QtWidgets import QAbstractItemView
+
 
 from . import utils
 
@@ -37,10 +40,18 @@ class MDA_MVC(QtWidgets.QWidget):
         from .mda_file_viz import MDAFileVisualization
         from .select_fields_table_view import SelectFieldsTableView
 
+        self._selection = None
+        self._selection_model = None
+        self._firstFileIndex = None
+        self._lastFileIndex = None
+        self._currentFileIndex = None
+
         self.mda_folder_tableview = MDAFolderTableView(self)
         layout = self.folder_groupbox.layout()
         layout.addWidget(self.mda_folder_tableview)
         self.mda_folder_tableview.displayTable()
+
+        # self._current_index = self._firstFileIndex
 
         # Refreshing folder content:
         try:
@@ -57,9 +68,21 @@ class MDA_MVC(QtWidgets.QWidget):
         layout = self.viz_groupbox.layout()
         layout.addWidget(self.mda_file_visualization)
 
-        self.mda_folder_tableview.tableView.doubleClicked.connect(self.doFileSelected)
+        model = self.mda_folder_tableview.tableView.model()
 
-        self._selection = None
+        if model is not None:
+            self._firstFileIndex = model.index(0, 0)
+            self._lastFileIndex = model.index(model.rowCount() - 1, 0)
+            # Highlight (select) and plot the first file:
+            self._selection_model = self.mda_folder_tableview.tableView.selectionModel()
+            self.highlightNewFile(0)
+            self.doFileSelected(model.index(0, 0))
+
+        self.mda_folder_tableview.tableView.doubleClicked.connect(self.doFileSelected)
+        self.mda_folder_tableview.firstButton.clicked.connect(self.goToFirst)
+        self.mda_folder_tableview.lastButton.clicked.connect(self.goToLast)
+        self.mda_folder_tableview.backButton.clicked.connect(self.goToBack)
+        self.mda_folder_tableview.nextButton.clicked.connect(self.goToNext)
 
         # save/restore splitter sizes in application settings
         for key in "hsplitter vsplitter".split():
@@ -67,6 +90,92 @@ class MDA_MVC(QtWidgets.QWidget):
             sname = self.splitter_settings_name(key)
             settings.restoreSplitter(splitter, sname)
             splitter.splitterMoved.connect(partial(self.splitter_moved, key))
+
+    def dataPath(self):
+        """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
+        return self.parent.dataPath()
+
+    def mdaFileCount(self):
+        """Number of mda files in the selected folder."""
+        return self.parent.mdaFileCount()
+
+    def mdaFileList(self):
+        """List of mda file (name only) in the selected folder."""
+        return self.parent.mdaFileList()
+
+    def selection(self):
+        return self._selection
+
+    def selectionModel(self):
+        return self._selection_model
+
+    def currentFileIndex(self):
+        return self._currentFileIndex
+
+    def firstFileIndex(self):
+        return self._firstFileIndex
+
+    def lastFileIndex(self):
+        return self._lastFileIndex
+
+    def highlightNewFile(self, row):
+        if self.selectionModel() and self.mda_folder_tableview.tableView.model():
+            # Select the row to highlight
+            index = self.mda_folder_tableview.tableView.model().index(row, 0)
+            self.selectionModel().select(
+                index, QItemSelectionModel.ClearAndSelect | QItemSelectionModel.Rows
+            )
+
+            # Set the selection mode and behavior to mimic clicking on a row with the mouse
+            self.mda_folder_tableview.tableView.setSelectionMode(
+                QAbstractItemView.SingleSelection
+            )
+            self.mda_folder_tableview.tableView.setSelectionBehavior(
+                QAbstractItemView.SelectRows
+            )
+
+            # Scroll to the selected row to ensure it's visible
+            # Use PositionAtTop or PositionAtBottom for the first/last file respectively
+            scrollHint = QAbstractItemView.EnsureVisible
+            if row == 0:
+                scrollHint = QAbstractItemView.PositionAtTop
+            elif row == self.mda_folder_tableview.tableView.model().rowCount() - 1:
+                scrollHint = QAbstractItemView.PositionAtBottom
+            self.mda_folder_tableview.tableView.scrollTo(index, scrollHint)
+
+    def goToFirst(self):
+        if self.firstFileIndex():
+            index = self.firstFileIndex()
+            row = index.row()
+            self.highlightNewFile(row)
+            self.doFileSelected(index)
+
+    def goToLast(self):
+        if self.lastFileIndex():
+            index = self.lastFileIndex()
+            row = index.row()
+            self.highlightNewFile(row)
+            self.doFileSelected(index)
+
+    def goToNext(self):
+        if self.selectionModel() and self.lastFileIndex():
+            i = self.currentFileIndex()
+            if i.row() == self.lastFileIndex().row():
+                return
+            if i != None:
+                i = self.mda_folder_tableview.tableView.model().index(i.row() + 1, 0)
+                self.highlightNewFile(i.row())
+                self.doFileSelected(i)
+
+    def goToBack(self):
+        if self.currentFileIndex() and self.firstFileIndex():
+            i = self.currentFileIndex()
+            if i.row() == self.firstFileIndex().row():
+                return
+            if i != None:
+                i = self.mda_folder_tableview.tableView.model().index(i.row() - 1, 0)
+                self.highlightNewFile(i.row())
+                self.doFileSelected(i)
 
     # # ------------ Folder & file selection methods:
 
@@ -86,7 +195,7 @@ class MDA_MVC(QtWidgets.QWidget):
         Args:
             index (int): file index
         """
-
+        self._currentFileIndex = index
         model = self.mda_folder_tableview.tableView.model()
         if model is not None:
             self.select_fields_tableview.displayTable(index.row())
@@ -123,21 +232,6 @@ class MDA_MVC(QtWidgets.QWidget):
                     self.setStatus("Mode is set to Auto-off")
             else:
                 self.setStatus("Could not find a (positioner,detector) pair to plot.")
-
-    def selection(self):
-        return self._selection
-
-    def dataPath(self):
-        """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
-        return self.parent.dataPath()
-
-    def mdaFileCount(self):
-        """Number of mda files in the selected folder."""
-        return self.parent.mdaFileCount()
-
-    def mdaFileList(self):
-        """List of mda file (name only) in the selected folder."""
-        return self.parent.mdaFileList()
 
     def doRefresh(self):
         self.setStatus("Refreshing folder...")

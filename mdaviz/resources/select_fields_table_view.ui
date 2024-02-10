@@ -106,7 +106,7 @@
           <item row="0" column="1">
            <widget class="QComboBox" name="autoBox">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Modes:&lt;br/&gt;Auto-add&lt;br/&gt;Auto-replace&lt;br/&gt;Auto-off&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Modes:&lt;br/&gt;Auto-replace&lt;br/&gt;Auto-add&lt;br/&gt;Auto-off&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
