@@ -78,7 +78,7 @@ class MDA_MVC(QtWidgets.QWidget):
             self.highlightNewFile(0)
             self.doFileSelected(model.index(0, 0))
 
-        self.mda_folder_tableview.tableView.doubleClicked.connect(self.doFileSelected)
+        self.mda_folder_tableview.tableView.clicked.connect(self.doFileSelected)
         self.mda_folder_tableview.firstButton.clicked.connect(self.goToFirst)
         self.mda_folder_tableview.lastButton.clicked.connect(self.goToLast)
         self.mda_folder_tableview.backButton.clicked.connect(self.goToBack)
