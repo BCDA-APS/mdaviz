@@ -63,7 +63,7 @@
       <item>
        <widget class="QLabel" name="folder_label">
         <property name="text">
-         <string>Folder path:   </string>
+         <string>Path:   </string>
         </property>
        </widget>
       </item>
@@ -127,7 +127,7 @@
       <item>
        <widget class="QComboBox" name="subfolder">
         <property name="toolTip">
-         <string>Choose a subfolder</string>
+         <string>Select folder from parent path</string>
         </property>
        </widget>
       </item>
