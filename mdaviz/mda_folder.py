@@ -71,6 +71,7 @@ class MDA_MVC(QtWidgets.QWidget):
         model = self.mda_folder_tableview.tableView.model()
 
         if model is not None:
+            self.mda_folder_tableview.tableView.setFocus()
             self._firstFileIndex = model.index(0, 0)
             self._lastFileIndex = model.index(model.rowCount() - 1, 0)
             # Highlight (select) and plot the first file:
@@ -120,6 +121,8 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def highlightNewFile(self, row):
         if self.selectionModel() and self.mda_folder_tableview.tableView.model():
+            # Ensure the table view has focus to get the blue highlight on Mac OS
+            self.mda_folder_tableview.tableView.setFocus()
             # Select the row to highlight
             index = self.mda_folder_tableview.tableView.model().index(row, 0)
             self.selectionModel().select(
