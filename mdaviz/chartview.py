@@ -163,7 +163,7 @@ class ChartViewMpl(QtWidgets.QWidget):
 
     def plot(self, row, *args, **kwargs):
         # Extract label from kwargs, default to None if not present
-        print(f"calling PLot, {row=}")
+        print(f"Calling Plot: {row=}")
         label = kwargs.get("label", None)
         if label:
             if label not in self.line2D:

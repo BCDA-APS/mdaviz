@@ -80,37 +80,37 @@
           <property name="verticalSpacing">
            <number>0</number>
           </property>
-          <item row="0" column="1">
+          <item row="0" column="2">
            <widget class="QPushButton" name="replaceButton">
             <property name="text">
              <string>Replace</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
+          <item row="0" column="3">
            <widget class="QPushButton" name="addButton">
             <property name="text">
              <string>Add</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="2">
+          <item row="0" column="1">
            <widget class="QComboBox" name="autoBox"/>
           </item>
+          <item row="0" column="4">
+           <widget class="QPushButton" name="clearButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Clear</string>
+            </property>
+           </widget>
+          </item>
          </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="clearButton">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Clear Graph</string>
-         </property>
         </widget>
        </item>
       </layout>
