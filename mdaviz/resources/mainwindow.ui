@@ -33,7 +33,7 @@
       <item>
        <widget class="QPushButton" name="open">
         <property name="toolTip">
-         <string>Show the previous page of runs.</string>
+         <string>Open a new folder</string>
         </property>
         <property name="icon">
          <iconset>
@@ -62,9 +62,6 @@
       </item>
       <item>
        <widget class="QLabel" name="folder_label">
-        <property name="toolTip">
-         <string>Recent folders.</string>
-        </property>
         <property name="text">
          <string>Folder path:   </string>
         </property>
@@ -73,7 +70,7 @@
       <item>
        <widget class="QComboBox" name="folder">
         <property name="toolTip">
-         <string>Selected path.</string>
+         <string>Selected path</string>
         </property>
        </widget>
       </item>
@@ -93,7 +90,7 @@
       <item>
        <widget class="QPushButton" name="refresh">
         <property name="toolTip">
-         <string>Show the next page of runs.</string>
+         <string>Refresh folder content</string>
         </property>
         <property name="icon">
          <iconset>
@@ -130,7 +127,7 @@
       <item>
        <widget class="QComboBox" name="subfolder">
         <property name="toolTip">
-         <string>Choose a file from this folder.</string>
+         <string>Choose a subfolder</string>
         </property>
        </widget>
       </item>
@@ -149,9 +146,6 @@
       </item>
       <item>
        <widget class="QLabel" name="info">
-        <property name="toolTip">
-         <string>Selected folder type.</string>
-        </property>
         <property name="text">
          <string>Folder info</string>
         </property>
@@ -196,7 +190,7 @@
      <x>0</x>
      <y>0</y>
      <width>719</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
