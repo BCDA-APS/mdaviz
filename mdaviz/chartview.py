@@ -347,7 +347,7 @@ class ChartViewMpl(QtWidgets.QWidget):
             "press middle click"
         )
         self.parent.findChild(QtWidgets.QLineEdit, "pos2_text").setText(
-            "press middle click"
+            "press right click"
         )
         self.parent.findChild(QtWidgets.QLineEdit, "diff_text").setText("n/a")
         self.parent.findChild(QtWidgets.QLineEdit, "midpoint_text").setText("n/a")
