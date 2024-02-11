@@ -8,7 +8,6 @@ Uses :class:`select_fields_tablemodel.SelectFieldsTableModel`.
     ~SelectFieldsTableView
 """
 
-import datetime
 from mda import readMDA
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
@@ -194,15 +193,13 @@ def to_datasets(fileName, detsDict, selections):
         ds_options["label"] = y_name_with_file_units
         ds = [x_data, y_data] if x_data is not None else [y_data]
         datasets.append((ds, ds_options))
-    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    title = f"Plot Date & Time: {now}"
 
     plot_options = {
         "x": x_name,  # label for x axis
         "x_units": x_units,
         "y": ", ".join(y_names_with_units[0:1]),  # label for y axis
         "y_units": y_units,
-        "title": title,
+        "title": "",
     }
 
     return datasets, plot_options

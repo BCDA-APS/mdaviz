@@ -17,7 +17,6 @@ FONTSIZE = 10
 LEFT_BUTTON = 1
 MIDDLE_BUTTON = 2
 RIGHT_BUTTON = 3
-TIMESTAMP_LIMIT = datetime.datetime.fromisoformat("1990-01-01").timestamp()
 
 # https://pyqtgraph.readthedocs.io/en/latest/api_reference/graphicsItems/scatterplotitem.html#pyqtgraph.ScatterPlotItem.setSymbol
 # https://developer.mozilla.org/en-US/docs/Web/CSS/named-color
@@ -88,13 +87,11 @@ class ChartView(QtWidgets.QWidget):
         }
 
         # Plot configuration
-        config = {
-            "title": self.setPlotTitle,
-            "y": self.setLeftAxisText,
-            "x": self.setBottomAxisText,
-        }
-        for k, func in config.items():
-            func(kwargs.get(k))
+        self._plot_options = kwargs.get("plot_options", {})
+        self._title = self.plot_options().get("title", "")
+        self._ylabel = self.plot_options().get("y", "")
+        self._xlabel = self.plot_options().get("x", "")
+        self.setConfigPlot()
 
         # Track curves and display in QComboBox:
         self.line2D = {}  # all the Line2D on the graph, key = label
@@ -128,6 +125,28 @@ class ChartView(QtWidgets.QWidget):
     def setLeftAxisText(self, text):
         self.main_axes.set_ylabel(text, fontsize=FONTSIZE, labelpad=20)
 
+    def setConfigPlot(self, grid=True):
+        self.setLeftAxisText(self.ylabel())
+        self.setBottomAxisText(self.xlabel())
+        self.setPlotTitle(self.title())
+        if grid:
+            self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
+        else:
+            self.main_axes.grid(False)
+        self.canvas.draw()
+
+    def title(self):
+        return self._title
+
+    def xlabel(self):
+        return self._xlabel
+
+    def ylabel(self):
+        return self._ylabel
+
+    def plot_options(self):
+        return self._plot_options
+
     def addCurve(self, row, *args, **kwargs):
         # Add to graph
         plot_obj = self.main_axes.plot(*args, **kwargs)
@@ -151,30 +170,37 @@ class ChartView(QtWidgets.QWidget):
                 row = self.line2D[label][3]
                 line = self.line2D[label][0]
                 line.remove()
-                self.updatePlot()
                 # Remove curve from dictionary
                 del self.line2D[label]
+
                 # Remove curve from comboBox
                 print(f"Calling removeCurve: {row=}")
                 self.removeItemCurveBox(label)
                 self.parent.select_fields_tableview.tableView.model().uncheckCheckBox(
                     row
                 )
+                # Update plot labels, legend and title
+                self.updatePlot()
 
     def plot(self, row, *args, **kwargs):
         # Extract label from kwargs, default to None if not present
         print(f"Calling Plot: {row=}")
-        label = kwargs.get("label", None)
+        self._plot_options = kwargs.get("plot_options")
+        ds_options = self._ds_options = kwargs.get("ds_options")
+        label = ds_options.get("label", None)
+        self.main_axes.axis("on")
         if label:
             if label not in self.line2D:
-                self.addCurve(row, *args, **kwargs)
+                self.addCurve(row, *args, **ds_options)
 
     def clearPlot(self):
         self.main_axes.clear()
+        self.main_axes.axis("off")
+        self.main_axes.set_title("")
         self.clearCursors()
-        self.canvas.draw()
         self.clearCursorInfo()
         self.clearBasicMath()
+        self.figure.canvas.draw()
         self.line2D = {}
         self.curveBox.clear()
 
@@ -190,15 +216,19 @@ class ChartView(QtWidgets.QWidget):
             self.curveBox.removeItem(i)
 
     def updatePlot(self):
-        self.main_axes.relim()  # Recompute the axes limits
-        self.main_axes.autoscale_view()  # Autoscale the view based on the remaining data
+        # Update labels and title:
+        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self._title = f"Plot Date & Time: {now}"
+        self._xlabel = self._plot_options.get("x", "")
+        if self.curveBox.count() <= 0:
+            self._ylabel = self._plot_options.get("y", "")
+        else:  # New ylabel is the first curve on the pull down menu
+            self._ylabel = self.curveBox.currentText().split(" ", 1)[1]
+        # Recompute the axes limits and autoscale:
+        self.main_axes.relim()
+        self.main_axes.autoscale_view()
         self.updateLegend()
-        if (
-            self.curveBox.count() > 0
-        ):  # New ylabel is the first curve on the pull down menu
-            new_ylabel = self.curveBox.currentText().split(" ", 1)[1]
-            self.main_axes.set_ylabel(new_ylabel)
-        self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
+        self.setConfigPlot()
         self.canvas.draw()
 
     def updateLegend(self):
@@ -265,8 +295,11 @@ class ChartView(QtWidgets.QWidget):
             )
         self.cursors["diff"] = "n/a"
         self.cursors["midpoint"] = "n/a"
-        self.updatePlot()
         self.updateCursorInfo()
+        # Recompute the axes limits and autoscale:
+        self.main_axes.relim()
+        self.main_axes.autoscale_view()
+        self.canvas.draw()
 
     def clearCursors(self):
         self.removeCursor(1)

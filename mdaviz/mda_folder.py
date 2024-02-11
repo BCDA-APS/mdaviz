@@ -276,14 +276,17 @@ class MDA_MVC(QtWidgets.QWidget):
             # Get dataset for the positioner/detector selection:
             detsDict = self.select_fields_tableview.detsDict()
             fileName = self.select_fields_tableview.fileName()
-            datasets, options = to_datasets(fileName, detsDict, self.selectionField())
+            datasets, plot_options = to_datasets(
+                fileName, detsDict, self.selectionField()
+            )
 
             if not isinstance(widgetMpl, ChartView):
-                widgetMpl = ChartView(self, **options)  # Make a blank chart.
+                widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
             if action in ("replace"):
                 widgetMpl.clearPlot()
             for row, (ds, ds_options) in zip(y_rows, datasets):
-                widgetMpl.plot(row, *ds, **ds_options)
+                kwargs = {"ds_options": ds_options, "plot_options": plot_options}
+                widgetMpl.plot(row, *ds, **kwargs)
             self.mda_file_visualization.setPlot(widgetMpl)
 
         elif action in ("clear"):
@@ -327,18 +330,22 @@ class MDA_MVC(QtWidgets.QWidget):
         # Get info for the file & POS/DET selection:
         detsDict = self.select_fields_tableview.detsDict()
         fileName = self.select_fields_tableview.fileName()
-        datasets, options = to_datasets(fileName, detsDict, selection)
+        datasets, plot_options = to_datasets(fileName, detsDict, selection)
+
         self._selection_field = selection
         y_rows = selection.get("Y", [])
         print(f"\nonCheckboxStateChange called:  {mode} {fileName} with {selection}")
 
         if mode in ("Auto-replace", "Auto-add"):
             if not isinstance(widgetMpl, ChartView):
-                widgetMpl = ChartView(self, **options)  # Make a blank chart.
+                widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
             if mode in ("Auto-replace"):
                 widgetMpl.clearPlot()
             for row, (ds, ds_options) in zip(y_rows, datasets):
-                widgetMpl.plot(row, *ds, **ds_options)
+                # ds_options: label (for legend)
+                # plot_options: xlabel, ylabel, title
+                kwargs = {"ds_options": ds_options, "plot_options": plot_options}
+                widgetMpl.plot(row, *ds, **kwargs)
             self.mda_file_visualization.setPlot(widgetMpl)
 
         elif mode in ("Auto-off"):
