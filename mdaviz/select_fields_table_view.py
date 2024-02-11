@@ -162,7 +162,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self.parent.setStatus(text)
 
 
-def to_datasets_mpl(fileName, detsDict, selections):
+def to_datasets(fileName, detsDict, selections):
     """Prepare datasets and options for plotting with Matplotlib."""
     datasets = []
 

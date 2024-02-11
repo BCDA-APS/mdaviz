@@ -35,8 +35,6 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
 
         self.setFolder(data)
         self.setFileList(self._get_fileList())
-        # this return the truncated list of file in the pager
-        # TODO: this could probably go away while there is no pager
 
     # ------------ methods required by Qt's view
 
@@ -120,7 +118,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         self._data = folder
         self._folderCount = len(folder)
 
-    def fileList(self):  # truncated file list
+    def fileList(self):
         return self._fileList
 
     def setFileList(self, value):

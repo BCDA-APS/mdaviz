@@ -52,7 +52,7 @@ def auto_symbol():
     return next(_AUTO_SYMBOL_CYCLE)
 
 
-class ChartViewMpl(QtWidgets.QWidget):
+class ChartView(QtWidgets.QWidget):
     def __init__(self, parent, **kwargs):
         self.parent = parent
         super().__init__()
@@ -71,7 +71,7 @@ class ChartViewMpl(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(self)
         layout.addWidget(self.toolbar)
         layout.addWidget(self.canvas)
-        # Apply the QVBoxLayout to the ChartViewMpl widget
+        # Apply the QVBoxLayout to the ChartView widget
         self.setLayout(layout)
 
         # Connect the click event to a handler
