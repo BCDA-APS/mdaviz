@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>958</width>
-    <height>417</height>
+    <width>679</width>
+    <height>870</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QScrollArea" name="scrollArea">
      <property name="widgetResizable">
@@ -24,11 +24,17 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>932</width>
-        <height>391</height>
+        <width>653</width>
+        <height>844</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>5</number>
+       </property>
+       <property name="bottomMargin">
+        <number>5</number>
+       </property>
        <item>
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
@@ -54,6 +60,80 @@
            </item>
           </layout>
          </widget>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget" native="true">
+         <layout class="QGridLayout" name="gridLayout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="horizontalSpacing">
+           <number>20</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>0</number>
+          </property>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="firstButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Select first file</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>first.png</normaloff>first.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4">
+           <widget class="QPushButton" name="lastButton">
+            <property name="toolTip">
+             <string>Select last file</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>last.png</normaloff>last.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QPushButton" name="nextButton">
+            <property name="toolTip">
+             <string>Select next file</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>next.png</normaloff>next.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="backButton">
+            <property name="toolTip">
+             <string>Select previous file</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>back.png</normaloff>back.png</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>

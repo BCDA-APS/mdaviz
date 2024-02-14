@@ -8,7 +8,6 @@ Uses :class:`select_fields_tablemodel.SelectFieldsTableModel`.
     ~SelectFieldsTableView
 """
 
-import datetime
 from mda import readMDA
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
@@ -26,6 +25,7 @@ COLUMNS = [
     TableColumn("X", ColumnDataType.checkbox, rule=FieldRuleType.unique),
     TableColumn("Y", ColumnDataType.checkbox, rule=FieldRuleType.multiple),
     TableColumn("I0", ColumnDataType.checkbox, rule=FieldRuleType.unique),
+    TableColumn("Unscale", ColumnDataType.checkbox, rule=FieldRuleType.multiple),
     TableColumn("PV", ColumnDataType.text),
     TableColumn("DESC", ColumnDataType.text),
     TableColumn("Unit", ColumnDataType.text),
@@ -35,6 +35,7 @@ COLUMNS = [
 class SelectFieldsTableView(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
     selected = QtCore.pyqtSignal(str, dict)
+    fieldchange = QtCore.pyqtSignal(str, dict)
 
     def __init__(self, parent):
         self.parent = parent
@@ -49,18 +50,21 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
 
+        self.addButton.hide()
+        self.replaceButton.hide()
         self.addButton.clicked.connect(partial(self.responder, "add"))
         self.clearButton.clicked.connect(partial(self.responder, "clear"))
         self.replaceButton.clicked.connect(partial(self.responder, "replace"))
 
-        options = ["Auto-add", "Auto-replace", "Auto-off"]
+        options = ["Auto-replace", "Auto-add", "Auto-off"]
         self._mode = options[0]
         self.autoBox.addItems(options)
         self.autoBox.currentTextChanged.connect(self.setMode)
+        self.autoBox.currentTextChanged.connect(self.updateButtonVisibility)
 
     def responder(self, action):
         """Modify the plot with the described action."""
-        print(f"/nResponder: {action=}")
+        print(f"\nResponder: {action=}")
         self.selected.emit(action, self.tableView.model().plotFields()[0])
 
     def file(self):
@@ -90,6 +94,15 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def setMode(self, *args):
         self._mode = args[0]
+
+    def updateButtonVisibility(self):
+        # Check the current text and show/hide buttons accordingly
+        if self.autoBox.currentText() == "Auto-off":
+            self.addButton.show()
+            self.replaceButton.show()
+        else:
+            self.addButton.hide()
+            self.replaceButton.hide()
 
     def displayTable(self, index):
         from .select_fields_table_model import SelectFieldsTableModel
@@ -148,7 +161,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self.parent.setStatus(text)
 
 
-def to_datasets_mpl(fileName, detsDict, selections):
+def to_datasets(fileName, detsDict, selections):
     """Prepare datasets and options for plotting with Matplotlib."""
     datasets = []
 
@@ -180,15 +193,13 @@ def to_datasets_mpl(fileName, detsDict, selections):
         ds_options["label"] = y_name_with_file_units
         ds = [x_data, y_data] if x_data is not None else [y_data]
         datasets.append((ds, ds_options))
-    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    title = f"Plot Date & Time: {now}"
 
     plot_options = {
         "x": x_name,  # label for x axis
         "x_units": x_units,
         "y": ", ".join(y_names_with_units[0:1]),  # label for y axis
         "y_units": y_units,
-        "title": title,
+        "title": "",
     }
 
     return datasets, plot_options

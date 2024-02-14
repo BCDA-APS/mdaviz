@@ -54,21 +54,11 @@
          </property>
          <widget class="QWidget" name="plotPageMpl">
           <attribute name="title">
-           <string>PlotMPL</string>
+           <string>Plot</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
             <widget class="QWidget" name="plotMPL" native="true"/>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="plotPageQt">
-          <attribute name="title">
-           <string>PlotQt</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
-           <item>
-            <widget class="QWidget" name="plot" native="true"/>
            </item>
           </layout>
          </widget>
@@ -182,19 +172,33 @@
                 </property>
                 <item row="1" column="0">
                  <widget class="QLabel" name="cursor2_label">
+                  <property name="toolTip">
+                   <string>Press right click</string>
+                  </property>
                   <property name="text">
                    <string>Cursor 2</string>
                   </property>
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QLineEdit" name="pos1_text"/>
+                 <widget class="QLineEdit" name="pos1_text">
+                  <property name="toolTip">
+                   <string>Cursor 1 position</string>
+                  </property>
+                 </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QLineEdit" name="pos2_text"/>
+                 <widget class="QLineEdit" name="pos2_text">
+                  <property name="toolTip">
+                   <string>Cursor 2 position</string>
+                  </property>
+                 </widget>
                 </item>
                 <item row="0" column="0">
                  <widget class="QLabel" name="cursor1_label">
+                  <property name="toolTip">
+                   <string>Press middle click</string>
+                  </property>
                   <property name="text">
                    <string>Cursor 1</string>
                   </property>
@@ -202,6 +206,9 @@
                 </item>
                 <item row="1" column="2">
                  <widget class="QPushButton" name="cursor2_remove">
+                  <property name="toolTip">
+                   <string>Remove cursor 2</string>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -219,6 +226,9 @@
                 </item>
                 <item row="0" column="2">
                  <widget class="QPushButton" name="cursor1_remove">
+                  <property name="toolTip">
+                   <string>Remove cursor 1</string>
+                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -251,23 +261,37 @@
                 </property>
                 <item row="0" column="0">
                  <widget class="QLabel" name="diff_label">
+                  <property name="toolTip">
+                   <string>(x1-x2,y1-y2)</string>
+                  </property>
                   <property name="text">
                    <string>Difference</string>
                   </property>
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QLineEdit" name="midpoint_text"/>
+                 <widget class="QLineEdit" name="midpoint_text">
+                  <property name="toolTip">
+                   <string>(0.5*(x1 + x2), 0.5*(y1 + y2) )</string>
+                  </property>
+                 </widget>
                 </item>
                 <item row="1" column="0">
                  <widget class="QLabel" name="midpoint_label">
+                  <property name="toolTip">
+                   <string>(0.5*(x1 + x2), 0.5*(y1 + y2) )</string>
+                  </property>
                   <property name="text">
                    <string>Midpoint</string>
                   </property>
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QLineEdit" name="diff_text"/>
+                 <widget class="QLineEdit" name="diff_text">
+                  <property name="toolTip">
+                   <string>(x1-x2,y1-y2)</string>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </widget>
@@ -347,10 +371,16 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
+                   <property name="toolTip">
+                    <string>Selected curve</string>
+                   </property>
                   </widget>
                  </item>
                  <item>
                   <widget class="QPushButton" name="curveRemove">
+                   <property name="toolTip">
+                    <string>Remove selected curve from graph</string>
+                   </property>
                    <property name="text">
                     <string/>
                    </property>
@@ -401,6 +431,9 @@
                     </property>
                     <item row="1" column="0">
                      <widget class="QLabel" name="max_label">
+                      <property name="toolTip">
+                       <string>(x,y) coordinates for MAX</string>
+                      </property>
                       <property name="text">
                        <string>Max</string>
                       </property>
@@ -408,16 +441,27 @@
                     </item>
                     <item row="0" column="0">
                      <widget class="QLabel" name="min_label">
+                      <property name="toolTip">
+                       <string>(x,y) coordinates for MIN</string>
+                      </property>
                       <property name="text">
                        <string>Min</string>
                       </property>
                      </widget>
                     </item>
                     <item row="1" column="1">
-                     <widget class="QLineEdit" name="max_text"/>
+                     <widget class="QLineEdit" name="max_text">
+                      <property name="toolTip">
+                       <string>(x,y) coordinates for MAX</string>
+                      </property>
+                     </widget>
                     </item>
                     <item row="0" column="1">
-                     <widget class="QLineEdit" name="min_text"/>
+                     <widget class="QLineEdit" name="min_text">
+                      <property name="toolTip">
+                       <string>(x,y) coordinates for MIN</string>
+                      </property>
+                     </widget>
                     </item>
                    </layout>
                   </widget>
@@ -439,13 +483,20 @@
                     </property>
                     <item row="0" column="0">
                      <widget class="QLabel" name="com_label">
+                      <property name="toolTip">
+                       <string>Centor of mass abscissa</string>
+                      </property>
                       <property name="text">
                        <string>COM</string>
                       </property>
                      </widget>
                     </item>
                     <item row="0" column="1">
-                     <widget class="QLineEdit" name="com_text"/>
+                     <widget class="QLineEdit" name="com_text">
+                      <property name="toolTip">
+                       <string>Centor of mass abscissa</string>
+                      </property>
+                     </widget>
                     </item>
                     <item row="1" column="0">
                      <widget class="QLabel" name="Mean_label">
