@@ -258,10 +258,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def folderNotValid(self, layout, comment, clear_sub=True):
         """If folder not valid, display no MVC and indicates reason in app status."""
-        self.clearContent(clear_sub)
+        # self.clearContent(clear_sub)
+        self.subfolder.clear()
+        print("ok1")
         self.mvc_folder = None
+        print("ok2")
         layout.addWidget(QtWidgets.QWidget())
+        print("ok3")
         self.setStatus(comment)
+        print("ok4")
 
     def setFolderList(self, folder_list=None):
         """Set the list of recent folder and remove duplicate"""
