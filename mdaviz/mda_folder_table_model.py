@@ -52,7 +52,10 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         # display data
         if role == QtCore.Qt.DisplayRole:
             # print("Display role:", index.row(), index.column())
+            print("bingo\n\n")  # the file is not the right one, it is the first file from the last folder
             file = self.fileList()[index.row()]
+            print(file)
+            print("bango\n\n")
             label = self.columnLabels[index.column()]
             action = self.actions_library[label]
             return action(file)
@@ -74,6 +77,10 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         return folder
 
     def get_file_path(self, file):
+        
+        print("inside get file path")
+        print(f"{file=}")
+        print(self.dataPath() / file)
         return self.dataPath() / file
 
     def get_file_size(self, file):
@@ -85,7 +92,10 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         return utils.byte2str(readMDA(str(filepath))[1].time).split(".")[0]
 
     def get_file_pts(self, file):
+        print("problem spot\n\n")
         filepath = self.get_file_path(file)
+        print("filepath: \n\n")
+        print(filepath)
         return readMDA(str(filepath))[1].curr_pt
 
     def get_file_dim(self, file):

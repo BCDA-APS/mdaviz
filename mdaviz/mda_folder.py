@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import QAbstractItemView
 
 from . import utils
 
-MYFILE = "mda_0001.mda"
+# MYFILE = "mda_0001.mda"
 
 
 class MDA_MVC(QtWidgets.QWidget):
@@ -68,7 +68,7 @@ class MDA_MVC(QtWidgets.QWidget):
         self._lastFileIndex = None
         self._currentFileIndex = None
         model = self.mda_folder_tableview.tableView.model()
-        if model is not None:
+        if model is not None and self.parent.hasMdaFiles() is not False:
             self.mda_folder_tableview.tableView.setFocus()
             self._firstFileIndex = model.index(0, 0)
             self._lastFileIndex = model.index(model.rowCount() - 1, 0)
