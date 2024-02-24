@@ -287,50 +287,52 @@ class MainWindow(QtWidgets.QMainWindow):
         self.folder.clear()
         self.folder.addItems(folder_list)
 
-    ### Not in use at the moment, save for later
+    ### Not in use at the moment, save for later?
+    # Was working but I decided to keep empty table views (header only)
+    # instead of removing the widgets completely.
+    #
+    # def clearContent(
+    #     self,
+    #     clear_sub=True,
+    #     clear_folder_view=True,
+    #     clear_field_view=True,
+    #     clear_visualization=True,
+    #     clear_all_layout=False,
+    # ):
+    #     if self.mvc_folder is not None:
+    #         # Clear widgets from the folder view group box
+    #         if clear_folder_view:
+    #             layout_folder = self.mvc_folder.folder_groupbox.layout()
+    #             for i in reversed(range(layout_folder.count())):
+    #                 item = layout_folder.itemAt(i)
+    #                 widget = item.widget() if item is not None else None
+    #                 if widget is not None:
+    #                     layout_folder.removeWidget(widget)
+    #                     widget.deleteLater()
 
-    def clearContent(
-        self,
-        clear_sub=True,
-        clear_folder_view=True,
-        clear_field_view=True,
-        clear_visualization=True,
-        clear_all_layout=False,
-    ):
-        if self.mvc_folder is not None:
-            # Clear widgets from the folder view group box
-            if clear_folder_view:
-                layout_folder = self.mvc_folder.folder_groupbox.layout()
-                for i in reversed(range(layout_folder.count())):
-                    item = layout_folder.itemAt(i)
-                    widget = item.widget() if item is not None else None
-                    if widget is not None:
-                        layout_folder.removeWidget(widget)
-                        widget.deleteLater()
+    #         # Clear widgets from the field view group box
+    #         if clear_field_view:
+    #             layout_field = self.mvc_folder.mda_groupbox.layout()
+    #             for i in reversed(range(layout_field.count())):
+    #                 item = layout_field.itemAt(i)
+    #                 widget = item.widget() if item is not None else None
+    #                 if widget is not None:
+    #                     layout_field.removeWidget(widget)
+    #                     widget.deleteLater()
 
-            # Clear widgets from the field view group box
-            if clear_field_view:
-                layout_field = self.mvc_folder.mda_groupbox.layout()
-                for i in reversed(range(layout_field.count())):
-                    item = layout_field.itemAt(i)
-                    widget = item.widget() if item is not None else None
-                    if widget is not None:
-                        layout_field.removeWidget(widget)
-                        widget.deleteLater()
+    #         # Clear widgets from the visualization group box
+    #         if clear_visualization:
+    #             layout_viz = self.mvc_folder.viz_groupbox.layout()
+    #             for i in reversed(range(layout_viz.count())):
+    #                 item = layout_viz.itemAt(i)
+    #                 widget = item.widget() if item is not None else None
+    #                 if widget is not None:
+    #                     layout_viz.removeWidget(widget)
+    #                     widget.deleteLater()
 
-            # Clear widgets from the visualization group box
-            if clear_visualization:
-                layout_viz = self.mvc_folder.viz_groupbox.layout()
-                for i in reversed(range(layout_viz.count())):
-                    item = layout_viz.itemAt(i)
-                    widget = item.widget() if item is not None else None
-                    if widget is not None:
-                        layout_viz.removeWidget(widget)
-                        widget.deleteLater()
+    #     if clear_sub:
+    #         self.subfolder.clear()
 
-        if clear_sub:
-            self.subfolder.clear()
-
-        if clear_all_layout:
-            layout = self.groupbox.layout()
-            utils.removeAllLayoutWidgets(layout)
+    #     if clear_all_layout:
+    #         layout = self.groupbox.layout()
+    #         utils.removeAllLayoutWidgets(layout)
