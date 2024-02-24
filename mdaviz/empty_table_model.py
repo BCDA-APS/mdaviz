@@ -23,3 +23,11 @@ class EmptyTableModel(QAbstractTableModel):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             return self.headers[section]
         return QVariant()
+
+    def clearAllCheckboxes(self):
+        # no check box to clear in an empty table
+        return
+
+    def uncheckCheckBox(self, row):
+        # no check box to uncheck in an empty table
+        return

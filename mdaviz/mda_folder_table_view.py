@@ -38,6 +38,17 @@ class MDAFolderTableView(QtWidgets.QWidget):
         if len(data) > 0:
             data_model = MDAFolderTableModel(data, self.parent)
             self.tableView.setModel(data_model)
+            # # sets the tab label to be the folder name
+            # folder_path = str(self.parent.dataPath())
+            # print("Hello", folder_name)
+            # # Make sure to strip the trailing slash if it exists
+            # folder_path = (
+            #     folder_path.rstrip("/") if isinstance(folder_path, str) else folder_path
+            # )
+            # # Then get the last subfolder name
+            # folder_name = folder_path.parts[-1] if folder_path.parts else None
+
+            # # self.tabWidget.setTabText(0, self.file().name)
             labels = data_model.columnLabels
 
             def centerColumn(label):
@@ -54,13 +65,13 @@ class MDAFolderTableView(QtWidgets.QWidget):
             empty_model = EmptyTableModel(HEADERS)
             self.tableView.setModel(empty_model)
 
-    def dataPath(self):
-        """Path (obj) of the data folder."""
-        return self.parent.dataPath()
+    # def dataPath(self):
+    #     """Path (obj) of the data folder."""
+    #     return self.parent.dataPath()
 
-    def mdaFileCount(self):
-        """Number of mda files in the selected folder."""
-        return self.parent.mdaFileCount()
+    # def mdaFileCount(self):
+    #     """Number of mda files in the selected folder."""
+    #     return self.parent.mdaFileCount()
 
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""

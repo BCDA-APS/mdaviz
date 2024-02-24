@@ -118,8 +118,9 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
     checkboxStateChanged = QtCore.pyqtSignal(dict)  # emit field selection
 
     def __init__(self, columns, fields, first_pos, first_det, parent=None):
-        self.selections = {first_pos: "X", first_det: "Y"} if first_det else {}
+        # parent = <mdaviz.mda_folder.MDA_MVC object at 0x1052cf490>
 
+        self.selections = {first_pos: "X", first_det: "Y"} if first_det else {}
         self._columns_locked, self._fields_locked = False, False
         self.setColumns(columns)
         self.setFields(fields)
@@ -219,7 +220,6 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         # Check if there are any selections to clear
         if not self.selections:
             return  # No selections to clear
-        # Clear all selections
         self.selections.clear()
         topLeftIndex = self.index(0, 0)
         bottomRightIndex = self.index(self.rowCount() - 1, self.columnCount() - 1)
