@@ -20,6 +20,8 @@ from .select_fields_table_model import FieldRuleType
 from .select_fields_table_model import TableColumn
 from .select_fields_table_model import TableField
 
+HEADERS = "Field", "X", "Y", "I0", "Unscale", "PV", "DESC", "Unit"
+
 COLUMNS = [
     TableColumn("Field", ColumnDataType.text),
     TableColumn("X", ColumnDataType.checkbox, rule=FieldRuleType.unique),
@@ -39,6 +41,8 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def __init__(self, parent):
         self.parent = parent
+        # parent = <mdaviz.mda_folder.MDA_MVC object at 0x1101e7520>
+
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
@@ -106,16 +110,23 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def displayTable(self, index):
         from .select_fields_table_model import SelectFieldsTableModel
+        from .empty_table_model import EmptyTableModel
 
-        self.setData(index)
-        # here data is a list of TableField objects
-        fields, first_pos, first_det = self.data()
-        data_model = SelectFieldsTableModel(
-            COLUMNS, fields, first_pos, first_det, self.parent
-        )
-        self.tableView.setModel(data_model)
-        # sets the tab label to be the file name
-        self.tabWidget.setTabText(0, self.file().name)
+        print(index)
+        if index is not None and self.mdaFileList():
+            # If there are MDA file
+            self.setData(index)
+            fields, first_pos, first_det = self.data()
+            data_model = SelectFieldsTableModel(
+                COLUMNS, fields, first_pos, first_det, self.parent
+            )
+            self.tableView.setModel(data_model)
+            # sets the tab label to be the file name
+            self.tabWidget.setTabText(0, self.file().name)
+        else:
+            # No MDA files to display, show an empty table with headers
+            empty_model = EmptyTableModel(HEADERS)
+            self.tableView.setModel(empty_model)
 
     def displayMetadata(self, index):
         self.parent.mda_file_visualization.setMetadata(self.getMetadata())
@@ -159,6 +170,9 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def setStatus(self, text):
         self.parent.setStatus(text)
+
+    def clearContents(self):
+        self.tableView.setModel(None)
 
 
 def to_datasets(fileName, detsDict, selections):

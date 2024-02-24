@@ -5,6 +5,8 @@ Search for mda files.
 from PyQt5 import QtCore, QtWidgets
 from . import utils
 
+HEADERS = "Prefix", "Scan #", "Points", "Dim", "Positioner", "Date", "Size"
+
 
 class _AlignCenterDelegate(QtWidgets.QStyledItemDelegate):
     """https://stackoverflow.com/a/61722299"""
@@ -18,8 +20,8 @@ class MDAFolderTableView(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
 
     def __init__(self, parent):
+        # parent = <mdaviz.mda_folder.MDA_MVC object at 0x1101e7520>
         self.parent = parent
-
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
@@ -30,10 +32,10 @@ class MDAFolderTableView(QtWidgets.QWidget):
 
     def displayTable(self):
         from mdaviz.mda_folder_table_model import MDAFolderTableModel
+        from .empty_table_model import EmptyTableModel
 
         data = self.mdaFileList()
-        if len(data)>0:
-            print("YESSSSSSSSSSSSSSSSSSSSSSS")
+        if len(data) > 0:
             data_model = MDAFolderTableModel(data, self.parent)
             self.tableView.setModel(data_model)
             labels = data_model.columnLabels
@@ -49,17 +51,9 @@ class MDAFolderTableView(QtWidgets.QWidget):
             centerColumn("Positioner")
             centerColumn("Dim")
         else:
-            print("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
-            # No MDA files to display, show an empty table with headers
-            self.tableView.setModel(None)  # Clear existing model/data
-            data_model = MDAFolderTableModel([], self.parent)  # Create a model with no data
-            self.tableView.setModel(data_model)  # Set the model to display just the headers
+            empty_model = EmptyTableModel(HEADERS)
+            self.tableView.setModel(empty_model)
 
-            # Optionally, set a message or status indicating no files were found
-            self.setStatus("No MDA files found in the selected folder.")
-        
-        
-        
     def dataPath(self):
         """Path (obj) of the data folder."""
         return self.parent.dataPath()
@@ -74,3 +68,7 @@ class MDAFolderTableView(QtWidgets.QWidget):
 
     def setStatus(self, text):
         self.parent.setStatus(text)
+
+    def clearContents(self):
+        # Clear the data model of the table view
+        self.tableView.setModel(None)

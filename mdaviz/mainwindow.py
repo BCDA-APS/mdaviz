@@ -2,7 +2,7 @@ from pathlib import Path
 from PyQt5 import QtWidgets
 
 from . import APP_TITLE
-from .mda_folder import MDA_MVC                
+from .mda_folder import MDA_MVC
 from . import utils
 from .user_settings import settings
 from .opendialog import DIR_SETTINGS_KEY
@@ -30,9 +30,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self._subFolderList = []  # the list of subfolder in pull down 2
         self._mdaFileList = []  # the list of mda file NAME str (name only)
         self._mdaFileCount = 0  # the number of mda files in the list
-        self._hasMdaFiles = True
         self.mvc_folder = None
-        
+
         self.setWindowTitle(APP_TITLE)
         self.setRecent(None)
         self.actionOpen.triggered.connect(self.doOpen)
@@ -132,9 +131,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def mdaFileCount(self):
         """Number of mda files in the selected folder."""
         return self._mdaFileCount
-    
-    def hasMdaFiles(self):
-        return self._hasMdaFiles
 
     def setMdaFileList(self, data_path):
         if data_path:
@@ -219,9 +215,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
                 self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
 
-                # subfolder_list = [str(item) for item in folder_path.iterdir() if (item.is_dir() and not item.name.startswith("."))]
-                # self.setSubfolderList(subfolder_list)
-
                 # Update the list of recent directories in settings
                 recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)
                 recent_dirs = recent_dirs_str.split(",") if recent_dirs_str else []
@@ -233,11 +226,21 @@ class MainWindow(QtWidgets.QMainWindow):
                 settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs))
 
             else:
-                self._folderPath = None
-                self._dataPath = None
-                self.setSubfolderList([])
                 comment = f"{str(folder_path)!r} - invalid path."
-                self.folderNotValid(layout, comment)
+                self.folderNotValid(comment)
+
+    def folderNotValid(self, comment):
+        print(comment)
+        self._folderPath = None
+        self._dataPath = None
+        self._mdaFileList = []
+        self._mdaFileCount = 0
+        self.setSubfolderList([])
+        self.setStatus(comment)
+        if self.mvc_folder is not None:
+            # If MVC exists, display empty table views
+            self.mvc_folder.updateFolderView()
+            self.mvc_folder.updateFieldsView(None)
 
     def setSubFolderPath(self, subfolder_name):
         if subfolder_name:
@@ -248,25 +251,16 @@ class MainWindow(QtWidgets.QMainWindow):
             self._mdaFileCount = len(mda_files_path)
             self.setMdaFileList(data_path)
             self.info.setText(f"{self._mdaFileCount} mda files")
-            if mda_files_path:  # folder contains mda
-                self._hasMdaFiles = True
-                self.setStatus(f"Folder path: {str(data_path)!r}")
-                self.clearContent(clear_sub=False)
+            if self.mvc_folder is None:
                 self.mvc_folder = MDA_MVC(self)
                 layout.addWidget(self.mvc_folder)
             else:
-                # if self._hasMdaFiles == True:
-                #     comment = f"No mda files found in {str(data_path)!r}."
-                #     self.folderNotValid(layout, comment, clear_sub=False)
-                self._hasMdaFiles = False
-                
-
-    def folderNotValid(self, layout, comment, clear_sub=True):
-        """If folder not valid, display no MVC and indicates reason in app status."""
-        self.clearContent(clear_sub)
-        self.mvc_folder = None
-        layout.addWidget(QtWidgets.QWidget())
-        self.setStatus(comment)
+                # Always update the folder view since it is a new subfolder
+                self.mvc_folder.updateFolderView()
+            if mda_files_path == []:
+                # If there are no MDA files, pass None to display empty table
+                self.mvc_folder.updateFieldsView(None)
+                self.setStatus("No MDA files found in the selected folder.")
 
     def setFolderList(self, folder_list=None):
         """Set the list of recent folder and remove duplicate"""
@@ -287,42 +281,56 @@ class MainWindow(QtWidgets.QMainWindow):
         self._folderList = new_path_list
 
     def setRecent(self, folder_list):
-        """ Sets the recent folder list, updating the internal folder list & populate the QComboBox"""
+        """Sets the recent folder list, updating the internal folder list & populate the QComboBox"""
         self.setFolderList(folder_list)
         folder_list = self.folderList()
-        # self.hasMdaFiles = False
         self.folder.clear()
         self.folder.addItems(folder_list)
-        # self.hasMdaFiles = True
 
-    # def clearContent(self, clear_sub=True):
-    #     layout = self.groupbox.layout()
-    #     utils.removeAllLayoutWidgets(layout)
-    #     if clear_sub:
-    #         self.subfolder.clear()
-            
-            
-    def clearContent(self, clear_sub=True, clear_folder_view=True, clear_field_view=True, clear_visualization=True):
-        from .mda_folder_table_view import MDAFolderTableView
-        from .select_fields_table_view import SelectFieldsTableView
-        from .mda_file_viz import MDAFileVisualization
-        
-        layout = self.groupbox.layout()
-        
-        # Iterate over all widgets in the layout and remove only the specified ones
-        for i in reversed(range(layout.count())): 
-            widget = layout.itemAt(i).widget()
-            if widget is not None:
-                # Use the actual widget classes to identify the widgets to clear
-                if clear_folder_view and isinstance(widget, MDAFolderTableView):
-                    layout.removeWidget(widget)
-                    widget.deleteLater()
-                elif clear_field_view and isinstance(widget, SelectFieldsTableView):
-                    layout.removeWidget(widget)
-                    widget.deleteLater()
-                elif clear_visualization and isinstance(widget, MDAFileVisualization):
-                    layout.removeWidget(widget)
-                    widget.deleteLater()
-        
+    ### Not in use at the moment, save for later
+
+    def clearContent(
+        self,
+        clear_sub=True,
+        clear_folder_view=True,
+        clear_field_view=True,
+        clear_visualization=True,
+        clear_all_layout=False,
+    ):
+        if self.mvc_folder is not None:
+            # Clear widgets from the folder view group box
+            if clear_folder_view:
+                layout_folder = self.mvc_folder.folder_groupbox.layout()
+                for i in reversed(range(layout_folder.count())):
+                    item = layout_folder.itemAt(i)
+                    widget = item.widget() if item is not None else None
+                    if widget is not None:
+                        layout_folder.removeWidget(widget)
+                        widget.deleteLater()
+
+            # Clear widgets from the field view group box
+            if clear_field_view:
+                layout_field = self.mvc_folder.mda_groupbox.layout()
+                for i in reversed(range(layout_field.count())):
+                    item = layout_field.itemAt(i)
+                    widget = item.widget() if item is not None else None
+                    if widget is not None:
+                        layout_field.removeWidget(widget)
+                        widget.deleteLater()
+
+            # Clear widgets from the visualization group box
+            if clear_visualization:
+                layout_viz = self.mvc_folder.viz_groupbox.layout()
+                for i in reversed(range(layout_viz.count())):
+                    item = layout_viz.itemAt(i)
+                    widget = item.widget() if item is not None else None
+                    if widget is not None:
+                        layout_viz.removeWidget(widget)
+                        widget.deleteLater()
+
         if clear_sub:
             self.subfolder.clear()
+
+        if clear_all_layout:
+            layout = self.groupbox.layout()
+            utils.removeAllLayoutWidgets(layout)

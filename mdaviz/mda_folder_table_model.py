@@ -14,8 +14,8 @@ from . import utils
 
 class MDAFolderTableModel(QtCore.QAbstractTableModel):
     def __init__(self, data, parent):
+        # parent = <mdaviz.mda_folder.MDA_MVC object at 0x1101e7520>
         self.parent = parent
-
         self.actions_library = {
             "Prefix": lambda file: file.rsplit("_", 1)[0],
             "Scan #": lambda file: int(file.rsplit("_", 1)[1].split(".")[0]),
@@ -27,20 +27,18 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         }
 
         self.columnLabels = list(self.actions_library.keys())
-
-        self.setAscending(True)
-        self._folderCount = 0
+        self._fileListCount = 0
 
         super().__init__()
 
-        self.setFolder(data)
-        self.setFileList(self._get_fileList())
+        self.setFileList(data)
 
     # ------------ methods required by Qt's view
 
     def rowCount(self, parent=None):
         # Want it to return the number of rows to be shown at a given time
         value = len(self.fileList())
+        # value = self.mainWindow.mdaFileCount()
         return value
 
     def columnCount(self, parent=None):
@@ -51,11 +49,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
     def data(self, index, role=None):
         # display data
         if role == QtCore.Qt.DisplayRole:
-            # print("Display role:", index.row(), index.column())
-            print("bingo\n\n")  # the file is not the right one, it is the first file from the last folder
             file = self.fileList()[index.row()]
-            print(file)
-            print("bango\n\n")
             label = self.columnLabels[index.column()]
             action = self.actions_library[label]
             return action(file)
@@ -69,18 +63,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
 
     # ------------ local methods
 
-    def _get_fileList(self):
-        folder = self.folder()
-        ascending = 1 if self.ascending() else -1
-        if ascending < 0:
-            folder.reverse()
-        return folder
-
     def get_file_path(self, file):
-        
-        print("inside get file path")
-        print(f"{file=}")
-        print(self.dataPath() / file)
         return self.dataPath() / file
 
     def get_file_size(self, file):
@@ -92,10 +75,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         return utils.byte2str(readMDA(str(filepath))[1].time).split(".")[0]
 
     def get_file_pts(self, file):
-        print("problem spot\n\n")
         filepath = self.get_file_path(file)
-        print("filepath: \n\n")
-        print(filepath)
         return readMDA(str(filepath))[1].curr_pt
 
     def get_file_dim(self, file):
@@ -118,28 +98,19 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
 
     # # ------------ get & set methods
 
-    def folder(self):  # in this case folder is the list of mda file name
-        return self._data
-
-    def folderCount(self):
-        return self._folderCount
-
-    def setFolder(self, folder):
-        self._data = folder
-        self._folderCount = len(folder)
-
-    def fileList(self):
-        return self._fileList
-
-    def setFileList(self, value):
-        self._fileList = value
-
     def dataPath(self):
         """Path (obj) of the selected data folder (folder + subfolder)."""
         return self.parent.dataPath()
 
-    def ascending(self):
-        return self._ascending
+    def fileList(self):
+        """Here fileList = data arg = self.mainWindow.mdaFileList()
+        ie the list of mda file NAME str (name only)
+        """
+        return self._data
 
-    def setAscending(self, value):
-        self._ascending = value
+    def setFileList(self, data):
+        """Here data arg = self.mainWindow.mdaFileList()
+        ie the list of mda file NAME str (name only)
+        """
+        self._data = data
+        self._fileListCount = len(data)

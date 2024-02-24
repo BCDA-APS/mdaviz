@@ -29,7 +29,7 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def __init__(self, parent):
         self.parent = parent
-
+        # parent = <mdaviz.mainwindow.MainWindow object at 0x1101e4ee0>
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
@@ -68,7 +68,7 @@ class MDA_MVC(QtWidgets.QWidget):
         self._lastFileIndex = None
         self._currentFileIndex = None
         model = self.mda_folder_tableview.tableView.model()
-        if model is not None and self.parent.hasMdaFiles() is not False:
+        if model is not None and self.parent.mdaFileCount() > 0:
             self.mda_folder_tableview.tableView.setFocus()
             self._firstFileIndex = model.index(0, 0)
             self._lastFileIndex = model.index(model.rowCount() - 1, 0)
@@ -90,6 +90,17 @@ class MDA_MVC(QtWidgets.QWidget):
             sname = self.splitter_settings_name(key)
             settings.restoreSplitter(splitter, sname)
             splitter.splitterMoved.connect(partial(self.splitter_moved, key))
+
+    def updateFolderView(self):
+        # Clear existing data and set new data for mda_folder_tableview
+        self.mda_folder_tableview.clearContents()
+        self.mda_folder_tableview.displayTable()
+
+    def updateFieldsView(self, index=None):
+        index = self.currentFileIndex().row() if self.currentFileIndex() else index
+        # Clear existing data and set new data for select_fields_tableview
+        self.select_fields_tableview.clearContents()
+        self.select_fields_tableview.displayTable(index)
 
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
