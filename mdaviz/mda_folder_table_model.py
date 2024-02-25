@@ -11,26 +11,16 @@ from pathlib import Path
 from PyQt5 import QtCore
 from . import utils
 
+HEADERS = "Prefix", "Scan #", "Points", "Dim", "Positioner", "Date", "Size"
+
 
 class MDAFolderTableModel(QtCore.QAbstractTableModel):
     def __init__(self, data, parent):
         # parent = <mdaviz.mda_folder.MDA_MVC object at 0x1101e7520>
-        self.parent = parent
-        self.actions_library = {
-            "Prefix": lambda file: file.rsplit("_", 1)[0],
-            "Scan #": lambda file: int(file.rsplit("_", 1)[1].split(".")[0]),
-            "Points": lambda file: self.get_file_pts(file),
-            "Dim": lambda file: self.get_file_dim(file),
-            "Positioner": lambda file: self.get_file_pos(file),
-            "Date": lambda file: self.get_file_date(file),
-            "Size": lambda file: self.get_file_size(file),
-        }
-
-        self.columnLabels = list(self.actions_library.keys())
-        self._fileListCount = 0
-
+        self.mda_mvc = parent
         super().__init__()
 
+        self.columnLabels = HEADERS
         self.setFileList(data)
 
     # ------------ methods required by Qt's view
@@ -38,7 +28,6 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
     def rowCount(self, parent=None):
         # Want it to return the number of rows to be shown at a given time
         value = len(self.fileList())
-        # value = self.mainWindow.mdaFileCount()
         return value
 
     def columnCount(self, parent=None):
@@ -51,8 +40,9 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         if role == QtCore.Qt.DisplayRole:
             file = self.fileList()[index.row()]
             label = self.columnLabels[index.column()]
-            action = self.actions_library[label]
-            return action(file)
+            file_info = self.get_file_info(file)
+            value = file_info[label]
+            return value
 
     def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
         if role == QtCore.Qt.DisplayRole:
@@ -63,44 +53,36 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
 
     # ------------ local methods
 
-    def get_file_path(self, file):
-        return self.dataPath() / file
+    def get_file_info(self, file):
+        file_path = self.mda_mvc.dataPath() / file
+        file_data = readMDA(str(file_path))[1]
+        file_prefix = file.rsplit("_", 1)[0]
+        file_num = int(file.rsplit("_", 1)[1].split(".")[0])
+        file_size = utils.human_readable_size(file_path.stat().st_size)
+        file_date = utils.byte2str(file_data.time).split(".")[0]
+        file_pts = file_data.curr_pt
+        file_dim = file_data.dim
+        pv = utils.byte2str(file_data.p[0].name) if len(file_data.p) else "index"
+        desc = utils.byte2str(file_data.p[0].desc) if len(file_data.p) else "index"
+        file_pos = desc if desc else pv
 
-    def get_file_size(self, file):
-        filepath = self.get_file_path(file)
-        return utils.human_readable_size(filepath.stat().st_size)
-
-    def get_file_date(self, file):
-        filepath = self.get_file_path(file)
-        return utils.byte2str(readMDA(str(filepath))[1].time).split(".")[0]
-
-    def get_file_pts(self, file):
-        filepath = self.get_file_path(file)
-        return readMDA(str(filepath))[1].curr_pt
-
-    def get_file_dim(self, file):
-        filepath = self.get_file_path(file)
-        return readMDA(str(filepath))[1].dim
-
-    def get_file_pos(self, file):
-        filepath = self.get_file_path(file)
-        pv = (
-            utils.byte2str(readMDA(str(filepath))[1].p[0].name)
-            if len(readMDA(str(filepath))[1].p)
-            else "index"
-        )
-        desc = (
-            utils.byte2str(readMDA(str(filepath))[1].p[0].desc)
-            if len(readMDA(str(filepath))[1].p)
-            else "index"
-        )
-        return desc if desc else pv
+        fileInfo = {}
+        # HEADERS = "Prefix", "Scan #", "Points", "Dim", "Positioner", "Date", "Size"
+        values = [
+            file_prefix,
+            file_num,
+            file_pts,
+            file_dim,
+            file_pos,
+            file_date,
+            file_size,
+        ]
+        for k, v in zip(HEADERS, values):
+            fileInfo[k] = v
+        print(f"{fileInfo=}")
+        return fileInfo
 
     # # ------------ get & set methods
-
-    def dataPath(self):
-        """Path (obj) of the selected data folder (folder + subfolder)."""
-        return self.parent.dataPath()
 
     def fileList(self):
         """Here fileList = data arg = self.mainWindow.mdaFileList()
@@ -113,4 +95,3 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         ie the list of mda file NAME str (name only)
         """
         self._data = data
-        self._fileListCount = len(data)

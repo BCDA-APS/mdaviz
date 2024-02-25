@@ -4,8 +4,7 @@ Search for mda files.
 
 from PyQt5 import QtCore, QtWidgets
 from . import utils
-
-HEADERS = "Prefix", "Scan #", "Points", "Dim", "Positioner", "Date", "Size"
+from .mda_folder_table_model import HEADERS
 
 
 class _AlignCenterDelegate(QtWidgets.QStyledItemDelegate):
