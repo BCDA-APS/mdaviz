@@ -227,20 +227,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
             else:
                 comment = f"{str(folder_path)!r} - invalid path."
-                self.folderNotValid(comment)
-
-    def folderNotValid(self, comment):
-        print(comment)
-        self._folderPath = None
-        self._dataPath = None
-        self._mdaFileList = []
-        self._mdaFileCount = 0
-        self.setSubfolderList([])
-        self.setStatus(comment)
-        if self.mvc_folder is not None:
-            # If MVC exists, display empty table views
-            self.mvc_folder.updateFolderView()
-            self.mvc_folder.updateFieldsView(None)
+                self._folderPath = None
+                self._dataPath = None
+                self._mdaFileList = []
+                self._mdaFileCount = 0
+                self.setSubfolderList([])
+                self.setStatus(comment)
+                if self.mvc_folder is not None:
+                    # If MVC exists, display empty table views
+                    self.mvc_folder.updateFolderView()
+                    self.mvc_folder.updateFieldsView(None)
 
     def setSubFolderPath(self, subfolder_name):
         if subfolder_name:
