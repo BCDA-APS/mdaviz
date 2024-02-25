@@ -135,15 +135,16 @@ def mda2ftm(selection):
 def ftm2mda(selection):
     """Goes from  {1: 'X', 2: 'Y', 4: 'Y'} (field TM) to {'Y': [2, 3], 'X': 1} (mda)"""
     mda_selection = {}
-    for key, value in selection.items():
-        if value == "X":
-            # Directly assign the value for 'X' since it's always unique
-            mda_selection[value] = key
-        else:
-            # Append to the list for 'Y'
-            if value not in mda_selection:
-                mda_selection[value] = []
-            mda_selection[value].append(key)
+    if selection is not None:
+        for key, value in selection.items():
+            if value == "X":
+                # Directly assign the value for 'X' since it's always unique
+                mda_selection[value] = key
+            else:
+                # Append to the list for 'Y'
+                if value not in mda_selection:
+                    mda_selection[value] = []
+                mda_selection[value].append(key)
     return mda_selection
 
 
