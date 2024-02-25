@@ -40,7 +40,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
     fieldchange = QtCore.pyqtSignal(str, dict)
 
     def __init__(self, parent):
-        self.parent = parent
+        self.mda_mvc = parent
         # parent = <mdaviz.mda_folder.MDA_MVC object at 0x1101e7520>
 
         super().__init__()
@@ -117,8 +117,9 @@ class SelectFieldsTableView(QtWidgets.QWidget):
             # If there are MDA file
             self.setData(index)
             fields, first_pos, first_det = self.data()
+            selection_field = self.mda_mvc.selectionField()
             data_model = SelectFieldsTableModel(
-                COLUMNS, fields, first_pos, first_det, self.parent
+                COLUMNS, fields, selection_field, self.mda_mvc
             )
             self.tableView.setModel(data_model)
             # sets the tab label to be the file name
@@ -129,7 +130,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
             self.tableView.setModel(empty_model)
 
     def displayMetadata(self, index):
-        self.parent.mda_file_visualization.setMetadata(self.getMetadata())
+        self.mda_mvc.mda_file_visualization.setMetadata(self.getMetadata())
 
     def setData(self, index):
         file_name = self.mdaFileList()[index]
@@ -162,14 +163,14 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def dataPath(self):
         """Path (obj) of the data folder."""
-        return self.parent.dataPath()
+        return self.mda_mvc.dataPath()
 
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
-        return self.parent.mdaFileList()
+        return self.mda_mvc.mdaFileList()
 
     def setStatus(self, text):
-        self.parent.setStatus(text)
+        self.mda_mvc.setStatus(text)
 
     def clearContents(self):
         self.tableView.setModel(None)
