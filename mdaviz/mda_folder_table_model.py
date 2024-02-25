@@ -79,7 +79,6 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         ]
         for k, v in zip(HEADERS, values):
             fileInfo[k] = v
-        print(f"{fileInfo=}")
         return fileInfo
 
     # # ------------ get & set methods

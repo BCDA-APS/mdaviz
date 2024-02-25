@@ -20,7 +20,7 @@ class MDAFolderTableView(QtWidgets.QWidget):
 
     def __init__(self, parent):
         # parent = <mdaviz.mda_folder.MDA_MVC object at 0x1101e7520>
-        self.parent = parent
+        self.mda_mvc = parent
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
@@ -30,24 +30,21 @@ class MDAFolderTableView(QtWidgets.QWidget):
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
 
     def displayTable(self):
-        from mdaviz.mda_folder_table_model import MDAFolderTableModel
+        from .mda_folder_table_model import MDAFolderTableModel
         from .empty_table_model import EmptyTableModel
 
         data = self.mdaFileList()
         if len(data) > 0:
-            data_model = MDAFolderTableModel(data, self.parent)
+            data_model = MDAFolderTableModel(data, self.mda_mvc)
             self.tableView.setModel(data_model)
-            # # sets the tab label to be the folder name
-            # folder_path = str(self.parent.dataPath())
-            # print("Hello", folder_name)
-            # # Make sure to strip the trailing slash if it exists
-            # folder_path = (
-            #     folder_path.rstrip("/") if isinstance(folder_path, str) else folder_path
-            # )
-            # # Then get the last subfolder name
-            # folder_name = folder_path.parts[-1] if folder_path.parts else None
-
-            # # self.tabWidget.setTabText(0, self.file().name)
+            # Sets the tab label to be the folder name
+            folder_path = self.mda_mvc.dataPath()
+            # Make sure to strip the trailing slash if it exists
+            folder_path = (
+                folder_path.rstrip("/") if isinstance(folder_path, str) else folder_path
+            )
+            folder_name = folder_path.parts[-1] if folder_path.parts else None
+            self.tabWidget.setTabText(0, folder_name)
             labels = data_model.columnLabels
 
             def centerColumn(label):
@@ -64,20 +61,12 @@ class MDAFolderTableView(QtWidgets.QWidget):
             empty_model = EmptyTableModel(HEADERS)
             self.tableView.setModel(empty_model)
 
-    # def dataPath(self):
-    #     """Path (obj) of the data folder."""
-    #     return self.parent.dataPath()
-
-    # def mdaFileCount(self):
-    #     """Number of mda files in the selected folder."""
-    #     return self.parent.mdaFileCount()
-
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
-        return self.parent.mdaFileList()
+        return self.mda_mvc.mdaFileList()
 
     def setStatus(self, text):
-        self.parent.setStatus(text)
+        self.mda_mvc.setStatus(text)
 
     def clearContents(self):
         # Clear the data model of the table view

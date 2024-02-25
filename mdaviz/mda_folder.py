@@ -28,8 +28,8 @@ class MDA_MVC(QtWidgets.QWidget):
     motion_wait_time = 1
 
     def __init__(self, parent):
-        self.parent = parent
         # parent = <mdaviz.mainwindow.MainWindow object at 0x1101e4ee0>
+        self.mainWindow = parent
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
@@ -46,10 +46,10 @@ class MDA_MVC(QtWidgets.QWidget):
         layout.addWidget(self.mda_folder_tableview)
         self.mda_folder_tableview.displayTable()
         try:
-            self.parent.refresh.released.disconnect()
+            self.mainWindow.refresh.released.disconnect()
         except TypeError:
             pass
-        self.parent.refresh.released.connect(self.doRefresh)
+        self.mainWindow.refresh.released.connect(self.doRefresh)
 
         # Fields table view:
         self.select_fields_tableview = SelectFieldsTableView(self)
@@ -68,7 +68,7 @@ class MDA_MVC(QtWidgets.QWidget):
         self._lastFileIndex = None
         self._currentFileIndex = None
         model = self.mda_folder_tableview.tableView.model()
-        if model is not None and self.parent.mdaFileCount() > 0:
+        if model is not None and self.mainWindow.mdaFileCount() > 0:
             self.mda_folder_tableview.tableView.setFocus()
             self._firstFileIndex = model.index(0, 0)
             self._lastFileIndex = model.index(model.rowCount() - 1, 0)
@@ -104,15 +104,15 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
-        return self.parent.dataPath()
+        return self.mainWindow.dataPath()
 
     def mdaFileCount(self):
         """Number of mda files in the selected folder."""
-        return self.parent.mdaFileCount()
+        return self.mainWindow.mdaFileCount()
 
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
-        return self.parent.mdaFileList()
+        return self.mainWindow.mdaFileList()
 
     def selectionField(self):
         return self._selection_field
@@ -250,7 +250,7 @@ class MDA_MVC(QtWidgets.QWidget):
         self.setStatus("Refreshing folder...")
         current_folder = self.dataPath()
         current_mdaFileList = self.mdaFileList()
-        self.parent.setMdaFileList(current_folder)
+        self.mainWindow.setMdaFileList(current_folder)
         new_mdaFileList = self.mdaFileList()
         if new_mdaFileList:
             self.mda_folder_tableview.displayTable()
@@ -396,4 +396,4 @@ class MDA_MVC(QtWidgets.QWidget):
         settings.saveSplitter(splitter, sname)
 
     def setStatus(self, text):
-        self.parent.setStatus(text)
+        self.mainWindow.setStatus(text)
