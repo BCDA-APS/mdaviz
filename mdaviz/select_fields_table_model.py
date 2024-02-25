@@ -30,6 +30,7 @@ such a 'list(object)' or 'dict(str=object)', then change both 'columns()' and
     ~TableField
 """
 
+from .utils import mda2ftm, ftm2mda
 from dataclasses import KW_ONLY
 from dataclasses import dataclass
 
@@ -117,16 +118,17 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
 
     checkboxStateChanged = QtCore.pyqtSignal(dict)  # emit field selection
 
-    def __init__(self, columns, fields, first_pos, first_det, parent=None):
-        # parent = <mdaviz.mda_folder.MDA_MVC object at 0x1052cf490>
+    def __init__(self, columns, fields, selection_field, parent=None):
 
-        self.selections = {first_pos: "X", first_det: "Y"} if first_det else {}
+        # parent = <mdaviz.mda_folder.MDA_MVC object at 0x1052cf490>
+        self.mda_mvc = parent
+
+        self.selections = mda2ftm(selection_field)
         self._columns_locked, self._fields_locked = False, False
         self.setColumns(columns)
         self.setFields(fields)
         self._columns_locked, self._fields_locked = True, True
 
-        self.parent = parent
         super().__init__()
         self.updateCheckboxes()
 
@@ -204,14 +206,15 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
 
     def uncheckCheckBox(self, row):
         if row in self.selections:
-            col = self.columnNumber(
-                self.selections[row]
-            )  # Get the column index of the checkbox being unchecked
-            del self.selections[row]  # Remove the selection
+            # Get the column index of the checkbox being unchecked
+            col = self.columnNumber(self.selections[row])
+            # Remove the selection
+            del self.selections[row]
+            # Update view
             index = self.index(row, col)
-            self.dataChanged.emit(
-                index, index, [QtCore.Qt.CheckStateRole]
-            )  # Update view
+            self.dataChanged.emit(index, index, [QtCore.Qt.CheckStateRole])
+            # Update the mda_mvc selection
+            self.updateMdaMvcSelection(self.selections)
 
     def clearAllCheckboxes(self):
         """
@@ -226,6 +229,8 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         self.dataChanged.emit(
             topLeftIndex, bottomRightIndex, [QtCore.Qt.CheckStateRole]
         )
+        # Update the mda_mvc selection
+        self.mda_mvc.updateSelectionField(None)
 
     def applySelectionRules(self, index, changes=False):
         """Apply selection rules 2-4."""
@@ -252,11 +257,15 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         corner2 = self.index(bottom, right)
         self.dataChanged.emit(corner1, corner2, [QtCore.Qt.CheckStateRole])
         # prune empty data from self.selections
-        # fmt: off
-        self.selections = {
-            k: v for k, v in self.selections.items() if v is not None
-        }
-        # fmt: on
+        self.selections = {k: v for k, v in self.selections.items() if v is not None}
+        # Update the mda_mvc selection
+        self.updateMdaMvcSelection(self.selections)
+
+    def updateMdaMvcSelection(self, new_selection):
+        if new_selection is None:
+            return
+        new_selection = ftm2mda(new_selection)
+        self.mda_mvc.updateSelectionField(new_selection)
 
     def logCheckboxSelections(self):
         print("checkbox selections:")
@@ -361,4 +370,4 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         return choices, choices_pretty
 
     def setStatus(self, text):
-        self.parent.setStatus(text)
+        self.mda_mvc.setStatus(text)

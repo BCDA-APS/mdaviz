@@ -18,8 +18,6 @@ from PyQt5.QtWidgets import QAbstractItemView
 
 from . import utils
 
-# MYFILE = "mda_0001.mda"
-
 
 class MDA_MVC(QtWidgets.QWidget):
     """MVC class for mda files."""
@@ -63,6 +61,7 @@ class MDA_MVC(QtWidgets.QWidget):
 
         # Initialize File and Field Selection
         self._selection_field = None
+        self._saved_selection = None
         self._selection_model = None
         self._firstFileIndex = None
         self._lastFileIndex = None
@@ -115,9 +114,27 @@ class MDA_MVC(QtWidgets.QWidget):
         return self.mainWindow.mdaFileList()
 
     def selectionField(self):
+        """
+        Syntaxe: {'Y': [2, 3], 'X': 1}
+        """
+        if self._selection_field is None:
+            first_pos_idx = self.select_fields_tableview.firstPos()
+            first_det_idx = self.select_fields_tableview.firstDet()
+            if first_pos_idx is not None and first_det_idx is not None:
+                self._selection_field = {"X": first_pos_idx, "Y": [first_det_idx]}
+            else:
+                self._selection_field = None
         return self._selection_field
 
+    def updateSelectionField(self, new_selection):
+        self._selection_field = new_selection
+
     def selectionModel(self):
+        """
+        Used to access the selection model associated with a view, such as MDAFolderTableView.
+        The selection model manages the selection state (e.g., which rows or items are selected)
+        within the view.
+        """
         return self._selection_model
 
     def currentFileIndex(self):
@@ -194,6 +211,7 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def doFileSelected(self, index):
         """
+        TODO: update docstring:
         Display field table view, file metadata, and plot first pos & det depending on mode.
 
         If the graph is blank, selecting a file:
@@ -228,19 +246,14 @@ class MDA_MVC(QtWidgets.QWidget):
                 self.onCheckboxStateChange
             )
 
-            # Try something else:
-            self.setStatus(
-                f"\n\n======== Selected file: {self.mdaFileList()[index.row()]}"
-            )
-
-            first_pos_idx = self.select_fields_tableview.firstPos()
-            first_det_idx = self.select_fields_tableview.firstDet()
-            if first_pos_idx is not None and first_det_idx is not None:
-                first_selection = {"X": first_pos_idx, "Y": [first_det_idx]}
+            # A file is selected:
+            self.setStatus(f"\n\n==== Selected file: {self.mdaFileList()[index.row()]}")
+            # when opening the app, plot first DET vs first POS:
+            if self.selectionField():
                 if self.select_fields_tableview.mode() == "Auto-add":
-                    self.doPlot("add", first_selection)
+                    self.doPlot("add", self.selectionField())
                 elif self.select_fields_tableview.mode() == "Auto-replace":
-                    self.doPlot("replace", first_selection)
+                    self.doPlot("replace", self.selectionField())
                 else:
                     self.setStatus("Mode is set to Auto-off")
             else:
