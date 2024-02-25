@@ -119,6 +119,34 @@ def get_md(mda_file_metadata):
     return new_metadata
 
 
+def mda2ftm(selection):
+    """Goes from  {'Y': [2, 3], 'X': 1} (mda) to {1: 'X', 2: 'Y', 4: 'Y'} (field TM)"""
+    if selection is not None:
+        ftm_selection = {
+            v: "X" if k == "X" else "Y"
+            for k, vals in selection.items()
+            for v in ([vals] if isinstance(vals, int) else vals)
+        }
+    else:
+        ftm_selection = {}
+    return ftm_selection
+
+
+def ftm2mda(selection):
+    """Goes from  {1: 'X', 2: 'Y', 4: 'Y'} (field TM) to {'Y': [2, 3], 'X': 1} (mda)"""
+    mda_selection = {}
+    for key, value in selection.items():
+        if value == "X":
+            # Directly assign the value for 'X' since it's always unique
+            mda_selection[value] = key
+        else:
+            # Append to the list for 'Y'
+            if value not in mda_selection:
+                mda_selection[value] = []
+            mda_selection[value].append(key)
+    return mda_selection
+
+
 def run_in_thread(func):
     """
     (decorator) run ``func`` in thread
