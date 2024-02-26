@@ -20,14 +20,14 @@ from .select_fields_table_model import FieldRuleType
 from .select_fields_table_model import TableColumn
 from .select_fields_table_model import TableField
 
-HEADERS = "Field", "X", "Y", "I0", "Unscale", "PV", "DESC", "Unit"
+HEADERS = "Field", "X", "Y", "Mon", "Norm", "PV", "DESC", "Unit"
 
 COLUMNS = [
     TableColumn("Field", ColumnDataType.text),
     TableColumn("X", ColumnDataType.checkbox, rule=FieldRuleType.unique),
     TableColumn("Y", ColumnDataType.checkbox, rule=FieldRuleType.multiple),
-    TableColumn("I0", ColumnDataType.checkbox, rule=FieldRuleType.unique),
-    TableColumn("Unscale", ColumnDataType.checkbox, rule=FieldRuleType.multiple),
+    TableColumn("Mon", ColumnDataType.checkbox, rule=FieldRuleType.unique),
+    TableColumn("Norm", ColumnDataType.checkbox, rule=FieldRuleType.multiple),
     TableColumn("PV", ColumnDataType.text),
     TableColumn("DESC", ColumnDataType.text),
     TableColumn("Unit", ColumnDataType.text),
