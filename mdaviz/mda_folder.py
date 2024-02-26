@@ -18,18 +18,24 @@ from PyQt5.QtWidgets import QAbstractItemView
 
 from . import utils
 
-MYFILE = "mda_0001.mda"
-
 
 class MDA_MVC(QtWidgets.QWidget):
-    """MVC class for mda files."""
+    """Model View Controller class for mda files."""
 
     ui_file = utils.getUiFileName(__file__)
     motion_wait_time = 1
 
     def __init__(self, parent):
-        self.parent = parent
+        """
+        Initialize the model and connect with its parent.
 
+        PARAMETERS
+
+        parent object:
+            Instance of mdaviz.mainwindow.MainWindow
+        """
+        
+        self.mainWindow = parent
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
@@ -46,10 +52,10 @@ class MDA_MVC(QtWidgets.QWidget):
         layout.addWidget(self.mda_folder_tableview)
         self.mda_folder_tableview.displayTable()
         try:
-            self.parent.refresh.released.disconnect()
+            self.mainWindow.refresh.released.disconnect()
         except TypeError:
             pass
-        self.parent.refresh.released.connect(self.doRefresh)
+        self.mainWindow.refresh.released.connect(self.doRefresh)
 
         # Fields table view:
         self.select_fields_tableview = SelectFieldsTableView(self)
@@ -63,12 +69,13 @@ class MDA_MVC(QtWidgets.QWidget):
 
         # Initialize File and Field Selection
         self._selection_field = None
+        self._saved_selection = None
         self._selection_model = None
         self._firstFileIndex = None
         self._lastFileIndex = None
         self._currentFileIndex = None
         model = self.mda_folder_tableview.tableView.model()
-        if model is not None:
+        if model is not None and self.mainWindow.mdaFileCount() > 0:
             self.mda_folder_tableview.tableView.setFocus()
             self._firstFileIndex = model.index(0, 0)
             self._lastFileIndex = model.index(model.rowCount() - 1, 0)
@@ -91,22 +98,51 @@ class MDA_MVC(QtWidgets.QWidget):
             settings.restoreSplitter(splitter, sname)
             splitter.splitterMoved.connect(partial(self.splitter_moved, key))
 
+    def updateFolderView(self):
+        # Clear existing data and set new data for mda_folder_tableview
+        self.mda_folder_tableview.clearContents()
+        self.mda_folder_tableview.displayTable()
+
+    def updateFieldsView(self, index=None):
+        index = self.currentFileIndex().row() if self.currentFileIndex() else index
+        # Clear existing data and set new data for select_fields_tableview
+        self.select_fields_tableview.clearContents()
+        self.select_fields_tableview.displayTable(index)
+
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
-        return self.parent.dataPath()
+        return self.mainWindow.dataPath()
 
     def mdaFileCount(self):
         """Number of mda files in the selected folder."""
-        return self.parent.mdaFileCount()
+        return self.mainWindow.mdaFileCount()
 
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
-        return self.parent.mdaFileList()
+        return self.mainWindow.mdaFileList()
 
     def selectionField(self):
+        """
+        Syntaxe: {'Y': [2, 3], 'X': 1}
+        """
+        if self._selection_field is None:
+            first_pos_idx = self.select_fields_tableview.firstPos()
+            first_det_idx = self.select_fields_tableview.firstDet()
+            if first_pos_idx is not None and first_det_idx is not None:
+                self._selection_field = {"X": first_pos_idx, "Y": [first_det_idx]}
+            else:
+                self._selection_field = None
         return self._selection_field
 
+    def updateSelectionField(self, new_selection):
+        self._selection_field = new_selection
+
     def selectionModel(self):
+        """
+        Used to access the selection model associated with a view, such as MDAFolderTableView.
+        The selection model manages the selection state (e.g., which rows or items are selected)
+        within the view.
+        """
         return self._selection_model
 
     def currentFileIndex(self):
@@ -183,6 +219,7 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def doFileSelected(self, index):
         """
+        TODO: update docstring:
         Display field table view, file metadata, and plot first pos & det depending on mode.
 
         If the graph is blank, selecting a file:
@@ -217,19 +254,14 @@ class MDA_MVC(QtWidgets.QWidget):
                 self.onCheckboxStateChange
             )
 
-            # Try something else:
-            self.setStatus(
-                f"\n\n======== Selected file: {self.mdaFileList()[index.row()]}"
-            )
-
-            first_pos_idx = self.select_fields_tableview.firstPos()
-            first_det_idx = self.select_fields_tableview.firstDet()
-            if first_pos_idx is not None and first_det_idx is not None:
-                first_selection = {"X": first_pos_idx, "Y": [first_det_idx]}
+            # A file is selected:
+            self.setStatus(f"\n\n==== Selected file: {self.mdaFileList()[index.row()]}")
+            # when opening the app, plot first DET vs first POS:
+            if self.selectionField():
                 if self.select_fields_tableview.mode() == "Auto-add":
-                    self.doPlot("add", first_selection)
+                    self.doPlot("add", self.selectionField())
                 elif self.select_fields_tableview.mode() == "Auto-replace":
-                    self.doPlot("replace", first_selection)
+                    self.doPlot("replace", self.selectionField())
                 else:
                     self.setStatus("Mode is set to Auto-off")
             else:
@@ -239,7 +271,7 @@ class MDA_MVC(QtWidgets.QWidget):
         self.setStatus("Refreshing folder...")
         current_folder = self.dataPath()
         current_mdaFileList = self.mdaFileList()
-        self.parent.setMdaFileList(current_folder)
+        self.mainWindow.setMdaFileList(current_folder)
         new_mdaFileList = self.mdaFileList()
         if new_mdaFileList:
             self.mda_folder_tableview.displayTable()
@@ -385,4 +417,4 @@ class MDA_MVC(QtWidgets.QWidget):
         settings.saveSplitter(splitter, sname)
 
     def setStatus(self, text):
-        self.parent.setStatus(text)
+        self.mainWindow.setStatus(text)

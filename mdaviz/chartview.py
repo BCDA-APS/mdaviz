@@ -53,7 +53,8 @@ def auto_symbol():
 
 class ChartView(QtWidgets.QWidget):
     def __init__(self, parent, **kwargs):
-        self.parent = parent
+        # parent=<mdaviz.mda_folder.MDA_MVC object at 0x10e7ff520>
+        self.mda_mvc = parent
         super().__init__()
 
         # Create a Matplotlib figure and canvas
@@ -95,15 +96,15 @@ class ChartView(QtWidgets.QWidget):
 
         # Track curves and display in QComboBox:
         self.line2D = {}  # all the Line2D on the graph, key = label
-        self.curveBox = self.parent.findChild(QtWidgets.QComboBox, "curveBox")
+        self.curveBox = self.mda_mvc.findChild(QtWidgets.QComboBox, "curveBox")
         self.curveBox.currentTextChanged.connect(self.updateBasicMathInfo)
 
         # Remove buttons
-        self.removeButton = self.parent.findChild(QtWidgets.QPushButton, "curveRemove")
-        self.removeCursor1 = self.parent.findChild(
+        self.removeButton = self.mda_mvc.findChild(QtWidgets.QPushButton, "curveRemove")
+        self.removeCursor1 = self.mda_mvc.findChild(
             QtWidgets.QPushButton, "cursor1_remove"
         )
-        self.removeCursor2 = self.parent.findChild(
+        self.removeCursor2 = self.mda_mvc.findChild(
             QtWidgets.QPushButton, "cursor2_remove"
         )
         # Remove button triggers removeCurve twice: once when pushed, once when released.
@@ -164,7 +165,8 @@ class ChartView(QtWidgets.QWidget):
         if label in self.line2D:
             if len(self.line2D) == 1:
                 self.clearPlot()
-                self.parent.select_fields_tableview.tableView.model().clearAllCheckboxes()
+                self.mda_mvc.select_fields_tableview.tableView.model().clearAllCheckboxes()
+
             else:
                 # Remove curve from graph
                 row = self.line2D[label][3]
@@ -176,7 +178,7 @@ class ChartView(QtWidgets.QWidget):
                 # Remove curve from comboBox
                 print(f"Calling removeCurve: {row=}")
                 self.removeItemCurveBox(label)
-                self.parent.select_fields_tableview.tableView.model().uncheckCheckBox(
+                self.mda_mvc.select_fields_tableview.tableView.model().uncheckCheckBox(
                     row
                 )
                 # Update plot labels, legend and title
@@ -272,11 +274,11 @@ class ChartView(QtWidgets.QWidget):
                     result = f"({utils.num2fstr(i[0])}, {utils.num2fstr(i[1])})"
                 else:
                     result = f"{utils.num2fstr(i)}" if i else "n/a"
-                self.parent.findChild(QtWidgets.QLineEdit, txt).setText(result)
+                self.mda_mvc.findChild(QtWidgets.QLineEdit, txt).setText(result)
 
     def clearBasicMath(self):
         for txt in ["min_text", "max_text", "com_text", "mean_text"]:
-            self.parent.findChild(QtWidgets.QLineEdit, txt).setText("n/a")
+            self.mda_mvc.findChild(QtWidgets.QLineEdit, txt).setText("n/a")
 
     def hasDataItems(self):
         # Return whether any artists have been added to the Axes (bool)
@@ -362,25 +364,25 @@ class ChartView(QtWidgets.QWidget):
         self.updateCursorInfo()
 
     def updateCursorInfo(self):
-        self.parent.findChild(QtWidgets.QLineEdit, "pos1_text").setText(
+        self.mda_mvc.findChild(QtWidgets.QLineEdit, "pos1_text").setText(
             self.cursors["text1"]
         )
-        self.parent.findChild(QtWidgets.QLineEdit, "pos2_text").setText(
+        self.mda_mvc.findChild(QtWidgets.QLineEdit, "pos2_text").setText(
             self.cursors["text2"]
         )
-        self.parent.findChild(QtWidgets.QLineEdit, "diff_text").setText(
+        self.mda_mvc.findChild(QtWidgets.QLineEdit, "diff_text").setText(
             self.cursors["diff"]
         )
-        self.parent.findChild(QtWidgets.QLineEdit, "midpoint_text").setText(
+        self.mda_mvc.findChild(QtWidgets.QLineEdit, "midpoint_text").setText(
             self.cursors["midpoint"]
         )
 
     def clearCursorInfo(self):
-        self.parent.findChild(QtWidgets.QLineEdit, "pos1_text").setText(
+        self.mda_mvc.findChild(QtWidgets.QLineEdit, "pos1_text").setText(
             "press middle click"
         )
-        self.parent.findChild(QtWidgets.QLineEdit, "pos2_text").setText(
+        self.mda_mvc.findChild(QtWidgets.QLineEdit, "pos2_text").setText(
             "press right click"
         )
-        self.parent.findChild(QtWidgets.QLineEdit, "diff_text").setText("n/a")
-        self.parent.findChild(QtWidgets.QLineEdit, "midpoint_text").setText("n/a")
+        self.mda_mvc.findChild(QtWidgets.QLineEdit, "diff_text").setText("n/a")
+        self.mda_mvc.findChild(QtWidgets.QLineEdit, "midpoint_text").setText("n/a")

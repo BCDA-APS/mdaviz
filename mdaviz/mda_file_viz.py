@@ -15,8 +15,15 @@ class MDAFileVisualization(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
 
     def __init__(self, parent):
-        self.parent = parent
+        """
+        Create the vizualization widget and connect with its parent.
 
+        PARAMETERS
+
+        parent object:
+            Instance of mdaviz.mda_folder.MDAMVC
+        """
+        self.mda_mvc = parent
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
@@ -35,7 +42,9 @@ class MDAFileVisualization(QtWidgets.QWidget):
 
     def setPlot(self, plot_widget):
         layout = self.plotPageMpl.layout()
-        utils.removeAllLayoutWidgets(layout)
+        utils.removeAllLayoutWidgets(
+            layout
+        )  # TODO replace with mainWindow.clearContent?
         layout.addWidget(plot_widget)
         self.tabWidget.setCurrentWidget(self.plotPageMpl)
 
@@ -50,4 +59,4 @@ class MDAFileVisualization(QtWidgets.QWidget):
         return True  # If not a chartView instance, consider it as blank
 
     def setStatus(self, text):
-        self.parent.setStatus(text)
+        self.mda_mvc.setStatus(text)

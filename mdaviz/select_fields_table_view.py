@@ -20,12 +20,14 @@ from .select_fields_table_model import FieldRuleType
 from .select_fields_table_model import TableColumn
 from .select_fields_table_model import TableField
 
+HEADERS = "Field", "X", "Y", "Mon", "Norm", "PV", "DESC", "Unit"
+
 COLUMNS = [
     TableColumn("Field", ColumnDataType.text),
     TableColumn("X", ColumnDataType.checkbox, rule=FieldRuleType.unique),
     TableColumn("Y", ColumnDataType.checkbox, rule=FieldRuleType.multiple),
-    TableColumn("I0", ColumnDataType.checkbox, rule=FieldRuleType.unique),
-    TableColumn("Unscale", ColumnDataType.checkbox, rule=FieldRuleType.multiple),
+    TableColumn("Mon", ColumnDataType.checkbox, rule=FieldRuleType.unique),
+    TableColumn("Norm", ColumnDataType.checkbox, rule=FieldRuleType.multiple),
     TableColumn("PV", ColumnDataType.text),
     TableColumn("DESC", ColumnDataType.text),
     TableColumn("Unit", ColumnDataType.text),
@@ -38,7 +40,16 @@ class SelectFieldsTableView(QtWidgets.QWidget):
     fieldchange = QtCore.pyqtSignal(str, dict)
 
     def __init__(self, parent):
-        self.parent = parent
+        """
+        Create the table view and connect with its parent.
+
+        PARAMETERS
+
+        parent object:
+            Instance of mdaviz.mda_folder.MDAMVC
+        """        
+        
+        self.mda_mvc = parent
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
@@ -106,19 +117,27 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def displayTable(self, index):
         from .select_fields_table_model import SelectFieldsTableModel
+        from .empty_table_model import EmptyTableModel
 
-        self.setData(index)
-        # here data is a list of TableField objects
-        fields, first_pos, first_det = self.data()
-        data_model = SelectFieldsTableModel(
-            COLUMNS, fields, first_pos, first_det, self.parent
-        )
-        self.tableView.setModel(data_model)
-        # sets the tab label to be the file name
-        self.tabWidget.setTabText(0, self.file().name)
+        print(index)
+        if index is not None and self.mdaFileList():
+            # If there are MDA file
+            self.setData(index)
+            fields, first_pos, first_det = self.data()
+            selection_field = self.mda_mvc.selectionField()
+            data_model = SelectFieldsTableModel(
+                COLUMNS, fields, selection_field, self.mda_mvc
+            )
+            self.tableView.setModel(data_model)
+            # sets the tab label to be the file name
+            self.tabWidget.setTabText(0, self.file().name)
+        else:
+            # No MDA files to display, show an empty table with headers
+            empty_model = EmptyTableModel(HEADERS)
+            self.tableView.setModel(empty_model)
 
     def displayMetadata(self, index):
-        self.parent.mda_file_visualization.setMetadata(self.getMetadata())
+        self.mda_mvc.mda_file_visualization.setMetadata(self.getMetadata())
 
     def setData(self, index):
         file_name = self.mdaFileList()[index]
@@ -151,14 +170,17 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def dataPath(self):
         """Path (obj) of the data folder."""
-        return self.parent.dataPath()
+        return self.mda_mvc.dataPath()
 
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
-        return self.parent.mdaFileList()
+        return self.mda_mvc.mdaFileList()
 
     def setStatus(self, text):
-        self.parent.setStatus(text)
+        self.mda_mvc.setStatus(text)
+
+    def clearContents(self):
+        self.tableView.setModel(None)
 
 
 def to_datasets(fileName, detsDict, selections):

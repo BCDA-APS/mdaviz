@@ -119,6 +119,57 @@ def get_md(mda_file_metadata):
     return new_metadata
 
 
+def mda2ftm(selection):
+    """
+    Converts a field selection from MDA_MVC (MVC) format to SelectFieldsTableModel (TM) format.
+
+    The MVC format {'Y': [2, 3], 'X': 1} is transformed into TM format {1: 'X', 2: 'Y', 4: 'Y'}.
+    This is used to sync selection states between SelectFieldsTableModel and MDA_MVC.
+
+    Parameters:
+    - selection (dict): The selection in MVC format to be converted.
+
+    Returns:
+    - dict: The selection converted to TM format.
+    """
+    if selection is not None:
+        ftm_selection = {
+            v: "X" if k == "X" else "Y"
+            for k, vals in selection.items()
+            for v in ([vals] if isinstance(vals, int) else vals)
+        }
+    else:
+        ftm_selection = {}
+    return ftm_selection
+
+
+def ftm2mda(selection):
+    """
+    Converts a field selection from SelectFieldsTableModel (TM) format to MDA_MVC (MVC) format.
+
+    The TM format {1: 'X', 2: 'Y', 4: 'Y'} is transformed into MVC format {'Y': [2, 3], 'X': 1}.
+    Used to update MDA_MVC selection state (self.selectionField()) based on changes in SelectFieldsTableModel.
+
+    Parameters:
+    - selection (dict): The selection in TM format to be converted.
+
+    Returns:
+    - dict: The selection converted to MVC format.
+    """
+    mda_selection = {}
+    if selection is not None:
+        for key, value in selection.items():
+            if value == "X":
+                # Directly assign the value for 'X' since it's always unique
+                mda_selection[value] = key
+            else:
+                # Append to the list for 'Y'
+                if value not in mda_selection:
+                    mda_selection[value] = []
+                mda_selection[value].append(key)
+    return mda_selection
+
+
 def run_in_thread(func):
     """
     (decorator) run ``func`` in thread
