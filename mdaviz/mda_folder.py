@@ -123,6 +123,10 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def selectionField(self):
         """
+        Dictionary containing the POS (X) and list of DETs (Y) indexes checked 
+        in Fields Table View to be plotted in the graph. 
+        When opening the app, it is initialized to None and 
+        defaulted value is first DET and first POS if they exists. 
         Syntaxe: {'Y': [2, 3], 'X': 1}
         """
         if self._selection_field is None:
@@ -136,6 +140,22 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def updateSelectionField(self, new_selection):
         self._selection_field = new_selection
+
+    def cleanSelectionField(self,old_selection,new_selection):
+        """Check if the previous selection matches the same POS/DETs for the newly selected file
+        Returns the curated selection, i.e. only the matching POS/DETs.
+
+        Args:
+            old_selection (dict): field selection for the previously selected file 
+        """
+        # self.select_fields_tableview.pvList()
+        # needs a way to store the pvlist everytime I change file: 
+        # the pvList attribute will change when the new file is selected
+        # unless we save that as when creating the Folder Table View for all the files in the folder
+        # or we keep last file and next file, same as current index: current pv list
+        # to be compared with the next pv list
+        
+        pass
 
     def selectionModel(self):
         """
@@ -237,8 +257,10 @@ class MDA_MVC(QtWidgets.QWidget):
         self._currentFileIndex = index
         model = self.mda_folder_tableview.tableView.model()
         if model is not None:
+            oldPvList = self.mda_folder_tableview.pvList() 
             self.select_fields_tableview.displayTable(index.row())
             self.select_fields_tableview.displayMetadata(index.row())
+            newPvList = self.mda_folder_tableview.pvList() 
             # Disconnect previous subcription from the signal emitted when selecting a new file:
             try:
                 self.select_fields_tableview.selected.disconnect()
@@ -256,8 +278,9 @@ class MDA_MVC(QtWidgets.QWidget):
 
             # A file is selected:
             self.setStatus(f"\n\n==== Selected file: {self.mdaFileList()[index.row()]}")
-            # when opening the app, plot first DET vs first POS:
             if self.selectionField():
+                # TODO: new_selection=self.cleanSelectionField(oldPvList,newPvList)
+            
                 if self.select_fields_tableview.mode() == "Auto-add":
                     self.doPlot("add", self.selectionField())
                 elif self.select_fields_tableview.mode() == "Auto-replace":
