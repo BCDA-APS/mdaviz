@@ -20,13 +20,21 @@ from . import utils
 
 
 class MDA_MVC(QtWidgets.QWidget):
-    """MVC class for mda files."""
+    """Model View Controller class for mda files."""
 
     ui_file = utils.getUiFileName(__file__)
     motion_wait_time = 1
 
     def __init__(self, parent):
-        # parent = <mdaviz.mainwindow.MainWindow object at 0x1101e4ee0>
+        """
+        Initialize the model and connect with its parent.
+
+        PARAMETERS
+
+        parent object:
+            Instance of mdaviz.mainwindow.MainWindow
+        """
+        
         self.mainWindow = parent
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)

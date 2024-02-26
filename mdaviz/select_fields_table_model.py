@@ -119,8 +119,15 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
     checkboxStateChanged = QtCore.pyqtSignal(dict)  # emit field selection
 
     def __init__(self, columns, fields, selection_field, parent=None):
+        """
+        Create the table model and connect with its parent.
 
-        # parent = <mdaviz.mda_folder.MDA_MVC object at 0x1052cf490>
+        PARAMETERS
+
+        parent object:
+            Instance of mdaviz.mda_folder.MDAMVC
+        """
+        
         self.mda_mvc = parent
 
         self.selections = mda2ftm(selection_field)

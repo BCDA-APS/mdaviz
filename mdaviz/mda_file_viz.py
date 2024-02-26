@@ -15,9 +15,15 @@ class MDAFileVisualization(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
 
     def __init__(self, parent):
-        # parent =
-        self.parent = parent
-        # parent = <mdaviz.mda_folder.MDA_MVC object at 0x1101e7520>
+        """
+        Create the vizualization widget and connect with its parent.
+
+        PARAMETERS
+
+        parent object:
+            Instance of mdaviz.mda_folder.MDAMVC
+        """
+        self.mda_mvc = parent
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
@@ -53,4 +59,4 @@ class MDAFileVisualization(QtWidgets.QWidget):
         return True  # If not a chartView instance, consider it as blank
 
     def setStatus(self, text):
-        self.parent.setStatus(text)
+        self.mda_mvc.setStatus(text)
