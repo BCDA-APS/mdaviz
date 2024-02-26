@@ -120,7 +120,18 @@ def get_md(mda_file_metadata):
 
 
 def mda2ftm(selection):
-    """Goes from  {'Y': [2, 3], 'X': 1} (mda) to {1: 'X', 2: 'Y', 4: 'Y'} (field TM)"""
+    """
+    Converts a field selection from MDA_MVC (MVC) format to SelectFieldsTableModel (TM) format.
+
+    The MVC format {'Y': [2, 3], 'X': 1} is transformed into TM format {1: 'X', 2: 'Y', 4: 'Y'}.
+    This is used to sync selection states between SelectFieldsTableModel and MDA_MVC.
+
+    Parameters:
+    - selection (dict): The selection in MVC format to be converted.
+
+    Returns:
+    - dict: The selection converted to TM format.
+    """
     if selection is not None:
         ftm_selection = {
             v: "X" if k == "X" else "Y"
@@ -133,7 +144,18 @@ def mda2ftm(selection):
 
 
 def ftm2mda(selection):
-    """Goes from  {1: 'X', 2: 'Y', 4: 'Y'} (field TM) to {'Y': [2, 3], 'X': 1} (mda)"""
+    """
+    Converts a field selection from SelectFieldsTableModel (TM) format to MDA_MVC (MVC) format.
+
+    The TM format {1: 'X', 2: 'Y', 4: 'Y'} is transformed into MVC format {'Y': [2, 3], 'X': 1}.
+    Used to update MDA_MVC selection state (self.selectionField()) based on changes in SelectFieldsTableModel.
+
+    Parameters:
+    - selection (dict): The selection in TM format to be converted.
+
+    Returns:
+    - dict: The selection converted to MVC format.
+    """
     mda_selection = {}
     if selection is not None:
         for key, value in selection.items():
