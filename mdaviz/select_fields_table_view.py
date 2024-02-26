@@ -119,7 +119,6 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         from .select_fields_table_model import SelectFieldsTableModel
         from .empty_table_model import EmptyTableModel
 
-        print(index)
         if index is not None and self.mdaFileList():
             # If there are MDA file
             self.setData(index)
