@@ -184,17 +184,18 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def updateSelectionForNewPVs(self, oldPvList, newPvList):
         """
-        Update the selection of detectors based on the new list of PVs.
+        Update the selection of positioner (X) & detectors (Y) based on the new list of PVs
+        after selecting a new file.
         
         Args:
             oldPvList (list): The list of PVs in the previously selected file.
-            newPvList (list): The list of PVs in the newly selected file.
+            newPvList (list): The list of matching PVs in the newly selected file.
         
         Returns:
             dict: Updated selection with valid PVs for the new file.
         """
         new_selection = {'Y': [], 'X': 0}
-        # Process Y (detectors) selection
+        # Process Y (detectors) selection: if PV exists, updates its index, otherwise, removes it. 
         posY = self.selectionField()['Y']
         for det_idx in posY:
             if det_idx < len(oldPvList):
@@ -202,9 +203,8 @@ class MDA_MVC(QtWidgets.QWidget):
                 if old_pv in newPvList:
                     new_selection['Y'].append(newPvList.index(old_pv))
         
-        # Process X (positioner) selection: no change
-        posX = self.selectionField()['X']
-        new_selection['X'] = posX  
+        # Process X (positioner) selection: if 1st positioner, use it, otherwise default to Index
+        new_selection['X'] = self.select_fields_tableview.firstPos()
         print(f"{new_selection=}")  
         self.updateSelectionField(new_selection)
         
@@ -261,7 +261,7 @@ class MDA_MVC(QtWidgets.QWidget):
         # Update the status and selection based on the new file.
         selectedFile = self.mdaFileList()[index.row()]
         selectedFields = self.selectionField()
-        self.setStatus(f"\n\n==== Selected file: {selectedFile}")
+        self.setStatus(f"\n\n==== Selected file: {selectedFile} in {str(self.dataPath())}")
         if selectedFields:
             print(f"\nBefore: {self.selectionField()=}")
             #print(f"{oldPvList=}")
