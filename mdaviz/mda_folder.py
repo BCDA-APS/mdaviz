@@ -98,16 +98,6 @@ class MDA_MVC(QtWidgets.QWidget):
             settings.restoreSplitter(splitter, sname)
             splitter.splitterMoved.connect(partial(self.splitter_moved, key))
 
-    def updateFolderView(self):
-        # Clear existing data and set new data for mda_folder_tableview
-        self.mda_folder_tableview.clearContents()
-        self.mda_folder_tableview.displayTable()
-
-    def updateFieldsView(self, index=None):
-        index = self.currentFileIndex().row() if self.currentFileIndex() else index
-        # Clear existing data and set new data for select_fields_tableview
-        self.select_fields_tableview.clearContents()
-        self.select_fields_tableview.displayTable(index)
 
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
@@ -120,6 +110,48 @@ class MDA_MVC(QtWidgets.QWidget):
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
         return self.mainWindow.mdaFileList()
+
+    def currentFileIndex(self):
+        return self._currentFileIndex
+
+    def firstFileIndex(self):
+        return self._firstFileIndex
+
+    def lastFileIndex(self):
+        return self._lastFileIndex
+     
+    # # ------------ Table view methods:
+
+    def updateFolderView(self):
+        """Clear existing data and set new data for mda_folder_tableview"""
+        self.mda_folder_tableview.clearContents()
+        self.mda_folder_tableview.displayTable()
+
+    def updateFieldsView(self, index=None):
+        """Clear existing data and set new data for select_fields_tableview"""
+        index = self.currentFileIndex().row() if self.currentFileIndex() else index
+        self.select_fields_tableview.clearContents()
+        self.select_fields_tableview.displayTable(index)
+    
+    def doRefresh(self):
+        self.setStatus("Refreshing folder...")
+        current_folder = self.dataPath()
+        current_mdaFileList = self.mdaFileList()
+        self.mainWindow.setMdaFileList(current_folder)
+        new_mdaFileList = self.mdaFileList()
+        if new_mdaFileList:
+            self.mda_folder_tableview.displayTable()
+            difference = [
+                item for item in new_mdaFileList if item not in current_mdaFileList
+            ]
+            if difference:
+                self.setStatus(f"Loading new files: {difference}")
+            else:
+                self.setStatus(f"No new files.")
+        else:
+            self.setStatus(f"Nothing to update.")
+
+    # # ------------ Fields selection methods:
 
     def selectionField(self):
         """
@@ -176,98 +208,8 @@ class MDA_MVC(QtWidgets.QWidget):
         print(f"{new_selection=}")  
         self.updateSelectionField(new_selection)
         
-
-    def selectionModel(self):
-        """
-        Used to access the selection model associated with a view, such as MDAFolderTableView.
-        The selection model manages the selection state (e.g., which rows or items are selected)
-        within the view.
-        """
-        return self._selection_model
-
-    def currentFileIndex(self):
-        return self._currentFileIndex
-
-    def firstFileIndex(self):
-        return self._firstFileIndex
-
-    def lastFileIndex(self):
-        return self._lastFileIndex
-
-    def highlightNewFile(self, row):
-        if self.selectionModel() and self.mda_folder_tableview.tableView.model():
-            # Ensure the table view has focus to get the blue highlight on Mac OS
-            self.mda_folder_tableview.tableView.setFocus()
-            # Select the row to highlight
-            index = self.mda_folder_tableview.tableView.model().index(row, 0)
-            self.selectionModel().select(
-                index, QItemSelectionModel.ClearAndSelect | QItemSelectionModel.Rows
-            )
-
-            # Set the selection mode and behavior to mimic clicking on a row with the mouse
-            self.mda_folder_tableview.tableView.setSelectionMode(
-                QAbstractItemView.SingleSelection
-            )
-            self.mda_folder_tableview.tableView.setSelectionBehavior(
-                QAbstractItemView.SelectRows
-            )
-
-            # Scroll to the selected row to ensure it's visible
-            # Use PositionAtTop or PositionAtBottom for the first/last file respectively
-            scrollHint = QAbstractItemView.EnsureVisible
-            if row == 0:
-                scrollHint = QAbstractItemView.PositionAtTop
-            elif row == self.mda_folder_tableview.tableView.model().rowCount() - 1:
-                scrollHint = QAbstractItemView.PositionAtBottom
-            self.mda_folder_tableview.tableView.scrollTo(index, scrollHint)
-
-    def goToFirst(self):
-        if self.firstFileIndex():
-            index = self.firstFileIndex()
-            row = index.row()
-            self.highlightNewFile(row)
-            self.doFileSelected(index)
-
-    def goToLast(self):
-        if self.lastFileIndex():
-            index = self.lastFileIndex()
-            row = index.row()
-            self.highlightNewFile(row)
-            self.doFileSelected(index)
-
-    def goToNext(self):
-        if self.selectionModel() and self.lastFileIndex():
-            i = self.currentFileIndex()
-            if i.row() == self.lastFileIndex().row():
-                return
-            if i != None:
-                i = self.mda_folder_tableview.tableView.model().index(i.row() + 1, 0)
-                self.highlightNewFile(i.row())
-                self.doFileSelected(i)
-
-    def goToBack(self):
-        if self.currentFileIndex() and self.firstFileIndex():
-            i = self.currentFileIndex()
-            if i.row() == self.firstFileIndex().row():
-                return
-            if i != None:
-                i = self.mda_folder_tableview.tableView.model().index(i.row() - 1, 0)
-                self.highlightNewFile(i.row())
-                self.doFileSelected(i)
-
-    # # ------------ Folder & file selection methods:
-
-
-    def disconnectSignals(self):
-        """Disconnect signals for selection changes and checkbox state changes."""
-        try:
-            self.select_fields_tableview.selected.disconnect()
-        except TypeError:  # No slots connected yet
-            pass
-        try:
-            self.select_fields_tableview.tableView.model().checkboxStateChanged.disconnect()
-        except TypeError:  # No slots connected yet
-            pass
+        
+    # # ------------ File selection methods:
 
     def doFileSelected(self, index):
         """
@@ -332,6 +274,22 @@ class MDA_MVC(QtWidgets.QWidget):
         else:
             self.setStatus("Could not find a (positioner,detector) pair to plot.")
             
+
+    def disconnectSignals(self):
+        """Disconnect signals for selection changes and checkbox state changes."""
+        try:
+            self.select_fields_tableview.selected.disconnect()
+        except TypeError:  # No slots connected yet
+            pass
+        try:
+            self.select_fields_tableview.tableView.model().checkboxStateChanged.disconnect()
+        except TypeError:  # No slots connected yet
+            pass
+        
+
+
+    # # ------------ Plot methods:
+
     def handlePlotBasedOnMode(self):
         """Handle plotting based on the current mode (add, replace, or auto-off)."""
         mode = self.select_fields_tableview.mode()
@@ -342,26 +300,6 @@ class MDA_MVC(QtWidgets.QWidget):
         else:
             self.setStatus("Mode is set to Auto-off")
 
-
-    def doRefresh(self):
-        self.setStatus("Refreshing folder...")
-        current_folder = self.dataPath()
-        current_mdaFileList = self.mdaFileList()
-        self.mainWindow.setMdaFileList(current_folder)
-        new_mdaFileList = self.mdaFileList()
-        if new_mdaFileList:
-            self.mda_folder_tableview.displayTable()
-            difference = [
-                item for item in new_mdaFileList if item not in current_mdaFileList
-            ]
-            if difference:
-                self.setStatus(f"Loading new files: {difference}")
-            else:
-                self.setStatus(f"No new files.")
-        else:
-            self.setStatus(f"Nothing to update.")
-
-    # # ------------ Plot methods:
 
     def doPlot(self, *args, **kwargs):
         """Slot: data field selected (for plotting) button is clicked."""
@@ -400,6 +338,79 @@ class MDA_MVC(QtWidgets.QWidget):
         elif action in ("clear"):
             widgetMpl.clearPlot()
             self.select_fields_tableview.tableView.model().clearAllCheckboxes()
+
+
+    # # ------------ Folder Table View navigation & selection highlight:
+    
+    def selectionModel(self):
+        """
+        Used to access the selection model associated with a view, such as MDAFolderTableView.
+        The selection model manages the selection state (e.g., which rows or items are selected)
+        within the view.
+        """
+        return self._selection_model
+    
+    def highlightNewFile(self, row):
+        if self.selectionModel() and self.mda_folder_tableview.tableView.model():
+            # Ensure the table view has focus to get the blue highlight on Mac OS
+            self.mda_folder_tableview.tableView.setFocus()
+            # Select the row to highlight
+            index = self.mda_folder_tableview.tableView.model().index(row, 0)
+            self.selectionModel().select(
+                index, QItemSelectionModel.ClearAndSelect | QItemSelectionModel.Rows
+            )
+
+            # Set the selection mode and behavior to mimic clicking on a row with the mouse
+            self.mda_folder_tableview.tableView.setSelectionMode(
+                QAbstractItemView.SingleSelection
+            )
+            self.mda_folder_tableview.tableView.setSelectionBehavior(
+                QAbstractItemView.SelectRows
+            )
+
+            # Scroll to the selected row to ensure it's visible
+            # Use PositionAtTop or PositionAtBottom for the first/last file respectively
+            scrollHint = QAbstractItemView.EnsureVisible
+            if row == 0:
+                scrollHint = QAbstractItemView.PositionAtTop
+            elif row == self.mda_folder_tableview.tableView.model().rowCount() - 1:
+                scrollHint = QAbstractItemView.PositionAtBottom
+            self.mda_folder_tableview.tableView.scrollTo(index, scrollHint)
+
+    def goToFirst(self):
+        if self.firstFileIndex():
+            index = self.firstFileIndex()
+            row = index.row()
+            self.highlightNewFile(row)
+            self.doFileSelected(index)
+
+    def goToLast(self):
+        if self.lastFileIndex():
+            index = self.lastFileIndex()
+            row = index.row()
+            self.highlightNewFile(row)
+            self.doFileSelected(index)
+
+    def goToNext(self):
+        if self.selectionModel() and self.lastFileIndex():
+            i = self.currentFileIndex()
+            if i.row() == self.lastFileIndex().row():
+                return
+            if i != None:
+                i = self.mda_folder_tableview.tableView.model().index(i.row() + 1, 0)
+                self.highlightNewFile(i.row())
+                self.doFileSelected(i)
+
+    def goToBack(self):
+        if self.currentFileIndex() and self.firstFileIndex():
+            i = self.currentFileIndex()
+            if i.row() == self.firstFileIndex().row():
+                return
+            if i != None:
+                i = self.mda_folder_tableview.tableView.model().index(i.row() - 1, 0)
+                self.highlightNewFile(i.row())
+                self.doFileSelected(i)
+
 
     # # ------------ Checkbox methods:
 
