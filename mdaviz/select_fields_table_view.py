@@ -56,6 +56,8 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def setup(self):
         from functools import partial
+        
+        self._pvList=None
 
         # since we cannot set header's ResizeMode in Designer ...
         header = self.tableView.horizontalHeader()
