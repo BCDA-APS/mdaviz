@@ -147,9 +147,9 @@ class MDA_MVC(QtWidgets.QWidget):
             if difference:
                 self.setStatus(f"Loading new files: {difference}")
             else:
-                self.setStatus(f"No new files.")
+                self.setStatus("No new files.")
         else:
-            self.setStatus(f"Nothing to update.")
+            self.setStatus("Nothing to update.")
 
     # # ------------ Fields selection methods:
 
