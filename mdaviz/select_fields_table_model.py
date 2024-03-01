@@ -127,10 +127,10 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         parent object:
             Instance of mdaviz.mda_folder.MDAMVC
         """
-        
-        self.mda_mvc = parent
 
+        self.mda_mvc = parent
         self.selections = mda2ftm(selection_field)
+
         self._columns_locked, self._fields_locked = False, False
         self.setColumns(columns)
         self.setFields(fields)
@@ -195,7 +195,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         row, column = index.row(), index.column()
         column_name = self.columnName(column)
         checked = state == QtCore.Qt.Checked
-        prior = self.selections.get(row)
+        prior = self.selections.get(row)  # value if row exist as a key, None otherwise
         self.selections[row] = column_name if checked else None  # Rule 1
         changes = self.selections[row] != prior
         changes = self.applySelectionRules(index, changes)
@@ -251,10 +251,12 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
                         changes = True
         return changes
 
-    def updateCheckboxes(self):
+    def updateCheckboxes(self, new_selection=None, update_mda_mvc=True):
         """Update checkboxes to agree with self.selections."""
-        if len(self.selections) > 0:
-            top, bottom = min(self.selections), max(self.selections)
+        if new_selection is None:
+            new_selection = self.selections
+        if len(new_selection) > 0:  # was self.selections
+            top, bottom = min(new_selection), max(new_selection)
         else:
             top, bottom = 0, self.rowCount() - 1
         left, right = min(self.checkboxColumns), max(self.checkboxColumns)
@@ -263,10 +265,12 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         corner1 = self.index(top, left)
         corner2 = self.index(bottom, right)
         self.dataChanged.emit(corner1, corner2, [QtCore.Qt.CheckStateRole])
-        # prune empty data from self.selections
-        self.selections = {k: v for k, v in self.selections.items() if v is not None}
-        # Update the mda_mvc selection
-        self.updateMdaMvcSelection(self.selections)
+        # prune empty data from new_selection
+        new_selection = {k: v for k, v in new_selection.items() if v is not None}
+        self.selections = new_selection
+        # Update the mda_mvc selection if needed:
+        if update_mda_mvc:
+            self.updateMdaMvcSelection(new_selection)
 
     def updateMdaMvcSelection(self, new_selection):
         if new_selection is None:
