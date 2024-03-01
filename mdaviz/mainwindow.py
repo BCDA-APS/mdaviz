@@ -1,5 +1,6 @@
 from pathlib import Path
 from PyQt5 import QtWidgets
+from PyQt5.QtGui import QIcon
 
 from . import APP_TITLE
 from .mda_folder import MDA_MVC
@@ -20,6 +21,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         utils.myLoadUi(UI_FILE, baseinstance=self)
+        icon_path = Path(__file__).parent / "resources" / "viz.jpg"
+        self.setWindowIcon(QIcon(str(icon_path)))
         self.setup()
 
     def setup(self):
