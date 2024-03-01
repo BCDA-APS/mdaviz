@@ -139,6 +139,9 @@ class SelectFieldsTableView(QtWidgets.QWidget):
     def displayMetadata(self, index):
         self.mda_mvc.mda_file_visualization.setMetadata(self.getMetadata())
 
+    # def displayData(self, index):
+    #     self.mda_mvc.mda_file_visualization.setXyData(self.getXyData())
+
     def setData(self, index):
         file_name = self.mdaFileList()[index]
         file_path = self.dataPath() / file_name
