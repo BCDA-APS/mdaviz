@@ -248,53 +248,6 @@ class MDA_MVC(QtWidgets.QWidget):
             utils.mda2ftm(new_selection), update_mda_mvc=False
         )
 
-    # def updateSelectionForNewPVs(self, oldPvList, newPvList, verbose=False):
-    #     """
-    #     Update the selection of positioner (X) & detectors (Y) based on the new list of PVs
-    #     after selecting a new file.
-
-    #     Args:
-    #         oldPvList (list): The list of PVs in the previously selected file.
-    #         newPvList (list): The list of matching PVs in the newly selected file.
-
-    #     Returns:
-    #         dict: Updated selection with valid PVs for the new file.
-    #     """
-    #     changes_made = False
-    #     new_selection = {"Y": [], "X": 0}
-    #     # Process Y (detectors) selection: if PV exists, updates its index, otherwise, removes it.
-    #     posY = self.selectionField()["Y"]
-    #     for det_idx in posY:
-    #         if det_idx < len(oldPvList):
-    #             old_pv = oldPvList[det_idx]
-    #             if old_pv in newPvList:
-    #                 new_idx = newPvList.index(old_pv)
-    #                 if verbose:
-    #                     print(
-    #                         f"Keeping PV: {old_pv=} was at index {det_idx}, now at index {new_idx}"
-    #                     )
-    #                 new_selection["Y"].append(new_idx)
-    #                 if new_idx != det_idx:
-    #                     changes_made = True
-
-    #             else:
-    #                 changes_made = True
-    #                 if verbose:
-    #                     print(f"Removing PV: {old_pv=} was at index {det_idx}")
-    #     # Process X (positioner) selection: if 1st positioner, use it, otherwise default to Index
-    #     old_posX = self.selectionField()["X"]
-    #     new_posX = self.select_fields_tableview.firstPos()
-    #     new_selection["X"] = new_posX
-    #     if old_posX != new_posX:
-    #         changes_made = True
-    #     if changes_made:
-    #         self.updateSelectionField(new_selection)
-    #         self.select_fields_tableview.tableView.model().updateCheckboxes(
-    #             utils.mda2ftm(new_selection), update_mda_mvc=False
-    #         )
-    #     if verbose:
-    #         print(f"Change made to selection: {changes_made}")
-
     # # ------------ File selection methods:
 
     def doFileSelected(self, index, verbose=True):
