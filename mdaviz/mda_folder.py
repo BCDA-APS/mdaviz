@@ -34,7 +34,7 @@ class MDA_MVC(QtWidgets.QWidget):
         parent object:
             Instance of mdaviz.mainwindow.MainWindow
         """
-        
+
         self.mainWindow = parent
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
@@ -98,7 +98,6 @@ class MDA_MVC(QtWidgets.QWidget):
             settings.restoreSplitter(splitter, sname)
             splitter.splitterMoved.connect(partial(self.splitter_moved, key))
 
-
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
         return self.mainWindow.dataPath()
@@ -119,7 +118,7 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def lastFileIndex(self):
         return self._lastFileIndex
-     
+
     # # ------------ Table view methods:
 
     def updateFolderView(self):
@@ -132,7 +131,7 @@ class MDA_MVC(QtWidgets.QWidget):
         index = self.currentFileIndex().row() if self.currentFileIndex() else index
         self.select_fields_tableview.clearContents()
         self.select_fields_tableview.displayTable(index)
-    
+
     def doRefresh(self):
         self.setStatus("Refreshing folder...")
         current_folder = self.dataPath()
@@ -156,7 +155,7 @@ class MDA_MVC(QtWidgets.QWidget):
     def selectionField(self):
         """
         Retrieves the current selection of positioner (X) and detectors (Y) to be plotted.
-        
+
         This method returns a dictionary representing the indices of the selected positioner
         and detectors within the Fields Table View. Upon first invocation or if no selections
         have been made, it attempts to default to the first available positioner and detector,
@@ -182,36 +181,56 @@ class MDA_MVC(QtWidgets.QWidget):
     def updateSelectionField(self, new_selection):
         self._selection_field = new_selection
 
-    def updateSelectionForNewPVs(self, oldPvList, newPvList):
+    def updateSelectionForNewPVs(self, oldPvList, newPvList, verbose=False):
         """
         Update the selection of positioner (X) & detectors (Y) based on the new list of PVs
         after selecting a new file.
-        
+
         Args:
             oldPvList (list): The list of PVs in the previously selected file.
             newPvList (list): The list of matching PVs in the newly selected file.
-        
+
         Returns:
             dict: Updated selection with valid PVs for the new file.
         """
-        new_selection = {'Y': [], 'X': 0}
-        # Process Y (detectors) selection: if PV exists, updates its index, otherwise, removes it. 
-        posY = self.selectionField()['Y']
+        changes_made = False
+        new_selection = {"Y": [], "X": 0}
+        # Process Y (detectors) selection: if PV exists, updates its index, otherwise, removes it.
+        posY = self.selectionField()["Y"]
         for det_idx in posY:
             if det_idx < len(oldPvList):
                 old_pv = oldPvList[det_idx]
                 if old_pv in newPvList:
-                    new_selection['Y'].append(newPvList.index(old_pv))
-        
+                    new_idx = newPvList.index(old_pv)
+                    if verbose:
+                        print(
+                            f"Keeping PV: {old_pv=} was at index {det_idx}, now at index {new_idx}"
+                        )
+                    new_selection["Y"].append(new_idx)
+                    if new_idx != det_idx:
+                        changes_made = True
+
+                else:
+                    changes_made = True
+                    if verbose:
+                        print(f"Removing PV: {old_pv=} was at index {det_idx}")
         # Process X (positioner) selection: if 1st positioner, use it, otherwise default to Index
-        new_selection['X'] = self.select_fields_tableview.firstPos()
-        print(f"{new_selection=}")  
-        self.updateSelectionField(new_selection)
-        
-        
+        old_posX = self.selectionField()["X"]
+        new_posX = self.select_fields_tableview.firstPos()
+        new_selection["X"] = new_posX
+        if old_posX != new_posX:
+            changes_made = True
+        if changes_made:
+            self.updateSelectionField(new_selection)
+            self.select_fields_tableview.tableView.model().updateCheckboxes(
+                utils.mda2ftm(new_selection), update_mda_mvc=False
+            )
+        if verbose:
+            print(f"Change made to selection: {changes_made}")
+
     # # ------------ File selection methods:
 
-    def doFileSelected(self, index):
+    def doFileSelected(self, index, verbose=True):
         """
         Handles the selection of a new file in the folder table view. This method updates the UI
         to display the fields table view and metadata for the selected file, manages the connections
@@ -234,7 +253,7 @@ class MDA_MVC(QtWidgets.QWidget):
             - If a valid selection of positioner and detector is found, initiates plotting based on
             the selected mode. Otherwise, updates the status to indicate no valid pair was found.
             - Handles the case where no previous file was selected (e.g., at application start).
-            
+
         Note:
             The method assumes that `mda_folder_tableview` and `select_fields_tableview` are
             initialized and correctly set up to interact with the underlying data model and UI.
@@ -245,35 +264,34 @@ class MDA_MVC(QtWidgets.QWidget):
         if self.mda_folder_tableview.tableView.model() is None:
             return
 
-
-        oldPvList = self.select_fields_tableview.pvList() 
+        oldPvList = self.select_fields_tableview.pvList()
         self.select_fields_tableview.displayTable(index.row())
         self.select_fields_tableview.displayMetadata(index.row())
-        newPvList = self.select_fields_tableview.pvList() 
-        
+        newPvList = self.select_fields_tableview.pvList()
+
         # Manage signal connections for the new file selection.
         self.disconnectSignals()
         self.select_fields_tableview.selected.connect(self.doPlot)
         self.select_fields_tableview.tableView.model().checkboxStateChanged.connect(
             self.onCheckboxStateChange
         )
-        
+
         # Update the status and selection based on the new file.
         selectedFile = self.mdaFileList()[index.row()]
         selectedFields = self.selectionField()
-        self.setStatus(f"\n\n==== Selected file: {selectedFile} in {str(self.dataPath())}")
+        self.setStatus(
+            f"\n\n========= Selected file: {selectedFile} in {str(self.dataPath())}"
+        )
         if selectedFields:
-            print(f"\nBefore: {self.selectionField()=}")
-            #print(f"{oldPvList=}")
+            if verbose:
+                print(f"\n----- Selection before clean up: {self.selectionField()}")
             if oldPvList is not None:
-                self.updateSelectionForNewPVs(oldPvList, newPvList)
-                self.select_fields_tableview.tableView.model().updateCheckboxes(utils.mda2ftm(selectedFields),update_mda_mvc=False)
-            print(f"\nAfter: {self.selectionField()=}")
-            #print(f"{newPvList=}")
+                self.updateSelectionForNewPVs(oldPvList, newPvList, verbose)
+            if verbose:
+                print(f"\n----- Selection after clean up: {self.selectionField()}")
             self.handlePlotBasedOnMode()
         else:
             self.setStatus("Could not find a (positioner,detector) pair to plot.")
-            
 
     def disconnectSignals(self):
         """Disconnect signals for selection changes and checkbox state changes."""
@@ -285,8 +303,6 @@ class MDA_MVC(QtWidgets.QWidget):
             self.select_fields_tableview.tableView.model().checkboxStateChanged.disconnect()
         except TypeError:  # No slots connected yet
             pass
-        
-
 
     # # ------------ Plot methods:
 
@@ -299,7 +315,6 @@ class MDA_MVC(QtWidgets.QWidget):
             self.doPlot("replace", self.selectionField())
         else:
             self.setStatus("Mode is set to Auto-off")
-
 
     def doPlot(self, *args, **kwargs):
         """Slot: data field selected (for plotting) button is clicked."""
@@ -339,9 +354,8 @@ class MDA_MVC(QtWidgets.QWidget):
             widgetMpl.clearPlot()
             self.select_fields_tableview.tableView.model().clearAllCheckboxes()
 
-
     # # ------------ Folder Table View navigation & selection highlight:
-    
+
     def selectionModel(self):
         """
         Used to access the selection model associated with a view, such as MDAFolderTableView.
@@ -349,7 +363,7 @@ class MDA_MVC(QtWidgets.QWidget):
         within the view.
         """
         return self._selection_model
-    
+
     def highlightNewFile(self, row):
         if self.selectionModel() and self.mda_folder_tableview.tableView.model():
             # Ensure the table view has focus to get the blue highlight on Mac OS
@@ -410,7 +424,6 @@ class MDA_MVC(QtWidgets.QWidget):
                 i = self.mda_folder_tableview.tableView.model().index(i.row() - 1, 0)
                 self.highlightNewFile(i.row())
                 self.doFileSelected(i)
-
 
     # # ------------ Checkbox methods:
 
