@@ -80,9 +80,9 @@ class MDA_MVC(QtWidgets.QWidget):
             self._firstFileIndex = model.index(0, 0)
             self._lastFileIndex = model.index(model.rowCount() - 1, 0)
             # Highlight (select) and plot the first file:
-            self._selection_model = self.mda_folder_tableview.tableView.selectionModel()
-            self.highlightNewFile(0)
-            self.doFileSelected(model.index(0, 0))
+            # self._selection_model = self.mda_folder_tableview.tableView.selectionModel()
+            # self.highlightNewFile(0)
+            # self.doFileSelected(model.index(0, 0))
 
         # Folder table view signal/slot connections:
         self.mda_folder_tableview.tableView.clicked.connect(self.doFileSelected)
