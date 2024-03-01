@@ -251,27 +251,6 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
                         changes = True
         return changes
 
-    # def updateCheckboxes(self):
-    #     """Update checkboxes to agree with self.selections."""
-    #     print("\nEntering updateCheckboxes")
-    #     print(f"{self.selections=}")
-    #     if len(self.selections) > 0:
-    #         top, bottom = min(self.selections), max(self.selections)
-    #     else:
-    #         top, bottom = 0, self.rowCount() - 1
-    #     left, right = min(self.checkboxColumns), max(self.checkboxColumns)
-    #     # logger.debug("corners: (%d,%d)  (%d,%d)", top, left, bottom, right)
-    #     # Re-evaluate the checkboxes bounded by the two corners (inclusive).
-    #     corner1 = self.index(top, left)
-    #     corner2 = self.index(bottom, right)
-    #     self.dataChanged.emit(corner1, corner2, [QtCore.Qt.CheckStateRole])
-    #     # prune empty data from self.selections
-    #     self.selections = {k: v for k, v in self.selections.items() if v is not None}
-    #     print(f"{self.selections=}")
-    #     # Update the mda_mvc selection
-    #     self.updateMdaMvcSelection(self.selections)
-    #     print(f"{self.selections=}")
-
     def updateCheckboxes(self, new_selection=None, update_mda_mvc=True):
         """Update checkboxes to agree with self.selections."""
         if new_selection is None:
