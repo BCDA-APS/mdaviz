@@ -315,12 +315,18 @@
                      <property name="toolTip">
                       <string>Cursor 2 position</string>
                      </property>
+                     <property name="readOnly">
+                      <bool>true</bool>
+                     </property>
                     </widget>
                    </item>
                    <item row="0" column="1">
                     <widget class="QLineEdit" name="pos1_text">
                      <property name="toolTip">
                       <string>Cursor 1 position</string>
+                     </property>
+                     <property name="readOnly">
+                      <bool>true</bool>
                      </property>
                     </widget>
                    </item>
@@ -407,12 +413,18 @@
                      <property name="toolTip">
                       <string>(x1-x2,y1-y2)</string>
                      </property>
+                     <property name="readOnly">
+                      <bool>true</bool>
+                     </property>
                     </widget>
                    </item>
                    <item row="1" column="1">
                     <widget class="QLineEdit" name="midpoint_text">
                      <property name="toolTip">
                       <string>(0.5*(x1 + x2), 0.5*(y1 + y2) )</string>
+                     </property>
+                     <property name="readOnly">
+                      <bool>true</bool>
                      </property>
                     </widget>
                    </item>
@@ -523,10 +535,17 @@
                       <property name="toolTip">
                        <string>(x,y) coordinates for MAX</string>
                       </property>
+                      <property name="readOnly">
+                       <bool>true</bool>
+                      </property>
                      </widget>
                     </item>
                     <item row="4" column="1">
-                     <widget class="QLineEdit" name="mean_text"/>
+                     <widget class="QLineEdit" name="mean_text">
+                      <property name="readOnly">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
                     </item>
                     <item row="2" column="0">
                      <widget class="QLabel" name="min_label">
@@ -617,6 +636,9 @@
                      <widget class="QLineEdit" name="com_text">
                       <property name="toolTip">
                        <string>Centor of mass abscissa</string>
+                      </property>
+                      <property name="readOnly">
+                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>
