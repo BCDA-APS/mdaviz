@@ -195,6 +195,20 @@
               <number>0</number>
              </property>
              <item>
+              <widget class="QLabel" name="filePath_label">
+               <property name="styleSheet">
+                <string notr="true">QLabel {
+    background-color: rgb(248, 248, 248);
+    border: none;
+    padding: 2px;
+}</string>
+               </property>
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QWidget" name="curves" native="true">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
