@@ -250,7 +250,7 @@ class MDA_MVC(QtWidgets.QWidget):
 
     # # ------------ File selection methods:
 
-    def doFileSelected(self, index, verbose=True):
+    def doFileSelected(self, index, verbose=False):
         """
         Handles the selection of a new file in the folder table view. This method updates the UI
         to display the fields table view and metadata for the selected file, manages the connections
@@ -286,7 +286,8 @@ class MDA_MVC(QtWidgets.QWidget):
 
         oldPvList = self.select_fields_tableview.pvList()
         self.select_fields_tableview.displayTable(index.row())
-        self.select_fields_tableview.displayMetadata(index.row())
+        self.select_fields_tableview.displayMetadata()
+        self.select_fields_tableview.displayData()
         newPvList = self.select_fields_tableview.pvList()
 
         # Manage signal connections for the new file selection.

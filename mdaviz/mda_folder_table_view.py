@@ -27,13 +27,14 @@ class MDAFolderTableView(QtWidgets.QWidget):
         parent object:
             Instance of mdaviz.mda_folder.MDAMVC
         """
-        
+
         self.mda_mvc = parent
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
 
     def setup(self):
+        # Configure the horizontal header to resize based on content.
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
 

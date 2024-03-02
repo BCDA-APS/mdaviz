@@ -4,42 +4,35 @@ from . import utils
 
 
 class DataTableModel(QAbstractTableModel):
+    """
+    This model is designed to handle data represented as a dictionary where keys correspond to column labels and values are lists of data points for each column.
+
+    Parameters:
+    - detsDict (dict): A dictionary where keys are column labels (as strings) and values are lists of data points. Each key-value pair represents a column and its corresponding data in the table.
+    - parent (QObject, optional): The parent object for this table model, default is None.
+
+    Methods:
+    - rowCount: Returns the number of rows in the table model.
+    - columnCount: Returns the number of columns in the table model.
+    - data: Returns the data to be displayed for a given index and role.
+    - headerData: Provides the header labels for the table model.
+    - columnLabels: Returns a list of column labels.
+    - setColumnLabels: Sets the column labels based on keys from the input dictionary.
+    - allData: Returns the current data stored in the model.
+    - setAllData: Sets the model's data using the input dictionary.
+
+    The model dynamically adjusts to changes in the input data, updating both the data displayed and the column headers as necessary.
+    """
 
     def __init__(self, detsDict, parent=None):
-        """
-                Create the model and connect with its parent.
-
-                Here the number of row is going to be the indexes,
-                with the number of rows being the number of points
-                in the selected scan
-
-                The number of column will either:
-                    - (1) all the data: all pos + all dets
-                    - or (2) just the number of element
-                in selection, eg: selection = {Y:[2,3],X=[0]},
-                then number of column will be 3
-                not taking into account Mon and Norm for now.
-                Do we want to always show indexes?
-                For now (1) is easier, let's just do that.
-
-        ,
-
-                PARAMETERS
-                headers:
-                    will be defined by the selection from fields TV:
-                    pos and det(s)
-                parent object:
-                    I don't know yet! I'd like it to be MDA_MVC but might end up being FTV
-        """
-        # TODO: confirm who's the parent: FTV or MDA_MVC?
-        self.mda_mvc = parent
+        """ """
         super().__init__(parent)
 
-        self.setAllData()
+        self.setAllData(detsDict)
         self.setColumnLabels()
 
     def rowCount(self, parent=None):
-        value = len(self.allData()[0]) if len(self.allData()) > 0 else 0
+        value = len(self.allData()["Index"]) if len(self.allData()) > 0 else 0
         return value
 
     def columnCount(self, parent=None):
@@ -49,22 +42,17 @@ class DataTableModel(QAbstractTableModel):
     def data(self, index, role):
         # display data
         if role == QtCore.Qt.DisplayRole and self.setAllData is not {}:
-            label = self.columnLabels[index.column()]
+            label = self.columnLabels()[index.column()]
             value = self.allData()[label][index.row()]
             return value
 
     def headerData(self, section, orientation, role):
-        # Provide header labels
+        """
+        Provide horizontal header labels only, nothing for vertical headers (Index is always the first column).
+        """
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
-            return self.columnLabels[section]
+            return self.columnLabels()[section]
         return QVariant()
-
-    def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
-        if role == QtCore.Qt.DisplayRole:
-            if orientation == QtCore.Qt.Horizontal:
-                return self.columnLabels[section]
-            else:
-                return str(section + 1)  # may want to alter at some point
 
     # # # ------------ get & set methods
 
@@ -72,7 +60,7 @@ class DataTableModel(QAbstractTableModel):
         return self._columnLabels
 
     def setColumnLabels(self):
-        self._columnLabels = list(self.allData.keys())
+        self._columnLabels = list(self.allData().keys())
         return self._columnLabels
 
     def allData(self):

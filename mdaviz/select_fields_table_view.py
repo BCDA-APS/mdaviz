@@ -56,12 +56,13 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def setup(self):
         from functools import partial
-        
-        self._pvList=None
 
-        # since we cannot set header's ResizeMode in Designer ...
+        self._pvList = None
+
+        # Configure the horizontal header to resize based on content.
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        # Hide first column (since content is used as vertical header):
 
         self.addButton.hide()
         self.replaceButton.hide()
@@ -99,7 +100,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def firstDet(self):
         return self._firstDet
-    
+
     def pvList(self):
         return self._pvList
 
@@ -139,16 +140,17 @@ class SelectFieldsTableView(QtWidgets.QWidget):
             self.tableView.setModel(data_model)
             # sets the tab label to be the file name
             self.tabWidget.setTabText(0, self.file().name)
+            self.tableView.hideColumn(0)
         else:
             # No MDA files to display, show an empty table with headers
             empty_model = EmptyTableModel(HEADERS)
             self.tableView.setModel(empty_model)
 
-    def displayMetadata(self, index):
+    def displayMetadata(self):
         self.mda_mvc.mda_file_visualization.setMetadata(self.getMetadata())
 
-    # def displayData(self, index):
-    #     self.mda_mvc.mda_file_visualization.setXyData(self.getXyData())
+    def displayData(self):
+        self.mda_mvc.mda_file_visualization.setTableData(self.detsDict())
 
     def setData(self, index):
         file_name = self.mdaFileList()[index]
@@ -173,8 +175,8 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self._detsDict = detsDict
         self._data = fields, first_pos, first_det
         self._metadata = file_metadata
-        self._pvList=[utils.byte2str(v.name) for v in detsDict.values()]
-        
+        self._pvList = [utils.byte2str(v.name) for v in detsDict.values()]
+
     def getMetadata(self):
         """Provide a text view of the file metadata."""
         metadata = utils.get_md(self.metadata())
