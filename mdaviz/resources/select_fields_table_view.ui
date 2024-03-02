@@ -54,6 +54,18 @@
            <string>data</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_5">
+           <property name="spacing">
+            <number>12</number>
+           </property>
+           <property name="leftMargin">
+            <number>8</number>
+           </property>
+           <property name="rightMargin">
+            <number>8</number>
+           </property>
+           <property name="bottomMargin">
+            <number>20</number>
+           </property>
            <item>
             <widget class="QLabel" name="filePath_label">
              <property name="styleSheet">
