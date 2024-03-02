@@ -132,7 +132,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         if index is not None and self.mdaFileList():
             # If there are MDA file
             self.setData(index)
-            filePathLabel = self.mda_mvc.findChild(QtWidgets.QLabel, "filePath_label")
+            filePathLabel = self.mda_mvc.findChild(QtWidgets.QLabel, "filePath_FTV")
             filePathLabel.setText(str(self.file().parent))
             fields, first_pos, first_det = self.data()
             selection_field = self.mda_mvc.selectionField()

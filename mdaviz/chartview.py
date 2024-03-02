@@ -167,6 +167,7 @@ class ChartView(QtWidgets.QWidget):
             "offset": 0,  # default offset
             "factor": 1,  # default factor
             "row": row,
+            "path": str(self.mda_mvc.select_fields_tableview.file().parent),
         }
         # Add to the comboBox
         self.addIemCurveBox(label)
@@ -250,13 +251,16 @@ class ChartView(QtWidgets.QWidget):
             self.main_axes.legend()
 
     def curveSelected(self, label):
-        # Update QLineEdit widgets with the values for the selected curve
+        filePathLabel = self.mda_mvc.findChild(QtWidgets.QLabel, "filePath_viz")
+        # Update QLineEdit & QLabel widgets with the values for the selected curve
         if label in self.line2D:
             self.offset_value.setText(str(self.line2D[label]["offset"]))
             self.factor_value.setText(str(self.line2D[label]["factor"]))
+            filePathLabel.setText(self.line2D[label]["path"])
         else:
             self.offset_value.setText("0")
             self.factor_value.setText("1")
+            filePathLabel.setText("")
         # Update basic math info:
         self.updateBasicMathInfo(label)
 
