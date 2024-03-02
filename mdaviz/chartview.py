@@ -97,7 +97,7 @@ class ChartView(QtWidgets.QWidget):
         # Track curves and display in QComboBox:
         self.line2D = {}  # all the Line2D on the graph, key = label
         self.curveBox = self.mda_mvc.findChild(QtWidgets.QComboBox, "curveBox")
-        self.curveBox.currentTextChanged.connect(self.updateBasicMathInfo)
+        self.curveBox.currentTextChanged.connect(self.curveSelected)
 
         # Remove buttons
         self.removeButton = self.mda_mvc.findChild(QtWidgets.QPushButton, "curveRemove")
@@ -158,9 +158,16 @@ class ChartView(QtWidgets.QWidget):
         # Add to graph
         plot_obj = self.main_axes.plot(*args, **kwargs)
         self.updatePlot()
-        # Add to the dictionary
+        # Add to the dictionary:
         label = kwargs.get("label", None)
-        self.line2D[label] = plot_obj[0], args[0], args[1], row
+        self.line2D[label] = {
+            "line_obj": plot_obj[0],
+            "x_data": args[0],
+            "y_data": args[1],
+            "offset": 0,  # default offset
+            "factor": 1,  # default factor
+            "row": row,
+        }
         # Add to the comboBox
         self.addIemCurveBox(label)
 
@@ -174,8 +181,8 @@ class ChartView(QtWidgets.QWidget):
 
             else:
                 # Remove curve from graph
-                row = self.line2D[label][3]
-                line = self.line2D[label][0]
+                row = self.line2D[label]["row"]
+                line = self.line2D[label]["line_obj"]
                 line.remove()
                 # Remove curve from dictionary
                 del self.line2D[label]
@@ -242,26 +249,38 @@ class ChartView(QtWidgets.QWidget):
         if valid_labels:
             self.main_axes.legend()
 
+    def curveSelected(self, label):
+        # Update QLineEdit widgets with the values for the selected curve
+        if label in self.line2D:
+            self.offset_value.setText(str(self.line2D[label]["offset"]))
+            self.factor_value.setText(str(self.line2D[label]["factor"]))
+        else:
+            self.offset_value.setText("0")
+            self.factor_value.setText("1")
+        # Update basic math info:
+        self.updateBasicMathInfo(label)
+
     def applyBasicMathToCurve(self):
         # Get the current text from the QLineEdit widgets & convert to float:
         try:
             offset = float(self.offset_value.text())
         except ValueError:
-            # If conversion fails, default to 0
             offset = 0
         try:
             factor = float(self.factor_value.text())
         except ValueError:
-            # If conversion fails, default to 1
             factor = 1
         # Get the current curve
         label = self.curveBox.currentText()
         if label in self.line2D:
-            line, x, y, row = self.line2D[label]
-            # Apply factor and offset
-            new_y = numpy.multiply(y, factor) + offset
+            # Update the stored parameters for the current curve
+            self.line2D[label]["offset"] = offset
+            self.line2D[label]["factor"] = factor
+            # Apply factor and offset to the selected curve
+            curve = self.line2D[label]
+            new_y = numpy.multiply(curve["y_data"], factor) + offset
             # Update the Line2D object with the new y-values
-            line.set_ydata(new_y)
+            curve["line_obj"].set_ydata(new_y)
             # Refresh the plot
             self.updatePlot()
 
@@ -286,14 +305,11 @@ class ChartView(QtWidgets.QWidget):
         y_mean = numpy.mean(y_array)
         return (x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean
 
-    def updateBasicMathInfo(self, *args):
-        if args and args[0] != "":
-            current_label = args[0]
-            charlie = self.line2D.get(current_label)
-            if charlie is None:
-                return
-            x = charlie[1]
-            y = charlie[2]
+    def updateBasicMathInfo(self, label):
+        if label and label in self.line2D:
+            curve_data = self.line2D[label]
+            x = curve_data["x_data"]
+            y = curve_data["y_data"]
             stats = self.calculateBasicMath(x, y)
             for i, txt in zip(stats, ["min_text", "max_text", "com_text", "mean_text"]):
                 if isinstance(i, tuple):
@@ -301,6 +317,9 @@ class ChartView(QtWidgets.QWidget):
                 else:
                     result = f"{utils.num2fstr(i)}" if i else "n/a"
                 self.mda_mvc.findChild(QtWidgets.QLineEdit, txt).setText(result)
+        else:
+            for txt in ["min_text", "max_text", "com_text", "mean_text"]:
+                self.mda_mvc.findChild(QtWidgets.QLineEdit, txt).setText("n/a")
 
     def clearBasicMath(self):
         for txt in ["min_text", "max_text", "com_text", "mean_text"]:
