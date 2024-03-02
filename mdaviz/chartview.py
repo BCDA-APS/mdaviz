@@ -79,10 +79,10 @@ class ChartView(QtWidgets.QWidget):
         self.cursors = {
             1: None,
             "pos1": None,
-            "text1": "press middle click",
+            "text1": "middle click",
             2: None,
             "pos2": None,
-            "text2": "press right click",
+            "text2": "right click",
             "diff": "n/a",
             "midpoint": "n/a",
         }
@@ -290,7 +290,7 @@ class ChartView(QtWidgets.QWidget):
             self.cursors[cursor_num] = None
             self.cursors[f"pos{cursor_num}"] = None
             self.cursors[f"text{cursor_num}"] = (
-                "press middle click" if cursor_num == 1 else "press right click"
+                "middle click" if cursor_num == 1 else "right click"
             )
         self.cursors["diff"] = "n/a"
         self.cursors["midpoint"] = "n/a"
@@ -375,11 +375,7 @@ class ChartView(QtWidgets.QWidget):
         )
 
     def clearCursorInfo(self):
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "pos1_text").setText(
-            "press middle click"
-        )
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "pos2_text").setText(
-            "press right click"
-        )
+        self.mda_mvc.findChild(QtWidgets.QLineEdit, "pos1_text").setText("middle click")
+        self.mda_mvc.findChild(QtWidgets.QLineEdit, "pos2_text").setText("right click")
         self.mda_mvc.findChild(QtWidgets.QLineEdit, "diff_text").setText("n/a")
         self.mda_mvc.findChild(QtWidgets.QLineEdit, "midpoint_text").setText("n/a")
