@@ -140,7 +140,9 @@ class SelectFieldsTableView(QtWidgets.QWidget):
             self.tableView.setModel(data_model)
             # sets the tab label to be the file name
             self.tabWidget.setTabText(0, self.file().name)
-            self.tableView.hideColumn(0)
+            # Hide Field/Mon/Norm columns (Field = vertical header, Mon & Norm not yet implemented)
+            for i in [0, 3, 4]:
+                self.tableView.hideColumn(i)
         else:
             # No MDA files to display, show an empty table with headers
             empty_model = EmptyTableModel(HEADERS)
