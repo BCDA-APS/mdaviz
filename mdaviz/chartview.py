@@ -316,14 +316,14 @@ class ChartView(QtWidgets.QWidget):
                     result = f"({utils.num2fstr(i[0])}, {utils.num2fstr(i[1])})"
                 else:
                     result = f"{utils.num2fstr(i)}" if i else "n/a"
-                self.mda_mvc.findChild(QtWidgets.QLineEdit, txt).setText(result)
+                self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText(result)
         else:
             for txt in ["min_text", "max_text", "com_text", "mean_text"]:
-                self.mda_mvc.findChild(QtWidgets.QLineEdit, txt).setText("n/a")
+                self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText("n/a")
 
     def clearBasicMath(self):
         for txt in ["min_text", "max_text", "com_text", "mean_text"]:
-            self.mda_mvc.findChild(QtWidgets.QLineEdit, txt).setText("n/a")
+            self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText("n/a")
 
     def hasDataItems(self):
         # Return whether any artists have been added to the Axes (bool)
@@ -409,21 +409,21 @@ class ChartView(QtWidgets.QWidget):
         self.updateCursorInfo()
 
     def updateCursorInfo(self):
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "pos1_text").setText(
+        self.mda_mvc.findChild(QtWidgets.QLabel, "pos1_text").setText(
             self.cursors["text1"]
         )
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "pos2_text").setText(
+        self.mda_mvc.findChild(QtWidgets.QLabel, "pos2_text").setText(
             self.cursors["text2"]
         )
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "diff_text").setText(
+        self.mda_mvc.findChild(QtWidgets.QLabel, "diff_text").setText(
             self.cursors["diff"]
         )
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "midpoint_text").setText(
+        self.mda_mvc.findChild(QtWidgets.QLabel, "midpoint_text").setText(
             self.cursors["midpoint"]
         )
 
     def clearCursorInfo(self):
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "pos1_text").setText("middle click")
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "pos2_text").setText("right click")
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "diff_text").setText("n/a")
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "midpoint_text").setText("n/a")
+        self.mda_mvc.findChild(QtWidgets.QLabel, "pos1_text").setText("middle click")
+        self.mda_mvc.findChild(QtWidgets.QLabel, "pos2_text").setText("right click")
+        self.mda_mvc.findChild(QtWidgets.QLabel, "diff_text").setText("n/a")
+        self.mda_mvc.findChild(QtWidgets.QLabel, "midpoint_text").setText("n/a")
