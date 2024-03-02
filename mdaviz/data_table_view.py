@@ -47,3 +47,6 @@ class DataTableView(QtWidgets.QWidget):
     def clearContents(self):
         # Clear the data model of the table view
         self.tableView.setModel(None)
+
+
+# self.select_fields_tableview.displayData(index.row())

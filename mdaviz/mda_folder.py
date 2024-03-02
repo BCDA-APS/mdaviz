@@ -34,7 +34,7 @@ class MDA_MVC(QtWidgets.QWidget):
         parent object:
             Instance of mdaviz.mainwindow.MainWindow
         """
-        
+
         self.mainWindow = parent
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
@@ -239,7 +239,6 @@ class MDA_MVC(QtWidgets.QWidget):
         if model is not None:
             self.select_fields_tableview.displayTable(index.row())
             self.select_fields_tableview.displayMetadata(index.row())
-            #self.select_fields_tableview.displayData(index.row())
             # Disconnect previous subcription from the signal emitted when selecting a new file:
             try:
                 self.select_fields_tableview.selected.disconnect()
