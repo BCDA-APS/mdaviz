@@ -56,6 +56,8 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def setup(self):
         from functools import partial
+        
+        self._pvList=None
 
         # since we cannot set header's ResizeMode in Designer ...
         header = self.tableView.horizontalHeader()
@@ -97,6 +99,9 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def firstDet(self):
         return self._firstDet
+    
+    def pvList(self):
+        return self._pvList
 
     def metadata(self):
         return self._metadata
@@ -123,7 +128,6 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         from .select_fields_table_model import SelectFieldsTableModel
         from .empty_table_model import EmptyTableModel
 
-        print(index)
         if index is not None and self.mdaFileList():
             # If there are MDA file
             self.setData(index)
@@ -169,7 +173,8 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self._detsDict = detsDict
         self._data = fields, first_pos, first_det
         self._metadata = file_metadata
-
+        self._pvList=[utils.byte2str(v.name) for v in detsDict.values()]
+        
     def getMetadata(self):
         """Provide a text view of the file metadata."""
         metadata = utils.get_md(self.metadata())
