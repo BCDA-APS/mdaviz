@@ -117,6 +117,12 @@ class ChartView(QtWidgets.QWidget):
         self.removeCursor1.clicked.connect(partial(self.removeCursor, cursor_num=1))
         self.removeCursor2.clicked.connect(partial(self.removeCursor, cursor_num=2))
 
+        # Connect offset & factor QLineEdit:
+        self.offset_value = self.mda_mvc.findChild(QtWidgets.QLineEdit, "offset_value")
+        self.factor_value = self.mda_mvc.findChild(QtWidgets.QLineEdit, "factor_value")
+        self.offset_value.editingFinished.connect(self.applyBasicMathToCurve)
+        self.factor_value.editingFinished.connect(self.applyBasicMathToCurve)
+
     def setPlotTitle(self, text):
         self.main_axes.set_title(text, fontsize=FONTSIZE, y=1.03)
 
@@ -235,6 +241,29 @@ class ChartView(QtWidgets.QWidget):
         valid_labels = [label for label in labels if not label.startswith("_")]
         if valid_labels:
             self.main_axes.legend()
+
+    def applyBasicMathToCurve(self):
+        # Get the current text from the QLineEdit widgets & convert to float:
+        try:
+            offset = float(self.offset_value.text())
+        except ValueError:
+            # If conversion fails, default to 0
+            offset = 0
+        try:
+            factor = float(self.factor_value.text())
+        except ValueError:
+            # If conversion fails, default to 1
+            factor = 1
+        # Get the current curve
+        label = self.curveBox.currentText()
+        if label in self.line2D:
+            line, x, y, row = self.line2D[label]
+            # Apply factor and offset
+            new_y = numpy.multiply(y, factor) + offset
+            # Update the Line2D object with the new y-values
+            line.set_ydata(new_y)
+            # Refresh the plot
+            self.updatePlot()
 
     def calculateBasicMath(self, x_data, y_data):
         x_array = numpy.array(x_data)
