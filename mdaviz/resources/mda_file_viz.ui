@@ -571,7 +571,11 @@
                      </widget>
                     </item>
                     <item row="1" column="1">
-                     <widget class="QLineEdit" name="offset_value"/>
+                     <widget class="QLineEdit" name="offset_value">
+                      <property name="toolTip">
+                       <string>Add constant to selected curve</string>
+                      </property>
+                     </widget>
                     </item>
                     <item row="1" column="0">
                      <widget class="QLabel" name="offset_label">
@@ -581,7 +585,11 @@
                      </widget>
                     </item>
                     <item row="2" column="1">
-                     <widget class="QLineEdit" name="factor_value"/>
+                     <widget class="QLineEdit" name="factor_value">
+                      <property name="toolTip">
+                       <string>Multiply selected curve by constant</string>
+                      </property>
+                     </widget>
                     </item>
                     <item row="3" column="0">
                      <widget class="QLabel" name="com_label">
