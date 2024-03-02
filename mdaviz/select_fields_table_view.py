@@ -47,8 +47,8 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
         parent object:
             Instance of mdaviz.mda_folder.MDAMVC
-        """        
-        
+        """
+
         self.mda_mvc = parent
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
@@ -86,6 +86,10 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         return self._fileName
 
     def data(self):
+        """Return the data from the table view:
+        e.g. self.data=([TableField(name='P0', selection=None,...
+                ...desc='Index', pv='Index', unit='a.u')
+        """
         return self._data
 
     def firstPos(self):
@@ -226,5 +230,4 @@ def to_datasets(fileName, detsDict, selections):
         "y_units": y_units,
         "title": "",
     }
-
     return datasets, plot_options
