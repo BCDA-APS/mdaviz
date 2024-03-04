@@ -3,6 +3,7 @@ from PyQt5.QtGui import QFont
 
 from . import utils
 from .chartview import ChartView
+from .data_table_view import DataTableView
 
 MD_FONT = "Monospace"
 MD_FONT_SIZE = 12
@@ -32,6 +33,12 @@ class MDAFileVisualization(QtWidgets.QWidget):
         font = QFont(MD_FONT)
         font.setPointSize(MD_FONT_SIZE)
         self.metadata.setFont(font)
+
+    def setTableData(self, data):
+        self.data_table_view = DataTableView(data, self)
+        layout = self.dataPage.layout()
+        layout.addWidget(self.data_table_view)
+        self.data_table_view.displayTable()
 
     def setMetadata(self, text, *args, **kwargs):
         # tab=self.metadataPage

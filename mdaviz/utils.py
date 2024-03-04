@@ -74,6 +74,7 @@ def get_det(mda_file_data):
     first_pos = 1 if mda_file_data.np else 0
     first_det = mda_file_data.np + 1
 
+    # Defining a default scanPositioner Object for "Index" at for key=0:
     P0 = scanPositioner()
     P0.number = 0  # positioner number in sscan record
     P0.fieldName = "P0"  # name of sscanRecord PV
@@ -87,8 +88,8 @@ def get_det(mda_file_data):
     P0.data = list(
         range(0, mda_file_data.curr_pt)
     )  # list of values written to 'name' PV.  If rank==2, lists of lists, etc.
-
     D[0] = P0
+
     for e, p in enumerate(p_list):
         D[e + 1] = p
     for e, d in enumerate(d_list):
