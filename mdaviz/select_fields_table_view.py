@@ -130,7 +130,6 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         from .empty_table_model import EmptyTableModel
 
         if index is not None and self.mdaFileList():
-            # If there are MDA file
             self.setData(index)
             filePathLabel = self.mda_mvc.findChild(QtWidgets.QLabel, "filePath_FTV")
             filePathLabel.setText(str(self.file().parent))
