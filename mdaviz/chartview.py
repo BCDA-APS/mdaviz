@@ -79,10 +79,10 @@ class ChartView(QtWidgets.QWidget):
         self.cursors = {
             1: None,
             "pos1": None,
-            "text1": "press middle click",
+            "text1": "middle click",
             2: None,
             "pos2": None,
-            "text2": "press right click",
+            "text2": "right click",
             "diff": "n/a",
             "midpoint": "n/a",
         }
@@ -97,7 +97,7 @@ class ChartView(QtWidgets.QWidget):
         # Track curves and display in QComboBox:
         self.line2D = {}  # all the Line2D on the graph, key = label
         self.curveBox = self.mda_mvc.findChild(QtWidgets.QComboBox, "curveBox")
-        self.curveBox.currentTextChanged.connect(self.updateBasicMathInfo)
+        self.curveBox.currentTextChanged.connect(self.curveSelected)
 
         # Remove buttons
         self.removeButton = self.mda_mvc.findChild(QtWidgets.QPushButton, "curveRemove")
@@ -116,6 +116,12 @@ class ChartView(QtWidgets.QWidget):
         self.removeButton.clicked.connect(self.removeCurve)
         self.removeCursor1.clicked.connect(partial(self.removeCursor, cursor_num=1))
         self.removeCursor2.clicked.connect(partial(self.removeCursor, cursor_num=2))
+
+        # Connect offset & factor QLineEdit:
+        self.offset_value = self.mda_mvc.findChild(QtWidgets.QLineEdit, "offset_value")
+        self.factor_value = self.mda_mvc.findChild(QtWidgets.QLineEdit, "factor_value")
+        self.offset_value.editingFinished.connect(self.applyBasicMathToCurve)
+        self.factor_value.editingFinished.connect(self.applyBasicMathToCurve)
 
     def setPlotTitle(self, text):
         self.main_axes.set_title(text, fontsize=FONTSIZE, y=1.03)
@@ -152,9 +158,17 @@ class ChartView(QtWidgets.QWidget):
         # Add to graph
         plot_obj = self.main_axes.plot(*args, **kwargs)
         self.updatePlot()
-        # Add to the dictionary
+        # Add to the dictionary:
         label = kwargs.get("label", None)
-        self.line2D[label] = plot_obj[0], args[0], args[1], row
+        self.line2D[label] = {
+            "line_obj": plot_obj[0],
+            "x_data": args[0],
+            "y_data": args[1],
+            "offset": 0,  # default offset
+            "factor": 1,  # default factor
+            "row": row,
+            "path": str(self.mda_mvc.select_fields_tableview.file().parent),
+        }
         # Add to the comboBox
         self.addIemCurveBox(label)
 
@@ -168,8 +182,8 @@ class ChartView(QtWidgets.QWidget):
 
             else:
                 # Remove curve from graph
-                row = self.line2D[label][3]
-                line = self.line2D[label][0]
+                row = self.line2D[label]["row"]
+                line = self.line2D[label]["line_obj"]
                 line.remove()
                 # Remove curve from dictionary
                 del self.line2D[label]
@@ -236,6 +250,44 @@ class ChartView(QtWidgets.QWidget):
         if valid_labels:
             self.main_axes.legend()
 
+    def curveSelected(self, label):
+        filePathLabel = self.mda_mvc.findChild(QtWidgets.QLabel, "filePath_viz")
+        # Update QLineEdit & QLabel widgets with the values for the selected curve
+        if label in self.line2D:
+            self.offset_value.setText(str(self.line2D[label]["offset"]))
+            self.factor_value.setText(str(self.line2D[label]["factor"]))
+            filePathLabel.setText(self.line2D[label]["path"])
+        else:
+            self.offset_value.setText("0")
+            self.factor_value.setText("1")
+            filePathLabel.setText("")
+        # Update basic math info:
+        self.updateBasicMathInfo(label)
+
+    def applyBasicMathToCurve(self):
+        # Get the current text from the QLineEdit widgets & convert to float:
+        try:
+            offset = float(self.offset_value.text())
+        except ValueError:
+            offset = 0
+        try:
+            factor = float(self.factor_value.text())
+        except ValueError:
+            factor = 1
+        # Get the current curve
+        label = self.curveBox.currentText()
+        if label in self.line2D:
+            # Update the stored parameters for the current curve
+            self.line2D[label]["offset"] = offset
+            self.line2D[label]["factor"] = factor
+            # Apply factor and offset to the selected curve
+            curve = self.line2D[label]
+            new_y = numpy.multiply(curve["y_data"], factor) + offset
+            # Update the Line2D object with the new y-values
+            curve["line_obj"].set_ydata(new_y)
+            # Refresh the plot
+            self.updatePlot()
+
     def calculateBasicMath(self, x_data, y_data):
         x_array = numpy.array(x_data)
         y_array = numpy.array(y_data)
@@ -257,25 +309,25 @@ class ChartView(QtWidgets.QWidget):
         y_mean = numpy.mean(y_array)
         return (x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean
 
-    def updateBasicMathInfo(self, *args):
-        if args and args[0] != "":
-            current_label = args[0]
-            charlie = self.line2D.get(current_label)
-            if charlie is None:
-                return
-            x = charlie[1]
-            y = charlie[2]
+    def updateBasicMathInfo(self, label):
+        if label and label in self.line2D:
+            curve_data = self.line2D[label]
+            x = curve_data["x_data"]
+            y = curve_data["y_data"]
             stats = self.calculateBasicMath(x, y)
             for i, txt in zip(stats, ["min_text", "max_text", "com_text", "mean_text"]):
                 if isinstance(i, tuple):
                     result = f"({utils.num2fstr(i[0])}, {utils.num2fstr(i[1])})"
                 else:
                     result = f"{utils.num2fstr(i)}" if i else "n/a"
-                self.mda_mvc.findChild(QtWidgets.QLineEdit, txt).setText(result)
+                self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText(result)
+        else:
+            for txt in ["min_text", "max_text", "com_text", "mean_text"]:
+                self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText("n/a")
 
     def clearBasicMath(self):
         for txt in ["min_text", "max_text", "com_text", "mean_text"]:
-            self.mda_mvc.findChild(QtWidgets.QLineEdit, txt).setText("n/a")
+            self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText("n/a")
 
     def hasDataItems(self):
         # Return whether any artists have been added to the Axes (bool)
@@ -290,7 +342,7 @@ class ChartView(QtWidgets.QWidget):
             self.cursors[cursor_num] = None
             self.cursors[f"pos{cursor_num}"] = None
             self.cursors[f"text{cursor_num}"] = (
-                "press middle click" if cursor_num == 1 else "press right click"
+                "middle click" if cursor_num == 1 else "right click"
             )
         self.cursors["diff"] = "n/a"
         self.cursors["midpoint"] = "n/a"
@@ -361,25 +413,21 @@ class ChartView(QtWidgets.QWidget):
         self.updateCursorInfo()
 
     def updateCursorInfo(self):
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "pos1_text").setText(
+        self.mda_mvc.findChild(QtWidgets.QLabel, "pos1_text").setText(
             self.cursors["text1"]
         )
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "pos2_text").setText(
+        self.mda_mvc.findChild(QtWidgets.QLabel, "pos2_text").setText(
             self.cursors["text2"]
         )
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "diff_text").setText(
+        self.mda_mvc.findChild(QtWidgets.QLabel, "diff_text").setText(
             self.cursors["diff"]
         )
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "midpoint_text").setText(
+        self.mda_mvc.findChild(QtWidgets.QLabel, "midpoint_text").setText(
             self.cursors["midpoint"]
         )
 
     def clearCursorInfo(self):
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "pos1_text").setText(
-            "press middle click"
-        )
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "pos2_text").setText(
-            "press right click"
-        )
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "diff_text").setText("n/a")
-        self.mda_mvc.findChild(QtWidgets.QLineEdit, "midpoint_text").setText("n/a")
+        self.mda_mvc.findChild(QtWidgets.QLabel, "pos1_text").setText("middle click")
+        self.mda_mvc.findChild(QtWidgets.QLabel, "pos2_text").setText("right click")
+        self.mda_mvc.findChild(QtWidgets.QLabel, "diff_text").setText("n/a")
+        self.mda_mvc.findChild(QtWidgets.QLabel, "midpoint_text").setText("n/a")

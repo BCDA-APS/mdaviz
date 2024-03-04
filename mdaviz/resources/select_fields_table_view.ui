@@ -33,7 +33,13 @@
         <number>5</number>
        </property>
        <property name="leftMargin">
+        <number>6</number>
+       </property>
+       <property name="topMargin">
         <number>12</number>
+       </property>
+       <property name="rightMargin">
+        <number>6</number>
        </property>
        <property name="bottomMargin">
         <number>5</number>
@@ -43,13 +49,49 @@
          <property name="currentIndex">
           <number>0</number>
          </property>
+         <property name="tabsClosable">
+          <bool>true</bool>
+         </property>
          <widget class="QWidget" name="TabWidgetPage2">
           <attribute name="title">
            <string>data</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_5">
+           <property name="spacing">
+            <number>12</number>
+           </property>
+           <property name="leftMargin">
+            <number>8</number>
+           </property>
+           <property name="rightMargin">
+            <number>8</number>
+           </property>
+           <property name="bottomMargin">
+            <number>20</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="filePath_FTV">
+             <property name="styleSheet">
+              <string notr="true">QLabel {
+    background-color: rgb(248, 248, 248);
+    border: none;
+    padding: 2px;
+}</string>
+             </property>
+             <property name="text">
+              <string>File Path</string>
+             </property>
+            </widget>
+           </item>
            <item>
             <widget class="QTableView" name="tableView">
+             <property name="styleSheet">
+              <string notr="true">QLabel {
+    background-color: white;
+    border: none; /* This removes the border */
+    padding: 2px;
+}</string>
+             </property>
              <property name="alternatingRowColors">
               <bool>true</bool>
              </property>
