@@ -58,11 +58,11 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         from functools import partial
 
         self._pvList = None
+        self.setTabList()
 
         # Configure the horizontal header to resize based on content.
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
-        # Hide first column (since content is used as vertical header):
 
         self.addButton.hide()
         self.replaceButton.hide()
@@ -82,10 +82,11 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self.selected.emit(action, self.tableView.model().plotFields()[0])
 
     def file(self):
+        """Path object containing the entire absolute file path"""
         return self._file
 
     def fileName(self):
-        # File name without the .mda extension
+        """File name without the .mda extension"""
         return self._fileName
 
     def data(self):
@@ -115,15 +116,77 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def setMode(self, *args):
         self._mode = args[0]
+        
+    def tabList(self):
+        """The list of opened tabs"""
+        return self._tabList
+        
+    def setTabList(self,new_tab_list=None):
+        if not new_tab_list: 
+            self._tabList=[]
+        else:
+            self._tabList= new_tab_list
 
     def updateButtonVisibility(self):
-        # Check the current text and show/hide buttons accordingly
+        """ Check the current text in "mode" pull down and show/hide buttons accordingly"""
         if self.autoBox.currentText() == "Auto-off":
             self.addButton.show()
             self.replaceButton.show()
         else:
             self.addButton.hide()
             self.replaceButton.hide()
+            
+            
+            
+    def addNewTab(self, filePath, tableModel, label):
+        """
+        Adds a new tab with a QTableView and QLabel for the file path.
+
+        Parameters:
+        filePath (str): The file path to display in the QLabel.
+        tableModel (QAbstractTableModel): The model to set for the QTableView.
+        label (str): tab label
+        """
+        # Create a new widget and layout for this tab
+        newTabWidget = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(newTabWidget)
+
+        # Create and configure the file path label
+        filePathLabel = QtWidgets.QLabel(filePath)
+        layout.addWidget(filePathLabel)
+
+        # Create and configure the table view
+        tableView = QtWidgets.QTableView()
+        tableView.setModel(tableModel)
+        layout.addWidget(tableView)
+
+        # Add the new tab to the tab widget
+        tabIndex = self.tabWidget.addTab(newTabWidget, label)
+        self.tabWidget.setCurrentIndex(tabIndex)        
+
+    # def displayTable(self, index):
+    #     from .select_fields_table_model import SelectFieldsTableModel
+    #     from .empty_table_model import EmptyTableModel
+
+    #     if index is not None and self.mdaFileList():
+    #         self.setData(index)
+    #         filePathLabel = self.mda_mvc.findChild(QtWidgets.QLabel, "filePath_FTV")
+    #         filePathLabel.setText(str(self.file().parent))
+    #         fields, first_pos, first_det = self.data()
+    #         selection_field = self.mda_mvc.selectionField()
+    #         data_model = SelectFieldsTableModel(
+    #             COLUMNS, fields, selection_field, self.mda_mvc
+    #         )
+    #         self.tableView.setModel(data_model)
+    #         # sets the tab label to be the file name
+    #         self.tabWidget.setTabText(0, self.file().name)
+    #         # Hide Field/Mon/Norm columns (Field = vertical header, Mon & Norm not yet implemented)
+    #         for i in [0, 3, 4]:
+    #             self.tableView.hideColumn(i)
+    #     else:
+    #         # No MDA files to display, show an empty table with headers
+    #         empty_model = EmptyTableModel(HEADERS)
+    #         self.tableView.setModel(empty_model)
 
     def displayTable(self, index):
         from .select_fields_table_model import SelectFieldsTableModel
@@ -131,16 +194,32 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
         if index is not None and self.mdaFileList():
             self.setData(index)
-            filePathLabel = self.mda_mvc.findChild(QtWidgets.QLabel, "filePath_FTV")
-            filePathLabel.setText(str(self.file().parent))
-            fields, first_pos, first_det = self.data()
-            selection_field = self.mda_mvc.selectionField()
+            fields = self.data()[0]     # entire list of TableFields ojects (all pos & dets) 
+            selection_field = self.mda_mvc.selectionField() 
             data_model = SelectFieldsTableModel(
                 COLUMNS, fields, selection_field, self.mda_mvc
             )
             self.tableView.setModel(data_model)
-            # sets the tab label to be the file name
-            self.tabWidget.setTabText(0, self.file().name)
+            
+            tab_list=self.tabList()
+            
+            if tab_list:
+                ##### THIS IS WHERE MY PROBLEM IS?
+                self.tabWidget.addTab()
+                self.tabWidget.setTabText(len(tab_list), self.fileName())
+            else:
+                self.tabWidget.setTabText(0, self.fileName())
+            # add entry to the list:
+            tab_list.append(str(self.file()))
+            self.setTabList(tab_list)
+            
+            # sets the tab label & file path QLabel:
+            self.tabWidget.setTabText(0, self.fileName())
+            filePath_QLabel = self.mda_mvc.findChild(QtWidgets.QLabel, "filePath_FTV")
+            filePath_QLabel.setText(str(self.file().parent))
+
+            
+            
             # Hide Field/Mon/Norm columns (Field = vertical header, Mon & Norm not yet implemented)
             for i in [0, 3, 4]:
                 self.tableView.hideColumn(i)
@@ -148,6 +227,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
             # No MDA files to display, show an empty table with headers
             empty_model = EmptyTableModel(HEADERS)
             self.tableView.setModel(empty_model)
+
 
     def displayMetadata(self):
         self.mda_mvc.mda_file_visualization.setMetadata(self.getMetadata())
