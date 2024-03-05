@@ -165,19 +165,9 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
                 return self.columnName(section)
             elif orientation == QtCore.Qt.Vertical:
                 # Return the text from the first column as the vertical header label
-                index = self.index(
-                    section, 0
-                )  # Assuming the first column holds the label
+                index = self.index(section, 0)
                 return self.fieldText(index)
         return None
-
-    # def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
-    #     """Column headers.  Called by QTableView."""
-    #     if role == QtCore.Qt.DisplayRole:
-    #         if orientation == QtCore.Qt.Horizontal:
-    #             return self.columnName(section)
-    #         else:
-    #             return str(section + 1)  # may want to alter at some point
 
     def setData(self, index, value, role):
         """Toggle the checkboxes.  Called by QTableView."""
