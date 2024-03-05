@@ -52,7 +52,7 @@
          <property name="tabsClosable">
           <bool>true</bool>
          </property>
-         <widget class="QWidget" name="TabWidgetPage2">
+         <widget class="QWidget" name="TabWidget">
           <attribute name="title">
            <string>data</string>
           </attribute>

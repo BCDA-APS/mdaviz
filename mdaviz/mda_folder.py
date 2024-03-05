@@ -44,6 +44,7 @@ class MDA_MVC(QtWidgets.QWidget):
         from .user_settings import settings
         from .mda_folder_table_view import MDAFolderTableView
         from .mda_file_viz import MDAFileVisualization
+        from .mda_file import MDAFile
         from .select_fields_table_view import SelectFieldsTableView
 
         # Folders table view:
@@ -57,7 +58,13 @@ class MDA_MVC(QtWidgets.QWidget):
             pass
         self.mainWindow.refresh.released.connect(self.doRefresh)
 
-        # Fields table view:
+        # File table view:
+        self.mda_file = MDAFile(self)
+        layout = self.mda_groupbox.layout()
+        layout.addWidget(self.mda_file)
+        
+        
+        # Select fields table view:
         self.select_fields_tableview = SelectFieldsTableView(self)
         layout = self.mda_groupbox.layout()
         layout.addWidget(self.select_fields_tableview)
@@ -288,6 +295,7 @@ class MDA_MVC(QtWidgets.QWidget):
         self.select_fields_tableview.displayTable(index.row())
         self.select_fields_tableview.displayMetadata()
         self.select_fields_tableview.displayData()
+        self.mda_file.addNewTab(index.row())
         newPvList = self.select_fields_tableview.pvList()
 
         # Manage signal connections for the new file selection.

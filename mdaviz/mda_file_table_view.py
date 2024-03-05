@@ -5,7 +5,7 @@ Uses :class:`select_fields_tablemodel.SelectFieldsTableModel`.
 
 .. autosummary::
 
-    ~SelectFieldsTableView
+    MDAFileTableView
 """
 
 from mda import readMDA
@@ -34,7 +34,7 @@ COLUMNS = [
 ]
 
 
-class SelectFieldsTableView(QtWidgets.QWidget):
+class MDAFileTableView(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
     selected = QtCore.pyqtSignal(str, dict)
     fieldchange = QtCore.pyqtSignal(str, dict)
@@ -46,40 +46,26 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         PARAMETERS
 
         parent object:
-            Instance of mdaviz.mda_folder.MDAMVC
+            Instance of mdaviz.mda_file.MdaFile
         """
 
-        self.mda_mvc = parent
+        self.mda_file = parent
         super().__init__()
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
 
     def setup(self):
-        from functools import partial
 
         self._pvList = None
-        self.setTabList()
 
         # Configure the horizontal header to resize based on content.
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
 
-        self.addButton.hide()
-        self.replaceButton.hide()
-        self.addButton.clicked.connect(partial(self.responder, "add"))
-        self.clearButton.clicked.connect(partial(self.responder, "clear"))
-        self.replaceButton.clicked.connect(partial(self.responder, "replace"))
-
-        options = ["Auto-replace", "Auto-add", "Auto-off"]
-        self._mode = options[0]
-        self.autoBox.addItems(options)
-        self.autoBox.currentTextChanged.connect(self.setMode)
-        self.autoBox.currentTextChanged.connect(self.updateButtonVisibility)
-
-    def responder(self, action):
-        """Modify the plot with the described action."""
-        print(f"\nResponder: {action=}")
-        self.selected.emit(action, self.tableView.model().plotFields()[0])
+    # def responder(self, action):
+    #     """Modify the plot with the described action."""
+    #     print(f"\nResponder: {action=}")
+    #     self.selected.emit(action, self.tableView.model().plotFields()[0])
 
     def file(self):
         """Path object containing the entire absolute file path"""
@@ -105,39 +91,10 @@ class SelectFieldsTableView(QtWidgets.QWidget):
     def pvList(self):
         return self._pvList
 
-    def metadata(self):
-        return self._metadata
-
     def detsDict(self):
         return self._detsDict
-
-    def mode(self):
-        return self._mode
-
-    def setMode(self, *args):
-        self._mode = args[0]
-        
-    def tabList(self):
-        """The list of opened tabs"""
-        return self._tabList
-        
-    def setTabList(self,new_tab_list=None):
-        if not new_tab_list: 
-            self._tabList=[]
-        else:
-            self._tabList= new_tab_list
-
-    def updateButtonVisibility(self):
-        """ Check the current text in "mode" pull down and show/hide buttons accordingly"""
-        if self.autoBox.currentText() == "Auto-off":
-            self.addButton.show()
-            self.replaceButton.show()
-        else:
-            self.addButton.hide()
-            self.replaceButton.hide()
             
-            
-            
+       
 
     # def displayTable(self, index):
     #     from .select_fields_table_model import SelectFieldsTableModel
@@ -170,7 +127,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         if index is not None and self.mdaFileList():
             self.setData(index)
             fields = self.data()[0]     # entire list of TableFields ojects (all pos & dets) 
-            selection_field = self.mda_mvc.selectionField() 
+            selection_field = self.mda_file.mda_mvc.selectionField() 
             data_model = SelectFieldsTableModel(
                 COLUMNS, fields, selection_field, self.mda_mvc
             )
@@ -178,14 +135,12 @@ class SelectFieldsTableView(QtWidgets.QWidget):
             
             tab_list=self.tabList()
             
-            # if tab_list:
-            #     ##### THIS IS WHERE MY PROBLEM IS?
-            #     self.tabWidget.addTab()
-            #     self.tabWidget.setTabText(len(tab_list), self.fileName())
-            # else:
-            #     self.tabWidget.setTabText(0, self.fileName())
-
-            self.tabWidget.setTabText(0, self.fileName())
+            if tab_list:
+                ##### THIS IS WHERE MY PROBLEM IS?
+                self.tabWidget.addTab()
+                self.tabWidget.setTabText(len(tab_list), self.fileName())
+            else:
+                self.tabWidget.setTabText(0, self.fileName())
             # add entry to the list:
             tab_list.append(str(self.file()))
             self.setTabList(tab_list)
@@ -204,13 +159,6 @@ class SelectFieldsTableView(QtWidgets.QWidget):
             # No MDA files to display, show an empty table with headers
             empty_model = EmptyTableModel(HEADERS)
             self.tableView.setModel(empty_model)
-
-
-    def displayMetadata(self):
-        self.mda_mvc.mda_file_visualization.setMetadata(self.getMetadata())
-
-    def displayData(self):
-        self.mda_mvc.mda_file_visualization.setTableData(self.detsDict())
 
     def setData(self, index):
         file_name = self.mdaFileList()[index]
@@ -237,21 +185,16 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self._metadata = file_metadata
         self._pvList = [utils.byte2str(v.name) for v in detsDict.values()]
 
-    def getMetadata(self):
-        """Provide a text view of the file metadata."""
-        metadata = utils.get_md(self.metadata())
-        return yaml.dump(metadata, default_flow_style=False)
-
     def dataPath(self):
         """Path (obj) of the data folder."""
-        return self.mda_mvc.dataPath()
+        return self.mda_file.mda_mvc.dataPath()
 
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
-        return self.mda_mvc.mdaFileList()
+        return self.mda_file.mda_mvc.mdaFileList()
 
     def setStatus(self, text):
-        self.mda_mvc.setStatus(text)
+        self.mda_file.mda_mvc.setStatus(text)
 
     def clearContents(self):
         self.tableView.setModel(None)
