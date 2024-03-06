@@ -166,7 +166,9 @@ class MDAFile(QtWidgets.QWidget):
 
         # Access and update the QLabel for the filePath:
         filePathLabel = self.file_tableview.filePath
-        filePathLabel.setText(str(file_path.parent))
+        filePathLabel.setText(str(file_path))
+        # change to full path vs just file_path.parent:
+        # can't read the tab lable when too many tabs open!
 
     def removeFileTab(self, *args):
         """
