@@ -142,25 +142,31 @@ class MDAFile(QtWidgets.QWidget):
 
     def addFileTab(self, index):
         """
-        Adds a new tab with a QTableView and QLabel for the file path.
+        Adds a new tab with a QTableView and QLabel for the selected file.
 
         Parameters:
-        tableModel (QAbstractTableModel): The model to set for the QTableView.
+        - index (int): The index of the selected file in the MDA file list.
         """
+
         from .mda_file_table_view import MDAFileTableView
 
+        # Get data for the selected file:
         self.setData(index)
+        file_path = self.data()["filePath"]
+        file_name = self.data()["fileName"]
 
+        # Create a new instance of MDAFileTableView for the selected file:
+        self.file_tableview = MDAFileTableView(self)
+        self.tabWidget.addTab(self.file_tableview, file_name)
+
+        # Add selected file to the list of open tabs:
         tab_list = self.tabList()
-        file_path = str(self.data()["filePath"])
-        tab_list.append(file_path)
+        tab_list.append(str(file_path))
         self.setTabList(tab_list)
 
-        self.file_tableview = MDAFileTableView(index, self)
-        self.tabWidget.addTab(self.file_tableview, self.data()["fileName"])
-
-        filePathLabel = self.file_tableview.filePath  # Access the QLabel for FilePath
-        filePathLabel.setText(str(self.data()["filePath"].parent))
+        # Access and update the QLabel for the filePath:
+        filePathLabel = self.file_tableview.filePath
+        filePathLabel.setText(str(file_path.parent))
 
     def removeFileTab(self, *args):
         """
@@ -203,30 +209,6 @@ class MDAFile(QtWidgets.QWidget):
             self.setStatus(
                 f"Cannot find corresponding file tab:  {index=}, {filepath=}"
             )
-
-    # def displayTable(self, index):
-    #     from .select_fields_table_model import SelectFieldsTableModel
-    #     from .empty_table_model import EmptyTableModel
-
-    #     if index is not None and self.mdaFileList():
-    #         self.setData(index)
-    #         filePathLabel = self.mda_mvc.findChild(QtWidgets.QLabel, "filePath_FTV")
-    #         filePathLabel.setText(str(self.file().parent))
-    #         fields, first_pos, first_det = self.data()
-    #         selection_field = self.mda_mvc.selectionField()
-    #         data_model = SelectFieldsTableModel(
-    #             COLUMNS, fields, selection_field, self.mda_mvc
-    #         )
-    #         self.tableView.setModel(data_model)
-    #         # sets the tab label to be the file name
-    #         self.tabWidget.setTabText(0, self.file().name)
-    #         # Hide Field/Mon/Norm columns (Field = vertical header, Mon & Norm not yet implemented)
-    #         for i in [0, 3, 4]:
-    #             self.tableView.hideColumn(i)
-    #     else:
-    #         # No MDA files to display, show an empty table with headers
-    #         empty_model = EmptyTableModel(HEADERS)
-    #         self.tableView.setModel(empty_model)
 
     # ------ Button methods:
 
