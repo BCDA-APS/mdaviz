@@ -24,8 +24,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>387</width>
-        <height>629</height>
+        <width>385</width>
+        <height>627</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -47,30 +47,11 @@
        <item>
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>-1</number>
          </property>
          <property name="tabsClosable">
           <bool>true</bool>
          </property>
-         <widget class="QWidget" name="TabWidget">
-          <attribute name="title">
-           <string>data</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_5">
-           <property name="spacing">
-            <number>12</number>
-           </property>
-           <property name="leftMargin">
-            <number>8</number>
-           </property>
-           <property name="rightMargin">
-            <number>8</number>
-           </property>
-           <property name="bottomMargin">
-            <number>20</number>
-           </property>
-          </layout>
-         </widget>
         </widget>
        </item>
        <item>
