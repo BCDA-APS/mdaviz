@@ -116,28 +116,25 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
     def setMode(self, *args):
         self._mode = args[0]
-        
+
     def tabList(self):
         """The list of opened tabs"""
         return self._tabList
-        
-    def setTabList(self,new_tab_list=None):
-        if not new_tab_list: 
-            self._tabList=[]
+
+    def setTabList(self, new_tab_list=None):
+        if not new_tab_list:
+            self._tabList = []
         else:
-            self._tabList= new_tab_list
+            self._tabList = new_tab_list
 
     def updateButtonVisibility(self):
-        """ Check the current text in "mode" pull down and show/hide buttons accordingly"""
+        """Check the current text in "mode" pull down and show/hide buttons accordingly"""
         if self.autoBox.currentText() == "Auto-off":
             self.addButton.show()
             self.replaceButton.show()
         else:
             self.addButton.hide()
             self.replaceButton.hide()
-            
-            
-            
 
     # def displayTable(self, index):
     #     from .select_fields_table_model import SelectFieldsTableModel
@@ -169,15 +166,17 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 
         if index is not None and self.mdaFileList():
             self.setData(index)
-            fields = self.data()[0]     # entire list of TableFields ojects (all pos & dets) 
-            selection_field = self.mda_mvc.selectionField() 
+            fields = self.data()[
+                0
+            ]  # entire list of TableFields ojects (all pos & dets)
+            selection_field = self.mda_mvc.selectionField()
             data_model = SelectFieldsTableModel(
                 COLUMNS, fields, selection_field, self.mda_mvc
             )
             self.tableView.setModel(data_model)
-            
-            tab_list=self.tabList()
-            
+
+            tab_list = self.tabList()
+
             # if tab_list:
             #     ##### THIS IS WHERE MY PROBLEM IS?
             #     self.tabWidget.addTab()
@@ -189,14 +188,12 @@ class SelectFieldsTableView(QtWidgets.QWidget):
             # add entry to the list:
             tab_list.append(str(self.file()))
             self.setTabList(tab_list)
-            
+
             # sets the tab label & file path QLabel:
             self.tabWidget.setTabText(0, self.fileName())
             filePath_QLabel = self.mda_mvc.findChild(QtWidgets.QLabel, "filePath_FTV")
             filePath_QLabel.setText(str(self.file().parent))
 
-            
-            
             # Hide Field/Mon/Norm columns (Field = vertical header, Mon & Norm not yet implemented)
             for i in [0, 3, 4]:
                 self.tableView.hideColumn(i)
@@ -204,7 +201,6 @@ class SelectFieldsTableView(QtWidgets.QWidget):
             # No MDA files to display, show an empty table with headers
             empty_model = EmptyTableModel(HEADERS)
             self.tableView.setModel(empty_model)
-
 
     def displayMetadata(self):
         self.mda_mvc.mda_file_visualization.setMetadata(self.getMetadata())

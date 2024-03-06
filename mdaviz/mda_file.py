@@ -65,6 +65,15 @@ class MDAFile(QtWidgets.QWidget):
 
     # ------ Get & set methods:
 
+    # def firstPos(self):
+    #     return self._firstPos
+
+    # def firstDet(self):
+    #     return self._firstDet
+
+    # def pvList(self):
+    #     return self._pvList
+
     def mode(self):
         return self._mode
 
@@ -82,6 +91,11 @@ class MDAFile(QtWidgets.QWidget):
         return self._data
 
     def setData(self, index=None):
+
+        # QUESTION: do I need to store the "data" for all the open files or
+        # (like right now) just the one I am dealing with now (i.e. selected
+        # file)?
+
         """
         Populates the `_data` attribute with file information and data extracted
         from a specified file in the MDA file list at the provided index, if any.
@@ -89,8 +103,8 @@ class MDAFile(QtWidgets.QWidget):
 
         Parameters:
         - index (int, optional): The index of the file in the MDA
-        file list to read and extract data from. Defaults to None, resulting in
-        no operation.
+        file list to read and extract data from.
+        Defaults to None, resulting in self._data = None.
 
         The populated `_data` dictionary includes:
         - fileName (str): The name of the file without its extension.
@@ -105,8 +119,9 @@ class MDAFile(QtWidgets.QWidget):
         Note: This method modifies the object's state by setting the `_data`
         attribute.
         """
-        data = {}
+        data = None
         if index is not None:
+            data = {}
             file_name = self.mdaFileList()[index]
             file_path = self.dataPath() / file_name
             file_metadata, file_data = readMDA(file_path)
@@ -157,7 +172,10 @@ class MDAFile(QtWidgets.QWidget):
 
         # Create a new instance of MDAFileTableView for the selected file:
         self.file_tableview = MDAFileTableView(self)
-        self.tabWidget.addTab(self.file_tableview, file_name)
+        tabIndex = self.tabWidget.addTab(self.file_tableview, file_name)
+        self.tabWidget.setCurrentIndex(tabIndex)
+
+        self.file_tableview.displayTable()
 
         # Add selected file to the list of open tabs:
         tab_list = self.tabList()
@@ -237,6 +255,8 @@ class MDAFile(QtWidgets.QWidget):
 
 
 # ------ Creating datasets for the selected file:
+
+# QUESTION: SHOULD THIS BE HERE OR IN TABLE VIEW?
 
 
 def to_datasets(fileName, detsDict, selections):
