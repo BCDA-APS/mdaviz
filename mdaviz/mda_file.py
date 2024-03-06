@@ -53,7 +53,7 @@ class MDAFile(QtWidgets.QWidget):
         self.autoBox.currentTextChanged.connect(self.setMode)
         self.autoBox.currentTextChanged.connect(self.updateButtonVisibility)
 
-        self.tabWidget.tabCloseRequested.connect(self.removeTab)
+        self.tabWidget.tabCloseRequested.connect(self.removeFileTab)
 
     def dataPath(self):
         """Path (obj) of the data folder."""
@@ -140,7 +140,7 @@ class MDAFile(QtWidgets.QWidget):
     def displayData(self):
         self.mda_mvc.mda_file_visualization.setTableData(self.data()["detsDict"])
 
-    def addFileTab(self, index, tableModel=None):
+    def addFileTab(self, index):
         """
         Adds a new tab with a QTableView and QLabel for the file path.
 
@@ -152,21 +152,17 @@ class MDAFile(QtWidgets.QWidget):
         self.setData(index)
 
         tab_list = self.tabList()
-        print(f"\n{tab_list=}")
         file_path = str(self.data()["filePath"])
-        print(f"{file_path=}")
         tab_list.append(file_path)
-        print(f"{tab_list=}")
         self.setTabList(tab_list)
-        print(f"{self.tabList()}=")
 
-        self.file_tableview = MDAFileTableView(self)
+        self.file_tableview = MDAFileTableView(index, self)
         self.tabWidget.addTab(self.file_tableview, self.data()["fileName"])
 
         filePathLabel = self.file_tableview.filePath  # Access the QLabel for FilePath
         filePathLabel.setText(str(self.data()["filePath"].parent))
 
-    def removeTab(self, *args):
+    def removeFileTab(self, *args):
         """
         Removes a tab from the tab widget based on a file path or index (1st arg).
 
