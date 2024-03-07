@@ -345,6 +345,8 @@ class MDA_MVC(QtWidgets.QWidget):
         from .chartview import ChartView
         from .select_fields_table_view import to_datasets
 
+        # from .mda_file import MDAFile
+
         action = args[0]
         self._selection_field = args[1]
         y_rows = self._selection_field.get("Y", [])
@@ -358,7 +360,11 @@ class MDA_MVC(QtWidgets.QWidget):
         widgetMpl = layoutMpl.itemAt(0).widget()
 
         if action in ("replace", "add"):
-            # Get dataset for the positioner/detector selection:
+            # # Get dataset for the positioner/detector selection:
+            # detsDict = self.select_fields_tableview.detsDict()
+            # fileName = self.select_fields_tableview.fileName()
+            # datasets, plot_options = MDAFile.to_datasets(self.selectionField())
+
             detsDict = self.select_fields_tableview.detsDict()
             fileName = self.select_fields_tableview.fileName()
             datasets, plot_options = to_datasets(

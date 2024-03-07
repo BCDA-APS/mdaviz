@@ -136,6 +136,7 @@ class MDAFile(QtWidgets.QWidget):
                 "firstPos": first_pos,
                 "firstDet": first_det,
                 "pvList": pvList,
+                "index": index,
             }
         self._data = data
 
@@ -252,51 +253,3 @@ class MDAFile(QtWidgets.QWidget):
         else:
             self.addButton.hide()
             self.replaceButton.hide()
-
-
-# ------ Creating datasets for the selected file:
-
-# QUESTION: SHOULD THIS BE HERE OR IN TABLE VIEW?
-
-
-def to_datasets(fileName, detsDict, selections):
-    """Prepare datasets and options for plotting with Matplotlib."""
-    datasets = []
-
-    # x_axis is the row number
-    x_axis = selections.get("X")
-    x_data = detsDict[x_axis].data if x_axis is not None else None
-    x_units = utils.byte2str(detsDict[x_axis].unit) if x_axis is not None else "a.u."
-    x_name = (
-        utils.byte2str(detsDict[x_axis].name) + f" ({x_units})"
-        if x_axis is not None
-        else "Index"
-    )
-
-    # y_axis is the list of row numbers
-    y_names_with_units = []
-    y_names_with_file_units = []
-    for y_axis in selections.get("Y", []):
-        y = detsDict[y_axis]
-        y_data = y.data
-        # y labels:
-        y_units = utils.byte2str(y.unit) if y.unit else "a.u."
-        y_name = utils.byte2str(y.name)
-        y_name_with_units = y_name + "  (" + y_units + ")"
-        y_name_with_file_units = fileName + ": " + y_name + "  (" + y_units + ")"
-        y_names_with_units.append(y_name_with_units)
-        y_names_with_file_units.append(y_name_with_file_units)
-        # append to dataset:
-        ds, ds_options = [], {}
-        ds_options["label"] = y_name_with_file_units
-        ds = [x_data, y_data] if x_data is not None else [y_data]
-        datasets.append((ds, ds_options))
-
-    plot_options = {
-        "x": x_name,  # label for x axis
-        "x_units": x_units,
-        "y": ", ".join(y_names_with_units[0:1]),  # label for y axis
-        "y_units": y_units,
-        "title": "",
-    }
-    return datasets, plot_options
