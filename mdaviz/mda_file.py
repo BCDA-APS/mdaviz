@@ -108,10 +108,11 @@ class MDAFile(QtWidgets.QWidget):
 
         The populated `_data` dictionary includes:
         - fileName (str): The name of the file without its extension.
-        - filePath (Path): The full path of the file as a Path object.
+        - filePath (str): The full path of the file.
+        - folderPath (str): The full path of the parent folder.
         - xy (list): The extracted data from the file.
         - metadata (dict): The extracted metadata from the file.
-        - detsDict (dict): A dictionary of positioner & detector information.
+        - scanDict (dict): A dictionary of positioner & detector information.
         - firstPos (float): The first positioner (P1, or if no positioner, P0 = index).
         - firstDet (float): The first detector (D01).
         - pvList (list of str): List of detectors PV names as strings.
@@ -124,15 +125,17 @@ class MDAFile(QtWidgets.QWidget):
             data = {}
             file_name = self.mdaFileList()[index]
             file_path = self.dataPath() / file_name
+            folder_path = self.dataPath()
             file_metadata, file_data = readMDA(file_path)
-            detsDict, first_pos, first_det = utils.get_det(file_data)
-            pvList = [utils.byte2str(v.name) for v in detsDict.values()]
+            scanDict, first_pos, first_det = utils.get_det(file_data)
+            pvList = [utils.byte2str(v.name) for v in scanDict.values()]
             data = {
                 "fileName": file_name.rsplit(".mda", 1)[0],
-                "filePath": file_path,
+                "filePath": str(file_path),
+                "folderPath": str(folder_path),
                 "xy": file_data,
                 "metadata": file_metadata,
-                "detsDict": detsDict,
+                "scanDict": scanDict,
                 "firstPos": first_pos,
                 "firstDet": first_det,
                 "pvList": pvList,
@@ -151,10 +154,14 @@ class MDAFile(QtWidgets.QWidget):
         return yaml.dump(metadata, default_flow_style=False)
 
     def displayMetadata(self):
+        """Display metadata in the vizualization panel.
+        """
         self.mda_mvc.mda_file_visualization.setMetadata(self.metadata())
 
     def displayData(self):
-        self.mda_mvc.mda_file_visualization.setTableData(self.data()["detsDict"])
+        """Display pos(s) & det(s) values as a tableview in the vizualization panel.
+        """
+        self.mda_mvc.mda_file_visualization.setTableData(self.data()["scanDict"])
 
     def addFileTab(self, index):
         """
@@ -163,6 +170,8 @@ class MDAFile(QtWidgets.QWidget):
         Parameters:
         - index (int): The index of the selected file in the MDA file list.
         """
+
+        # TODO: make sure to not reopen a new tab with a file that is already opened. 
 
         from .mda_file_table_view import MDAFileTableView
 
@@ -180,17 +189,18 @@ class MDAFile(QtWidgets.QWidget):
 
         # Add selected file to the list of open tabs:
         tab_list = self.tabList()
-        tab_list.append(str(file_path))
+        tab_list.append(file_path)
         self.setTabList(tab_list)
 
         # Access and update the QLabel for the filePath:
         filePathLabel = self.file_tableview.filePath
-        filePathLabel.setText(str(file_path))
-        # change to full path vs just file_path.parent:
-        # can't read the tab lable when too many tabs open!
+        filePathLabel.setText(file_path)
+        # change to full path vs just folder_path:
+        # can't read the tab label when too many tabs open!
 
     def removeFileTab(self, *args):
         """
+
         Removes a tab from the tab widget based on a file path or index (1st arg).
 
         If the file path or index is valid and corresponds to an open tab, removes
@@ -253,3 +263,64 @@ class MDAFile(QtWidgets.QWidget):
         else:
             self.addButton.hide()
             self.replaceButton.hide()
+
+
+
+    # ------ Creating datasets for the selected file:
+
+    # QUESTION: SHOULD THIS BE HERE OR IN MDA_FILE? WE NEED TO KEEP TRACK OF
+    # THE FILE PATH (BETTER THAN INDEX, 2 DIFFERENT FILE IN DIFFERENT FOLDER CAN
+    # HAVE THE SAME INDEX). =====> MAKE DATASETS PART OF SELF.MDA_FILE.DATA()
+
+    def to_datasets(self):      #, selections):
+        #I Want to save all the datasets for all the POS/DET in self.data()["scanDict"], will deal with the selection in mda_file_TV
+        """Prepare datasets and options for plotting with Matplotlib."""
+        
+        from mda import scanPositioner, scanDetector
+        
+        datasets = []
+        file_name = self.data()["fileName"]
+        scan_dict = self.data()["scanDict"]
+        first_pos = self.data()["firstPos"]
+        first_det = self.data()["firstDet"]
+        
+        # Assuming detsDict is your dictionary and mda.scanPositioner and mda.scanDetector are your classes
+        pos_list = [value for value in scan_dict.values() if isinstance(value, scanPositioner)]
+        det_list = [value for value in scan_dict.values() if isinstance(value, scanDetector)]
+
+        
+        x_dataset = {}
+           
+        for (e,x) in enumerate(pos_list):
+            x_data = x.data or None
+            x_unit = utils.byte2str(x.unit) or "a.u."
+            x_name = (utils.byte2str(x.name) + f" ({x_unit})") 
+            x_dataset[e]=[x_data, x_unit, x_name]
+
+            # y_axis is the list of row numbers
+            y_names_with_units = []
+            y_names_with_file_units = []
+            for y_axis in selections.get("Y", []):
+                y = dets_dict[y_axis]
+                y_data = y.data
+                # y labels:
+                y_units = utils.byte2str(y.unit) if y.unit else "a.u."
+                y_name = utils.byte2str(y.name)
+                y_name_with_units = y_name + "  (" + y_units + ")"
+                y_name_with_file_units = file_name + ": " + y_name + "  (" + y_units + ")"
+                y_names_with_units.append(y_name_with_units)
+                y_names_with_file_units.append(y_name_with_file_units)
+                # append to dataset:
+                ds, ds_options = [], {}
+                ds_options["label"] = y_name_with_file_units
+                ds = [x_data, y_data] if x_data is not None else [y_data]
+                datasets.append((ds, ds_options))
+
+            plot_options = {
+                "x": x_name,  # label for x axis
+                "x_units": x_units,
+                "y": ", ".join(y_names_with_units[0:1]),  # label for y axis
+                "y_units": y_units,
+                "title": "",
+            }
+        return datasets, plot_options
