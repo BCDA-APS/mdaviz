@@ -17,7 +17,6 @@ Support functions for this demo project.
 import datetime
 import pathlib
 import threading
-from mda import scanPositioner
 
 
 def human_readable_size(size, decimal_places=2):
@@ -53,8 +52,17 @@ def num2fstr(x):
     return f"{x:.3e}" if abs(x) < 1e-3 else f"{x:.3f}"
 
 
-def byte2str(byte_literal):
-    """Convert byte literals to strings."""
+def byte2str(byte_literal):    
+    """
+    Converts a byte literal to a UTF-8 encoded string.
+    If the input is not a byte literal, it is returned as is without any conversion.
+
+    Parameters:
+    - byte_literal (bytes | Any): The byte literal to be decoded or any input to be returned as is if not bytes.
+
+    Returns:
+    - str | Any: The decoded string if the input is a byte literal, otherwise the original input.
+    """
     return (
         byte_literal.decode("utf-8")
         if isinstance(byte_literal, bytes)
@@ -63,16 +71,41 @@ def byte2str(byte_literal):
 
 
 def get_det(mda_file_data):
-    """det_dict = { index: [fieldname, pv, desc, unit]}"""
+    """
+    Extracts scan positioners and detectors from an MDA file data object.
+
+    This function processes an mda.scanDim object to extract its scanPositioner and scanDetector instances. 
+    It organizes these instances into a dictionary, with their indexes as keys in the order of P0, P1,... Px, D01, D02,... DX.
+    P0 is a default scanPositioner object representing the point index. If additional positioners exist, they follow P0 in sequence.
+    The first detector is labeled D01 and subsequent detectors follow in numerical order.
+
+    Parameters:
+    - mda_file_data: An instance of an mda.scanDim object, which contains the MDA file data to be processed.
+
+    Returns:
+    - A tuple containing:
+      - A dictionary (D) where keys are indexes, mapping to either scanPositioner or scanDetector objects.
+        The dictionary is structured as {0: P0, 1: P1, ..., np: D01, np+1: D02, ..., np+nd: DX}.
+      - The index (first_pos) of the first positioner in the returned dictionary. This is 1 if a positioner
+        other than the default index positioner exists, otherwise 0.
+      - The index (first_det) of the first detector in the returned dictionary, which directly follows the last positioner.
+
+    Note:
+    - P0 is created by default and corresponds to the point index, described as an 'Index' scanPositioner object with predefined properties.
+    - np is the total number of positioners, nd the number of detectors, and npts the number of data points actually acquired.
+    """
+    from mda import scanPositioner
+    
     D = {}
-    p_list = [
-        mda_file_data.p[i] for i in range(0, mda_file_data.np)
-    ]  # mda_file_data.np = number of positioners
-    d_list = [
-        mda_file_data.d[i] for i in range(0, mda_file_data.nd)
-    ]  # mda_file_data.nd = number of detectors
-    first_pos = 1 if mda_file_data.np else 0
-    first_det = mda_file_data.np + 1
+    print(f"\n\n{mda_file_data=}\n\n")
+    
+    p_list = mda_file_data.p  # list of scanDetector instances
+    d_list = mda_file_data.d  # list of scanPositioner instances
+    np = mda_file_data.np     # number of pos; for reference: nd = mda_file_data.nd (# of det)
+    npts = mda_file_data.curr_pt = 0	# number of data points actually acquired
+    
+    first_pos = 1 if np else 0
+    first_det = np + 1
 
     # Defining a default scanPositioner Object for "Index" at for key=0:
     P0 = scanPositioner()
@@ -85,15 +118,16 @@ def get_det(mda_file_data):
     P0.readback_name = ""  # name of EPICS PV this positioner read from, if any
     P0.readback_desc = ""  # description of 'readback_name' PV
     P0.readback_unit = ""  # units of 'readback_name' PV
-    P0.data = list(
-        range(0, mda_file_data.curr_pt)
-    )  # list of values written to 'name' PV.  If rank==2, lists of lists, etc.
+    P0.data = list(range(npts))  # list of values written to 'Index' PV.  
+    
+    # Make the Index scanPositioner the positioner 0 and build D:
     D[0] = P0
-
     for e, p in enumerate(p_list):
         D[e + 1] = p
     for e, d in enumerate(d_list):
-        D[e + 1 + mda_file_data.np] = d
+        D[e + 1 + np] = d
+        
+    # QUESTION: Should I return P and D instead? ie separate positioner from detectors?
     return D, first_pos, first_det
 
 
