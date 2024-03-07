@@ -74,15 +74,18 @@
       </item>
       <item>
        <widget class="QLabel" name="folder_label">
+        <property name="toolTip">
+         <string>Selected parent folder</string>
+        </property>
         <property name="text">
-         <string>Path:   </string>
+         <string>Full Path:</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QComboBox" name="folder">
         <property name="toolTip">
-         <string>Selected path</string>
+         <string>Selected parent folder</string>
         </property>
        </widget>
       </item>
@@ -131,15 +134,18 @@
       </item>
       <item>
        <widget class="QLabel" name="subfolder_label">
+        <property name="toolTip">
+         <string>Select folder or subfolder from full path</string>
+        </property>
         <property name="text">
-         <string>Folder:</string>
+         <string>Subfolder(s):</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QComboBox" name="subfolder">
         <property name="toolTip">
-         <string>Select folder from parent path</string>
+         <string>Select folder or subfolder from full path</string>
         </property>
        </widget>
       </item>
@@ -214,7 +220,7 @@
      <x>0</x>
      <y>0</y>
      <width>719</width>
-     <height>24</height>
+     <height>28</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
