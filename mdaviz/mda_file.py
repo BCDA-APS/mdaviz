@@ -178,6 +178,7 @@ class MDAFile(QtWidgets.QWidget):
         file_path = self.data()["filePath"]
         file_name = self.data()["fileName"]
 
+        tab_list = self.tabList()
         if file_path in tab_list:
             # If file already opened in a tab, just switch to that tab:
             tab_index = tab_list.index(file_path)
