@@ -8,7 +8,8 @@ class DataTableModel(QAbstractTableModel):
     This model is designed to handle data represented as a dictionary where keys correspond to column labels and values are lists of data points for each column.
 
     Parameters:
-    - detsDict (dict): A dictionary where keys are column labels (as strings) and values are lists of data points. Each key-value pair represents a column and its corresponding data in the table.
+    - scanDict (dict): A dictionary where keys are pos/det indexes and values are dictionaries:
+        {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...','type':...}}.
     - parent (QObject, optional): The parent object for this table model, default is None.
 
     Methods:
@@ -24,15 +25,15 @@ class DataTableModel(QAbstractTableModel):
     The model dynamically adjusts to changes in the input data, updating both the data displayed and the column headers as necessary.
     """
 
-    def __init__(self, detsDict, parent=None):
+    def __init__(self, scanDict, parent=None):
         """ """
         super().__init__(parent)
 
-        self.setAllData(detsDict)
+        self.setAllData(scanDict)
         self.setColumnLabels()
 
     def rowCount(self, parent=None):
-        value = len(self.allData()["Index"]) if len(self.allData()) > 0 else 0
+        value = len(self.allData())
         return value
 
     def columnCount(self, parent=None):
@@ -66,11 +67,11 @@ class DataTableModel(QAbstractTableModel):
     def allData(self):
         return self._allData
 
-    def setAllData(self, detsDict):
+    def setAllData(self, scanDict):
         self._allData = {}
-        if detsDict:
-            for v in list(detsDict.values()):
-                pv = utils.byte2str(v.name)
-                data = v.data
+        if scanDict:
+            for v in list(scanDict.values()):
+                pv = v["name"]
+                data = v["data"]
                 self._allData[pv] = data
         return self._allData
