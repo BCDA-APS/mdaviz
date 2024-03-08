@@ -190,16 +190,14 @@ def get_scan(mda_file_data):
 
     datasets = {}
     for k, v in D.items():
-        v_type = "POS" if isinstance(v, scanPositioner) else "DET"
-        v_data = v.data or []
-        v_unit = byte2str(v.unit) if v.unit else "a.u."
-        v_name = byte2str(v.name) if v.name else "n/a"
         datasets[k] = {
             "object": v,
-            "data": v_data,
-            "unit": v_unit,
-            "name": v_name,
-            "type": v_type,
+            "type": "POS" if isinstance(v, scanPositioner) else "DET",
+            "data": v.data or [],
+            "unit": byte2str(v.unit) if v.unit else "a.u.",
+            "name": byte2str(v.name) if v.name else "n/a",
+            "desc": byte2str(v.desc) if v.desc else "",
+            "fieldName": byte2str(v.fieldName),
         }
 
     return datasets, first_pos_index, first_det_index
