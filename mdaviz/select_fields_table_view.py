@@ -206,7 +206,8 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self.mda_mvc.mda_file_visualization.setMetadata(self.getMetadata())
 
     def displayData(self):
-        self.mda_mvc.mda_file_visualization.setTableData(self.detsDict())
+        # self.mda_mvc.mda_file_visualization.setTableData(self.detsDict())
+        pass
 
     def setData(self, index):
         file_name = self.mdaFileList()[index]
@@ -232,10 +233,7 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         self._data = fields, first_pos, first_det
         self._metadata = file_metadata
         self._pvList = [utils.byte2str(v.name) for v in detsDict.values()]
-        print(f"\n{detsDict=}")
-        print(f"\n{first_pos=}")
-        print(f"\n{first_det=}")
-                
+
     def getMetadata(self):
         """Provide a text view of the file metadata."""
         metadata = utils.get_md(self.metadata())
@@ -259,13 +257,12 @@ class SelectFieldsTableView(QtWidgets.QWidget):
 def to_datasets(fileName, detsDict, selections):
     """Prepare datasets and options for plotting with Matplotlib."""
     datasets = []
-    
+
     # x_axis is the row number
     print(f"\n\n{selections=}")
-    
+
     x_axis = selections.get("X")
-    
-    
+
     x_data = detsDict[x_axis].data if x_axis is not None else None
     x_units = utils.byte2str(detsDict[x_axis].unit) if x_axis is not None else "a.u."
     x_name = (
@@ -273,11 +270,6 @@ def to_datasets(fileName, detsDict, selections):
         if x_axis is not None
         else "Index"
     )
-    print(f"{x_axis=}")
-    print(f"{x_units=}")
-    print(f"{x_name=}")
-    print(f"{x_data=}")
-    
     # y_axis is the list of row numbers
     y_names_with_units = []
     y_names_with_file_units = []
@@ -304,4 +296,5 @@ def to_datasets(fileName, detsDict, selections):
         "y_units": y_units,
         "title": "",
     }
+
     return datasets, plot_options
