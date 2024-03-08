@@ -267,36 +267,3 @@ class MDAFile(QtWidgets.QWidget):
         else:
             self.addButton.hide()
             self.replaceButton.hide()
-
-    # ------ Creating datasets for the selected file:
-
-    # QUESTION: SHOULD THIS BE HERE OR IN MDA_FILE? WE NEED TO KEEP TRACK OF
-    # THE FILE PATH (BETTER THAN INDEX, 2 DIFFERENT FILE IN DIFFERENT FOLDER CAN
-    # HAVE THE SAME INDEX). =====> MAKE DATASETS PART OF SELF.MDA_FILE.DATA()
-
-    def to_datasets(self):
-        """
-        Converts scanDict entries into structured datasets for plotting.
-
-        Iterates over the object's scanDict, containing mda.scanPositioner and mda.scanDetector instances,
-        and organizes their data into a dictionary format suitable for further analysis or visualization. Each
-        entry includes the extracted data, unit (converted to string, defaulting to "a.u." for arbitrary units if
-        unspecified), and name (defaulting to "n/a" if absent).
-
-        Returns:
-            A dictionary with keys matching those of scanDict. Each key maps to a dictionary for the respective
-            scan object, containing 'data', 'unit', and 'name'.
-
-        """
-
-        scan_dict = self.data()["scanDict"]
-
-        datasets = {}
-
-        for k, v in scan_dict.items():
-            v_data = v.data or []
-            v_unit = utils.byte2str(v.unit) if v.unit else "a.u."
-            v_name = utils.byte2str(v.name) if v.name else "n/a"
-            datasets[k] = {"data": v_data, "unit": v_unit, "name": v_name}
-
-        return datasets
