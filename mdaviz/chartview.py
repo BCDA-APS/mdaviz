@@ -154,7 +154,7 @@ class ChartView(QtWidgets.QWidget):
     def plot_options(self):
         return self._plot_options
 
-    def addCurve(self, row, *args, **kwargs):
+    def addCurve(self, row, path, *args, **kwargs):
         # Add to graph
         plot_obj = self.main_axes.plot(*args, **kwargs)
         self.updatePlot()
@@ -167,7 +167,7 @@ class ChartView(QtWidgets.QWidget):
             "offset": 0,  # default offset
             "factor": 1,  # default factor
             "row": row,
-            "path": str(self.mda_mvc.select_fields_tableview.file().parent),
+            "path": path,
         }
         # Add to the comboBox
         self.addIemCurveBox(label)
@@ -178,7 +178,7 @@ class ChartView(QtWidgets.QWidget):
         if label in self.line2D:
             if len(self.line2D) == 1:
                 self.clearPlot()
-                self.mda_mvc.select_fields_tableview.tableView.model().clearAllCheckboxes()
+                self.mda_mvc.currentFileTV().tableView.model().clearAllCheckboxes()
 
             else:
                 # Remove curve from graph
@@ -190,9 +190,7 @@ class ChartView(QtWidgets.QWidget):
 
                 # Remove curve from comboBox
                 self.removeItemCurveBox(label)
-                self.mda_mvc.select_fields_tableview.tableView.model().uncheckCheckBox(
-                    row
-                )
+                self.mda_mvc.currentFileTV().tableView.model().uncheckCheckBox(row)
                 # Update plot labels, legend and title
                 self.updatePlot()
 
@@ -200,11 +198,12 @@ class ChartView(QtWidgets.QWidget):
         # Extract label from kwargs, default to None if not present
         self._plot_options = kwargs.get("plot_options")
         ds_options = self._ds_options = kwargs.get("ds_options")
+        path = self._plot_options["folderPath"]
         label = ds_options.get("label", None)
         self.main_axes.axis("on")
         if label:
             if label not in self.line2D:
-                self.addCurve(row, *args, **ds_options)
+                self.addCurve(row, path, *args, **ds_options)
 
     def clearPlot(self):
         self.main_axes.clear()

@@ -37,7 +37,6 @@ class MDAFile(QtWidgets.QWidget):
     def setup(self):
         from functools import partial
 
-        # self._pvList = None
         self.setTabList()
         self.setData()
 
@@ -65,15 +64,6 @@ class MDAFile(QtWidgets.QWidget):
 
     # ------ Get & set methods:
 
-    # def firstPos(self):
-    #     return self._firstPos
-
-    # def firstDet(self):
-    #     return self._firstDet
-
-    # def pvList(self):
-    #     return self._pvList
-
     def mode(self):
         return self._mode
 
@@ -91,11 +81,6 @@ class MDAFile(QtWidgets.QWidget):
         return self._data
 
     def setData(self, index=None):
-
-        # QUESTION: do I need to store the "data" for all the open files or
-        # (like right now) just the one I am dealing with now (i.e. selected
-        # file)?
-
         """
         Populates the `_data` attribute with file information and data extracted
         from a specified file in the MDA file list at the provided index, if any.
@@ -120,28 +105,27 @@ class MDAFile(QtWidgets.QWidget):
         Note: This method modifies the object's state by setting the `_data`
         attribute.
         """
-        data = None
-        if index is not None:
-            data = {}
-            file_name = self.mdaFileList()[index]
-            file_path = self.dataPath() / file_name
-            folder_path = self.dataPath()
-            file_metadata, file_data = readMDA(file_path)
-            scanDict, first_pos, first_det = utils.get_scan(file_data)
-            pvList = [v["name"] for v in scanDict.values()]
-            data = {
-                "fileName": file_name.rsplit(".mda", 1)[0],
-                "filePath": str(file_path),
-                "folderPath": str(folder_path),
-                "xy": file_data,
-                "metadata": file_metadata,
-                "scanDict": scanDict,
-                "firstPos": first_pos,
-                "firstDet": first_det,
-                "pvList": pvList,
-                "index": index,
-            }
-        self._data = data
+        if index is None:
+            self._data = {}
+            return
+
+        folder_path = self.dataPath()
+        file_name = self.mdaFileList()[index]
+        file_path = self.dataPath() / file_name
+        file_metadata, file_data = readMDA(file_path)
+        scanDict, first_pos, first_det = utils.get_scan(file_data)
+        pvList = [v["name"] for v in scanDict.values()]
+        self._data = {
+            "fileName": file_name.rsplit(".mda", 1)[0],
+            "filePath": str(file_path),
+            "folderPath": str(folder_path),
+            "metadata": file_metadata,
+            "scanDict": scanDict,
+            "firstPos": first_pos,
+            "firstDet": first_det,
+            "pvList": pvList,
+            "index": index,
+        }
 
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
@@ -169,9 +153,9 @@ class MDAFile(QtWidgets.QWidget):
         - index (int): The index of the selected file in the MDA file list.
         """
 
-        # TODO: make sure to not reopen a new tab with a file that is already opened.
-
         from .mda_file_table_view import MDAFileTableView
+
+        print("\nEntering addFileTab")
 
         # Get data for the selected file:
         self.setData(index)
@@ -187,6 +171,7 @@ class MDAFile(QtWidgets.QWidget):
         else:
             # Create a new instance of MDAFileTableView for the selected file:
             self.file_tableview = MDAFileTableView(self)
+            # addTab returns the index of the new tab:
             tab_index = self.tabWidget.addTab(self.file_tableview, file_name)
             self.tabWidget.setCurrentIndex(tab_index)
 
@@ -199,8 +184,8 @@ class MDAFile(QtWidgets.QWidget):
             # Access and update the QLabel for the filePath:
             filePathLabel = self.file_tableview.filePath
             filePathLabel.setText(file_path)
-            # change to full path vs just folder_path:
-            # can't read the tab label when too many tabs open!
+        print(f"{self.data()['fileName']=}")
+        print("\nLeaving addFileTab")
 
     def removeFileTab(self, *args):
         """
@@ -244,6 +229,10 @@ class MDAFile(QtWidgets.QWidget):
             self.setStatus(
                 f"Cannot find corresponding file tab:  {index=}, {filepath=}"
             )
+
+    # TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO
+    # TODO : need a switch tab: update metadata and data, not plot    # TODO
+    # TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO
 
     # ------ Button methods:
 

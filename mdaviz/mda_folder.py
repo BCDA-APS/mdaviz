@@ -17,6 +17,7 @@ from PyQt5.QtWidgets import QAbstractItemView
 
 
 from . import utils
+from .mda_file_table_view import MDAFileTableView
 
 
 class MDA_MVC(QtWidgets.QWidget):
@@ -45,7 +46,6 @@ class MDA_MVC(QtWidgets.QWidget):
         from .mda_folder_table_view import MDAFolderTableView
         from .mda_file_viz import MDAFileVisualization
         from .mda_file import MDAFile
-        from .select_fields_table_view import SelectFieldsTableView
 
         # Folders table view:
         self.mda_folder_tableview = MDAFolderTableView(self)
@@ -58,38 +58,40 @@ class MDA_MVC(QtWidgets.QWidget):
             pass
         self.mainWindow.refresh.released.connect(self.doRefresh)
 
+        # TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO
+        # TODO : need to remove tab for folder! I am not doing that again # TODO
+        # TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO
+
         # File table view:
         self.mda_file = MDAFile(self)
         layout = self.mda_groupbox.layout()
         layout.addWidget(self.mda_file)
-
-        # Select fields table view:
-        self.select_fields_tableview = SelectFieldsTableView(self)
-        layout = self.mda_groupbox.layout()
-        layout.addWidget(self.select_fields_tableview)
 
         # Data vizualisation:
         self.mda_file_visualization = MDAFileVisualization(self)
         layout = self.viz_groupbox.layout()
         layout.addWidget(self.mda_file_visualization)
 
-        # Initialize File and Field Selection
-        self._selection_field = None
-        self._saved_selection = None
-        self._selection_model = None
-        self._firstFileIndex = None
-        self._lastFileIndex = None
-        self._currentFileIndex = None
+        # Initialize attributes:
+        self.setSelectionField()
+        self.setSelectionModel()
+        self.setSavedSelection()
+        self.setFirstFileIndex()
+        self.setLastFileIndex()
+        self.setCurrentFileIndex()
+        self.setCurrentFileSelected()
+        self.setCurrentFileTV()
+
+        # File Selection Model & Focus
         model = self.mda_folder_tableview.tableView.model()
         if model is not None and self.mainWindow.mdaFileCount() > 0:
             self.mda_folder_tableview.tableView.setFocus()
-            self._firstFileIndex = model.index(0, 0)
-            self._lastFileIndex = model.index(model.rowCount() - 1, 0)
-            # TODO: this might become a user setting, but JM does not like it.
-            # Highlight (select) and plot the first file:
-            # self._selection_model = self.mda_folder_tableview.tableView.selectionModel()
-            # self.highlightNewFile(0)
-            # self.doFileSelected(model.index(0, 0))
+            selection_model = self.mda_folder_tableview.tableView.selectionModel()
+            self.setSelectionModel(selection_model)
+            first_file_index = model.index(0, 0)
+            last_file_index = model.index(model.rowCount() - 1, 0)
+            self.setFirstFileIndex(first_file_index)
+            self.setLastFileIndex(last_file_index)
 
         # Folder table view signal/slot connections:
         self.mda_folder_tableview.tableView.clicked.connect(self.doFileSelected)
@@ -105,6 +107,8 @@ class MDA_MVC(QtWidgets.QWidget):
             settings.restoreSplitter(splitter, sname)
             splitter.splitterMoved.connect(partial(self.splitter_moved, key))
 
+    # # ------------ set & get methods:
+
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
         return self.mainWindow.dataPath()
@@ -117,6 +121,12 @@ class MDA_MVC(QtWidgets.QWidget):
         """List of mda file (name only) in the selected folder."""
         return self.mainWindow.mdaFileList()
 
+    def currentFileTV(self):
+        return self._currentFileTV
+
+    def currentFileSelected(self):
+        return self._currentFileIndex
+
     def currentFileIndex(self):
         return self._currentFileIndex
 
@@ -126,6 +136,38 @@ class MDA_MVC(QtWidgets.QWidget):
     def lastFileIndex(self):
         return self._lastFileIndex
 
+    def selectionModel(self):
+        """
+        Used to access the selection model associated with a view, such as MDAFolderTableView.
+        The selection model manages the selection state (e.g., which rows or items are selected)
+        within the view.
+        """
+        return self._selection_model
+
+    def savedSelection(self):  # TODO is this used at all?
+        return self._saved_selection
+
+    def setSelectionModel(self, selection=None):
+        self._selection_model = selection
+
+    def setSavedSelection(self, selection=None):
+        self._saved_selection = selection
+
+    def setCurrentFileTV(self, tableview=None):
+        self._currentFileTV = tableview
+
+    def setCurrentFileSelected(self, file_path=None):
+        self._currentFileIndex = file_path
+
+    def setCurrentFileIndex(self, index=None):
+        self._currentFileIndex = index
+
+    def setFirstFileIndex(self, index=None):
+        self._firstFileIndex = index
+
+    def setLastFileIndex(self, index=None):
+        self._lastFileIndex = index
+
     # # ------------ Table view methods:
 
     def updateFolderView(self):
@@ -133,11 +175,13 @@ class MDA_MVC(QtWidgets.QWidget):
         self.mda_folder_tableview.clearContents()
         self.mda_folder_tableview.displayTable()
 
-    def updateFieldsView(self, index=None):
-        """Clear existing data and set new data for select_fields_tableview"""
+    def updateFileView(self, index=None):
+        """Clear existing data and set new data for mda_file_tableview"""
         index = self.currentFileIndex().row() if self.currentFileIndex() else index
-        self.select_fields_tableview.clearContents()
-        self.select_fields_tableview.displayTable(index)
+        tableview = self.currentFileTV()
+        ## TODO need to keep track of which tab here? 1 tab is 1 tableview for one file
+        tableview.clearContents()
+        tableview.displayTable(index)
 
     def doRefresh(self):
         self.setStatus("Refreshing folder...")
@@ -159,12 +203,20 @@ class MDA_MVC(QtWidgets.QWidget):
 
     # # ------------ Fields selection methods:
 
+    def defaultSelection(self, first_pos_idx=None, first_det_idx=None):
+        if first_pos_idx is not None and first_det_idx is not None:
+            default_selection = {"X": first_pos_idx, "Y": [first_det_idx]}
+        else:
+            default_selection = None
+        return default_selection
+
     def selectionField(self):
         """
+        # TODO Update this:
         Retrieves the current selection of positioner (X) and detectors (Y) to be plotted.
 
         This method returns a dictionary representing the indices of the selected positioner
-        and detectors within the Fields Table View. Upon first invocation or if no selections
+        and detectors within the MDA File Table View. Upon first invocation or if no selections
         have been made, it attempts to default to the first available positioner and detector,
         if they exist.
 
@@ -176,17 +228,10 @@ class MDA_MVC(QtWidgets.QWidget):
             dict or None: A dictionary containing the selected indices for plotting or None
             if no valid selections can be made based on the available data.
         """
-        if self._selection_field is None:
-            first_pos_idx = self.select_fields_tableview.firstPos()
-            first_det_idx = self.select_fields_tableview.firstDet()
-            if first_pos_idx is not None and first_det_idx is not None:
-                self._selection_field = {"X": first_pos_idx, "Y": [first_det_idx]}
-            else:
-                self._selection_field = None
         return self._selection_field
 
-    def updateSelectionField(self, new_selection):
-        self._selection_field = new_selection
+    def setSelectionField(self, new_selection=None):
+        self._selection_field = new_selection if new_selection != {} else None
 
     def updateSelectionForNewPVs(self, oldPvList, newPvList, verbose=False):
         """
@@ -203,15 +248,13 @@ class MDA_MVC(QtWidgets.QWidget):
         """
         if verbose:
             print(f"\n----- Selection before clean up: {self.selectionField()}\n")
-
         changes_made = False
-        new_selection = {"Y": [], "X": self.select_fields_tableview.firstPos()}
-
+        tableview = self.currentFileTV()
+        new_selection = {"Y": [], "X": tableview.data()["fileInfo"]["firstPos"]}
         # Update Y selections
         changes_made |= self.updateDetectorSelection(
             oldPvList, newPvList, new_selection, verbose
         )
-
         # Update X selection and check for changes
         old_idx = self.selectionField()["X"]
         new_idx = new_selection["X"]
@@ -221,10 +264,8 @@ class MDA_MVC(QtWidgets.QWidget):
                 print(
                     f"Positioner <{oldPvList[old_idx]}> changed from {old_idx} to {new_idx} <{newPvList[new_idx]}>"
                 )
-
         if changes_made:
-            self.applySelectionChanges(new_selection, verbose)
-
+            self.applySelectionChanges(new_selection)
         if verbose:
             print(f"\n----- Selection After clean up: {self.selectionField()}\n")
 
@@ -248,15 +289,19 @@ class MDA_MVC(QtWidgets.QWidget):
                         print(f"Detector <{old_pv}> was removed")
         return changes_made
 
-    def applySelectionChanges(self, new_selection, verbose):
-        self.updateSelectionField(new_selection)
-        self.select_fields_tableview.tableView.model().updateCheckboxes(
+    ## TODO need to keep track of which tab here? 1 tab is 1 tableview for one file
+    def applySelectionChanges(self, new_selection):
+        print("\n\n\n\n\nEntering applySelectionChanges")
+        tableview = self.currentFileTV()
+        self.setSelectionField(new_selection)
+        tableview.tableView.model().updateCheckboxes(
             utils.mda2ftm(new_selection), update_mda_mvc=False
         )
+        print("\nLeaving applySelectionChanges")
 
     # # ------------ File selection methods:
 
-    def doFileSelected(self, index, verbose=False):
+    def doFileSelected(self, index, verbose=True):
         """
         Handles the selection of a new file in the folder table view. This method updates the UI
         to display the fields table view and metadata for the selected file, manages the connections
@@ -284,29 +329,58 @@ class MDA_MVC(QtWidgets.QWidget):
             The method assumes that `mda_folder_tableview` and `select_fields_tableview` are
             initialized and correctly set up to interact with the underlying data model and UI.
         """
+        selectedFile = self.mdaFileList()[index.row()]
+        file_path = str(self.dataPath() / selectedFile)
+        self.setCurrentFileIndex(index)
+        self.setCurrentFileSelected(file_path)  # TODO do i need that?
 
-        self._currentFileIndex = index
         # If there is no Folder Table View, do nothing
         if self.mda_folder_tableview.tableView.model() is None:
             return
 
-        oldPvList = self.select_fields_tableview.pvList()
-        self.select_fields_tableview.displayTable(index.row())
-        self.select_fields_tableview.displayMetadata()
-        self.select_fields_tableview.displayData()
+        print(f"\n{index.row()=}")
+
+        current_tab_index = self.mda_file.tabWidget.count()
+        # if no tab open, currentIndex would return -1:
+        if self.mda_file.tabWidget.count() == 0:
+            oldPvList = None
+        else:
+            # access the instance of tableView for the current tab:
+            oldPvList = self.mda_file.data().get("pvList")
+
         self.mda_file.addFileTab(index.row())
-        newPvList = self.select_fields_tableview.pvList()
+        self.mda_file.displayMetadata()
+        self.mda_file.displayData()
+        newPvList = self.mda_file.data().get("pvList")
+        firstPos = self.mda_file.data().get("firstPos")
+        firstDet = self.mda_file.data().get("firstDet")
+        default = self.defaultSelection(firstPos, firstDet)
+        print(f"{firstPos=}")
+        print(f"{firstDet=}")
+        print(f"{default=}")
+
+        current_tab_index = self.mda_file.tabWidget.currentIndex()
+        tableview = self.mda_file.tabWidget.widget(current_tab_index)
+        self.setCurrentFileTV(tableview)
+        print(f"{tableview.data()['fileInfo']['fileName']=}")
+        print(f"{self.currentFileTV().data()['fileInfo']['fileName']=}")
 
         # Manage signal connections for the new file selection.
-        self.disconnectSignals()
-        self.select_fields_tableview.selected.connect(self.doPlot)
-        self.select_fields_tableview.tableView.model().checkboxStateChanged.connect(
+        self.disconnectSignals(tableview)
+        tableview.selected.connect(self.doPlot)
+        tableview.tableView.model().checkboxStateChanged.connect(
             self.onCheckboxStateChange
         )
 
         # Update the status and selection based on the new file.
-        selectedFile = self.mdaFileList()[index.row()]
         selectedFields = self.selectionField()
+        if selectedFields is None:
+            print(f"{firstPos=}")
+            print(f"{firstDet=}")
+            self.setSelectionField(self.defaultSelection(firstPos, firstDet))
+            selectedFields = self.selectionField()
+            print(f"{selectedFields=}")
+        print(f"{selectedFields=}")
         self.setStatus(
             f"\n\n========= Selected file: {selectedFile} in {str(self.dataPath())}"
         )
@@ -317,14 +391,14 @@ class MDA_MVC(QtWidgets.QWidget):
         else:
             self.setStatus("Could not find a (positioner,detector) pair to plot.")
 
-    def disconnectSignals(self):
+    def disconnectSignals(self, tableview):
         """Disconnect signals for selection changes and checkbox state changes."""
         try:
-            self.select_fields_tableview.selected.disconnect()
+            tableview.selected.disconnect()
         except TypeError:  # No slots connected yet
             pass
         try:
-            self.select_fields_tableview.tableView.model().checkboxStateChanged.disconnect()
+            tableview.tableView.model().checkboxStateChanged.disconnect()
         except TypeError:  # No slots connected yet
             pass
 
@@ -332,24 +406,27 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def handlePlotBasedOnMode(self):
         """Handle plotting based on the current mode (add, replace, or auto-off)."""
-        mode = self.select_fields_tableview.mode()
+        print("\nEntering handlePlotBasedOnMode")
+        mode = self.mda_file.mode()
         if mode == "Auto-add":
             self.doPlot("add", self.selectionField())
         elif mode == "Auto-replace":
+            print(f"{mode=}")
+            print(f"{self.selectionField()=}")
             self.doPlot("replace", self.selectionField())
         else:
             self.setStatus("Mode is set to Auto-off")
+        print("\nLeaving handlePlotBasedOnMode\n\n")
 
     def doPlot(self, *args, **kwargs):
         """Slot: data field selected (for plotting) button is clicked."""
         from .chartview import ChartView
-        from .select_fields_table_view import to_datasets
 
-        # from .mda_file import MDAFile
+        tableview = self.currentFileTV()
 
         action = args[0]
-        self._selection_field = args[1]
-        y_rows = self._selection_field.get("Y", [])
+        self.setSelectionField(args[1])
+        y_rows = self.selectionField().get("Y", [])
 
         print(f"\ndoPlot called: {args=}")
 
@@ -361,15 +438,7 @@ class MDA_MVC(QtWidgets.QWidget):
 
         if action in ("replace", "add"):
             # # Get dataset for the positioner/detector selection:
-            # detsDict = self.select_fields_tableview.detsDict()
-            # fileName = self.select_fields_tableview.fileName()
-            # datasets, plot_options = MDAFile.to_datasets(self.selectionField())
-
-            detsDict = self.select_fields_tableview.detsDict()
-            fileName = self.select_fields_tableview.fileName()
-            datasets, plot_options = to_datasets(
-                fileName, detsDict, self.selectionField()
-            )
+            datasets, plot_options = tableview.data2Plot(self.selectionField())
 
             if not isinstance(widgetMpl, ChartView):
                 widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
@@ -382,17 +451,9 @@ class MDA_MVC(QtWidgets.QWidget):
 
         elif action in ("clear"):
             widgetMpl.clearPlot()
-            self.select_fields_tableview.tableView.model().clearAllCheckboxes()
+            tableview.tableView.model().clearAllCheckboxes()
 
     # # ------------ Folder Table View navigation & selection highlight:
-
-    def selectionModel(self):
-        """
-        Used to access the selection model associated with a view, such as MDAFolderTableView.
-        The selection model manages the selection state (e.g., which rows or items are selected)
-        within the view.
-        """
-        return self._selection_model
 
     def highlightNewFile(self, row):
         if self.selectionModel() and self.mda_folder_tableview.tableView.model():
@@ -460,8 +521,8 @@ class MDA_MVC(QtWidgets.QWidget):
     def onCheckboxStateChange(self, selection):
         """Slot: data field (for plotting) changes."""
         from .chartview import ChartView
-        from .select_fields_table_view import to_datasets
 
+        tableview = self.currentFileTV()
         previous_selection = self.selectionField()
 
         # Get the matplotlib chartview widget, if exists:
@@ -470,7 +531,7 @@ class MDA_MVC(QtWidgets.QWidget):
             raise RuntimeError("Expected exactly one widget in this layout!")
         widgetMpl = layoutMpl.itemAt(0).widget()
 
-        mode = self.select_fields_tableview.mode()
+        mode = self.mda_file.mode()
 
         # Exceptions:
         if not selection.get("Y"):  # no DET selected
@@ -479,24 +540,23 @@ class MDA_MVC(QtWidgets.QWidget):
         if not selection.get("X"):  # if no POS, default to index
             widgetMpl.clearPlot()
             selection["X"] = 0
-            self.select_fields_tableview.tableView.model().checkCheckBox(0, "X")
+            tableview.tableView.model().checkCheckBox(0, "X")
 
         if previous_selection:
             # if changing POS, clear the graph:
             if previous_selection.get("X") != selection.get("X"):
                 widgetMpl.clearPlot()  #
-            # if removing DET, clear the graph:
+            # if removing DET, clear the graph:   #TODO why?
             if len(previous_selection.get("Y")) > len(selection.get("Y")):
                 widgetMpl.clearPlot()
 
-        # Get info for the file & POS/DET selection:
-        detsDict = self.select_fields_tableview.detsDict()
-        fileName = self.select_fields_tableview.fileName()
-        datasets, plot_options = to_datasets(fileName, detsDict, selection)
+        # Get dataset for the positioner/detector selection:
+        datasets, plot_options = tableview.data2Plot(self.selectionField())
 
-        self._selection_field = selection
+        self.setSelectionField(selection)
         y_rows = selection.get("Y", [])
-        print(f"\nonCheckboxStateChange called:  {mode} {fileName} with {selection}")
+        # print(f"\nonCheckboxStateChange called:  {mode} {fileName} with {selection}")
+        print(f"\nonCheckboxStateChange called:  {mode} with {selection}")
 
         if mode in ("Auto-replace", "Auto-add"):
             if not isinstance(widgetMpl, ChartView):

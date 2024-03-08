@@ -63,8 +63,15 @@ class MDAFileTableView(QtWidgets.QWidget):
         """Return the data from the table view:
               self.data= fileName, scanDict, fields
         with:
-        - fileName (str): The name of the file without its extension.
-        - scanDict (dict): A dictionary of positioner & detector information.
+        - fileInfo (dict): A dictionary of all the file information:
+            - fileName (str): The name of the file without its extension.
+            - filePath (str): The full path of the file.
+            - folderPath (str): The full path of the parent folder.
+            - metadata (dict): The extracted metadata from the file.
+            - scanDict (dict): A dictionary of positioner & detector dataset for plot.
+            - firstPos (float): The first positioner (P1, or if no positioner, P0 = index).
+            - firstDet (float): The first detector (D01).
+            - pvList (list of str): List of detectors PV names as strings.
         - field (list): List of TableField object, one for each det/pos:
                 ([TableField(name='P0', selection=None,...
                 ...desc='Index', pv='Index', unit='a.u'),...])
@@ -72,10 +79,10 @@ class MDAFileTableView(QtWidgets.QWidget):
         return self._data
 
     def setData(self):
-        self._data = None
-        if self.mda_file.data() is not None:
+        self._data = {}
+        if self.mda_file.data() != {}:
+            fileInfo = self.mda_file.data()
             scanDict = self.mda_file.data()["scanDict"]
-            fileName = self.mda_file.data()["fileName"]
             fields = [
                 TableField(
                     v["fieldName"],
@@ -86,15 +93,17 @@ class MDAFileTableView(QtWidgets.QWidget):
                 )
                 for v in scanDict.values()
             ]
-        self._data = {"fileName": fileName, "scanDict": scanDict, "fields": fields}
+        self._data = {"fileInfo": fileInfo, "fields": fields}
 
     def displayTable(self):
         from .mda_file_table_model import MDAFileTableModel
         from .empty_table_model import EmptyTableModel
 
+        print("\nEntering displayTable")
         if self.data() is not None:
             fields = self.data()["fields"]
             selection_field = self.mda_file.mda_mvc.selectionField()
+            print(f"{selection_field=}")
             data_model = MDAFileTableModel(
                 COLUMNS, fields, selection_field, self.mda_file.mda_mvc
             )
@@ -106,6 +115,8 @@ class MDAFileTableView(QtWidgets.QWidget):
             # No MDA files to display, show an empty table with headers
             empty_model = EmptyTableModel(HEADERS)
             self.tableView.setModel(empty_model)
+        print(f"{self.data()['fileInfo']['fileName']=}")
+        print("\nLeaving displayTable\n\n")
 
     def setStatus(self, text):
         self.mda_file.mda_mvc.setStatus(text)
@@ -113,5 +124,58 @@ class MDAFileTableView(QtWidgets.QWidget):
     def clearContents(self):
         self.tableView.setModel(None)
 
-    def subDatasets(self, selections):
-        pass
+    def data2Plot(self, selections):
+        """
+        Extracts selected datasets for plotting from scanDict based on user selections.
+
+        Parameters:
+        - selections: A dictionary with keys "X" and "Y", where "X" is the index for the x-axis data
+        and "Y" is a list of indices for the y-axis data.
+
+        Returns:
+        - A tuple of (datasets, plot_options), where datasets is a list of tuples containing the
+        data and options (label) for each dataset, and plot_options contains overall plotting configurations.
+
+        Note:
+        scanDict = {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...',
+            'type':...}}.
+        """
+
+        datasets, plot_options = [], {}
+
+        if self.data() is not None:
+            # extract scan info:
+            fileName = self.data()["fileInfo"]["fileName"]
+            scanDict = self.data()["fileInfo"]["scanDict"]
+            # extract x data:
+            x_index = selections.get("X")
+            x_data = scanDict[x_index]["data"] if x_index in scanDict else None
+            # extract y(s) data:
+            y_indeces = selections.get("Y", [])
+            y_first_unit = y_first_name = ""
+            for i, y in enumerate(y_indeces):
+                if y not in scanDict:
+                    continue
+                y_data = scanDict[y]["data"]
+                y_name = scanDict[y]["name"]
+                y_unit = scanDict[y]["unit"]
+                y_label = f"{fileName}: {y_name} ({y_unit})"
+                if i == 0:
+                    y_first_unit = y_unit
+                    y_first_name = f"{y_name} ({y_unit})"
+                # append to dataset:
+                ds, ds_options = [], {}
+                ds_options["label"] = y_label
+                ds = [x_data, y_data] if x_data is not None else [y_data]
+                datasets.append((ds, ds_options))
+
+            plot_options = {
+                "x": scanDict[x_index]["name"] if x_index in scanDict else "",
+                "x_unit": scanDict[x_index]["unit"] if x_index in scanDict else "",
+                "y": y_first_name,
+                "y_unit": y_first_unit,
+                "title": "",
+                "folderPath": self.data()["fileInfo"]["folderPath"],
+            }
+
+        return datasets, plot_options

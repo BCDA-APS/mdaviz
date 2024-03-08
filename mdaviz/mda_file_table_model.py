@@ -240,7 +240,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
             topLeftIndex, bottomRightIndex, [QtCore.Qt.CheckStateRole]
         )
         # Update the mda_mvc selection
-        self.mda_mvc.updateSelectionField(None)
+        self.mda_mvc.setSelectionField()
 
     def applySelectionRules(self, index, changes=False):
         """Apply selection rules 2-4."""
@@ -279,7 +279,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         if new_selection is None:
             return
         new_selection = ftm2mda(new_selection)
-        self.mda_mvc.updateSelectionField(new_selection)
+        self.mda_mvc.setSelectionField(new_selection)
 
     def logCheckboxSelections(self):
         print("checkbox selections:")

@@ -162,12 +162,11 @@ def get_scan(mda_file_data):
     from mda import scanPositioner
 
     D = {}
-    print(f"\n\n{mda_file_data=}\n\n")
 
     p_list = mda_file_data.p  # list of scanDetector instances
     d_list = mda_file_data.d  # list of scanPositioner instances
     np = mda_file_data.np  # number of positioners
-    npts = mda_file_data.curr_pt = 0  # number of data points actually acquired
+    npts = mda_file_data.curr_pt  # number of data points actually acquired
 
     first_pos_index = 1 if np else 0
     first_det_index = np + 1

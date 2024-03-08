@@ -33,7 +33,7 @@ class DataTableModel(QAbstractTableModel):
         self.setColumnLabels()
 
     def rowCount(self, parent=None):
-        value = len(self.allData())
+        value = len(self.allData()["Index"]) if len(self.allData()) > 0 else 0
         return value
 
     def columnCount(self, parent=None):
