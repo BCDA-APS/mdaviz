@@ -52,7 +52,7 @@ def num2fstr(x):
     return f"{x:.3e}" if abs(x) < 1e-3 else f"{x:.3f}"
 
 
-def byte2str(byte_literal):    
+def byte2str(byte_literal):
     """
     Converts a byte literal to a UTF-8 encoded string.
     If the input is not a byte literal, it is returned as is without any conversion.
@@ -74,7 +74,7 @@ def get_det(mda_file_data):
     """
     Extracts scan positioners and detectors from an MDA file data object.
 
-    This function processes an mda.scanDim object to extract its scanPositioner and scanDetector instances. 
+    This function processes an mda.scanDim object to extract its scanPositioner and scanDetector instances.
     It organizes these instances into a dictionary, with their indexes as keys in the order of P0, P1,... Px, D01, D02,... DX.
     P0 is a default scanPositioner object representing the point index. If additional positioners exist, they follow P0 in sequence.
     The first detector is labeled D01 and subsequent detectors follow in numerical order.
@@ -95,15 +95,17 @@ def get_det(mda_file_data):
     - np is the total number of positioners, nd the number of detectors, and npts the number of data points actually acquired.
     """
     from mda import scanPositioner
-    
+
     D = {}
     print(f"\n\n{mda_file_data=}\n\n")
-    
+
     p_list = mda_file_data.p  # list of scanDetector instances
     d_list = mda_file_data.d  # list of scanPositioner instances
-    np = mda_file_data.np     # number of pos; for reference: nd = mda_file_data.nd (# of det)
-    npts = mda_file_data.curr_pt = 0	# number of data points actually acquired
-    
+    np = (
+        mda_file_data.np
+    )  # number of pos; for reference: nd = mda_file_data.nd (# of det)
+    npts = mda_file_data.curr_pt = 0  # number of data points actually acquired
+
     first_pos = 1 if np else 0
     first_det = np + 1
 
@@ -118,17 +120,89 @@ def get_det(mda_file_data):
     P0.readback_name = ""  # name of EPICS PV this positioner read from, if any
     P0.readback_desc = ""  # description of 'readback_name' PV
     P0.readback_unit = ""  # units of 'readback_name' PV
-    P0.data = list(range(npts))  # list of values written to 'Index' PV.  
-    
+    P0.data = list(range(npts))  # list of values written to 'Index' PV.
+
     # Make the Index scanPositioner the positioner 0 and build D:
     D[0] = P0
     for e, p in enumerate(p_list):
         D[e + 1] = p
     for e, d in enumerate(d_list):
         D[e + 1 + np] = d
-        
-    # QUESTION: Should I return P and D instead? ie separate positioner from detectors?
     return D, first_pos, first_det
+
+
+def get_scan(mda_file_data):
+    """
+    Extracts scan positioners and detectors from an MDA file data object and
+    prepares datasets.
+
+    Processes an mda.scanDim object to extract scanPositioner and scanDetector
+    instances, organizing them into a dictionary with additional metadata like
+    data, units, and names. A default scanPositioner object representing the
+    point index (P0) is included. If additional positioners exist, they follow
+    P0 in sequence. The first detector is labeled D01 and subsequent detectors
+    follow in numerical order: P0, P1,... Px, D01, D02,... DX.
+
+    Parameters: - mda_file_data: An instance of an mda.scanDim object to be
+    processed.
+
+    Returns:
+    - A tuple containing:
+      - A dictionary keyed by index, each mapping to a sub-dictionary containing
+        the scan object ('object') along with its 'data', 'unit', 'name' and 'type'.
+        Structure:
+        {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...',
+             'type':...}}.
+      - The index (first_pos) of the first positioner in the returned dictionary. This
+        is 1 if a positioner other than the default index positioner exists, otherwise 0.
+      - The index (first_det) of the first detector in the returned dictionary, which
+        directly follows the last positioner.
+    """
+
+    from mda import scanPositioner
+
+    D = {}
+    print(f"\n\n{mda_file_data=}\n\n")
+
+    p_list = mda_file_data.p  # list of scanDetector instances
+    d_list = mda_file_data.d  # list of scanPositioner instances
+    np = mda_file_data.np  # number of positioners
+    npts = mda_file_data.curr_pt = 0  # number of data points actually acquired
+
+    first_pos_index = 1 if np else 0
+    first_det_index = np + 1
+
+    # Defining a default scanPositioner Object for "Index":
+    P0 = scanPositioner()
+    # Set predefined properties for P0
+    P0.number = 0
+    P0.fieldName, P0.name, P0.desc = "P0", "Index", "Index"
+    P0.step_mode, P0.unit = "", "a.u"
+    P0.readback_name, P0.readback_desc, P0.readback_unit = "", "", ""
+    P0.data = list(range(npts))
+
+    # Make the Index scanPositioner the positioner 0 and build D:
+    D[0] = P0
+    for e, p in enumerate(p_list):
+        D[e + 1] = p
+    for e, d in enumerate(d_list):
+        D[e + 1 + np] = d
+
+    datasets = {}
+    for k, v in D.items():
+        v_type = "POS" if isinstance(v, scanPositioner) else "DET"
+        v_data = v.data or []
+        v_unit = byte2str(v.unit) if v.unit else "a.u."
+        v_name = byte2str(v.name) if v.name else "n/a"
+        datasets[k] = {
+            "object": v,
+            "data": v_data,
+            "unit": v_unit,
+            "name": v_name,
+            "type": v_type,
+        }
+
+    return datasets, first_pos_index, first_det_index
 
 
 def get_md(mda_file_metadata):

@@ -127,8 +127,8 @@ class MDAFile(QtWidgets.QWidget):
             file_path = self.dataPath() / file_name
             folder_path = self.dataPath()
             file_metadata, file_data = readMDA(file_path)
-            scanDict, first_pos, first_det = utils.get_det(file_data)
-            pvList = [utils.byte2str(v.name) for v in scanDict.values()]
+            scanDict, first_pos, first_det = utils.get_scan(file_data)
+            pvList = [v["name"] for v in scanDict.values()]
             data = {
                 "fileName": file_name.rsplit(".mda", 1)[0],
                 "filePath": str(file_path),
@@ -274,60 +274,29 @@ class MDAFile(QtWidgets.QWidget):
     # THE FILE PATH (BETTER THAN INDEX, 2 DIFFERENT FILE IN DIFFERENT FOLDER CAN
     # HAVE THE SAME INDEX). =====> MAKE DATASETS PART OF SELF.MDA_FILE.DATA()
 
-    def to_datasets(self):  # , selections):
-        # I Want to save all the datasets for all the POS/DET in self.data()["scanDict"], will deal with the selection in mda_file_TV
-        """Prepare datasets and options for plotting with Matplotlib."""
+    def to_datasets(self):
+        """
+        Converts scanDict entries into structured datasets for plotting.
 
-        from mda import scanPositioner, scanDetector
+        Iterates over the object's scanDict, containing mda.scanPositioner and mda.scanDetector instances,
+        and organizes their data into a dictionary format suitable for further analysis or visualization. Each
+        entry includes the extracted data, unit (converted to string, defaulting to "a.u." for arbitrary units if
+        unspecified), and name (defaulting to "n/a" if absent).
 
-        datasets = []
-        file_name = self.data()["fileName"]
+        Returns:
+            A dictionary with keys matching those of scanDict. Each key maps to a dictionary for the respective
+            scan object, containing 'data', 'unit', and 'name'.
+
+        """
+
         scan_dict = self.data()["scanDict"]
-        first_pos = self.data()["firstPos"]
-        first_det = self.data()["firstDet"]
 
-        # Assuming detsDict is your dictionary and mda.scanPositioner and mda.scanDetector are your classes
-        pos_list = [
-            value for value in scan_dict.values() if isinstance(value, scanPositioner)
-        ]
-        det_list = [
-            value for value in scan_dict.values() if isinstance(value, scanDetector)
-        ]
+        datasets = {}
 
-        x_dataset = {}
+        for k, v in scan_dict.items():
+            v_data = v.data or []
+            v_unit = utils.byte2str(v.unit) if v.unit else "a.u."
+            v_name = utils.byte2str(v.name) if v.name else "n/a"
+            datasets[k] = {"data": v_data, "unit": v_unit, "name": v_name}
 
-        for e, x in enumerate(pos_list):
-            x_data = x.data or None
-            x_unit = utils.byte2str(x.unit) or "a.u."
-            x_name = utils.byte2str(x.name) + f" ({x_unit})"
-            x_dataset[e] = [x_data, x_unit, x_name]
-
-            # y_axis is the list of row numbers
-            y_names_with_units = []
-            y_names_with_file_units = []
-            for y_axis in selections.get("Y", []):
-                y = dets_dict[y_axis]
-                y_data = y.data
-                # y labels:
-                y_units = utils.byte2str(y.unit) if y.unit else "a.u."
-                y_name = utils.byte2str(y.name)
-                y_name_with_units = y_name + "  (" + y_units + ")"
-                y_name_with_file_units = (
-                    file_name + ": " + y_name + "  (" + y_units + ")"
-                )
-                y_names_with_units.append(y_name_with_units)
-                y_names_with_file_units.append(y_name_with_file_units)
-                # append to dataset:
-                ds, ds_options = [], {}
-                ds_options["label"] = y_name_with_file_units
-                ds = [x_data, y_data] if x_data is not None else [y_data]
-                datasets.append((ds, ds_options))
-
-            plot_options = {
-                "x": x_name,  # label for x axis
-                "x_units": x_units,
-                "y": ", ".join(y_names_with_units[0:1]),  # label for y axis
-                "y_units": y_units,
-                "title": "",
-            }
-        return datasets, plot_options
+        return datasets
