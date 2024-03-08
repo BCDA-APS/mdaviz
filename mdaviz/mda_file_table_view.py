@@ -78,11 +78,11 @@ class MDAFileTableView(QtWidgets.QWidget):
             fileName = self.mda_file.data()["fileName"]
             fields = [
                 TableField(
-                    utils.byte2str(v.fieldName),
+                    v["fieldName"],
                     selection=None,
-                    pv=utils.byte2str(v.name),
-                    desc=utils.byte2str(v.desc),
-                    unit=utils.byte2str(v.unit),
+                    pv=v["name"],
+                    desc=v["desc"],
+                    unit=v["unit"],
                 )
                 for v in scanDict.values()
             ]
@@ -113,8 +113,5 @@ class MDAFileTableView(QtWidgets.QWidget):
     def clearContents(self):
         self.tableView.setModel(None)
 
-
-
-
-    def subDatasets(self,selections):
+    def subDatasets(self, selections):
         pass
