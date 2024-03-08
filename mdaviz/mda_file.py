@@ -154,13 +154,11 @@ class MDAFile(QtWidgets.QWidget):
         return yaml.dump(metadata, default_flow_style=False)
 
     def displayMetadata(self):
-        """Display metadata in the vizualization panel.
-        """
+        """Display metadata in the vizualization panel."""
         self.mda_mvc.mda_file_visualization.setMetadata(self.metadata())
 
     def displayData(self):
-        """Display pos(s) & det(s) values as a tableview in the vizualization panel.
-        """
+        """Display pos(s) & det(s) values as a tableview in the vizualization panel."""
         self.mda_mvc.mda_file_visualization.setTableData(self.data()["scanDict"])
 
     def addFileTab(self, index):
@@ -171,7 +169,7 @@ class MDAFile(QtWidgets.QWidget):
         - index (int): The index of the selected file in the MDA file list.
         """
 
-        # TODO: make sure to not reopen a new tab with a file that is already opened. 
+        # TODO: make sure to not reopen a new tab with a file that is already opened.
 
         from .mda_file_table_view import MDAFileTableView
 
@@ -180,23 +178,28 @@ class MDAFile(QtWidgets.QWidget):
         file_path = self.data()["filePath"]
         file_name = self.data()["fileName"]
 
-        # Create a new instance of MDAFileTableView for the selected file:
-        self.file_tableview = MDAFileTableView(self)
-        tabIndex = self.tabWidget.addTab(self.file_tableview, file_name)
-        self.tabWidget.setCurrentIndex(tabIndex)
+        if file_path in tab_list:
+            # If file already opened in a tab, just switch to that tab:
+            tab_index = tab_list.index(file_path)
+            self.tabWidget.setCurrentIndex(tab_index)
 
-        self.file_tableview.displayTable()
+        else:
+            # Create a new instance of MDAFileTableView for the selected file:
+            self.file_tableview = MDAFileTableView(self)
+            tab_index = self.tabWidget.addTab(self.file_tableview, file_name)
+            self.tabWidget.setCurrentIndex(tab_index)
 
-        # Add selected file to the list of open tabs:
-        tab_list = self.tabList()
-        tab_list.append(file_path)
-        self.setTabList(tab_list)
+            self.file_tableview.displayTable()
 
-        # Access and update the QLabel for the filePath:
-        filePathLabel = self.file_tableview.filePath
-        filePathLabel.setText(file_path)
-        # change to full path vs just folder_path:
-        # can't read the tab label when too many tabs open!
+            # Add selected file to the list of open tabs:
+            tab_list.append(file_path)
+            self.setTabList(tab_list)
+
+            # Access and update the QLabel for the filePath:
+            filePathLabel = self.file_tableview.filePath
+            filePathLabel.setText(file_path)
+            # change to full path vs just folder_path:
+            # can't read the tab label when too many tabs open!
 
     def removeFileTab(self, *args):
         """
@@ -264,38 +267,39 @@ class MDAFile(QtWidgets.QWidget):
             self.addButton.hide()
             self.replaceButton.hide()
 
-
-
     # ------ Creating datasets for the selected file:
 
     # QUESTION: SHOULD THIS BE HERE OR IN MDA_FILE? WE NEED TO KEEP TRACK OF
     # THE FILE PATH (BETTER THAN INDEX, 2 DIFFERENT FILE IN DIFFERENT FOLDER CAN
     # HAVE THE SAME INDEX). =====> MAKE DATASETS PART OF SELF.MDA_FILE.DATA()
 
-    def to_datasets(self):      #, selections):
-        #I Want to save all the datasets for all the POS/DET in self.data()["scanDict"], will deal with the selection in mda_file_TV
+    def to_datasets(self):  # , selections):
+        # I Want to save all the datasets for all the POS/DET in self.data()["scanDict"], will deal with the selection in mda_file_TV
         """Prepare datasets and options for plotting with Matplotlib."""
-        
+
         from mda import scanPositioner, scanDetector
-        
+
         datasets = []
         file_name = self.data()["fileName"]
         scan_dict = self.data()["scanDict"]
         first_pos = self.data()["firstPos"]
         first_det = self.data()["firstDet"]
-        
-        # Assuming detsDict is your dictionary and mda.scanPositioner and mda.scanDetector are your classes
-        pos_list = [value for value in scan_dict.values() if isinstance(value, scanPositioner)]
-        det_list = [value for value in scan_dict.values() if isinstance(value, scanDetector)]
 
-        
+        # Assuming detsDict is your dictionary and mda.scanPositioner and mda.scanDetector are your classes
+        pos_list = [
+            value for value in scan_dict.values() if isinstance(value, scanPositioner)
+        ]
+        det_list = [
+            value for value in scan_dict.values() if isinstance(value, scanDetector)
+        ]
+
         x_dataset = {}
-           
-        for (e,x) in enumerate(pos_list):
+
+        for e, x in enumerate(pos_list):
             x_data = x.data or None
             x_unit = utils.byte2str(x.unit) or "a.u."
-            x_name = (utils.byte2str(x.name) + f" ({x_unit})") 
-            x_dataset[e]=[x_data, x_unit, x_name]
+            x_name = utils.byte2str(x.name) + f" ({x_unit})"
+            x_dataset[e] = [x_data, x_unit, x_name]
 
             # y_axis is the list of row numbers
             y_names_with_units = []
@@ -307,7 +311,9 @@ class MDAFile(QtWidgets.QWidget):
                 y_units = utils.byte2str(y.unit) if y.unit else "a.u."
                 y_name = utils.byte2str(y.name)
                 y_name_with_units = y_name + "  (" + y_units + ")"
-                y_name_with_file_units = file_name + ": " + y_name + "  (" + y_units + ")"
+                y_name_with_file_units = (
+                    file_name + ": " + y_name + "  (" + y_units + ")"
+                )
                 y_names_with_units.append(y_name_with_units)
                 y_names_with_file_units.append(y_name_with_file_units)
                 # append to dataset:
