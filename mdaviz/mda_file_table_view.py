@@ -95,15 +95,13 @@ class MDAFileTableView(QtWidgets.QWidget):
             ]
         self._data = {"fileInfo": fileInfo, "fields": fields}
 
-    def displayTable(self):
+    def displayTable(self, selection_field):
         from .mda_file_table_model import MDAFileTableModel
         from .empty_table_model import EmptyTableModel
 
         print("\nEntering displayTable")
         if self.data() is not None:
             fields = self.data()["fields"]
-            selection_field = self.mda_file.mda_mvc.selectionField()
-            print(f"{selection_field=}")
             data_model = MDAFileTableModel(
                 COLUMNS, fields, selection_field, self.mda_file.mda_mvc
             )

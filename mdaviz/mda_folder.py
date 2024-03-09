@@ -203,13 +203,6 @@ class MDA_MVC(QtWidgets.QWidget):
 
     # # ------------ Fields selection methods:
 
-    def defaultSelection(self, first_pos_idx=None, first_det_idx=None):
-        if first_pos_idx is not None and first_det_idx is not None:
-            default_selection = {"X": first_pos_idx, "Y": [first_det_idx]}
-        else:
-            default_selection = None
-        return default_selection
-
     def selectionField(self):
         """
         # TODO Update this:
@@ -346,45 +339,33 @@ class MDA_MVC(QtWidgets.QWidget):
             oldPvList = None
         else:
             # access the instance of tableView for the current tab:
-            oldPvList = self.mda_file.data().get("pvList")
+            current_tab_index = self.mda_file.tabWidget.currentIndex()
+            oldTabTableview = self.mda_file.tabWidget.widget(current_tab_index)
+            oldPvList = oldTabTableview.data()["fileInfo"]["pvList"]
 
-        self.mda_file.addFileTab(index.row())
+        print(f"\nBefore addTab: {self.selectionField()=}")
+        self.mda_file.addFileTab(index.row(), self.selectionField())
+        print(f"\nAfter addTab: {self.selectionField()=}")
         self.mda_file.displayMetadata()
         self.mda_file.displayData()
         newPvList = self.mda_file.data().get("pvList")
-        firstPos = self.mda_file.data().get("firstPos")
-        firstDet = self.mda_file.data().get("firstDet")
-        default = self.defaultSelection(firstPos, firstDet)
-        print(f"{firstPos=}")
-        print(f"{firstDet=}")
-        print(f"{default=}")
 
         current_tab_index = self.mda_file.tabWidget.currentIndex()
-        tableview = self.mda_file.tabWidget.widget(current_tab_index)
-        self.setCurrentFileTV(tableview)
-        print(f"{tableview.data()['fileInfo']['fileName']=}")
-        print(f"{self.currentFileTV().data()['fileInfo']['fileName']=}")
+        newTabTableview = self.mda_file.tabWidget.widget(current_tab_index)
+        self.setCurrentFileTV(newTabTableview)
 
         # Manage signal connections for the new file selection.
-        self.disconnectSignals(tableview)
-        tableview.selected.connect(self.doPlot)
-        tableview.tableView.model().checkboxStateChanged.connect(
+        self.disconnectSignals(newTabTableview)
+        newTabTableview.selected.connect(self.doPlot)
+        newTabTableview.tableView.model().checkboxStateChanged.connect(
             self.onCheckboxStateChange
         )
 
-        # Update the status and selection based on the new file.
-        selectedFields = self.selectionField()
-        if selectedFields is None:
-            print(f"{firstPos=}")
-            print(f"{firstDet=}")
-            self.setSelectionField(self.defaultSelection(firstPos, firstDet))
-            selectedFields = self.selectionField()
-            print(f"{selectedFields=}")
-        print(f"{selectedFields=}")
         self.setStatus(
             f"\n\n========= Selected file: {selectedFile} in {str(self.dataPath())}"
         )
-        if selectedFields:
+        # selectionField() may have changed when calling addFileTab:
+        if self.selectionField():
             if oldPvList is not None:
                 self.updateSelectionForNewPVs(oldPvList, newPvList, verbose)
             self.handlePlotBasedOnMode()

@@ -145,7 +145,7 @@ class MDAFile(QtWidgets.QWidget):
         """Display pos(s) & det(s) values as a tableview in the vizualization panel."""
         self.mda_mvc.mda_file_visualization.setTableData(self.data()["scanDict"])
 
-    def addFileTab(self, index):
+    def addFileTab(self, index, selection_field):
         """
         Adds a new tab with a QTableView and QLabel for the selected file.
 
@@ -161,6 +161,28 @@ class MDAFile(QtWidgets.QWidget):
         self.setData(index)
         file_path = self.data()["filePath"]
         file_name = self.data()["fileName"]
+        first_pos = self.data()["firstPos"]
+        first_det = self.data()["firstDet"]
+        print(f"{first_pos=}")
+        print(f"{first_det=}")
+
+        print(f"\nBefore default: {selection_field=}")
+
+        def defaultSelection(first_pos_idx=None, first_det_idx=None):
+            print(f"\nIn default: {first_pos_idx=},{first_det_idx=}")
+            if first_pos_idx is not None and first_det_idx is not None:
+                default_selection = {"X": first_pos_idx, "Y": [first_det_idx]}
+            else:
+                default_selection = None
+            print(f"\nResult: {default_selection=}")
+            return default_selection
+
+        if selection_field is None:
+            default = defaultSelection(first_pos, first_det)
+
+            self.mda_mvc.setSelectionField(default)
+            selection_field = default
+            print(f"\nAfter default: {selection_field=}")
 
         tab_list = self.tabList()
         if file_path in tab_list:
@@ -175,7 +197,7 @@ class MDAFile(QtWidgets.QWidget):
             tab_index = self.tabWidget.addTab(self.file_tableview, file_name)
             self.tabWidget.setCurrentIndex(tab_index)
 
-            self.file_tableview.displayTable()
+            self.file_tableview.displayTable(selection_field)
 
             # Add selected file to the list of open tabs:
             tab_list.append(file_path)
