@@ -47,7 +47,7 @@ class MDAFile(QtWidgets.QWidget):
         self.replaceButton.clicked.connect(partial(self.responder, "replace"))
 
         options = ["Auto-replace", "Auto-add", "Auto-off"]
-        self._mode = options[0]
+        self.setMode(options[0])
         self.autoBox.addItems(options)
         self.autoBox.currentTextChanged.connect(self.setMode)
         self.autoBox.currentTextChanged.connect(self.updateButtonVisibility)
@@ -95,15 +95,18 @@ class MDAFile(QtWidgets.QWidget):
         - fileName (str): The name of the file without its extension.
         - filePath (str): The full path of the file.
         - folderPath (str): The full path of the parent folder.
-        - xy (list): The extracted data from the file.
         - metadata (dict): The extracted metadata from the file.
-        - scanDict (dict): A dictionary of positioner & detector information.
+        - scanDict (dict): A dictionary of positioner & detector information
+            "object": mda object X (scanPositioner or scanDetector)
+            "type": "POS" (if scanPositioner) or "DET" (if scanDetector),
+            "data": X.data or [],
+            "unit": byte2str(X.unit) if X.unit else "a.u.",
+            "name": byte2str(X.name) if X.name else "n/a",
+            "desc": byte2str(X.desc) if X.desc else "",
+            "fieldName": byte2str(X.fieldName)
         - firstPos (float): The first positioner (P1, or if no positioner, P0 = index).
         - firstDet (float): The first detector (D01).
         - pvList (list of str): List of detectors PV names as strings.
-
-        Note: This method modifies the object's state by setting the `_data`
-        attribute.
         """
         if index is None:
             self._data = {}
