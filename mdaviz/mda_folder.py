@@ -282,7 +282,11 @@ class MDA_MVC(QtWidgets.QWidget):
                         print(f"Detector <{old_pv}> was removed")
         return changes_made
 
-    ## TODO need to keep track of which tab here? 1 tab is 1 tableview for one file
+        # TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO
+        # TODO : need to keep track of which tab here? 1 tab is 1 tableview for one file # TODO
+        # TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO
+
+
     def applySelectionChanges(self, new_selection):
         print("\n\n\n\n\nEntering applySelectionChanges")
         tableview = self.currentFileTV()
@@ -416,6 +420,10 @@ class MDA_MVC(QtWidgets.QWidget):
         if layoutMpl.count() != 1:  # in case something changes ...
             raise RuntimeError("Expected exactly one widget in this layout!")
         widgetMpl = layoutMpl.itemAt(0).widget()
+        
+        # TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO
+        # TODO : need to fix button, not working anymore                  # TODO
+        # TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO
 
         if action in ("replace", "add"):
             # # Get dataset for the positioner/detector selection:
@@ -432,7 +440,7 @@ class MDA_MVC(QtWidgets.QWidget):
 
         elif action in ("clear"):
             widgetMpl.clearPlot()
-            tableview.tableView.model().clearAllCheckboxes()
+            tableview.clearContents()
 
     # # ------------ Folder Table View navigation & selection highlight:
 

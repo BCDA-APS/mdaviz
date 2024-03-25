@@ -121,6 +121,8 @@ class MDAFileTableView(QtWidgets.QWidget):
 
     def clearContents(self):
         self.tableView.setModel(None)
+        self.tableView.model().clearAllCheckboxes()
+            
 
     def data2Plot(self, selections):
         """

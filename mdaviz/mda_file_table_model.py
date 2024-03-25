@@ -364,6 +364,8 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
 
     # ------------ reporting
 
+    #TODO: we never call plotField with fieldname. Remove choices_pretty?
+
     def plotFields(self):
         """
         Returns a dictionary with the selected fields to be plotted.

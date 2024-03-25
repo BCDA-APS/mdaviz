@@ -271,7 +271,7 @@ class MDAFile(QtWidgets.QWidget):
 
         """
         print(f"\nResponder: {action=}")
-        self.selected.emit(action, self.tableView.model().plotFields()[0])
+        self.selected.emit(action, self.file_tableview.tableView.model().plotFields()[0])
 
     def updateButtonVisibility(self):
         """Check the current text in "mode" pull down and show/hide buttons accordingly"""
