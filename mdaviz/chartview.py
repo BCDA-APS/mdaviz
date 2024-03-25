@@ -196,8 +196,8 @@ class ChartView(QtWidgets.QWidget):
 
     def plot(self, row, *args, **kwargs):
         # Extract label from kwargs, default to None if not present
-        self._plot_options = kwargs.get("plot_options")
-        ds_options = self._ds_options = kwargs.get("ds_options")
+        self._plot_options = kwargs.get("plot_options",{})
+        ds_options = self._ds_options = kwargs.get("ds_options",{})
         path = self._plot_options["folderPath"]
         label = ds_options.get("label", None)
         self.main_axes.axis("on")
