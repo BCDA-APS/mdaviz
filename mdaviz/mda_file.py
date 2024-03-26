@@ -160,6 +160,12 @@ class MDAFile(QtWidgets.QWidget):
         - selection_field (dict): The dictionary containing the selection of pos/det(s) to plot.
         """
 
+
+        # TODO: when auto-replace, should only ever have 1 tab!!!!
+
+
+
+
         from .mda_file_table_view import MDAFileTableView
 
         print("\nEntering addFileTab")
