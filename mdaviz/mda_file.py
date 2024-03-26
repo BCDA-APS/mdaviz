@@ -256,6 +256,10 @@ class MDAFile(QtWidgets.QWidget):
             self.setStatus(
                 f"Cannot find corresponding file tab:  {index=}, {filepath=}"
             )
+            
+        if not self.tabList():  # If the list of tabs is empty after removing one
+            self.mda_mvc.mda_file_visualization.clearPlotArea()  # Clear all content from the viz panel
+
 
     ########################################################################
     # TODO : need a switch tab: update metadata and data, not plot    # ####
