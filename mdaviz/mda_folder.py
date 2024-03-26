@@ -93,7 +93,7 @@ class MDA_MVC(QtWidgets.QWidget):
             self.setLastFileIndex(last_file_index)
 
         # Folder table view signal/slot connections:
-            
+        self.mda_folder_tableview.tableView.clicked.connect(self.doFileSelected)    
         self.mda_folder_tableview.firstButton.clicked.connect(self.goToFirst)
         self.mda_folder_tableview.lastButton.clicked.connect(self.goToLast)
         self.mda_folder_tableview.backButton.clicked.connect(self.goToBack)
