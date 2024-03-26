@@ -58,10 +58,11 @@ class MDA_MVC(QtWidgets.QWidget):
             pass
         self.mainWindow.refresh.released.connect(self.doRefresh)
 
-        # TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO
-        # TODO : need to remove tab for folder! I am not doing that again # TODO
-        # TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO
-
+        ########################################################################
+        # TODO : need to remove tab for folder! I am not doing that again 
+        # TODO: there are too many layout, we are loosing some precious real estate; can we remove some layers?
+        ########################################################################
+        
         # File table view:
         self.mda_file = MDAFile(self)
         layout = self.mda_groupbox.layout()
@@ -85,7 +86,9 @@ class MDA_MVC(QtWidgets.QWidget):
         # File Selection Model & Focus
         model = self.mda_folder_tableview.tableView.model()
         if model is not None and self.mainWindow.mdaFileCount() > 0:
-            self.mda_folder_tableview.tableView.setFocus()
+            # self.mda_folder_tableview.tableView.setFocus()
+            # TODO: do we want to keep this?
+
             selection_model = self.mda_folder_tableview.tableView.selectionModel()
             self.setSelectionModel(selection_model)
             first_file_index = model.index(0, 0)
@@ -282,9 +285,9 @@ class MDA_MVC(QtWidgets.QWidget):
                         print(f"Detector <{old_pv}> was removed")
         return changes_made
 
-        # TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO
-        # TODO : need to keep track of which tab here? 1 tab is 1 tableview for one file # TODO
-        # TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO
+        ################################################################################
+        # TODO : need to keep track of which tab here? 1 tab is 1 tableview for one file
+        ################################################################################
 
 
     def applySelectionChanges(self, new_selection):
@@ -421,9 +424,9 @@ class MDA_MVC(QtWidgets.QWidget):
             raise RuntimeError("Expected exactly one widget in this layout!")
         widgetMpl = layoutMpl.itemAt(0).widget()
         
-        # TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO
-        # TODO : need to fix button, not working anymore                  # TODO
-        # TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO
+        ########################################################################
+        # TODO : need to fix button, not working anymore                  # ####
+        ########################################################################
 
         if action in ("replace", "add"):
             # # Get dataset for the positioner/detector selection:
@@ -447,7 +450,7 @@ class MDA_MVC(QtWidgets.QWidget):
     def highlightNewFile(self, row):
         if self.selectionModel() and self.mda_folder_tableview.tableView.model():
             # Ensure the table view has focus to get the blue highlight on Mac OS
-            self.mda_folder_tableview.tableView.setFocus()
+            # self.mda_folder_tableview.tableView.setFocus()
             # Select the row to highlight
             index = self.mda_folder_tableview.tableView.model().index(row, 0)
             self.selectionModel().select(
