@@ -509,12 +509,31 @@ class MDA_MVC(QtWidgets.QWidget):
 
         if previous_selection:
             # if changing POS, clear the graph:
-            if previous_selection.get("X") != selection.get("X"):
+            if previous_selection.get("X") != selection.get("X"):   
                 widgetMpl.clearPlot()  #
-            # if removing DET, clear the graph:   #TODO why?
+            # TODO: if remove X and no X left, core dump:      
+            # onCheckboxStateChange called:  Auto-replace with {'Y': [2], 'X': 0}
+            # Traceback (most recent call last):
+            #   File "/home/beams22/29IDUSER/bin/mdaviz/mdaviz/mda_folder.py", line 600, in onCheckboxStateChange
+            #     widgetMpl.plot(row, *ds, **kwargs)
+            #   File "/home/beams22/29IDUSER/bin/mdaviz/mdaviz/chartview.py", line 206, in plot
+            #     self.addCurve(row, path, *args, **ds_options)
+            #   File "/home/beams22/29IDUSER/bin/mdaviz/mdaviz/chartview.py", line 166, in addCurve
+            #     "y_data": args[1],
+            #               ~~~~^^^
+            # IndexError: tuple index out of range
+            # Aborted (core dumped)
+
+                
+            # if removing DET, clear the graph: 
             if len(previous_selection.get("Y")) > len(selection.get("Y")):
                 widgetMpl.clearPlot()
-
+                
+            # TODO that is weird, why? only should clear if there is no Y left
+            # that is the behavior that I observe in Auto-Replace
+            # in Auto-Add, should remove it from the graph but it doesn't
+            # lots of stuff to fix here
+            
         # Get dataset for the positioner/detector selection:
         datasets, plot_options = tableview.data2Plot(self.selectionField())
 
