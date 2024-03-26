@@ -435,6 +435,7 @@ class MDA_MVC(QtWidgets.QWidget):
 
         elif action in ("clear"):
             #widgetMpl.clearPlot()
+            print("TESTTESTTEST")
             self.mda_mvc.mda_file_visualization.clearAllContent()  # Clear all content from the viz panel
             tableview.clearContents()
 
