@@ -55,7 +55,7 @@ class MDAFile(QtWidgets.QWidget):
         self.tabWidget.tabCloseRequested.connect(self.removeFileTab)
 
     def dataPath(self):
-        """Path (obj) of the data folder."""
+        """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
         return self.mda_mvc.dataPath()
 
     def mdaFileList(self):
@@ -76,6 +76,9 @@ class MDAFile(QtWidgets.QWidget):
 
     def setTabList(self, new_tab_list=None):
         self._tabList = new_tab_list or []
+        # TODO: Is there a point in defaulting to None then []? Should I just do:
+        # setTabList(self, new_tab_list=[])
+        # self._tabList = new_tab_list         
 
     def data(self):
         return self._data
@@ -89,7 +92,7 @@ class MDAFile(QtWidgets.QWidget):
         Parameters:
         - index (int, optional): The index of the file in the MDA
         file list to read and extract data from.
-        Defaults to None, resulting in self._data = None.
+        Defaults to None, resulting in self._data = {}.
 
         The populated `_data` dictionary includes:
         - fileName (str): The name of the file without its extension.
@@ -116,7 +119,7 @@ class MDAFile(QtWidgets.QWidget):
         file_name = self.mdaFileList()[index]
         file_path = self.dataPath() / file_name
         file_metadata, file_data = readMDA(file_path)
-        scanDict, first_pos, first_det = utils.get_scan(file_data)
+        scanDict, first_pos, first_det = utils.get_scan(file_data)  
         pvList = [v["name"] for v in scanDict.values()]
         self._data = {
             "fileName": file_name.rsplit(".mda", 1)[0],
@@ -154,6 +157,7 @@ class MDAFile(QtWidgets.QWidget):
 
         Parameters:
         - index (int): The index of the selected file in the MDA file list.
+        - selection_field (dict): The dictionary containing the selection of pos/det(s) to plot.
         """
 
         from .mda_file_table_view import MDAFileTableView
@@ -162,17 +166,18 @@ class MDAFile(QtWidgets.QWidget):
 
         # Get data for the selected file:
         self.setData(index)
-        file_path = self.data()["filePath"]
-        file_name = self.data()["fileName"]
-        first_pos = self.data()["firstPos"]
-        first_det = self.data()["firstDet"]
+        data = self.data()
+        file_path = data["filePath"]
+        file_name = data["fileName"]
+        first_pos = data["firstPos"]
+        first_det = data["firstDet"]
         print(f"{first_pos=}")
         print(f"{first_det=}")
 
         print(f"\nBefore default: {selection_field=}")
 
         def defaultSelection(first_pos_idx=None, first_det_idx=None):
-            print(f"\nIn default: {first_pos_idx=},{first_det_idx=}")
+            print(f"\nIn defaultSelection: {first_pos_idx=},{first_det_idx=}")
             if first_pos_idx is not None and first_det_idx is not None:
                 default_selection = {"X": first_pos_idx, "Y": [first_det_idx]}
             else:
@@ -182,10 +187,9 @@ class MDAFile(QtWidgets.QWidget):
 
         if selection_field is None:
             default = defaultSelection(first_pos, first_det)
-
             self.mda_mvc.setSelectionField(default)
             selection_field = default
-            print(f"\nAfter default: {selection_field=}")
+            print(f"\nAfter (maybe) calling defaultSelection: {selection_field=}")
 
         tab_list = self.tabList()
         if file_path in tab_list:
@@ -196,7 +200,7 @@ class MDAFile(QtWidgets.QWidget):
         else:
             # Create a new instance of MDAFileTableView for the selected file:
             self.file_tableview = MDAFileTableView(self)
-            # addTab returns the index of the new tab:
+            # The addTab method returns the index of the new tab:
             tab_index = self.tabWidget.addTab(self.file_tableview, file_name)
             self.tabWidget.setCurrentIndex(tab_index)
 
@@ -209,16 +213,14 @@ class MDAFile(QtWidgets.QWidget):
             # Access and update the QLabel for the filePath:
             filePathLabel = self.file_tableview.filePath
             filePathLabel.setText(file_path)
-        print(f"{self.data()['fileName']=}")
         print("\nLeaving addFileTab")
 
     def removeFileTab(self, *args):
         """
-
         Removes a tab from the tab widget based on a file path or index (1st arg).
 
         If the file path or index is valid and corresponds to an open tab, removes
-        the tab from the widget and updates the status. If no valid arguments are
+        the tab from the widget and updates the app status message. If no valid arguments are
         provided or the tab cannot be found, the status is updated with an error
         message.
 
@@ -255,10 +257,10 @@ class MDAFile(QtWidgets.QWidget):
                 f"Cannot find corresponding file tab:  {index=}, {filepath=}"
             )
 
-    # TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO
-    # TODO : need a switch tab: update metadata and data, not plot    # TODO
-    # TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO# TODO
-
+    ########################################################################
+    # TODO : need a switch tab: update metadata and data, not plot    # ####
+    ########################################################################
+    
     # ------ Button methods:
 
     def responder(self, action):
