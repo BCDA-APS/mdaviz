@@ -258,7 +258,7 @@ class MDAFile(QtWidgets.QWidget):
             )
             
         if not self.tabList():  # If the list of tabs is empty after removing one
-            self.mda_mvc.mda_file_visualization.clearPlotArea()  # Clear all content from the viz panel
+            self.mda_mvc.mda_file_visualization.clearAllContent()  # Clear all content from the viz panel
 
 
     ########################################################################
