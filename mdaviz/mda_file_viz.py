@@ -64,6 +64,20 @@ class MDAFileVisualization(QtWidgets.QWidget):
         if isinstance(plot_widget, ChartView):
             return not plot_widget.hasDataItems()
         return True  # If not a chartView instance, consider it as blank
+    
+    def clearPlotArea(self):
+        """
+        Clears the plot area by calling the clearPlot method on the ChartView instance.
+        """
+        layout = self.plotPageMpl.layout()
+        if layout.count() > 0:
+            plot_widget = layout.itemAt(0).widget()
+            # Check if the plot widget is an instance of ChartView
+            if isinstance(plot_widget, ChartView):
+                plot_widget.clearPlot()  # Call clearPlot method of ChartView
+                self.figure.canvas.draw()  # Refresh the canvas to reflect the cleared plot
+ 
+    
 
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
