@@ -8,7 +8,6 @@ Uses :class:`select_fields_tablemodel.SelectFieldsTableModel`.
     MDAFileTableView
 """
 
-from mda import readMDA
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
@@ -61,7 +60,7 @@ class MDAFileTableView(QtWidgets.QWidget):
 
     def data(self):
         """Return the data from the table view:
-              self.data= fileName, scanDict, fields
+              self.data= fileInfo, fields
         with:
         - fileInfo (dict): A dictionary of all the file information:
             - fileName (str): The name of the file without its extension.
@@ -120,8 +119,8 @@ class MDAFileTableView(QtWidgets.QWidget):
         self.mda_file.mda_mvc.setStatus(text)
 
     def clearContents(self):
-        self.tableView.setModel(None)
         self.tableView.model().clearAllCheckboxes()
+        self.tableView.setModel(None)
             
 
     def data2Plot(self, selections):
@@ -151,9 +150,9 @@ class MDAFileTableView(QtWidgets.QWidget):
             x_index = selections.get("X")
             x_data = scanDict[x_index]["data"] if x_index in scanDict else None
             # extract y(s) data:
-            y_indeces = selections.get("Y", [])
+            y_index = selections.get("Y", [])
             y_first_unit = y_first_name = ""
-            for i, y in enumerate(y_indeces):
+            for i, y in enumerate(y_index):
                 if y not in scanDict:
                     continue
                 y_data = scanDict[y]["data"]
