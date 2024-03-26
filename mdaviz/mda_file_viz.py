@@ -44,8 +44,8 @@ class MDAFileVisualization(QtWidgets.QWidget):
         # tab=self.metadataPage
         self.metadata.setText(text)
 
-    def setData(self, text, *args, **kwargs):
-        self.data.setText(text)
+    # def setData(self, text, *args, **kwargs):  # TODO: am  I using this at all?
+    #     self.data.setText(text)
 
     def setPlot(self, plot_widget):
         layout = self.plotPageMpl.layout()
@@ -65,18 +65,35 @@ class MDAFileVisualization(QtWidgets.QWidget):
             return not plot_widget.hasDataItems()
         return True  # If not a chartView instance, consider it as blank
     
-    def clearPlotArea(self):
+    # def clearPlotArea(self):
+    #     """
+    #     Clears the plot area by calling the clearPlot method on the ChartView instance.
+    #     """
+    #     layout = self.plotPageMpl.layout()
+    #     if layout.count() > 0:
+    #         plot_widget = layout.itemAt(0).widget()
+    #         # Check if the plot widget is an instance of ChartView
+    #         if isinstance(plot_widget, ChartView):
+    #             plot_widget.clearPlot()  # Call clearPlot method of ChartView
+                
+ 
+    def clearAllContent(self):
         """
-        Clears the plot area by calling the clearPlot method on the ChartView instance.
+        Clears all content from the plot, metadata, and data tabs.
         """
+        # Clear Plot
         layout = self.plotPageMpl.layout()
         if layout.count() > 0:
             plot_widget = layout.itemAt(0).widget()
-            # Check if the plot widget is an instance of ChartView
             if isinstance(plot_widget, ChartView):
-                plot_widget.clearPlot()  # Call clearPlot method of ChartView
-                self.figure.canvas.draw()  # Refresh the canvas to reflect the cleared plot
- 
+                plot_widget.clearPlot()
+
+        # Clear Metadata
+        self.metadata.setText("") 
+
+        # Clear Data Table
+        layout = self.dataPage.layout()
+        utils.removeAllLayoutWidgets(layout)
     
 
     def setStatus(self, text):
