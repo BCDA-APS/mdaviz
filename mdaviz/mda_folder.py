@@ -426,14 +426,16 @@ class MDA_MVC(QtWidgets.QWidget):
             if not isinstance(widgetMpl, ChartView):
                 widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
             if action in ("replace"):
-                widgetMpl.clearPlot()
+                #widgetMpl.clearPlot()
+                self.mda_file_visualization.clearAllContent()  # Clear all content from the viz panel
             for row, (ds, ds_options) in zip(y_rows, datasets):
                 kwargs = {"ds_options": ds_options, "plot_options": plot_options}
                 widgetMpl.plot(row, *ds, **kwargs)
             self.mda_file_visualization.setPlot(widgetMpl)
 
         elif action in ("clear"):
-            widgetMpl.clearPlot()
+            #widgetMpl.clearPlot()
+            self.mda_mvc.mda_file_visualization.clearAllContent()  # Clear all content from the viz panel
             tableview.clearContents()
 
     # # ------------ Folder Table View navigation & selection highlight:
@@ -510,7 +512,8 @@ class MDA_MVC(QtWidgets.QWidget):
         if previous_selection:
             # if changing POS, clear the graph:
             if previous_selection.get("X") != selection.get("X"):   
-                widgetMpl.clearPlot()  #
+                widgetMpl.clearPlot()  #do I need: self.mda_mvc.mda_file_visualization.clearAllContent()?
+                
             # TODO: if remove X and no X left, core dump:      
             # onCheckboxStateChange called:  Auto-replace with {'Y': [2], 'X': 0}
             # Traceback (most recent call last):
@@ -527,7 +530,7 @@ class MDA_MVC(QtWidgets.QWidget):
                 
             # if removing DET, clear the graph: 
             if len(previous_selection.get("Y")) > len(selection.get("Y")):
-                widgetMpl.clearPlot()
+                widgetMpl.clearPlot() #do I need: self.mda_mvc.mda_file_visualization.clearAllContent()?
                 
             # TODO that is weird, why? only should clear if there is no Y left
             # that is the behavior that I observe in Auto-Replace
@@ -546,7 +549,8 @@ class MDA_MVC(QtWidgets.QWidget):
             if not isinstance(widgetMpl, ChartView):
                 widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
             if mode in ("Auto-replace"):
-                widgetMpl.clearPlot()
+                # widgetMpl.clearPlot()
+                self.mda_mvc.mda_file_visualization.clearAllContent()  # Clear all content from the viz panel
             for row, (ds, ds_options) in zip(y_rows, datasets):
                 # ds_options: label (for legend)
                 # plot_options: xlabel, ylabel, title
