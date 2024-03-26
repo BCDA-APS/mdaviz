@@ -53,7 +53,6 @@ class MDAFileVisualization(QtWidgets.QWidget):
             layout
         )  # TODO replace with mainWindow.clearContent? or clearPlotArea below?
         layout.addWidget(plot_widget)
-        #self.tabWidget.setCurrentWidget(self.plotPageMpl)
 
     def isPlotBlank(self):
         layout = self.plotPageMpl.layout()
