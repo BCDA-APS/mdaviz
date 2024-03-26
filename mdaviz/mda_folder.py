@@ -77,7 +77,6 @@ class MDA_MVC(QtWidgets.QWidget):
         self.setFirstFileIndex()
         self.setLastFileIndex()
         self.setCurrentFileIndex()
-        self.setCurrentFileSelected()
         self.setCurrentFileTV()
 
         # File Selection Model & Focus
@@ -95,7 +94,7 @@ class MDA_MVC(QtWidgets.QWidget):
         self.mda_folder_tableview.tableView.clicked.connect(self.doFileSelected)    
         self.mda_folder_tableview.firstButton.clicked.connect(self.goToFirst)
         self.mda_folder_tableview.lastButton.clicked.connect(self.goToLast)
-        self.mda_folder_tableview.backButton.clicked.connect(self.goToBack)
+        self.mda_folder_tableview.backButton.clicked.connect(self.goToPrevious)
         self.mda_folder_tableview.nextButton.clicked.connect(self.goToNext)
 
         # save/restore splitter sizes in application settings
@@ -117,9 +116,6 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def currentFileTV(self):
         return self._currentFileTV
-
-    def currentFileSelected(self):
-        return self._currentFileIndex
 
     def currentFileIndex(self):
         return self._currentFileIndex
@@ -150,10 +146,7 @@ class MDA_MVC(QtWidgets.QWidget):
     def setCurrentFileTV(self, tableview=None):
         self._currentFileTV = tableview
 
-    def setCurrentFileSelected(self, file_path=None):
-        self._currentFileIndex = file_path
-
-    def setCurrentFileIndex(self, index=None):
+    def setCurrentFileIndex(self, index=None): 
         self._currentFileIndex = index
 
     def setFirstFileIndex(self, index=None):
@@ -169,8 +162,15 @@ class MDA_MVC(QtWidgets.QWidget):
         self.mda_folder_tableview.clearContents()
         self.mda_folder_tableview.displayTable()
 
+
+
+
     def updateFileView(self, index=None):
         """Clear existing data and set new data for mda_file_tableview"""
+        # NOTE: Here I cannot use currentIndex = self.selectionModel().currentIndex()
+        # since here's a distinction between navigating through the table view (using arrow keys, 
+        # which doesn't trigger plotting) and actively selecting a file for display (through 
+        # double-clicking or using navigation buttons like first/next/previous/last, which triggers plotting)       
         index = self.currentFileIndex().row() if self.currentFileIndex() else index
         tableview = self.currentFileTV()
         ## TODO need to keep track of which tab here? 1 tab is 1 tableview for one file
@@ -321,10 +321,10 @@ class MDA_MVC(QtWidgets.QWidget):
             initialized and correctly set up to interact with the underlying data model and UI.
         """
         selectedFile = self.mdaFileList()[index.row()]
-        file_path = str(self.dataPath() / selectedFile)
         self.setCurrentFileIndex(index)
-        self.setCurrentFileSelected(file_path)  # TODO do i need that?
-
+        #file_path = str(self.dataPath() / selectedFile)
+        #self.setCurrentFileSelected(file_path)  # TODO am I using this?
+        
         # If there is no Folder Table View, do nothing
         if self.mda_folder_tableview.tableView.model() is None:
             return
@@ -457,7 +457,7 @@ class MDA_MVC(QtWidgets.QWidget):
         if nextIndex.isValid():
             self.selectAndShowIndex(nextIndex)
 
-    def goToBack(self):
+    def goToPrevious(self):
         currentIndex = self.selectionModel().currentIndex()
         prevIndex = currentIndex.sibling(currentIndex.row() - 1, currentIndex.column())
         if prevIndex.isValid():
