@@ -159,15 +159,7 @@ class MDAFile(QtWidgets.QWidget):
         - index (int): The index of the selected file in the MDA file list.
         - selection_field (dict): The dictionary containing the selection of pos/det(s) to plot.
         """
-
-
-        # TODO: when auto-replace, should only ever have 1 tab!!!!
-
-
-
-
-        from .mda_file_table_view import MDAFileTableView
-
+        
         print("\nEntering addFileTab")
 
         # Get data for the selected file:
@@ -190,7 +182,7 @@ class MDAFile(QtWidgets.QWidget):
                 default_selection = None
             print(f"\nResult: {default_selection=}")
             return default_selection
-
+                                
         if selection_field is None:
             default = defaultSelection(first_pos, first_det)
             self.mda_mvc.setSelectionField(default)
@@ -204,22 +196,38 @@ class MDAFile(QtWidgets.QWidget):
             self.tabWidget.setCurrentIndex(tab_index)
 
         else:
-            # Create a new instance of MDAFileTableView for the selected file:
-            self.file_tableview = MDAFileTableView(self)
-            # The addTab method returns the index of the new tab:
-            tab_index = self.tabWidget.addTab(self.file_tableview, file_name)
-            self.tabWidget.setCurrentIndex(tab_index)
-
-            self.file_tableview.displayTable(selection_field)
-
-            # Add selected file to the list of open tabs:
-            tab_list.append(file_path)
-            self.setTabList(tab_list)
-
-            # Access and update the QLabel for the filePath:
-            filePathLabel = self.file_tableview.filePath
-            filePathLabel.setText(file_path)
+            
+            mode = self.mode()          # ["Auto-replace", "Auto-add", "Auto-off"]
+            if mode == "Auto-add":       
+                self.createNewTab(file_name, file_path, selection_field)
+                # Add selected file to the list of open tabs:
+                tab_list.append(file_path)
+                self.setTabList(tab_list)
+                
+            elif mode == "Auto-replace":
+                # Clear all existing tabs first if in "Auto-replace" mode
+                while self.tabWidget.count() > 0:
+                    self.tabWidget.removeTab(0)
+                self.createNewTab(file_name, file_path, selection_field)
+                # Since we're auto-replacing, we can simplify the tab list management
+                self.setTabList([file_path])   
+                
+            # TODO implement auto-off: nothing happens?
+            # the addition of a new tab /update of existing tab will only happen when Replace or Add is pushed?        
+        
         print("\nLeaving addFileTab")
+        
+    def createNewTab(self, file_name, file_path, selection_field):
+        from .mda_file_table_view import MDAFileTableView
+        # Create a new instance of MDAFileTableView for the selected file:
+        self.file_tableview = MDAFileTableView(self)
+        tab_index = self.tabWidget.addTab(self.file_tableview, file_name)
+        self.tabWidget.setCurrentIndex(tab_index)
+        self.file_tableview.displayTable(selection_field)                
+        # Access and update the QLabel for the filePath:
+        filePathLabel = self.file_tableview.filePath
+        filePathLabel.setText(file_path)    
+        
 
     def removeFileTab(self, *args):
         """
