@@ -15,10 +15,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import QItemSelectionModel
 from PyQt5.QtWidgets import QAbstractItemView
 
-
 from . import utils
-from .mda_file_table_view import MDAFileTableView
-
 
 class MDA_MVC(QtWidgets.QWidget):
     """Model View Controller class for mda files."""
@@ -85,10 +82,9 @@ class MDA_MVC(QtWidgets.QWidget):
 
         # File Selection Model & Focus
         model = self.mda_folder_tableview.tableView.model()
-        if model is not None and self.mainWindow.mdaFileCount() > 0:
-            # self.mda_folder_tableview.tableView.setFocus()
-            # TODO: do we want to keep this?
-
+        if model is not None and len(self.mdaFileList()) > 0:
+            self.mda_folder_tableview.tableView.setFocus()
+            # TODO: does this has to do with #83 ?
             selection_model = self.mda_folder_tableview.tableView.selectionModel()
             self.setSelectionModel(selection_model)
             first_file_index = model.index(0, 0)
@@ -97,7 +93,7 @@ class MDA_MVC(QtWidgets.QWidget):
             self.setLastFileIndex(last_file_index)
 
         # Folder table view signal/slot connections:
-        self.mda_folder_tableview.tableView.clicked.connect(self.doFileSelected)
+            
         self.mda_folder_tableview.firstButton.clicked.connect(self.goToFirst)
         self.mda_folder_tableview.lastButton.clicked.connect(self.goToLast)
         self.mda_folder_tableview.backButton.clicked.connect(self.goToBack)
@@ -115,10 +111,6 @@ class MDA_MVC(QtWidgets.QWidget):
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
         return self.mainWindow.dataPath()
-
-    def mdaFileCount(self):
-        """Number of mda files in the selected folder."""
-        return self.mainWindow.mdaFileCount()
 
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
@@ -446,67 +438,113 @@ class MDA_MVC(QtWidgets.QWidget):
             tableview.clearContents()
 
     # # ------------ Folder Table View navigation & selection highlight:
-
-    def highlightNewFile(self, row):
-        if self.selectionModel() and self.mda_folder_tableview.tableView.model():
-            # Ensure the table view has focus to get the blue highlight on Mac OS
-            # self.mda_folder_tableview.tableView.setFocus()
-            # Select the row to highlight
-            index = self.mda_folder_tableview.tableView.model().index(row, 0)
-            self.selectionModel().select(
-                index, QItemSelectionModel.ClearAndSelect | QItemSelectionModel.Rows
-            )
-
-            # Set the selection mode and behavior to mimic clicking on a row with the mouse
-            self.mda_folder_tableview.tableView.setSelectionMode(
-                QAbstractItemView.SingleSelection
-            )
-            self.mda_folder_tableview.tableView.setSelectionBehavior(
-                QAbstractItemView.SelectRows
-            )
-
-            # Scroll to the selected row to ensure it's visible
-            # Use PositionAtTop or PositionAtBottom for the first/last file respectively
-            scrollHint = QAbstractItemView.EnsureVisible
-            if row == 0:
-                scrollHint = QAbstractItemView.PositionAtTop
-            elif row == self.mda_folder_tableview.tableView.model().rowCount() - 1:
-                scrollHint = QAbstractItemView.PositionAtBottom
-            self.mda_folder_tableview.tableView.scrollTo(index, scrollHint)
-
+    
+    
     def goToFirst(self):
-        if self.firstFileIndex():
-            index = self.firstFileIndex()
-            row = index.row()
-            self.highlightNewFile(row)
-            self.doFileSelected(index)
+        model = self.mda_folder_tableview.tableView.model()
+        if model.rowCount() > 0:
+            firstIndex = model.index(0, 0)
+            self.selectAndShowIndex(firstIndex)
 
     def goToLast(self):
-        if self.lastFileIndex():
-            index = self.lastFileIndex()
-            row = index.row()
-            self.highlightNewFile(row)
-            self.doFileSelected(index)
+        model = self.mda_folder_tableview.tableView.model()
+        if model.rowCount() > 0:
+            lastIndex = model.index(model.rowCount() - 1, 0)
+            self.selectAndShowIndex(lastIndex)
 
     def goToNext(self):
-        if self.selectionModel() and self.lastFileIndex():
-            i = self.currentFileIndex()
-            if i.row() == self.lastFileIndex().row():
-                return
-            if i != None:
-                i = self.mda_folder_tableview.tableView.model().index(i.row() + 1, 0)
-                self.highlightNewFile(i.row())
-                self.doFileSelected(i)
+        currentIndex = self.selectionModel().currentIndex()
+        nextIndex = currentIndex.sibling(currentIndex.row() + 1, currentIndex.column())
+        if nextIndex.isValid():
+            self.selectAndShowIndex(nextIndex)
 
     def goToBack(self):
-        if self.currentFileIndex() and self.firstFileIndex():
-            i = self.currentFileIndex()
-            if i.row() == self.firstFileIndex().row():
-                return
-            if i != None:
-                i = self.mda_folder_tableview.tableView.model().index(i.row() - 1, 0)
-                self.highlightNewFile(i.row())
-                self.doFileSelected(i)
+        currentIndex = self.selectionModel().currentIndex()
+        prevIndex = currentIndex.sibling(currentIndex.row() - 1, currentIndex.column())
+        if prevIndex.isValid():
+            self.selectAndShowIndex(prevIndex)
+
+    def selectAndShowIndex(self, index):
+        # Ensure the table view has focus to get the blue highlight on Mac OS
+        self.mda_folder_tableview.tableView.setFocus()
+        # Determine the appropriate scrollHint based on the row position
+        model = self.mda_folder_tableview.tableView.model()
+        rowCount = model.rowCount()
+        scrollHint = QAbstractItemView.EnsureVisible
+        if index.row() == 0:
+            scrollHint = QAbstractItemView.PositionAtTop
+        elif index.row() == rowCount - 1:
+            scrollHint = QAbstractItemView.PositionAtBottom
+        # Select the row and ensure it's visible
+        self.selectionModel().setCurrentIndex(index, QItemSelectionModel.ClearAndSelect | QItemSelectionModel.Rows)
+        self.mda_folder_tableview.tableView.scrollTo(index, scrollHint)
+        # Emit the file selected signal
+        self.doFileSelected(index)
+
+    
+
+    # def highlightNewFile(self, row):
+    #     if self.selectionModel() and self.mda_folder_tableview.tableView.model():
+    #         # Ensure the table view has focus to get the blue highlight on Mac OS
+    #         # TODO: does this has to do with #83 ?
+    #         self.mda_folder_tableview.tableView.setFocus()
+    #         # Select the row to highlight
+    #         index = self.mda_folder_tableview.tableView.model().index(row, 0)
+    #         self.selectionModel().select(
+    #             index, QItemSelectionModel.ClearAndSelect | QItemSelectionModel.Rows
+    #         )
+
+    #         # Set the selection mode and behavior to mimic clicking on a row with the mouse
+    #         self.mda_folder_tableview.tableView.setSelectionMode(
+    #             QAbstractItemView.SingleSelection
+    #         )
+    #         self.mda_folder_tableview.tableView.setSelectionBehavior(
+    #             QAbstractItemView.SelectRows
+    #         )
+
+    #         # Scroll to the selected row to ensure it's visible
+    #         # Use PositionAtTop or PositionAtBottom for the first/last file respectively
+    #         scrollHint = QAbstractItemView.EnsureVisible
+    #         if row == 0:
+    #             scrollHint = QAbstractItemView.PositionAtTop
+    #         elif row == self.mda_folder_tableview.tableView.model().rowCount() - 1:
+    #             scrollHint = QAbstractItemView.PositionAtBottom
+    #         self.mda_folder_tableview.tableView.scrollTo(index, scrollHint)
+
+    # # TODO: there might be a more clever way to do this: https://doc.qt.io/qtforpython-5/PySide2/QtCore/QItemSelectionModel.html
+    # def goToFirst(self):
+    #     if self.firstFileIndex():
+    #         index = self.firstFileIndex()
+    #         row = index.row()
+    #         self.highlightNewFile(row)
+    #         self.doFileSelected(index)
+
+    # def goToLast(self):
+    #     if self.lastFileIndex():
+    #         index = self.lastFileIndex()
+    #         row = index.row()
+    #         self.highlightNewFile(row)
+    #         self.doFileSelected(index)
+
+    # def goToNext(self):
+    #     if self.selectionModel() and self.lastFileIndex():
+    #         i = self.currentFileIndex()
+    #         if i.row() == self.lastFileIndex().row():
+    #             return
+    #         if i is not None:
+    #             i = self.mda_folder_tableview.tableView.model().index(i.row() + 1, 0)
+    #             self.highlightNewFile(i.row())
+    #             self.doFileSelected(i)
+
+    # def goToBack(self):
+    #     if self.currentFileIndex() and self.firstFileIndex():
+    #         i = self.currentFileIndex()
+    #         if i.row() == self.firstFileIndex().row():
+    #             return
+    #         if i is not None:
+    #             i = self.mda_folder_tableview.tableView.model().index(i.row() - 1, 0)
+    #             self.highlightNewFile(i.row())
+    #             self.doFileSelected(i)
 
     # # ------------ Checkbox methods:
 
