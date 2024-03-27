@@ -281,6 +281,9 @@ class MDAFile(QtWidgets.QWidget):
     
     # ------ Button methods:
 
+
+    # FIXME: repsonder is no longer working
+    
     def responder(self, action):
         """Modify the plot with the described action
 
