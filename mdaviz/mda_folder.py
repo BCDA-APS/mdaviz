@@ -75,21 +75,15 @@ class MDA_MVC(QtWidgets.QWidget):
         self.setSelectionField()
         self.setSelectionModel()
         self.setSavedSelection()
-        self.setFirstFileIndex()
-        self.setLastFileIndex()
         self.setCurrentFileIndex()
         self.setCurrentFileTV()
 
-        # File Selection Model & Focus
+        # File Selection Model & Focusfor keyboard arrow keys
         model = self.mda_folder_tableview.tableView.model()
         if model is not None and len(self.mdaFileList()) > 0:
             self.mda_folder_tableview.tableView.setFocus()
             selection_model = self.mda_folder_tableview.tableView.selectionModel()
             self.setSelectionModel(selection_model)
-            first_file_index = model.index(0, 0)
-            last_file_index = model.index(model.rowCount() - 1, 0)
-            self.setFirstFileIndex(first_file_index)
-            self.setLastFileIndex(last_file_index)
 
         # Folder table view signal/slot connections:
         self.mda_folder_tableview.tableView.doubleClicked.connect(self.doFileSelected)
@@ -121,12 +115,6 @@ class MDA_MVC(QtWidgets.QWidget):
     def currentFileIndex(self):
         return self._currentFileIndex
 
-    def firstFileIndex(self):
-        return self._firstFileIndex
-
-    def lastFileIndex(self):
-        return self._lastFileIndex
-
     def selectionModel(self):
         """
         Used to access the selection model associated with a view, such as MDAFolderTableView.
@@ -149,12 +137,6 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def setCurrentFileIndex(self, index=None):
         self._currentFileIndex = index
-
-    def setFirstFileIndex(self, index=None):
-        self._firstFileIndex = index
-
-    def setLastFileIndex(self, index=None):
-        self._lastFileIndex = index
 
     # # ------------ Table view methods:
 
