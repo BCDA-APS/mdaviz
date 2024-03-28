@@ -35,7 +35,6 @@ MVC implementation of mda files.
         ~setCurrentFileTV: Sets the table view associated with the current file.
         ~setSavedSelection: Stores the selection state for future reference.
         ~updateDetectorSelection: Updates detector selections based on the PVs in the newly selected file.
-        ~updateFolderView: Refreshes the folder view to reflect current folder contents.
         ~updateSelectionForNewPVs: Adjusts positioner and detector selections when switching to a new file.  
         ~setSplitterSettingsName: Generates a unique key name for storing splitter positions in settings.
         ~setSplitterMoved: Manages and saves user-adjusted splitter positions.
@@ -46,7 +45,7 @@ MVC implementation of mda files.
               
 
 Flow chart:
-    Refresh Button Press ---> doRefresh ---> updateFolderView 
+    Refresh Button Press ---> doRefresh ---> mda_folder_tableview.displayTable()  
     
     Double Click on File ---> doFileSelected ---> doPlot
     Navigation Button Press ---> goTo... ---> selectAndShowIndex ---> doFileSelected ---> doPlot
@@ -70,7 +69,7 @@ Data model updates:
     |___> onCheckboxStateChange ---> doPlot (to update the plot based on new selections)
 
     Refresh Button Press
-    |___> doRefresh ---> updateFolderView (to reload folder content)
+    |___> doRefresh ---> mda_folder_tableview.displayTable() (to reload folder content)
 
     Data Plotting Request (through user selection or automatically)
     |___> doPlot (updates the visualization with new data)
@@ -213,11 +212,6 @@ class MDA_MVC(QtWidgets.QWidget):
         self._currentFileIndex = index
 
     # # ------------ Table view methods:
-
-    def updateFolderView(self):
-        """Clear existing data and set new data for mda_folder_tableview"""
-        self.mda_folder_tableview.clearContents()
-        self.mda_folder_tableview.displayTable()
 
     def doRefresh(self):
         self.setStatus("Refreshing folder...")
