@@ -17,6 +17,7 @@ from PyQt5.QtWidgets import QAbstractItemView
 
 from . import utils
 
+
 class MDA_MVC(QtWidgets.QWidget):
     """Model View Controller class for mda files."""
 
@@ -56,10 +57,10 @@ class MDA_MVC(QtWidgets.QWidget):
         self.mainWindow.refresh.released.connect(self.doRefresh)
 
         ########################################################################
-        # TODO : need to remove tab for folder! I am not doing that again 
+        # TODO : need to remove tab for folder! I am not doing that again
         # TODO: there are too many layout, we are loosing some precious real estate; can we remove some layers?
         ########################################################################
-        
+
         # File table view:
         self.mda_file = MDAFile(self)
         layout = self.mda_groupbox.layout()
@@ -91,7 +92,7 @@ class MDA_MVC(QtWidgets.QWidget):
             self.setLastFileIndex(last_file_index)
 
         # Folder table view signal/slot connections:
-        self.mda_folder_tableview.tableView.clicked.connect(self.doFileSelected)    
+        self.mda_folder_tableview.tableView.clicked.connect(self.doFileSelected)
         self.mda_folder_tableview.firstButton.clicked.connect(self.goToFirst)
         self.mda_folder_tableview.lastButton.clicked.connect(self.goToLast)
         self.mda_folder_tableview.backButton.clicked.connect(self.goToPrevious)
@@ -146,7 +147,7 @@ class MDA_MVC(QtWidgets.QWidget):
     def setCurrentFileTV(self, tableview=None):
         self._currentFileTV = tableview
 
-    def setCurrentFileIndex(self, index=None): 
+    def setCurrentFileIndex(self, index=None):
         self._currentFileIndex = index
 
     def setFirstFileIndex(self, index=None):
@@ -162,15 +163,12 @@ class MDA_MVC(QtWidgets.QWidget):
         self.mda_folder_tableview.clearContents()
         self.mda_folder_tableview.displayTable()
 
-
-
-
     def updateFileView(self, index=None):
         """Clear existing data and set new data for mda_file_tableview"""
         # NOTE: Here I cannot use currentIndex = self.selectionModel().currentIndex()
-        # since here's a distinction between navigating through the table view (using arrow keys, 
-        # which doesn't trigger plotting) and actively selecting a file for display (through 
-        # double-clicking or using navigation buttons like first/next/previous/last, which triggers plotting)       
+        # since here's a distinction between navigating through the table view (using arrow keys,
+        # which doesn't trigger plotting) and actively selecting a file for display (through
+        # double-clicking or using navigation buttons like first/next/previous/last, which triggers plotting)
         index = self.currentFileIndex().row() if self.currentFileIndex() else index
         tableview = self.currentFileTV()
         ## TODO need to keep track of which tab here? 1 tab is 1 tableview for one file
@@ -280,7 +278,6 @@ class MDA_MVC(QtWidgets.QWidget):
         # TODO : need to keep track of which tab here? 1 tab is 1 tableview for one file
         ################################################################################
 
-
     def applySelectionChanges(self, new_selection):
         print("\n\n\n\n\nEntering applySelectionChanges")
         tableview = self.currentFileTV()
@@ -322,9 +319,9 @@ class MDA_MVC(QtWidgets.QWidget):
         """
         selectedFile = self.mdaFileList()[index.row()]
         self.setCurrentFileIndex(index)
-        #file_path = str(self.dataPath() / selectedFile)
-        #self.setCurrentFileSelected(file_path)  # TODO am I using this?
-        
+        # file_path = str(self.dataPath() / selectedFile)
+        # self.setCurrentFileSelected(file_path)  # TODO am I using this?
+
         # If there is no Folder Table View, do nothing
         if self.mda_folder_tableview.tableView.model() is None:
             return
@@ -414,7 +411,7 @@ class MDA_MVC(QtWidgets.QWidget):
         if layoutMpl.count() != 1:  # in case something changes ...
             raise RuntimeError("Expected exactly one widget in this layout!")
         widgetMpl = layoutMpl.itemAt(0).widget()
-        
+
         ########################################################################
         # TODO : need to fix button, not working anymore                  # ####
         ########################################################################
@@ -426,22 +423,20 @@ class MDA_MVC(QtWidgets.QWidget):
             if not isinstance(widgetMpl, ChartView):
                 widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
             if action in ("replace"):
-                #widgetMpl.clearPlot()
-                self.mda_file_visualization.clearAllContent()  # Clear all content from the viz panel
+                widgetMpl.clearPlot()  # do I need: self.mda_mvc.mda_file_visualization.clearAllContent()?
             for row, (ds, ds_options) in zip(y_rows, datasets):
                 kwargs = {"ds_options": ds_options, "plot_options": plot_options}
                 widgetMpl.plot(row, *ds, **kwargs)
             self.mda_file_visualization.setPlot(widgetMpl)
 
         elif action in ("clear"):
-            #widgetMpl.clearPlot()
+            # widgetMpl.clearPlot()
             print("TESTTESTTEST")
             self.mda_mvc.mda_file_visualization.clearAllContent()  # Clear all content from the viz panel
             tableview.clearContents()
 
     # # ------------ Folder Table View navigation & selection highlight:
-    
-    
+
     def goToFirst(self):
         model = self.mda_folder_tableview.tableView.model()
         if model.rowCount() > 0:
@@ -478,17 +473,23 @@ class MDA_MVC(QtWidgets.QWidget):
         elif index.row() == rowCount - 1:
             scrollHint = QAbstractItemView.PositionAtBottom
         # Select the row and ensure it's visible
-        self.selectionModel().setCurrentIndex(index, QItemSelectionModel.ClearAndSelect | QItemSelectionModel.Rows)
+        self.selectionModel().setCurrentIndex(
+            index, QItemSelectionModel.ClearAndSelect | QItemSelectionModel.Rows
+        )
         self.mda_folder_tableview.tableView.scrollTo(index, scrollHint)
         # Emit the file selected signal
         self.doFileSelected(index)
-
 
     # # ------------ Checkbox methods:
 
     def onCheckboxStateChange(self, selection):
         """Slot: data field (for plotting) changes."""
         from .chartview import ChartView
+
+        # TODO: do I need a flag here to prevent "onCheckbocChange" to apply
+        # when selecting a new file: selecting a new file triggers it since
+        # the checkbox status effectively changes. Created problem when I tried
+        # to clearAllContent in mda_vizualization
 
         tableview = self.currentFileTV()
         previous_selection = self.selectionField()
@@ -512,10 +513,10 @@ class MDA_MVC(QtWidgets.QWidget):
 
         if previous_selection:
             # if changing POS, clear the graph:
-            if previous_selection.get("X") != selection.get("X"):   
-                widgetMpl.clearPlot()  #do I need: self.mda_mvc.mda_file_visualization.clearAllContent()?
-                
-            # TODO: if remove X and no X left, core dump:      
+            if previous_selection.get("X") != selection.get("X"):
+                widgetMpl.clearPlot()
+
+            # TODO: if remove X and no X left, core dump:
             # onCheckboxStateChange called:  Auto-replace with {'Y': [2], 'X': 0}
             # Traceback (most recent call last):
             #   File "/home/beams22/29IDUSER/bin/mdaviz/mdaviz/mda_folder.py", line 600, in onCheckboxStateChange
@@ -528,16 +529,15 @@ class MDA_MVC(QtWidgets.QWidget):
             # IndexError: tuple index out of range
             # Aborted (core dumped)
 
-                
-            # if removing DET, clear the graph: 
+            # if removing DET, clear the graph:
             if len(previous_selection.get("Y")) > len(selection.get("Y")):
-                widgetMpl.clearPlot() #do I need: self.mda_mvc.mda_file_visualization.clearAllContent()?
-                
+                widgetMpl.clearPlot()
+
             # TODO that is weird, why? only should clear if there is no Y left
             # that is the behavior that I observe in Auto-Replace
             # in Auto-Add, should remove it from the graph but it doesn't
             # lots of stuff to fix here
-            
+
         # Get dataset for the positioner/detector selection:
         datasets, plot_options = tableview.data2Plot(self.selectionField())
 
@@ -550,8 +550,7 @@ class MDA_MVC(QtWidgets.QWidget):
             if not isinstance(widgetMpl, ChartView):
                 widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
             if mode in ("Auto-replace"):
-                # widgetMpl.clearPlot()
-                self.mda_mvc.mda_file_visualization.clearAllContent()  # Clear all content from the viz panel
+                widgetMpl.clearPlot()
             for row, (ds, ds_options) in zip(y_rows, datasets):
                 # ds_options: label (for legend)
                 # plot_options: xlabel, ylabel, title
