@@ -12,7 +12,6 @@ MVC implementation of mda files.
         ~setStatus: Updates the main window's status bar with a message.
         
         ~applySelectionChanges: Applies changes in positioner and detector selections for plotting.
-        ~currentFileIndex: Returns the index of the currently selected file.
         ~currentFileTV: Returns the table view associated with the current file.
         ~dataPath: Provides the path of the data folder containing MDA files.
         ~disconnectSignals: Disconnects signal connections to prevent unwanted signal emission during updates.
@@ -31,7 +30,6 @@ MVC implementation of mda files.
         ~selectionModel: Accesses the selection model associated with the folder table view.
         ~setSelectionField: Sets the field selections for plotting.
         ~setSelectionModel: Sets the selection model for managing item selections within the view.
-        ~setCurrentFileIndex: Sets the index of the currently selected file.
         ~setCurrentFileTV: Sets the table view associated with the current file.
         ~setSavedSelection: Stores the selection state for future reference.
         ~updateDetectorSelection: Updates detector selections based on the PVs in the newly selected file.
@@ -158,7 +156,6 @@ class MDA_MVC(QtWidgets.QWidget):
         self.setSelectionField()
         self.setSelectionModel()
         self.setSavedSelection()
-        self.setCurrentFileIndex()
         self.setCurrentFileTableview()
 
         # File Selection Model & Focusfor keyboard arrow keys
@@ -202,9 +199,6 @@ class MDA_MVC(QtWidgets.QWidget):
     def currentFileTableview(self):
         return self._currentFileTableview
 
-    def currentFileIndex(self):
-        return self._currentFileIndex
-
     def selectionModel(self):
         """
         Used to access the selection model associated with a view, such as MDAFolderTableView.
@@ -224,9 +218,6 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def setCurrentFileTableview(self, tableview=None):
         self._currentFileTableview = tableview
-
-    def setCurrentFileIndex(self, index=None):
-        self._currentFileIndex = index
 
     # # ------------ Table view methods:
 
@@ -380,7 +371,6 @@ class MDA_MVC(QtWidgets.QWidget):
             initialized and correctly set up to interact with the underlying data model and UI.
         """
         selectedFile = self.mdaFileList()[index.row()]
-        self.setCurrentFileIndex(index)
 
         # If there is no Folder Table View, do nothing
         if self.mda_folder_tableview.tableView.model() is None:
