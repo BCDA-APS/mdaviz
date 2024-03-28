@@ -6,6 +6,83 @@ MVC implementation of mda files.
 .. autosummary::
 
     ~MDA_MVC
+        
+        ~__init__: Initializes the MDA_MVC instance with the main window and UI setup.
+        ~setup: Initializes folder and file table views, data visualization components, and connections.
+        ~setStatus: Updates the main window's status bar with a message.
+        
+        ~applySelectionChanges: Applies changes in positioner and detector selections for plotting.
+        ~currentFileIndex: Returns the index of the currently selected file.
+        ~currentFileTV: Returns the table view associated with the current file.
+        ~dataPath: Provides the path of the data folder containing MDA files.
+        ~disconnectSignals: Disconnects signal connections to prevent unwanted signal emission during updates.
+        ~doFileSelected: Manages actions triggered by selecting a new file, including UI updates and plotting.
+        ~doPlot: Initiates plotting based on selected files and data fields.
+        ~doRefresh: Refreshes folder and file views with updated data from the current directory.
+        ~goToFirst: Selects the first file in the folder view.
+        ~goToLast: Selects the last file in the folder view.
+        ~goToNext: Navigates to and selects the next file.
+        ~goToPrevious: Navigates to and selects the previous file.
+        ~handlePlotBasedOnMode: Handles plotting actions based on the user-selected mode (e.g., Auto-add).
+        ~mdaFileList: Retrieves a list of MDA file names in the selected folder.
+        ~onCheckboxStateChange: Responds to changes in checkbox states within the file view for plotting updates.
+        ~selectAndShowIndex: Selects a file by its index and ensures visibility in the table view.
+        ~selectionField: Returns the current selection of positioner and detectors for plotting.
+        ~selectionModel: Accesses the selection model associated with the folder table view.
+        ~setSelectionField: Sets the field selections for plotting.
+        ~setSelectionModel: Sets the selection model for managing item selections within the view.
+        ~setCurrentFileIndex: Sets the index of the currently selected file.
+        ~setCurrentFileTV: Sets the table view associated with the current file.
+        ~setSavedSelection: Stores the selection state for future reference.
+        ~updateDetectorSelection: Updates detector selections based on the PVs in the newly selected file.
+        ~updateFileView: Refreshes the file view for the selected file.
+        ~updateFolderView: Refreshes the folder view to reflect current folder contents.
+        ~updateSelectionForNewPVs: Adjusts positioner and detector selections when switching to a new file.  
+
+        ~setSplitterSettingsName: Generates a unique key name for storing splitter positions in settings.
+        ~setSplitterMoved: Manages and saves user-adjusted splitter positions.
+        ~setSplitterWaitChanges: Waits for splitter position changes to settle before updating settings.
+        ~splitterMoved: Triggers actions when a splitter's position is changed.
+        ~splitterSettingsName: Provides a settings key name for a given splitter.
+        ~splitterWaitChanges: Delays settings update until splitter position changes have settled.        
+              
+
+Flow chart:
+    
+    Double Click on File ---> doFileSelected ---> doPlot
+
+    First Button Press ---> goToFirst ---> selectAndShowIndex ---> doFileSelected ---> doPlot
+    Last Button Press ---> goToLast ---> selectAndShowIndex ---> doFileSelected ---> doPlot
+    Next Button Press ---> goToNext ---> selectAndShowIndex ---> doFileSelected ---> doPlot
+    Previous Button Press ---> goToPrevious ---> selectAndShowIndex ---> doFileSelected ---> doPlot
+
+    Refresh Button Press ---> doRefresh ---> updateFolderView 
+
+    Checkbox State Change ---> onCheckboxStateChange ---> doPlot
+    WARNING: also triggered by doFileSelected (since it changes the selection)
+    
+Data model updates:
+
+    File Selection Change (via Navigation or Double Click)
+    |___> doFileSelected ---> updateFileView (to reflect new selection)
+    |___> updateSelectionForNewPVs (if necessary, to handle new Process Variables)
+    |___> applySelectionChanges (to update plotting selections)
+
+    Checkbox State Change in File View
+    |___> onCheckboxStateChange ---> doPlot (to update the plot based on new selections)
+
+    Refresh Button Press
+    |___> doRefresh ---> updateFolderView (to reload folder content)
+    |___> updateFileView (to reload file content if there is a change in selection)
+
+    Data Plotting Request (through user selection or automatically)
+    |___> doPlot (updates the visualization with new data)
+
+    Field Selection Change (e.g., positioners, detectors)
+    |___> updateDetectorSelection (updates selected detectors for new file)
+    |___> applySelectionChanges (updates the selections for plotting)
+
+    
 """
 
 import time
