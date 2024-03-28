@@ -34,8 +34,8 @@ COLUMNS = [
 
 class MDAFileTableView(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
-    selected = QtCore.pyqtSignal(str, dict)
-    fieldchange = QtCore.pyqtSignal(str, dict)
+    selected = QtCore.pyqtSignal(str, dict)  # TODO: not used here?
+    # fieldchange = QtCore.pyqtSignal(str, dict) # TODO: not used?
 
     def __init__(self, parent):
         """
@@ -121,7 +121,6 @@ class MDAFileTableView(QtWidgets.QWidget):
     def clearContents(self):
         self.tableView.model().clearAllCheckboxes()
         self.tableView.setModel(None)
-            
 
     def data2Plot(self, selections):
         """
