@@ -17,7 +17,8 @@ from . import utils
 class MDAFile(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
     selected = QtCore.pyqtSignal(str, dict)
-    fieldchange = QtCore.pyqtSignal(str, dict)
+    # fieldchange = QtCore.pyqtSignal(str, dict)  # TODO: not used?
+    currentTabChanged = QtCore.pyqtSignal(int)  # Emit the index of the current tab
 
     def __init__(self, parent):
         """
@@ -52,6 +53,7 @@ class MDAFile(QtWidgets.QWidget):
         self.autoBox.currentTextChanged.connect(self.setMode)
         self.autoBox.currentTextChanged.connect(self.updateButtonVisibility)
 
+        self.tabWidget.currentChanged.connect(self.onCurrentTabChanged)
         self.tabWidget.tabCloseRequested.connect(self.removeFileTab)
 
     def dataPath(self):
@@ -78,7 +80,7 @@ class MDAFile(QtWidgets.QWidget):
         self._tabList = new_tab_list or []
         # TODO: Is there a point in defaulting to None then []? Should I just do:
         # setTabList(self, new_tab_list=[])
-        # self._tabList = new_tab_list         
+        # self._tabList = new_tab_list
 
     def data(self):
         return self._data
@@ -119,7 +121,7 @@ class MDAFile(QtWidgets.QWidget):
         file_name = self.mdaFileList()[index]
         file_path = self.dataPath() / file_name
         file_metadata, file_data = readMDA(file_path)
-        scanDict, first_pos, first_det = utils.get_scan(file_data)  
+        scanDict, first_pos, first_det = utils.get_scan(file_data)
         pvList = [v["name"] for v in scanDict.values()]
         self._data = {
             "fileName": file_name.rsplit(".mda", 1)[0],
@@ -159,7 +161,7 @@ class MDAFile(QtWidgets.QWidget):
         - index (int): The index of the selected file in the MDA file list.
         - selection_field (dict): The dictionary containing the selection of pos/det(s) to plot.
         """
-        
+
         print("\nEntering addFileTab")
 
         # Get data for the selected file:
@@ -182,7 +184,7 @@ class MDAFile(QtWidgets.QWidget):
                 default_selection = None
             print(f"\nResult: {default_selection=}")
             return default_selection
-                                
+
         if selection_field is None:
             default = defaultSelection(first_pos, first_det)
             self.mda_mvc.setSelectionField(default)
@@ -196,38 +198,38 @@ class MDAFile(QtWidgets.QWidget):
             self.tabWidget.setCurrentIndex(tab_index)
 
         else:
-            
-            mode = self.mode()          # ["Auto-replace", "Auto-add", "Auto-off"]
-            if mode == "Auto-add":       
+
+            mode = self.mode()  # ["Auto-replace", "Auto-add", "Auto-off"]
+            if mode == "Auto-add":
                 self.createNewTab(file_name, file_path, selection_field)
                 # Add selected file to the list of open tabs:
                 tab_list.append(file_path)
                 self.setTabList(tab_list)
-                
+
             elif mode == "Auto-replace":
                 # Clear all existing tabs first if in "Auto-replace" mode
                 while self.tabWidget.count() > 0:
                     self.tabWidget.removeTab(0)
                 self.createNewTab(file_name, file_path, selection_field)
                 # Since we're auto-replacing, we can simplify the tab list management
-                self.setTabList([file_path])   
-                
+                self.setTabList([file_path])
+
             # TODO implement auto-off: nothing happens?
-            # the addition of a new tab /update of existing tab will only happen when Replace or Add is pushed?        
-        
+            # the addition of a new tab /update of existing tab will only happen when Replace or Add is pushed?
+
         print("\nLeaving addFileTab")
-        
+
     def createNewTab(self, file_name, file_path, selection_field):
         from .mda_file_table_view import MDAFileTableView
+
         # Create a new instance of MDAFileTableView for the selected file:
         self.file_tableview = MDAFileTableView(self)
         tab_index = self.tabWidget.addTab(self.file_tableview, file_name)
         self.tabWidget.setCurrentIndex(tab_index)
-        self.file_tableview.displayTable(selection_field)                
+        self.file_tableview.displayTable(selection_field)
         # Access and update the QLabel for the filePath:
         filePathLabel = self.file_tableview.filePath
-        filePathLabel.setText(file_path)    
-        
+        filePathLabel.setText(file_path)
 
     def removeFileTab(self, *args):
         """
@@ -270,20 +272,23 @@ class MDAFile(QtWidgets.QWidget):
             self.setStatus(
                 f"Cannot find corresponding file tab:  {index=}, {filepath=}"
             )
-            
+
         if not self.tabList():  # If the list of tabs is empty after removing one
             self.mda_mvc.mda_file_visualization.clearAllContent()  # Clear all content from the viz panel
-
 
     ########################################################################
     # TODO : need a switch tab: update metadata and data, not plot    # ####
     ########################################################################
-    
+
+    def onCurrentTabChanged(self, index):
+        # index is the new current tab's index
+        # Emit the signal to inform MDA_MVC about the change
+        self.currentTabChanged.emit(index)
+
     # ------ Button methods:
 
-
     # FIXME: repsonder is no longer working
-    
+
     def responder(self, action):
         """Modify the plot with the described action
 
@@ -293,8 +298,16 @@ class MDAFile(QtWidgets.QWidget):
             from buttons: add, clear, replace
 
         """
-        print(f"\nResponder: {action=}")
-        self.selected.emit(action, self.file_tableview.tableView.model().plotFields()[0])
+        # TODO: need to use the UPDATED file_tableview, ie the one in the tab that is currently selected
+        # would this be handled with mda_folder when it connects to it? I m not sure since it emits the stuff
+        # from self.file_tableview
+
+        print(
+            f"\nResponder: {action=} - {self.file_tableview.tableView.model().plotFields()[0]}"
+        )
+        self.selected.emit(
+            action, self.file_tableview.tableView.model().plotFields()[0]
+        )
 
     def updateButtonVisibility(self):
         """Check the current text in "mode" pull down and show/hide buttons accordingly"""
