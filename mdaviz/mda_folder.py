@@ -58,12 +58,22 @@ Data model updates:
 
     File Selection Change (via Navigation or Double Click)
     |___> doFileSelected
+        |___> Update Current File Index
+        |___> Update Current File Tableview (to point to the table view in the active tab)
         |___> mda_file.addFileTab (adds a new tab with file content)
         |___> mda_file.displayMetadata (displays selected file's metadata)
         |___> mda_file.displayData (displays selected file's data)
-    if necessary:
+    ...if necessary:
         |___> updateSelectionForNewPVs (updates PV selections based on previous one)
         |___> applySelectionChanges (updates plotting selections based on new PV position in tableview)
+
+
+    Tab Change:
+    |___> Update Current File Index
+    |___> Update Current File Tableview (to point to the table view in the active tab)
+    |___> (Any subsequent actions, such as applySelectionChanges, will use the updated current file tableview)
+
+
 
     Checkbox State Change in File View
     |___> onCheckboxStateChange ---> doPlot (to update the plot based on new selections)
@@ -164,6 +174,13 @@ class MDA_MVC(QtWidgets.QWidget):
         self.mda_folder_tableview.lastButton.clicked.connect(self.goToLast)
         self.mda_folder_tableview.backButton.clicked.connect(self.goToPrevious)
         self.mda_folder_tableview.nextButton.clicked.connect(self.goToNext)
+
+        # Tab connection:
+        try:
+            self.mda_file.currentTabChanged.disconnect()
+        except TypeError:  # No slots connected yet
+            pass
+        self.mda_file.currentTabChanged.connect(self.onCurrentTabChanged)
 
         # save/restore splitter sizes in application settings
         for key in "hsplitter vsplitter".split():
@@ -316,6 +333,13 @@ class MDA_MVC(QtWidgets.QWidget):
         # TODO : need to keep track of which tab here? 1 tab is 1 tableview for one file
         ################################################################################
 
+    def onCurrentTabChanged(self, index):
+        # Handle the change
+        new_tab_tableview = self.mda_file.tabWidget.widget(index)
+        self.currentFileTableview(new_tab_tableview)
+
+        # TODO TODO TODO TODO Update anything else necessary for the new tab: data, metadata and selectionField?
+
     def applySelectionChanges(self, new_selection):
         print("\n\n\n\n\nEntering applySelectionChanges")
         tableview = self.currentFileTableview()
@@ -339,8 +363,8 @@ class MDA_MVC(QtWidgets.QWidget):
         from the previously selected file.
 
         Args:
-            index (int): The index of the selected file in the file list. This index is used to
-                        retrieve the file's details and update the UI accordingly.
+            index (QModelIndex): The model index of the selected file in the file list.
+            This index is used to retrieve the file's details and update the UI accordingly.
 
         Behavior:
             - Displays the fields table view and metadata for the selected file.
@@ -357,8 +381,6 @@ class MDA_MVC(QtWidgets.QWidget):
         """
         selectedFile = self.mdaFileList()[index.row()]
         self.setCurrentFileIndex(index)
-        # file_path = str(self.dataPath() / selectedFile)
-        # self.setCurrentFileSelected(file_path)  # TODO am I using this?
 
         # If there is no Folder Table View, do nothing
         if self.mda_folder_tableview.tableView.model() is None:
