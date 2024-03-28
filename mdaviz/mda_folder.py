@@ -48,25 +48,25 @@ MVC implementation of mda files.
               
 
 Flow chart:
+    Refresh Button Press ---> doRefresh ---> updateFolderView 
     
     Double Click on File ---> doFileSelected ---> doPlot
-
-    First Button Press ---> goToFirst ---> selectAndShowIndex ---> doFileSelected ---> doPlot
-    Last Button Press ---> goToLast ---> selectAndShowIndex ---> doFileSelected ---> doPlot
-    Next Button Press ---> goToNext ---> selectAndShowIndex ---> doFileSelected ---> doPlot
-    Previous Button Press ---> goToPrevious ---> selectAndShowIndex ---> doFileSelected ---> doPlot
-
-    Refresh Button Press ---> doRefresh ---> updateFolderView 
+    Navigation Button Press ---> goTo... ---> selectAndShowIndex ---> doFileSelected ---> doPlot
 
     Checkbox State Change ---> onCheckboxStateChange ---> doPlot
-    WARNING: also triggered by doFileSelected (since it changes the selection)
+    WARNING:             |___> doFileSelected (since it changes the selection)
     
 Data model updates:
 
+
     File Selection Change (via Navigation or Double Click)
-    |___> doFileSelected ---> updateFileView (to reflect new selection)
-    |___> updateSelectionForNewPVs (if necessary, to handle new Process Variables)
-    |___> applySelectionChanges (to update plotting selections)
+    |___> doFileSelected
+        |___> mda_file.addFileTab (adds a new tab with file content)
+        |___> mda_file.displayMetadata (displays selected file's metadata)
+        |___> mda_file.displayData (displays selected file's data)
+    if necessary:
+        |___> updateSelectionForNewPVs (updates PV selections based on previous one)
+        |___> applySelectionChanges (updates plotting selections based on new PV position in tableview)
 
     Checkbox State Change in File View
     |___> onCheckboxStateChange ---> doPlot (to update the plot based on new selections)
@@ -153,7 +153,7 @@ class MDA_MVC(QtWidgets.QWidget):
         self.setSelectionModel()
         self.setSavedSelection()
         self.setCurrentFileIndex()
-        self.setCurrentFileTV()
+        self.setCurrentFileTableview()
 
         # File Selection Model & Focusfor keyboard arrow keys
         model = self.mda_folder_tableview.tableView.model()
@@ -186,8 +186,8 @@ class MDA_MVC(QtWidgets.QWidget):
         """List of mda file (name only) in the selected folder."""
         return self.mainWindow.mdaFileList()
 
-    def currentFileTV(self):
-        return self._currentFileTV
+    def currentFileTableview(self):
+        return self._currentFileTableview
 
     def currentFileIndex(self):
         return self._currentFileIndex
@@ -209,8 +209,8 @@ class MDA_MVC(QtWidgets.QWidget):
     def setSavedSelection(self, selection=None):
         self._saved_selection = selection
 
-    def setCurrentFileTV(self, tableview=None):
-        self._currentFileTV = tableview
+    def setCurrentFileTableview(self, tableview=None):
+        self._currentFileTableview = tableview
 
     def setCurrentFileIndex(self, index=None):
         self._currentFileIndex = index
@@ -229,7 +229,7 @@ class MDA_MVC(QtWidgets.QWidget):
         # which doesn't trigger plotting) and actively selecting a file for display (through
         # double-clicking or using navigation buttons like first/next/previous/last, which triggers plotting)
         index = self.currentFileIndex().row() if self.currentFileIndex() else index
-        tableview = self.currentFileTV()
+        tableview = self.currentFileTableview()
         ## TODO need to keep track of which tab here? 1 tab is 1 tableview for one file
         tableview.clearContents()
         tableview.displayTable(index)
@@ -293,7 +293,7 @@ class MDA_MVC(QtWidgets.QWidget):
         if verbose:
             print(f"\n----- Selection before clean up: {self.selectionField()}\n")
         changes_made = False
-        tableview = self.currentFileTV()
+        tableview = self.currentFileTableview()
         new_selection = {"Y": [], "X": tableview.data()["fileInfo"]["firstPos"]}
         # Update Y selections
         changes_made |= self.updateDetectorSelection(
@@ -339,7 +339,7 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def applySelectionChanges(self, new_selection):
         print("\n\n\n\n\nEntering applySelectionChanges")
-        tableview = self.currentFileTV()
+        tableview = self.currentFileTableview()
         self.setSelectionField(new_selection)
         tableview.tableView.model().updateCheckboxes(
             utils.mda2ftm(new_selection), update_mda_mvc=False
@@ -385,33 +385,30 @@ class MDA_MVC(QtWidgets.QWidget):
         if self.mda_folder_tableview.tableView.model() is None:
             return
 
-        print(f"\n{index.row()=}")
-
-        current_tab_index = self.mda_file.tabWidget.count()
-        # if no tab open, currentIndex would return -1:
+        # If no tabs are open, oldPvList should be None
         if self.mda_file.tabWidget.count() == 0:
-            oldPvList = None
+            old_pv_list = None
         else:
-            # access the instance of tableView for the current tab:
-            current_tab_index = self.mda_file.tabWidget.currentIndex()
-            oldTabTableview = self.mda_file.tabWidget.widget(current_tab_index)
-            oldPvList = oldTabTableview.data()["fileInfo"]["pvList"]
+            # Access the instance of tableView for the current tab:
+            old_tab_index = self.mda_file.tabWidget.currentIndex()
+            old_tab_tableview = self.mda_file.tabWidget.widget(old_tab_index)
+            old_pv_list = old_tab_tableview.data()["fileInfo"]["pvList"]
 
-        print(f"\nBefore addTab: {self.selectionField()=}")
+        # Update mda_file abd mda_vizualization content:
         self.mda_file.addFileTab(index.row(), self.selectionField())
-        print(f"\nAfter addTab: {self.selectionField()=}")
         self.mda_file.displayMetadata()
         self.mda_file.displayData()
-        newPvList = self.mda_file.data().get("pvList")
+        new_pv_list = self.mda_file.data().get("pvList")
 
-        current_tab_index = self.mda_file.tabWidget.currentIndex()
-        newTabTableview = self.mda_file.tabWidget.widget(current_tab_index)
-        self.setCurrentFileTV(newTabTableview)
+        # addFileTab -> tabWidget.setCurrentIndex to the new tab:
+        new_tab_index = self.mda_file.tabWidget.currentIndex()
+        new_tab_tableview = self.mda_file.tabWidget.widget(new_tab_index)
+        self.setCurrentFileTableview(new_tab_tableview)
 
         # Manage signal connections for the new file selection.
-        self.disconnectSignals(newTabTableview)
-        newTabTableview.selected.connect(self.doPlot)
-        newTabTableview.tableView.model().checkboxStateChanged.connect(
+        self.disconnectSignals(new_tab_tableview)
+        new_tab_tableview.selected.connect(self.doPlot)
+        new_tab_tableview.tableView.model().checkboxStateChanged.connect(
             self.onCheckboxStateChange
         )
 
@@ -420,8 +417,8 @@ class MDA_MVC(QtWidgets.QWidget):
         )
         # selectionField() may have changed when calling addFileTab:
         if self.selectionField():
-            if oldPvList is not None:
-                self.updateSelectionForNewPVs(oldPvList, newPvList, verbose)
+            if old_pv_list is not None:
+                self.updateSelectionForNewPVs(old_pv_list, new_pv_list, verbose)
             self.handlePlotBasedOnMode()
         else:
             self.setStatus("Could not find a (positioner,detector) pair to plot.")
@@ -457,7 +454,7 @@ class MDA_MVC(QtWidgets.QWidget):
         """Slot: data field selected (for plotting) button is clicked."""
         from .chartview import ChartView
 
-        tableview = self.currentFileTV()
+        tableview = self.currentFileTableview()
 
         action = args[0]
         self.setSelectionField(args[1])
@@ -550,7 +547,7 @@ class MDA_MVC(QtWidgets.QWidget):
         # the checkbox status effectively changes. Created problem when I tried
         # to clearAllContent in mda_vizualization
 
-        tableview = self.currentFileTV()
+        tableview = self.currentFileTableview()
         previous_selection = self.selectionField()
 
         # Get the matplotlib chartview widget, if exists:
