@@ -35,10 +35,8 @@ MVC implementation of mda files.
         ~setCurrentFileTV: Sets the table view associated with the current file.
         ~setSavedSelection: Stores the selection state for future reference.
         ~updateDetectorSelection: Updates detector selections based on the PVs in the newly selected file.
-        ~updateFileView: Refreshes the file view for the selected file.
         ~updateFolderView: Refreshes the folder view to reflect current folder contents.
         ~updateSelectionForNewPVs: Adjusts positioner and detector selections when switching to a new file.  
-
         ~setSplitterSettingsName: Generates a unique key name for storing splitter positions in settings.
         ~setSplitterMoved: Manages and saves user-adjusted splitter positions.
         ~setSplitterWaitChanges: Waits for splitter position changes to settle before updating settings.
@@ -73,7 +71,6 @@ Data model updates:
 
     Refresh Button Press
     |___> doRefresh ---> updateFolderView (to reload folder content)
-    |___> updateFileView (to reload file content if there is a change in selection)
 
     Data Plotting Request (through user selection or automatically)
     |___> doPlot (updates the visualization with new data)
@@ -221,18 +218,6 @@ class MDA_MVC(QtWidgets.QWidget):
         """Clear existing data and set new data for mda_folder_tableview"""
         self.mda_folder_tableview.clearContents()
         self.mda_folder_tableview.displayTable()
-
-    def updateFileView(self, index=None):
-        """Clear existing data and set new data for mda_file_tableview"""
-        # NOTE: Here I cannot use currentIndex = self.selectionModel().currentIndex()
-        # since here's a distinction between navigating through the table view (using arrow keys,
-        # which doesn't trigger plotting) and actively selecting a file for display (through
-        # double-clicking or using navigation buttons like first/next/previous/last, which triggers plotting)
-        index = self.currentFileIndex().row() if self.currentFileIndex() else index
-        tableview = self.currentFileTableview()
-        ## TODO need to keep track of which tab here? 1 tab is 1 tableview for one file
-        tableview.clearContents()
-        tableview.displayTable(index)
 
     def doRefresh(self):
         self.setStatus("Refreshing folder...")
