@@ -151,6 +151,23 @@ class MDAFile(QtWidgets.QWidget):
             return
         self.mda_mvc.mda_file_visualization.setTableData(tabledata)
 
+    def defaultSelection(self, first_pos, first_det, selection_field):
+        """Sets the default field selection if no selection is provided.
+
+        Args:
+            first_pos (int): The index of the first positioner.
+            first_det (int): The index of the first detector.
+            selection_field (dict): The current selection fields, if any.
+
+        Returns:
+            dict: The updated selection field.
+        """
+        if selection_field:
+            return selection_field
+        default = {"X": first_pos, "Y": [first_det]}
+        self.mda_mvc.setSelectionField(default)
+        return default
+
     def addFileTab(self, index, selection_field):
         """
         Adds a new tab with a QTableView and QLabel for the selected file.
@@ -159,8 +176,6 @@ class MDAFile(QtWidgets.QWidget):
         - index (int): The index of the selected file in the MDA file list.
         - selection_field (dict): The dictionary containing the selection of pos/det(s) to plot.
         """
-
-        print("\nEntering addFileTab")
 
         # Get data for the selected file:
         self.setData(index)
@@ -172,57 +187,50 @@ class MDAFile(QtWidgets.QWidget):
         metadata = data["metadata"]
         tabledata = data["scanDict"]
 
-        def defaultSelection(first_pos_idx=None, first_det_idx=None):
-            if first_pos_idx is not None and first_det_idx is not None:
-                default_selection = {"X": first_pos_idx, "Y": [first_det_idx]}
-            else:
-                default_selection = None
-            return default_selection
+        # Update data & metadata:
+        self.displayMetadata(metadata)
+        self.displayData(tabledata)
+        # Determine default selection if needed:
+        selection_field = self.defaultSelection(first_pos, first_det, selection_field)
 
-        if selection_field is None:
-            default = defaultSelection(first_pos, first_det)
-            self.mda_mvc.setSelectionField(default)
-            selection_field = default
-
+        # If file already opened in a tab, just switch to that tab:
         if file_path in self.tabDict():
-            # If file already opened in a tab, just switch to that tab:
-            tab_index = self.tabDict()[file_path]["index"]
-            self.tabWidget.setCurrentIndex(tab_index)
+            for tab_index in range(self.tabWidget.count()):
+                widget = self.tabWidget.widget(tab_index)
+                if widget.filePath.text() == file_path:
+                    # Found the tab, switch to it
+                    self.tabWidget.setCurrentIndex(tab_index)
+                    break  # Exit the loop after switching to the tab
 
+        # TODO: Directly Accessing Widgets for File Path: Accessing
+        # widget.filePath.text() directly is fine as long as every widget added
+        # to the tabWidget has a filePath attribute. Ensure this is consistently
+        # applied across all widgets. An alternative approach is to use
+        # QTabWidget's setTabData and tabData methods to store and retrieve the
+        # file path or other metadata, which could abstract away the need to
+        # directly interact with widget properties.
+
+        # If opening a new file, create a new tab and update tab dictionary:
         else:
-            # Populate data & metadata tabs:
-            self.displayMetadata(metadata)
-            self.displayData(tabledata)
-
             mode = self.mode()  # ["Auto-replace", "Auto-add", "Auto-off"]
             if mode == "Auto-add":
-                tab_index = self.createNewTab(file_name, file_path, selection_field)
+                self.createNewTab(file_name, file_path, selection_field)
                 tab_dict = self.tabDict()
-                tab_dict[file_path] = {
-                    "metadata": metadata,
-                    "tabledata": tabledata,
-                    "index": tab_index,
-                }
+                tab_dict[file_path] = {"metadata": metadata, "tabledata": tabledata}
 
             elif mode == "Auto-replace":
                 # Clear all existing tabs:
                 while self.tabWidget.count() > 0:
                     self.tabWidget.removeTab(0)
-                tab_index = self.createNewTab(file_name, file_path, selection_field)
-                tab_dict = {}
-                tab_dict[file_path] = {
-                    "metadata": metadata,
-                    "tabledata": tabledata,
-                    "index": tab_index,
-                }
+                self.createNewTab(file_name, file_path, selection_field)
+                tab_dict = {}  # Starting fresh
+                tab_dict[file_path] = {"metadata": metadata, "tabledata": tabledata}
 
             # Update the tab dictionary:
             self.setTabDict(tab_dict)
 
             # TODO implement auto-off: nothing happens?
             # the addition of a new tab /update of existing tab will only happen when Replace or Add is pushed?
-
-        print("\nLeaving addFileTab")
 
     def createNewTab(self, file_name, file_path, selection_field):
         from .mda_file_table_view import MDAFileTableView
@@ -235,7 +243,6 @@ class MDAFile(QtWidgets.QWidget):
         # Access and update the QLabel for the filePath:
         filePathLabel = self.file_tableview.filePath
         filePathLabel.setText(file_path)
-        return tab_index
 
     def removeFileTab(self, index=None):
         """
