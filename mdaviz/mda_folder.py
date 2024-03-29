@@ -85,7 +85,6 @@ Data model updates:
     Field Selection Change (e.g., positioners, detectors)
     |___> updateDetectorSelection (updates selected detectors for new file)
     |___> applySelectionChanges (updates the selections for plotting)
-
     
 """
 
@@ -325,15 +324,37 @@ class MDA_MVC(QtWidgets.QWidget):
         ################################################################################
 
     def onCurrentTabChanged(self, index):
-        # Handle the change
+        """
+        Updates UI to reflect the content of the newly selected tab or resets UI if no tab is selected.
+
+        When a new tab is selected, it sets the context to the corresponding table view, displays the file's
+        metadata, and data based on the selected tab's file path. If no tab is selected (index == -1),
+        the UI is reset to indicate no file is currently active.
+
+        Parameters:
+        - index (int): Index of the newly selected tab; -1 if no tab is selected.
+
+        Notes: This method is connected to the `currentChanged` signal of the QTabWidget that manages
+        the file tabs:
+        In MDAFile:
+            self.tabWidget.currentChanged.commect [signal: emits new_tab_index]
+                --> self.onCurrentTabChanged(new_tab_index) [slot]
+                    --> self.currentTabChanged  [QtCore.pyqtSignal(new_tab_index)]
+        In MDA_MVC:
+            self.mda_file.currentTabChanged.connect [signal: emits new_tab_index]
+                --> self.onCurrentTabChanged(new_tab_index)
+        """
+
+        # If there is no tab open:
         if index == -1:
             self.setCurrentFileTableview()  # reset to default = None
             self.setSelectionField()  # reset to default = None
             self.setStatus("No file currently selected.")
             return
+        # If there is at least one tab open, access the one currently selected:
         new_tab_tableview = self.mda_file.tabWidget.widget(index)
         self.setCurrentFileTableview(new_tab_tableview)
-        # read the label of the tab, that contains the filepath:
+        # Read the label of the tab, that contains the filepath:
         tab_file_path = new_tab_tableview.filePath.text()
         tab_info = self.mda_file.tabDict().get(tab_file_path, None)
         if tab_info:
@@ -348,7 +369,10 @@ class MDA_MVC(QtWidgets.QWidget):
         # it is link to the tabview itself?
 
         # TODO:  disable UI elements or actions that require an active file to be meaningful:
-        # For example: the add/replace button in auto-off need to be desabled if no files is selected
+        # For example: the add/replace button in auto-off need to be disabled if no files is selected
+        # Implementing a method that updates the state of UI components based on the current context
+        # (e.g., active tab, available data) would enhance usability. This method could be
+        # called after tab changes, file selections, or other significant events.
 
     def applySelectionChanges(self, new_selection):
         print("\n\n\n\n\nEntering applySelectionChanges")
