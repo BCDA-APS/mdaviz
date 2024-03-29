@@ -344,16 +344,24 @@ class MDA_MVC(QtWidgets.QWidget):
             self.mda_file.currentTabChanged.connect [signal: emits new_tab_index]
                 --> self.onCurrentTabChanged(new_tab_index)
         """
+
+        print(f"\nEntering onCurrentTabChanged for {index=}")
         # If there is no tab open:
         if index == -1:
             self.setCurrentFileTableview()  # Reset to indicate no active file table view
             self.setSelectionField()  # Reset selection field to default
             self.setStatus("No file currently selected.")
+            print(f"Leaving onCurrentTabChanged for {index=}")
             return
 
         # Retrieve the table view and file path for the currently selected tab
-        new_tab_tableview = self.mda_file.getTabTableview(index)
-        tab_file_path = self.mda_file.getTabInfo(index=index)
+
+        new_tab_tableview = self.mda_file.tabWidget.widget(index)
+        tab_file_path = new_tab_tableview.filePath.text()
+
+        # TODO: This should work but does not:
+        # new_tab_tableview = self.mda_file.getTabTableview(index)
+        # tab_file_path = self.mda_file.getTabInfo(index=index)
 
         # Update the context to the new table view
         self.setCurrentFileTableview(new_tab_tableview)
@@ -365,7 +373,7 @@ class MDA_MVC(QtWidgets.QWidget):
             self.mda_file.displayData(tab_info.get("tabledata", None))
         else:
             self.setStatus("No data and/or metadata found.")
-
+        print(f"Leaving onCurrentTabChanged; {tab_file_path=}")
         # TODO: update selectionField? how to keep track of which selectionField goes with which tab?
         # It seems that the code is doing fine with that, so I am not sure if I will introduce more
         # problem by trying to track and update selection fields when changing tabs. Is it because
@@ -459,14 +467,16 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def disconnectSignals(self, tableview):
         """Disconnect signals for selection changes and checkbox state changes."""
-        try:
-            tableview.selected.disconnect()
-        except TypeError:  # No slots connected yet
-            pass
-        try:
-            tableview.tableView.model().checkboxStateChanged.disconnect()
-        except TypeError:  # No slots connected yet
-            pass
+        if tableview is not None and hasattr(tableview, "selected"):
+            try:
+                tableview.selected.disconnect()
+            except TypeError:  # No slots connected yet
+                pass
+        if tableview is not None and hasattr(tableview, "tableView"):
+            try:
+                tableview.tableView.model().checkboxStateChanged.disconnect()
+            except TypeError:  # No slots connected yet
+                pass
 
     # # ------------ Plot methods:
 
