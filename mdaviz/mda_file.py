@@ -184,7 +184,7 @@ class MDAFile(QtWidgets.QWidget):
             self.mda_mvc.setSelectionField(default)
             selection_field = default
 
-        if file_path in list(self.tabDict().keys()):
+        if file_path in self.tabDict():
             # If file already opened in a tab, just switch to that tab:
             tab_index = self.tabDict()[file_path]["index"]
             self.tabWidget.setCurrentIndex(tab_index)
@@ -237,57 +237,29 @@ class MDAFile(QtWidgets.QWidget):
         filePathLabel.setText(file_path)
         return tab_index
 
-    def removeFileTab(self, *args):
+    def removeFileTab(self, index=None):
         """
-        Removes a tab from the tab widget based on a file path or index (1st arg).
-
-        If the file path or index is valid and corresponds to an open tab, removes
-        the tab from the widget and updates the app status message. If no valid arguments are
-        provided or the tab cannot be found, the status is updated with an error
-        message.
-
-        Parameters:
-        - args: can either be a string (file path) or an integer (index).
+        Removes a tab from the tab widget based on its index.
         """
-
-        tab_list = self.tabList()
         tab_dict = self.tabDict()
-        filepath = None
-        index = None
-        if not args:
-            self.setStatus("No arguments provided to removeTab method.")
-            return
-        if isinstance(args[0], int):
-            index = args[0]
-            if index < len(tab_list):
-                filepath = tab_list[index]
+        if index is not None and index < self.tabWidget.count():
+            current_tab = self.tabWidget.widget(index)
+            filepath = current_tab.filePath.text() if current_tab else None
+            # Ensure filepath is in tab_dict before attempting to remove
+            if filepath and filepath in tab_dict:
+                self.tabWidget.removeTab(index)
+                tab_dict.pop(filepath, None)
+                self.setTabDict(tab_dict)
+                self.setStatus(f"Closed file tab {index=}, {filepath=}")
             else:
-                index = None
-        elif isinstance(args[0], str):
-            filepath = args[0]
-            if filepath in tab_list:
-                index = tab_list.index(filepath)
-            else:
-                filepath = None
-        # If both index and filepath are determined successfully, remove the tab
-        if index is not None and filepath is not None:
-            self.tabWidget.removeTab(index)
-            tab_list.remove(filepath)  # Safely remove filepath since we know it exists
-            tab_dict.pop(filepath, None)
-            self.setTabList(tab_list)
-            self.setTabDict(tab_dict)
-            self.setStatus(f"Closed file tab {index=}, {filepath=}")
+                self.setStatus(
+                    f"Cannot find corresponding file tab: {index}, {filepath}"
+                )
         else:
-            self.setStatus(
-                f"Cannot find corresponding file tab:  {index=}, {filepath=}"
-            )
+            self.setStatus("Invalid tab index provided.")
 
-        if not self.tabList():  # If the list of tabs is empty after removing one
+        if not tab_dict:  # If the dict of tabs is empty after removing one
             self.mda_mvc.mda_file_visualization.clearAllContent()  # Clear all content from the viz panel
-
-    ########################################################################
-    # TODO : need a switch tab: update metadata and data, not plot    # ####
-    ########################################################################
 
     def onCurrentTabChanged(self, index):
         # index is the new current tab's index
@@ -299,13 +271,9 @@ class MDAFile(QtWidgets.QWidget):
     # FIXME: repsonder is no longer working
 
     def responder(self, action):
-        """Modify the plot with the described action
-
-        PARAMETERS
-
+        """Modify the plot with the described action.
         action:
             from buttons: add, clear, replace
-
         """
         # TODO: need to use the UPDATED file_tableview, ie the one in the tab that is currently selected
         # would this be handled with mda_folder when it connects to it? I m not sure since it emits the stuff
