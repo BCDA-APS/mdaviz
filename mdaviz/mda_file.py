@@ -42,19 +42,24 @@ class MDAFile(QtWidgets.QWidget):
         self.setTabDict()
         self.setData()
 
+        # Buttons handling:
         self.addButton.hide()
         self.replaceButton.hide()
         self.addButton.clicked.connect(partial(self.responder, "add"))
         self.clearButton.clicked.connect(partial(self.responder, "clear"))
         self.replaceButton.clicked.connect(partial(self.responder, "replace"))
 
+        # Mode handling:
         options = ["Auto-replace", "Auto-add", "Auto-off"]
         self.setMode(options[0])
         self.autoBox.addItems(options)
         self.autoBox.currentTextChanged.connect(self.setMode)
         self.autoBox.currentTextChanged.connect(self.updateButtonVisibility)
 
-        self.tabWidget.currentChanged.connect(self.onCurrentTabChanged)
+        # Tab handling:
+        # TODO: add signal slot for tab removed = removed trace(s) from the graph?
+        # TODO: do I need a slot for tab added? Don't think so
+        self.tabWidget.currentChanged.connect(self.onSwitchTab)
         self.tabWidget.tabCloseRequested.connect(self.removeFileTab)
 
     def dataPath(self):
@@ -321,10 +326,9 @@ class MDAFile(QtWidgets.QWidget):
         if not tab_dict:  # If the dict of tabs is empty after removing one
             self.mda_mvc.mda_file_visualization.clearAllContent()  # Clear all content from the viz panel
 
-    def onCurrentTabChanged(self, index):
-        # index is the new current tab's index
+    def onSwitchTab(self, new_tab_index):
         # Emit the signal to inform MDA_MVC about the change
-        self.currentTabChanged.emit(index)
+        self.currentTabChanged.emit(new_tab_index)
 
     # ------ Button methods:
 
@@ -354,3 +358,39 @@ class MDAFile(QtWidgets.QWidget):
         else:
             self.addButton.hide()
             self.replaceButton.hide()
+
+
+class TabManager(QtCore.QObject):
+    """
+    - Store and manage data for each tab (metadata, table data, etc.).
+    - Provide methods to add, remove, and retrieve data for tabs.
+    - Emit signals when tabs are added or removed, if other parts of the
+      application need to react to these changes.
+    """
+
+    tabAdded = QtCore.pyqtSignal(str)  # Signal emitting file path of added tab
+    tabRemoved = QtCore.pyqtSignal(str)  # Signal emitting file path of removed tab
+
+    def __init__(self):
+        super().__init__()
+        self._tabs = {}
+
+    def addTab(self, file_path, metadata, tabledata):
+        """Adds a tab with the specified data."""
+        if file_path not in self._tabs:  # Check if the tab doesn't already exist
+            self._tabs[file_path] = {"metadata": metadata, "tabledata": tabledata}
+            self.tabAdded.emit(file_path)
+
+    def removeTab(self, file_path):
+        """Removes the tab corresponding to the given file path."""
+        if file_path in self._tabs:  # Check if the tab exists
+            del self._tabs[file_path]
+            self.tabRemoved.emit(file_path)
+
+    def getTabData(self, file_path):
+        """Returns the data associated with the given file path."""
+        return self._tabs.get(file_path)
+
+    def tabs(self):
+        """Returns a read-only view of the tabs."""
+        return dict(self._tabs)

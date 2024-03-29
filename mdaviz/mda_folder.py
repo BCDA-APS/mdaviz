@@ -324,6 +324,8 @@ class MDA_MVC(QtWidgets.QWidget):
         ################################################################################
 
     def onCurrentTabChanged(self, index):
+        # TODO: should this be moved to mda_file?
+
         """
         Updates UI to reflect the content of the newly selected tab or resets UI if no tab is selected.
 
@@ -337,8 +339,8 @@ class MDA_MVC(QtWidgets.QWidget):
         Notes: This method is connected to the `currentChanged` signal of the QTabWidget that manages
         the file tabs:
         In MDAFile:
-            self.tabWidget.currentChanged.commect [signal: emits new_tab_index]
-                --> self.onCurrentTabChanged(new_tab_index) [slot]
+            self.tabWidget.currentChanged.connect [signal: emits new_tab_index]
+                --> self.onSwitchTab(new_tab_index) [slot]
                     --> self.currentTabChanged  [QtCore.pyqtSignal(new_tab_index)]
         In MDA_MVC:
             self.mda_file.currentTabChanged.connect [signal: emits new_tab_index]
