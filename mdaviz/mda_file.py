@@ -39,6 +39,7 @@ class MDAFile(QtWidgets.QWidget):
         from functools import partial
 
         self.setTabList()
+        self.setTabDict()
         self.setData()
 
         self.addButton.hide()
@@ -76,11 +77,17 @@ class MDAFile(QtWidgets.QWidget):
         """The list of opened tabs"""
         return self._tabList
 
+    def tabDict(self):
+        """The dict of opened tabs"""
+        return self._tabDict
+
     def setTabList(self, new_tab_list=None):
         self._tabList = new_tab_list or []
-        # TODO: Is there a point in defaulting to None then []? Should I just do:
-        # setTabList(self, new_tab_list=[])
-        # self._tabList = new_tab_list
+
+    def setTabDict(self, new_tab_dict=None):
+        self._tabDict = new_tab_dict or {}
+        if new_tab_dict:
+            print(list(new_tab_dict.keys()))
 
     def data(self):
         return self._data
@@ -140,18 +147,24 @@ class MDAFile(QtWidgets.QWidget):
 
     # ------ Populating GUIs with selected file content:
 
-    def metadata(self):
-        """Provide a text view of the file metadata."""
-        metadata = utils.get_md(self.data()["metadata"])
-        return yaml.dump(metadata, default_flow_style=False)
+    # def metadata(self):
+    #     """Provide a text view of the file metadata."""
+    #     metadata = utils.get_md(self.data()["metadata"])
+    #     return yaml.dump(metadata, default_flow_style=False)
 
-    def displayMetadata(self):
+    def displayMetadata(self, metadata):
         """Display metadata in the vizualization panel."""
-        self.mda_mvc.mda_file_visualization.setMetadata(self.metadata())
+        if not metadata:
+            return
+        metadata = utils.get_md(metadata)
+        metadata = yaml.dump(metadata, default_flow_style=False)
+        self.mda_mvc.mda_file_visualization.setMetadata(metadata)
 
-    def displayData(self):
+    def displayData(self, tabledata):
         """Display pos(s) & det(s) values as a tableview in the vizualization panel."""
-        self.mda_mvc.mda_file_visualization.setTableData(self.data()["scanDict"])
+        if not self.data():
+            return
+        self.mda_mvc.mda_file_visualization.setTableData(tabledata)
 
     def addFileTab(self, index, selection_field):
         """
@@ -171,6 +184,8 @@ class MDAFile(QtWidgets.QWidget):
         file_name = data["fileName"]
         first_pos = data["firstPos"]
         first_det = data["firstDet"]
+        metadata = data["metadata"]
+        tabledata = data["scanDict"]
         print(f"{first_pos=}")
         print(f"{first_det=}")
 
@@ -192,12 +207,20 @@ class MDAFile(QtWidgets.QWidget):
             print(f"\nAfter (maybe) calling defaultSelection: {selection_field=}")
 
         tab_list = self.tabList()
+        tab_dict = self.tabDict()
+
         if file_path in tab_list:
             # If file already opened in a tab, just switch to that tab:
             tab_index = tab_list.index(file_path)
             self.tabWidget.setCurrentIndex(tab_index)
 
         else:
+
+            self.displayMetadata(metadata)
+            self.displayData(tabledata)
+            # Add selected file to the dict of open tabs:
+            tab_dict[file_path] = [metadata, tabledata]
+            self.setTabDict(tab_dict)
 
             mode = self.mode()  # ["Auto-replace", "Auto-add", "Auto-off"]
             if mode == "Auto-add":
@@ -245,6 +268,7 @@ class MDAFile(QtWidgets.QWidget):
         """
 
         tab_list = self.tabList()
+        tab_dict = self.tabDict()
         filepath = None
         index = None
         if not args:
@@ -266,7 +290,9 @@ class MDAFile(QtWidgets.QWidget):
         if index is not None and filepath is not None:
             self.tabWidget.removeTab(index)
             tab_list.remove(filepath)  # Safely remove filepath since we know it exists
+            tab_dict.pop(filepath, None)
             self.setTabList(tab_list)
+            self.setTabDict(tab_dict)
             self.setStatus(f"Closed file tab {index=}, {filepath=}")
         else:
             self.setStatus(
