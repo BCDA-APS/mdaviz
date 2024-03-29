@@ -12,6 +12,7 @@ from PyQt5 import QtWidgets
 import yaml
 
 from . import utils
+from .mda_file_table_view import MDAFileTableView
 
 
 class MDAFile(QtWidgets.QWidget):
@@ -132,6 +133,62 @@ class MDAFile(QtWidgets.QWidget):
             "index": index,
         }
 
+    def getTabTableview(self, file_path=None, index=None):
+        """
+        Retrieves the MDAFileTableView based on a file path or tab index.
+
+        Parameters:
+        - file_path (str, optional): The file path associated with the tab. Defaults to None.
+        - index (int, optional): The index of the tab. Defaults to None.
+
+        Returns:
+        - MDAFileTableView or None: The table view associated with the given file path or index, or None if not found.
+        """
+        # Prioritize file_path if provided
+        if file_path is not None:
+            for tab_index in range(self.tabWidget.count()):
+                tab_tableview = self.tabWidget.widget(tab_index)
+                if (
+                    hasattr(tab_tableview, "filePath")
+                    and tab_tableview.filePath.text() == file_path
+                ):
+                    return tab_tableview
+        # Fallback to index if file_path is not provided or not found
+        elif index is not None and index < self.tabWidget.count():
+            return self.tabWidget.widget(index)
+        # Return None if neither method finds a match
+        return None
+
+    def getTabInfo(self, file_path=None, index=None):
+        """
+        Retrieves the index of a tab given its file path, or the file path given its tab index.
+
+        Parameters:
+        - file_path (str, optional): The file path to search for. If provided, returns its tab index.
+        - index (int, optional): The index of the tab. If provided, returns the file path of the tab.
+
+        Returns:
+        - int, str, or None: Depending on the input, returns either the tab index (if file_path was given),
+        the file path (if index was given), or None if no matching tab is found.
+        """
+        if file_path is not None:
+            for tab_index in range(self.tabWidget.count()):
+                tab_tableview = self.tabWidget.widget(tab_index)
+                if (
+                    hasattr(tab_tableview, "filePath")
+                    and tab_tableview.filePath.text() == file_path
+                ):
+                    return tab_index  # Return the index of the tab with the given file path
+
+        elif index is not None and index < self.tabWidget.count():
+            tab_tableview = self.tabWidget.widget(index)
+            if hasattr(tab_tableview, "filePath"):
+                return (
+                    tab_tableview.filePath.text()
+                )  # Return the file path of the tab at the given index
+
+        return None  # Return None if no matching tab is found or the inputs are invalid
+
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
 
@@ -195,12 +252,8 @@ class MDAFile(QtWidgets.QWidget):
 
         # If file already opened in a tab, just switch to that tab:
         if file_path in self.tabDict():
-            for tab_index in range(self.tabWidget.count()):
-                widget = self.tabWidget.widget(tab_index)
-                if widget.filePath.text() == file_path:
-                    # Found the tab, switch to it
-                    self.tabWidget.setCurrentIndex(tab_index)
-                    break  # Exit the loop after switching to the tab
+            tab_index = self.getTabInfo(file_path=file_path)
+            self.tabWidget.setCurrentIndex(tab_index)
 
         # TODO: Directly Accessing Widgets for File Path: Accessing
         # widget.filePath.text() directly is fine as long as every widget added
@@ -233,16 +286,16 @@ class MDAFile(QtWidgets.QWidget):
             # the addition of a new tab /update of existing tab will only happen when Replace or Add is pushed?
 
     def createNewTab(self, file_name, file_path, selection_field):
-        from .mda_file_table_view import MDAFileTableView
-
         # Create a new instance of MDAFileTableView for the selected file:
-        self.file_tableview = MDAFileTableView(self)
-        tab_index = self.tabWidget.addTab(self.file_tableview, file_name)
+        tableview = MDAFileTableView(self)
+        # Add the new tableview to a new tab, with file_name as the tab label:
+        tab_index = self.tabWidget.addTab(tableview, file_name)
+        # Make this the current tab:
         self.tabWidget.setCurrentIndex(tab_index)
-        self.file_tableview.displayTable(selection_field)
-        # Access and update the QLabel for the filePath:
-        filePathLabel = self.file_tableview.filePath
-        filePathLabel.setText(file_path)
+        # Display the data in the tableview
+        tableview.displayTable(selection_field)
+        # Update the filePath QLabel for with the file_path:
+        tableview.filePath.setText(file_path)
 
     def removeFileTab(self, index=None):
         """

@@ -344,18 +344,21 @@ class MDA_MVC(QtWidgets.QWidget):
             self.mda_file.currentTabChanged.connect [signal: emits new_tab_index]
                 --> self.onCurrentTabChanged(new_tab_index)
         """
-
         # If there is no tab open:
         if index == -1:
-            self.setCurrentFileTableview()  # reset to default = None
-            self.setSelectionField()  # reset to default = None
+            self.setCurrentFileTableview()  # Reset to indicate no active file table view
+            self.setSelectionField()  # Reset selection field to default
             self.setStatus("No file currently selected.")
             return
-        # If there is at least one tab open, access the one currently selected:
-        new_tab_tableview = self.mda_file.tabWidget.widget(index)
+
+        # Retrieve the table view and file path for the currently selected tab
+        new_tab_tableview = self.mda_file.getTabTableview(index)
+        tab_file_path = self.mda_file.getTabInfo(index=index)
+
+        # Update the context to the new table view
         self.setCurrentFileTableview(new_tab_tableview)
-        # Read the label of the tab, that contains the filepath:
-        tab_file_path = new_tab_tableview.filePath.text()
+
+        # Fetch and display the metadata and data associated with the file path
         tab_info = self.mda_file.tabDict().get(tab_file_path, None)
         if tab_info:
             self.mda_file.displayMetadata(tab_info.get("metadata", None))
