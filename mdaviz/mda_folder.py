@@ -326,10 +326,25 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def onCurrentTabChanged(self, index):
         # Handle the change
+        if index == -1:
+            self.setCurrentFileTableview()  # reset to default = None
+            self.setSelectionField()  # reset to default = None
+            self.setStatus("No file currently selected.")
+            return
         new_tab_tableview = self.mda_file.tabWidget.widget(index)
-        self.currentFileTableview(new_tab_tableview)
+        self.setCurrentFileTableview(new_tab_tableview)
+        # read the label of the tab, that contains the filepath:
+        tab_file_path = new_tab_tableview.filePath.text()
+        print(f"{tab_file_path=}")
+        metadata, tabledata = self.mda_file.tabDict().get(tab_file_path, [None, None])
+        if metadata and tabledata:
+            self.mda_file.displayMetadata(metadata)
+            self.mda_file.displayData(tabledata)
 
-        # TODO TODO TODO TODO Update anything else necessary for the new tab: data, metadata and selectionField?
+        # TODO: update selectionField: how to keep track of which selectionField goes with which tab?
+
+        # TODO:  disable UI elements or actions that require an active file to be meaningful:
+        # For example: the add/replace button in auto-off need to be desabled if no files is selected
 
     def applySelectionChanges(self, new_selection):
         print("\n\n\n\n\nEntering applySelectionChanges")
@@ -381,22 +396,19 @@ class MDA_MVC(QtWidgets.QWidget):
             old_pv_list = None
         else:
             # Access the instance of tableView for the current tab:
-            old_tab_index = self.mda_file.tabWidget.currentIndex()
-            old_tab_tableview = self.mda_file.tabWidget.widget(old_tab_index)
+            old_tab_tableview = self.currentFileTableview()
             old_pv_list = old_tab_tableview.data()["fileInfo"]["pvList"]
 
-        # Update mda_file abd mda_vizualization content:
+        # Add a new tab and update displayMetadata & displayData :
         self.mda_file.addFileTab(index.row(), self.selectionField())
-        self.mda_file.displayMetadata()
-        self.mda_file.displayData()
+
         new_pv_list = self.mda_file.data().get("pvList")
 
-        # addFileTab -> tabWidget.setCurrentIndex to the new tab:
-        new_tab_index = self.mda_file.tabWidget.currentIndex()
-        new_tab_tableview = self.mda_file.tabWidget.widget(new_tab_index)
-        self.setCurrentFileTableview(new_tab_tableview)
+        # addFileTab -> tabWidget.setCurrentIndex updates -> onCurrentTabChanged triggered
+        new_tab_tableview = self.currentFileTableview()
 
         # Manage signal connections for the new file selection.
+        # TODO: selected signal is not specific to the tableview /tab but to mda_file (parent widget)
         self.disconnectSignals(new_tab_tableview)
         new_tab_tableview.selected.connect(self.doPlot)
         new_tab_tableview.tableView.model().checkboxStateChanged.connect(
