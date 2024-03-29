@@ -335,13 +335,17 @@ class MDA_MVC(QtWidgets.QWidget):
         self.setCurrentFileTableview(new_tab_tableview)
         # read the label of the tab, that contains the filepath:
         tab_file_path = new_tab_tableview.filePath.text()
-        print(f"{tab_file_path=}")
-        metadata, tabledata = self.mda_file.tabDict().get(tab_file_path, [None, None])
-        if metadata and tabledata:
-            self.mda_file.displayMetadata(metadata)
-            self.mda_file.displayData(tabledata)
+        tab_info = self.mda_file.tabDict().get(tab_file_path, None)
+        if tab_info:
+            self.mda_file.displayMetadata(tab_info.get("metadata", None))
+            self.mda_file.displayData(tab_info.get("tabledata", None))
+        else:
+            self.setStatus("No data and/or metadata found.")
 
-        # TODO: update selectionField: how to keep track of which selectionField goes with which tab?
+        # TODO: update selectionField? how to keep track of which selectionField goes with which tab?
+        # It seems that the code is doing fine with that, so I am not sure if I will introduce more
+        # problem by trying to track and update selection fields when changing tabs. Is it because
+        # it is link to the tabview itself?
 
         # TODO:  disable UI elements or actions that require an active file to be meaningful:
         # For example: the add/replace button in auto-off need to be desabled if no files is selected
