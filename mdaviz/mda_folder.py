@@ -535,6 +535,7 @@ class MDA_MVC(QtWidgets.QWidget):
             print("TESTTESTTEST")
             self.mda_mvc.mda_file_visualization.clearAllContent()  # Clear all content from the viz panel
             tableview.clearContents()
+            # TODO: should close all tab => use tabManager?
 
     # # ------------ Folder Table View navigation & selection highlight:
 
