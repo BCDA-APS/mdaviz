@@ -281,7 +281,7 @@ class MDA_MVC(QtWidgets.QWidget):
         changes_made = False
         tableview = self.currentFileTableview()
         new_selection = {"Y": [], "X": tableview.data()["fileInfo"]["firstPos"]}
-        # Update Y selections
+        # Update Y selections: if either left operand or right operand is True, result will be True.
         changes_made |= self.updateDetectorSelection(
             oldPvList, newPvList, new_selection, verbose
         )
@@ -361,9 +361,8 @@ class MDA_MVC(QtWidgets.QWidget):
         new_tab_tableview = self.mda_file.tabWidget.widget(index)
         tab_file_path = new_tab_tableview.filePath.text()
 
-        # TODO: This should work but does not:
-        # new_tab_tableview = self.mda_file.getTabTableview(index)
-        # tab_file_path = self.mda_file.getTabInfo(index=index)
+        # TODO: Test oif this works now
+        # tab_file_path = self.mda_file.tabIndex2Path(index=index)
 
         # Update the context to the new table view
         self.setCurrentFileTableview(new_tab_tableview)
