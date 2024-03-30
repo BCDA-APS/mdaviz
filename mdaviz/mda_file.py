@@ -434,3 +434,57 @@ class TabManager(QtCore.QObject):
 # the right track. Thorough testing, especially with scenarios involving rapid
 # addition/removal of tabs and switching between tabs, will help ensure that the
 # UI and TabManager remain in sync.
+
+
+# For MDA_MVC:
+
+#     Your MDA_MVC class implementation appears comprehensive and
+#     well-organized. You've covered a broad range of functionalities essential
+#     for the MVC architecture in managing MDA files. Here are a few points to
+#     consider, focusing on ensuring coherence and functionality:
+
+#     Signal and Slot Connections: Ensure all signal connections are correctly
+#         established, especially for newly introduced signals related to
+#         TabManager. It's crucial that all parts of your MVC architecture
+#         communicate as intended.
+
+#     UI and Data Synchronization: Given your use of TabManager for managing tab
+#         data, verify that UI changes (e.g., tab switches, adds, and removes)
+#         are always in sync with the data model. This includes handling of
+#         signals like onTabRemoved and onAllTabsRemoved effectively to update
+#         the UI accordingly.
+
+#     Error Handling: Consider adding error handling for cases where operations
+#         might not go as expected. For example, what happens if doFileSelected
+#         is triggered but the file cannot be processed for some reason?
+#         Providing feedback or ensuring the application can gracefully handle
+#         such scenarios is important.
+
+#     Refreshing and Updating UI: The method doRefresh should ensure that the UI
+#         correctly reflects the current state of the file system or data source
+#         it's representing. This might involve more than just updating the
+#         table views, such as resetting selections or clearing data
+#         visualizations if necessary.
+
+#     Responsiveness to User Actions: Methods like goToFirst, goToLast,
+#         goToNext, and goToPrevious are crucial for navigating through files.
+#         Ensure these actions feel responsive to the user and that any
+#         associated data visualization updates occur without noticeable delay.
+
+#     Consistency in UI Updates: When tabs are changed via onCurrentTabChanged,
+#         ensure that the displayed metadata and data are always consistent with
+#         the selected tab. This includes proper handling of cases where a tab
+#         might not contain the expected data (e.g., if the file has been moved
+#         or deleted outside the application).
+
+#     Field Selection and Plotting Logic: The logic handling field selection for
+#         plotting and subsequent plot updates (in methods like
+#         onCheckboxStateChange and doPlot) should be robust against changes in
+#         the underlying data model. Ensure that selections are valid and that
+#         the plotting functionality reacts correctly to changes in selected
+#         fields.
+
+#     Documentation and Code Comments: Your documentation and comments provide a
+#         good overview of each method's purpose. Continuing to maintain this
+#         level of documentation as your code evolves will be beneficial for
+#         both your future self and others who may work with your code.
