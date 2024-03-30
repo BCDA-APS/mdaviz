@@ -41,6 +41,7 @@ class MDAFile(QtWidgets.QWidget):
 
         self.setTabDict()
         self.setData()
+        self.tabManager = TabManager()  # Instantiate TabManager
 
         # Buttons handling:
         self.addButton.hide()
@@ -57,10 +58,12 @@ class MDAFile(QtWidgets.QWidget):
         self.autoBox.currentTextChanged.connect(self.updateButtonVisibility)
 
         # Tab handling:
-        # TODO: add signal slot for tab removed = removed trace(s) from the graph?
-        # TODO: do I need a slot for tab added? Don't think so
         self.tabWidget.currentChanged.connect(self.onSwitchTab)
         self.tabWidget.tabCloseRequested.connect(self.removeFileTab)
+        # Connect TabManager signals:
+        self.tabManager.tabRemoved.connect(self.onTabRemoved)
+        self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
+        # TODO: do I need a slot for tab added? Don't think so
 
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
@@ -138,66 +141,28 @@ class MDAFile(QtWidgets.QWidget):
             "index": index,
         }
 
-    def getTabTableview(self, file_path=None, index=None):
-        """
-        Retrieves the MDAFileTableView based on a file path or tab index.
-
-        Parameters:
-        - file_path (str, optional): The file path associated with the tab. Defaults to None.
-        - index (int, optional): The index of the tab. Defaults to None.
-
-        Returns:
-        - MDAFileTableView or None: The table view associated with the given file path or index, or None if not found.
-        """
-        # Prioritize file_path if provided
-        if file_path is not None:
-            for tab_index in range(self.tabWidget.count()):
-                tab_tableview = self.tabWidget.widget(tab_index)
-                if (
-                    hasattr(tab_tableview, "filePath")
-                    and tab_tableview.filePath.text() == file_path
-                ):
-                    return tab_tableview
-        # Fallback to index if file_path is not provided or not found
-        elif index is not None and index < self.tabWidget.count():
-            return self.tabWidget.widget(index)
-        # Return None if neither method finds a match
-        return None
-
-    def getTabInfo(self, file_path=None, index=None):
-        """
-        Retrieves the index of a tab given its file path, or the file path given its tab index.
-
-        Parameters:
-        - file_path (str, optional): The file path to search for. If provided, returns its tab index.
-        - index (int, optional): The index of the tab. If provided, returns the file path of the tab.
-
-        Returns:
-        - int, str, or None: Depending on the input, returns either the tab index (if file_path was given),
-        the file path (if index was given), or None if no matching tab is found.
-        """
-        if file_path is not None:
-            for tab_index in range(self.tabWidget.count()):
-                tab_tableview = self.tabWidget.widget(tab_index)
-                if (
-                    hasattr(tab_tableview, "filePath")
-                    and tab_tableview.filePath.text() == file_path
-                ):
-                    return tab_index  # Return the index of the tab with the given file path
-
-        elif index is not None and index < self.tabWidget.count():
-            tab_tableview = self.tabWidget.widget(index)
-            if hasattr(tab_tableview, "filePath"):
-                return (
-                    tab_tableview.filePath.text()
-                )  # Return the file path of the tab at the given index
-
-        return None  # Return None if no matching tab is found or the inputs are invalid
-
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
 
-    # ------ Populating GUIs with selected file content:
+    # ------ Tab utilities:
+
+    def tabPath2Index(self, file_path):
+        """Finds and returns the index of a tab based on its associated file path."""
+        if file_path is not None:
+            for tab_index in range(self.tabWidget.count()):
+                tab_tableview = self.tabWidget.widget(tab_index)
+                if tab_tableview.filePath.text() == file_path:
+                    return tab_index
+        return None  # Return None if the file_path is not found.
+
+    def tabIndex2Path(self, index):
+        """Returns the file path associated with a given tab index."""
+        if 0 <= index < self.tabWidget.count():
+            tab_tableview = self.tabWidget.widget(index)
+            return tab_tableview.filePath.text()
+        return None  # Return None if the index is out of range.
+
+    # ------ Populating UIs with selected file content:
 
     def displayMetadata(self, metadata):
         """Display metadata in the vizualization panel."""
@@ -215,12 +180,10 @@ class MDAFile(QtWidgets.QWidget):
 
     def defaultSelection(self, first_pos, first_det, selection_field):
         """Sets the default field selection if no selection is provided.
-
         Args:
             first_pos (int): The index of the first positioner.
             first_det (int): The index of the first detector.
             selection_field (dict): The current selection fields, if any.
-
         Returns:
             dict: The updated selection field.
         """
@@ -230,14 +193,35 @@ class MDAFile(QtWidgets.QWidget):
         self.mda_mvc.setSelectionField(default)
         return default
 
+    # ------ Tabs management (UI):
+
+    def onTabRemoved(self, file_path):
+        # TODO: handle the UI update or other actions needed when a new tab is removed
+        # Remove trace(s) from graph?
+        pass
+
+    def onAllTabsRemoved(self):
+        # TODO: handle the UI update or other actions needed when a all tabs are removed
+        # e.g. disable certain UI elements that require a file to be selected (buttons?)
+        pass
+
     def addFileTab(self, index, selection_field):
         """
-        Adds a new tab with a QTableView and QLabel for the selected file.
+        Handles adding or activating a file tab within the tab widget.
+        - Retrieves data for the selected file based on its index in the MDA file list.
+        - Updates display for metadata and table data in the visualization panel.
+        - Determines and applies the default selection of fields if necessary.
+        - Checks if a tab for the file already exists; if so, activates it.
+        - If the file is new, depending on the mode (Auto-add, Auto-replace, Auto-off),
+        it creates a new tab or replaces existing tabs with the new file tab.
 
         Parameters:
-        - index (int): The index of the selected file in the MDA file list.
-        - selection_field (dict): The dictionary containing the selection of pos/det(s) to plot.
+        - index (int): The index of the file in the MDA file list.
+        - selection_field (dict): Specifies the fields (positioners/detectors) for display
+        and plotting.
         """
+        # TODO implement auto-off: nothing happens?
+        # the addition of a new tab /update of existing tab will only happen when Replace or Add is pushed?
 
         # Get data for the selected file:
         self.setData(index)
@@ -249,88 +233,77 @@ class MDAFile(QtWidgets.QWidget):
         metadata = data["metadata"]
         tabledata = data["scanDict"]
 
-        # Update data & metadata:
+        # Update data, metadata & selection field (if needed):
         self.displayMetadata(metadata)
         self.displayData(tabledata)
-        # Determine default selection if needed:
         selection_field = self.defaultSelection(first_pos, first_det, selection_field)
 
-        # If file already opened in a tab, just switch to that tab:
-        if file_path in self.tabDict():
-            tab_index = self.getTabInfo(file_path=file_path)
+        # Update tab widget:
+        if self.tabManager.getTabData(file_path):
+            tab_index = self.tabPath2Index(file_path)
             self.tabWidget.setCurrentIndex(tab_index)
-
-        # TODO: Directly Accessing Widgets for File Path: Accessing
-        # widget.filePath.text() directly is fine as long as every widget added
-        # to the tabWidget has a filePath attribute. Ensure this is consistently
-        # applied across all widgets. An alternative approach is to use
-        # QTabWidget's setTabData and tabData methods to store and retrieve the
-        # file path or other metadata, which could abstract away the need to
-        # directly interact with widget properties.
-
-        # If opening a new file, create a new tab and update tab dictionary:
         else:
             mode = self.mode()  # ["Auto-replace", "Auto-add", "Auto-off"]
             if mode == "Auto-add":
+                # Add this tab to the UI:
                 self.createNewTab(file_name, file_path, selection_field)
-                tab_dict = self.tabDict()
-                tab_dict[file_path] = {"metadata": metadata, "tabledata": tabledata}
-
             elif mode == "Auto-replace":
                 # Clear all existing tabs:
                 while self.tabWidget.count() > 0:
                     self.tabWidget.removeTab(0)
+                self.tabManager.removeAllTabs()
+                # Add this tab to the UI:
                 self.createNewTab(file_name, file_path, selection_field)
-                tab_dict = {}  # Starting fresh
-                tab_dict[file_path] = {"metadata": metadata, "tabledata": tabledata}
-
-            # Update the tab dictionary:
-            self.setTabDict(tab_dict)
-
-            # TODO implement auto-off: nothing happens?
-            # the addition of a new tab /update of existing tab will only happen when Replace or Add is pushed?
+            # Add new tab to tabManager:
+            self.tabManager.addTab(file_path, metadata, tabledata)
 
     def createNewTab(self, file_name, file_path, selection_field):
-        # Create a new instance of MDAFileTableView for the selected file:
+        """
+        Creates and activates a new tab with a MDAFileTableView for the selected file.
+        - Initializes a new MDAFileTableView with data based on the provided file and selection field.
+        - Adds a new tab to the tab widget.
+        - Labels the new tab with the file's name.
+        - Sets the new tab as the current active tab.
+        - Updates the filePath Qlabel within MDAFileTableView to reflect the selected file's path.
+
+        Parameters:
+        - file_name (str): The name of the file, used as the tab's label.
+        - file_path (str): The full path to the file, used to populate the table view and label.
+        - selection_field (dict): Specifies the data fields (positioners/detectors) for display in the table view.
+        """
         tableview = MDAFileTableView(self)
-        # Add the new tableview to a new tab, with file_name as the tab label:
         tab_index = self.tabWidget.addTab(tableview, file_name)
-        # Make this the current tab:
         self.tabWidget.setCurrentIndex(tab_index)
-        # Display the data in the tableview
         tableview.displayTable(selection_field)
-        # Update the filePath QLabel for with the file_path:
         tableview.filePath.setText(file_path)
 
     def removeFileTab(self, index=None):
         """
         Removes a tab from the tab widget based on its index.
         """
-        tab_dict = self.tabDict()
         if index is not None and index < self.tabWidget.count():
             current_tab = self.tabWidget.widget(index)
-            filepath = current_tab.filePath.text() if current_tab else None
-            # Ensure filepath is in tab_dict before attempting to remove
-            if filepath and filepath in tab_dict:
+            file_path = current_tab.filePath.text() if current_tab else None
+            # Ensure filepath is in tab_dict before attempting to remove:
+            if file_path and self.tabManager.getTabData(file_path):
                 self.tabWidget.removeTab(index)
-                tab_dict.pop(filepath, None)
-                self.setTabDict(tab_dict)
-                self.setStatus(f"Closed file tab {index=}, {filepath=}")
+                self.tabManager.removeTab(file_path)
+                self.setStatus(f"Closed file tab {index=}, {file_path=}")
             else:
                 self.setStatus(
-                    f"Cannot find corresponding file tab: {index}, {filepath}"
+                    f"Cannot find corresponding file tab: {index}, {file_path}"
                 )
         else:
             self.setStatus("Invalid tab index provided.")
-
-        if not tab_dict:  # If the dict of tabs is empty after removing one
-            self.mda_mvc.mda_file_visualization.clearAllContent()  # Clear all content from the viz panel
+        # If the dict of tabs is empty after removing on, clear all content from viz panel
+        if not self.tabManager.tabs():
+            self.mda_mvc.mda_file_visualization.clearAllContent()
 
     def onSwitchTab(self, new_tab_index):
         # Emit the signal to inform MDA_MVC about the change
         self.currentTabChanged.emit(new_tab_index)
 
-    # ------ Button methods:
+    # ------ Slot methods:
 
     # FIXME: repsonder is no longer working
 
@@ -360,37 +333,104 @@ class MDAFile(QtWidgets.QWidget):
             self.replaceButton.hide()
 
 
+# ------ Tabs management (data):
+
+
 class TabManager(QtCore.QObject):
     """
-    - Store and manage data for each tab (metadata, table data, etc.).
-    - Provide methods to add, remove, and retrieve data for tabs.
-    - Emit signals when tabs are added or removed, if other parts of the
-      application need to react to these changes.
+    Manages only the data aspects of tabs; does not handle UI elements (i.e. nothing
+    related to tab index, such as switching tabs).
+
+    Features:
+    - Tracks metadata and table data for each open tab.
+    - Allows adding and removing tabs dynamically.
+    - Emits signals to notify other components of tab-related changes.
+
+    Signals:
+    - tabAdded: Emitted when a new tab is added. Passes the file path of the added tab.
+    - tabRemoved: Emitted when a tab is removed. Passes the file path of the removed tab.
+    - allTabRemoved: Emitted when all tabs are removed. No parameters.
     """
 
     tabAdded = QtCore.pyqtSignal(str)  # Signal emitting file path of added tab
     tabRemoved = QtCore.pyqtSignal(str)  # Signal emitting file path of removed tab
+    allTabsRemoved = QtCore.pyqtSignal()  # Signal indicating all tabs have been removed
 
     def __init__(self):
         super().__init__()
         self._tabs = {}
 
     def addTab(self, file_path, metadata, tabledata):
-        """Adds a tab with the specified data."""
+        """Adds a new tab with specified metadata and table data."""
         if file_path not in self._tabs:  # Check if the tab doesn't already exist
             self._tabs[file_path] = {"metadata": metadata, "tabledata": tabledata}
             self.tabAdded.emit(file_path)
 
     def removeTab(self, file_path):
-        """Removes the tab corresponding to the given file path."""
+        """Removes the tab associated with the given file path."""
         if file_path in self._tabs:  # Check if the tab exists
             del self._tabs[file_path]
             self.tabRemoved.emit(file_path)
 
+    def removeAllTabs(self):
+        """Removes all tabs."""
+        self._tabs.clear()
+        self.allTabsRemoved.emit()
+
     def getTabData(self, file_path):
-        """Returns the data associated with the given file path."""
+        """Returns the metatdata & data for the tab associated with the given file path."""
         return self._tabs.get(file_path)
 
     def tabs(self):
-        """Returns a read-only view of the tabs."""
+        """Returns a read-only view of the currently managed tabs."""
         return dict(self._tabs)
+
+
+# chatGPT review:
+# Your implementation of addFileTab and createNewTab seems well thought out with
+# a clear workflow. Here are some considerations to ensure the TabManager's
+# state aligns with the UI:
+
+#     Synchronization Between Data and UI: Every action that affects tabs
+#         (adding, removing, switching) should reflect both in the UI and the
+#         data managed by TabManager. It looks like you're adding and removing
+#         tabs through the TabManager correctly. Just ensure that every UI
+#         action triggers the corresponding data update in TabManager.
+
+#     Error Handling for Tab Operations: Consider adding error handling or
+#         checks for situations where tab operations might fail or behave
+#         unexpectedly. For example, what happens if createNewTab is called with
+#         a file_path that already exists in TabManager? Although your logic
+#         should prevent this, defensive programming can help catch unexpected
+#         issues.
+
+#     Consistent State After Operations: After operations like adding a new tab
+#         or removing all tabs, verify that the application's state is
+#         consistent (e.g., no dangling references to removed tabs, UI elements
+#         are enabled/disabled appropriately).
+
+#     Update UI Responsively: Make sure the UI updates are responsive to changes
+#         in the TabManager. For instance, when a tab is added or removed, any
+#         UI elements depending on the number of open tabs (like "Close All
+#         Tabs" button) should update accordingly.
+
+#     onTabRemoved and onAllTabsRemoved Slots: You've mentioned placeholders for
+#         these methods but haven't detailed their implementations. These are
+#         crucial for handling UI updates or cleanup when tabs are removed.
+#         Ensure they're implemented to handle any necessary UI adjustments when
+#         tabs change.
+
+#     Removal of Tabs and Associated Data: In removeFileTab, you handle the
+#         removal process properly by checking if the tab exists in TabManager
+#         before attempting to remove it. Just make sure this also covers any
+#         associated data cleanup that might be needed to prevent memory leaks
+#         or stale data.
+
+#     Switching Tabs: When switching tabs (onSwitchTab), ensure that any
+#         context-sensitive UI elements (like metadata display, data tables,
+#         etc.) update to reflect the content of the newly active tab.
+
+# Overall, your methods for handling tab addition and removal appear to be on
+# the right track. Thorough testing, especially with scenarios involving rapid
+# addition/removal of tabs and switching between tabs, will help ensure that the
+# UI and TabManager remain in sync.
