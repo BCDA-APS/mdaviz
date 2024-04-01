@@ -262,6 +262,7 @@ class MDA_MVC(QtWidgets.QWidget):
         return self._selection_field
 
     def setSelectionField(self, new_selection=None):
+        # TODO: should it check new_selection != {}  or new_selection != {"X":None, "Y": [None]}
         self._selection_field = new_selection if new_selection != {} else None
 
     def updateSelectionForNewPVs(self, oldPvList, newPvList, verbose=False):
@@ -324,18 +325,18 @@ class MDA_MVC(QtWidgets.QWidget):
         # TODO : need to keep track of which tab here? 1 tab is 1 tableview for one file
         ################################################################################
 
-    def onTabChange(self, index, file_path, file_data):
+    def onTabChange(self, index, file_path, file_data, selection_field):
         """
         Updates UI to reflect the content of the newly selected tab or resets UI if no tab is selected.
 
         When a new tab is selected, it sets the context to the corresponding table view, displays the file's
-        metadata, and data based on the selected tab's file path. If no tab is selected (index == -1),
+        metadata, and data for the selected tab. If no tab is selected (index == -1),
         the UI is reset to indicate no file is currently active.
 
         Parameters:
         - index (int): Index of the newly selected tab; -1 if no tab is selected.
 
-        Notes: This method is connected to the `currentChanged` signal of the QTabWidget that manages
+        Notes: This method is connected to the `tabChanged` signal of the QTabWidget that manages
         the file tabs:
         In MDAFile:
             self.tabWidget.currentChanged.connect [signal: emits new_tab_index]
@@ -352,24 +353,21 @@ class MDA_MVC(QtWidgets.QWidget):
             self.setCurrentFileTableview()  # Reset to indicate no active file table view
             self.setSelectionField()  # Reset selection field to default
             self.setStatus("No file currently selected.")
-            print(f"Leaving onTabChange for {index=}")
             return
 
         # Retrieve the table view for the currently selected tab:
         new_tab_tableview = self.mda_file.tabWidget.widget(index)
         self.setCurrentFileTableview(new_tab_tableview)
+        self.setSelectionField(selection_field)
+        print(f"{self.selectionField()=}")
 
         # Fetch and display the metadata and data associated with the file path
         if file_data:
             self.mda_file.displayMetadata(file_data.get("metadata", None))
             self.mda_file.displayData(file_data.get("tabledata", None))
         else:
-            self.setStatus("No data and/or metadata found.")
-        print(f"Leaving onTabChange; {index=}")
-        # TODO: update selectionField? how to keep track of which selectionField goes with which tab?
-        # It seems that the code is doing fine with that, so I am not sure if I will introduce more
-        # problem by trying to track and update selection fields when changing tabs. Is it because
-        # it is link to the tabview itself?
+            self.setStatus("No data and/or metadata found for display.")
+        print(f"Leaving onTabChange for {file_path=}")
 
         # TODO:  disable UI elements or actions that require an active file to be meaningful:
         # For example: the add/replace button in auto-off need to be disabled if no files is selected
@@ -413,6 +411,7 @@ class MDA_MVC(QtWidgets.QWidget):
             - Handles the case where no previous file was selected (e.g., at application start).
         """
         selectedFile = self.mdaFileList()[index.row()]
+        self.setStatus(f"\n\n========= {selectedFile} in {str(self.dataPath())}")
 
         # If there is no Folder Table View, do nothing
         if self.mda_folder_tableview.tableView.model() is None:
@@ -426,12 +425,14 @@ class MDA_MVC(QtWidgets.QWidget):
             old_tab_tableview = self.currentFileTableview()
             old_pv_list = old_tab_tableview.data()["fileInfo"]["pvList"]
 
-        # Add a new tab and update displayMetadata & displayData :
+        # Add a new tab and update displayMetadata & displayData;
+        # if self.selectionField() is None, mda_file.addFileTab will set it
+        # to its default value ({"X": first_pos, "Y": [first_det]})
+
         self.mda_file.addFileTab(index.row(), self.selectionField())
-
-        new_pv_list = self.mda_file.data().get("pvList")
-
         # addFileTab -> tabWidget.setCurrentIndex updates -> onTabChange triggered
+        #            -> setCurrentFileTableview() & mda_file.setData
+        new_pv_list = self.mda_file.data().get("pvList")
         new_tab_tableview = self.currentFileTableview()
 
         # Manage signal connections for the new file selection.
@@ -442,9 +443,6 @@ class MDA_MVC(QtWidgets.QWidget):
             self.onCheckboxStateChange
         )
 
-        self.setStatus(
-            f"\n\n========= Selected file: {selectedFile} in {str(self.dataPath())}"
-        )
         # selectionField() may have changed when calling addFileTab:
         if self.selectionField():
             if old_pv_list is not None:
@@ -519,9 +517,11 @@ class MDA_MVC(QtWidgets.QWidget):
         elif action in ("clear"):
             # widgetMpl.clearPlot()
             print("TESTTESTTEST")
-            self.mda_mvc.mda_file_visualization.clearContents()  # Clear all content from the viz panel
-            tableview.clearContents()
-            # TODO: should close all tab => use tabManager?
+            # Clear all content from the file table view:
+            self.mda_file.removeAllFileTabs()
+            # Clear all content from the viz panel:
+            # TODO: would become redundant if we decide to clear the plot in mda_file.removeAllFileTabs()
+            self.mda_file_visualization.clearContents()
 
     # # ------------ Folder Table View navigation & selection highlight:
 

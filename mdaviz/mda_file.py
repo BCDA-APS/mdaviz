@@ -17,10 +17,10 @@ from .mda_file_table_view import MDAFileTableView
 
 class MDAFile(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
-    # Emit the action & selection when button is pushed:
-    selected = QtCore.pyqtSignal(str, dict)
-    # Emit the index of the new tab, the file path and the data it contains:
-    tabChanged = QtCore.pyqtSignal(int, str, dict)
+    # Emit the action when button is pushed:
+    selected = QtCore.pyqtSignal(str)
+    # Emit the new tab index (int), file path (str), data (dict) and selection field (dict):
+    tabChanged = QtCore.pyqtSignal(int, str, dict, dict)
 
     def __init__(self, parent):
         """
@@ -38,7 +38,6 @@ class MDAFile(QtWidgets.QWidget):
     def setup(self):
         from functools import partial
 
-        self.setTabDict()
         self.setData()
         self.tabManager = TabManager()  # Instantiate TabManager
 
@@ -271,9 +270,12 @@ class MDAFile(QtWidgets.QWidget):
 
     def removeFileTab(self, index=None):
         """
-        Removes a tab from the tab widget based on its index.
+        Removes a tab from the tab widget based on its index. If it's the last tab,
+        it calls removeAllTabs() to ensure consistent cleanup.
         """
-        if index is not None and index < self.tabWidget.count():
+        if self.tabWidget.count() == 1:
+            self.removeAllFileTabs()
+        elif index is not None and index < self.tabWidget.count():
             current_tab = self.tabWidget.widget(index)
             file_path = current_tab.filePath.text() if current_tab else None
             # Ensure filepath is in tab_dict before attempting to remove:
@@ -288,20 +290,34 @@ class MDAFile(QtWidgets.QWidget):
         else:
             self.setStatus("Invalid tab index provided.")
 
-        # If the dict of tabs is empty after removing one, clear all content from viz panel
-        # TODO: do I want to remove all the content or just the data?metadata?
+    def removeAllFileTabs(self):
+        """
+        Removes all tabs from the tab widget.
+        """
+        # TODO: do I want to remove all the content or just the data/metadata?
         # ie. should we sync the tab open/close with the curves on the graph?
-        if not self.tabManager.tabs():
-            self.mda_mvc.mda_file_visualization.clearContents(plot=False)
+        while self.tabWidget.count() > 0:
+            self.tabWidget.removeTab(self.tabWidget.count() - 1)
+        # Clear all data associated with the tabs from the TabManager.
+        self.tabManager.removeAllTabs()
+        # Optionally, clear all content from the visualization panel as well, if no tabs are open.
+        self.mda_mvc.mda_file_visualization.clearContent(plot=False)
+        # Update the status to reflect that all tabs have been closed.
+        self.setStatus("All file tabs have been closed.")
 
     def onSwitchTab(self, new_tab_index):
         new_file_path = self.tabIndex2Path(new_tab_index)
-        new_tab_data = self.tabManager.getTabData(new_file_path)
-        self.tabChanged.emit(new_tab_index, new_file_path, new_tab_data)
+        new_tab_data = self.tabManager.getTabData(new_file_path) or {}
+        new_tab_tableview = self.tabWidget.widget(new_tab_index)
+        if new_tab_tableview and new_tab_tableview.tableView.model():
+            new_selection_field = new_tab_tableview.tableView.model().plotFields()[0]
+        else:
+            new_selection_field = {}
+        self.tabChanged.emit(
+            new_tab_index, new_file_path, new_tab_data, new_selection_field
+        )
 
     # ------ Slot methods:
-
-    # FIXME: repsonder is no longer working
 
     def responder(self, action):
         """Modify the plot with the described action.
@@ -311,13 +327,8 @@ class MDAFile(QtWidgets.QWidget):
         # TODO: need to use the UPDATED file_tableview, ie the one in the tab that is currently selected
         # would this be handled with mda_folder when it connects to it? I m not sure since it emits the stuff
         # from self.file_tableview
-
-        print(
-            f"\nResponder: {action=} - {self.file_tableview.tableView.model().plotFields()[0]}"
-        )
-        self.selected.emit(
-            action, self.file_tableview.tableView.model().plotFields()[0]
-        )
+        print(f"\nResponder: {action=}")
+        self.selected.emit(action)
 
     def updateButtonVisibility(self):
         """Check the current text in "mode" pull down and show/hide buttons accordingly"""
@@ -373,7 +384,7 @@ class TabManager(QtCore.QObject):
 
     def getTabData(self, file_path):
         """Returns the metatdata & data for the tab associated with the given file path."""
-        return self._tabs.get(file_path, {})
+        return self._tabs.get(file_path)
 
     def tabs(self):
         """Returns a read-only view of the currently managed tabs."""
