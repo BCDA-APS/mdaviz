@@ -574,7 +574,7 @@ class MDA_MVC(QtWidgets.QWidget):
         """Slot: data field (for plotting) changes."""
         from .chartview import ChartView
 
-        # TODO: do I need a flag here to prevent "onCheckbocChange" to apply
+        # TODO: do I need a flag here to prevent "onCheckboxChange" to apply
         # when selecting a new file: selecting a new file triggers it since
         # the checkbox status effectively changes. Created problem when I tried
         # to clearContents in mda_vizualization

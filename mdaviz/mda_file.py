@@ -80,13 +80,6 @@ class MDAFile(QtWidgets.QWidget):
     def setMode(self, *args):
         self._mode = args[0]
 
-    def tabDict(self):
-        """The dict of opened tabs"""
-        return self._tabDict
-
-    def setTabDict(self, new_tab_dict=None):
-        self._tabDict = new_tab_dict or {}
-
     def data(self):
         return self._data
 
