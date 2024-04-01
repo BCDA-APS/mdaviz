@@ -174,12 +174,11 @@ class ChartView(QtWidgets.QWidget):
 
     def removeCurve(self, *args, **kwargs):
         label = self.curveBox.currentText()
-        # If removing the last curve, clear plot:
+        # If removing the last curve, clear all content from vizualization panel:
         if label in self.line2D:
             if len(self.line2D) == 1:
-                self.mda_mvc.mda_file_visualization.clearAllContent()  # Clear all content from the viz panel
+                self.mda_mvc.mda_file_visualization.clearContents()
                 self.mda_mvc.currentFileTV().tableView.model().clearAllCheckboxes()
-
             else:
                 # Remove curve from graph
                 row = self.line2D[label]["row"]
@@ -187,7 +186,6 @@ class ChartView(QtWidgets.QWidget):
                 line.remove()
                 # Remove curve from dictionary
                 del self.line2D[label]
-
                 # Remove curve from comboBox
                 self.removeItemCurveBox(label)
                 self.mda_mvc.currentFileTV().tableView.model().uncheckCheckBox(row)
@@ -196,8 +194,8 @@ class ChartView(QtWidgets.QWidget):
 
     def plot(self, row, *args, **kwargs):
         # Extract label from kwargs, default to None if not present
-        self._plot_options = kwargs.get("plot_options",{})
-        ds_options = self._ds_options = kwargs.get("ds_options",{})
+        self._plot_options = kwargs.get("plot_options", {})
+        ds_options = self._ds_options = kwargs.get("ds_options", {})
         path = self._plot_options["folderPath"]
         label = ds_options.get("label", None)
         self.main_axes.axis("on")

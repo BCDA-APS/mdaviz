@@ -75,23 +75,29 @@ class MDAFileVisualization(QtWidgets.QWidget):
     #         if isinstance(plot_widget, ChartView):
     #             plot_widget.clearPlot()  # Call clearPlot method of ChartView
 
-    def clearAllContent(self):
+    def clearContents(self, plot=True, data=True, metadata=True):
         """
-        Clears all content from the plot, metadata, and data tabs.
+        Clears content from the specified components of the visualization.
+
+        Parameters:
+        - plot (bool, optional): If True, clears the plot content. Defaults to True.
+        - data (bool, optional): If True, clears the data table content. Defaults to True.
+        - metadata (bool, optional): If True, clears the metadata content. Defaults to True.
         """
         # Clear Plot
-        layout = self.plotPageMpl.layout()
-        if layout.count() > 0:
-            plot_widget = layout.itemAt(0).widget()
-            if isinstance(plot_widget, ChartView):
-                plot_widget.clearPlot()
-
+        if plot:
+            layout = self.plotPageMpl.layout()
+            if layout.count() > 0:
+                plot_widget = layout.itemAt(0).widget()
+                if isinstance(plot_widget, ChartView):
+                    plot_widget.clearPlot()
         # Clear Metadata
-        self.metadata.setText("")
-
+        if metadata:
+            self.metadata.setText("")
         # Clear Data Table
-        layout = self.dataPage.layout()
-        utils.removeAllLayoutWidgets(layout)
+        if data:
+            layout = self.dataPage.layout()
+            utils.removeAllLayoutWidgets(layout)
 
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
