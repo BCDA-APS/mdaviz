@@ -24,8 +24,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>387</width>
-        <height>629</height>
+        <width>385</width>
+        <height>627</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -55,7 +55,7 @@
 }</string>
          </property>
          <property name="text">
-          <string>File Path</string>
+          <string/>
          </property>
         </widget>
        </item>

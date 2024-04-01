@@ -17,15 +17,14 @@ from .mda_file_table_view import MDAFileTableView
 
 class MDAFile(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
+    # Emit the action & selection when button is pushed:
     selected = QtCore.pyqtSignal(str, dict)
-    # fieldchange = QtCore.pyqtSignal(str, dict)  # TODO: not used?
-    currentTabChanged = QtCore.pyqtSignal(int)  # Emit the index of the current tab
+    # Emit the index of the new tab, the file path and the data it contains:
+    tabChanged = QtCore.pyqtSignal(int, str, dict)
 
     def __init__(self, parent):
         """
         Create the table view and connect with its parent.
-
-        PARAMETERS
 
         parent object:
             Instance of mdaviz.mda_folder.MDAMVC
@@ -61,9 +60,9 @@ class MDAFile(QtWidgets.QWidget):
         self.tabWidget.currentChanged.connect(self.onSwitchTab)
         self.tabWidget.tabCloseRequested.connect(self.removeFileTab)
         # Connect TabManager signals:
-        self.tabManager.tabRemoved.connect(self.onTabRemoved)
         self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
-        # TODO: do I need a slot for tab added? Don't think so
+        self.tabManager.tabRemoved.connect(self.onTabRemoved)
+        # TODO: is this last signal redundant with tabCloseRequested?
 
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
@@ -295,13 +294,17 @@ class MDAFile(QtWidgets.QWidget):
                 )
         else:
             self.setStatus("Invalid tab index provided.")
-        # If the dict of tabs is empty after removing on, clear all content from viz panel
+
+        # If the dict of tabs is empty after removing one, clear all content from viz panel
+        # TODO: do I want to remove all the content or just the data?metadata?
+        # ie. should we sync the tab open/close with the curves on the graph?
         if not self.tabManager.tabs():
-            self.mda_mvc.mda_file_visualization.clearAllContent()
+            self.mda_mvc.mda_file_visualization.clearContents(plot=False)
 
     def onSwitchTab(self, new_tab_index):
-        # Emit the signal to inform MDA_MVC about the change
-        self.currentTabChanged.emit(new_tab_index)
+        new_file_path = self.tabIndex2Path(new_tab_index)
+        new_tab_data = self.tabManager.getTabData(new_file_path)
+        self.tabChanged.emit(new_tab_index, new_file_path, new_tab_data)
 
     # ------ Slot methods:
 
@@ -352,7 +355,6 @@ class TabManager(QtCore.QObject):
     - allTabRemoved: Emitted when all tabs are removed. No parameters.
     """
 
-    tabAdded = QtCore.pyqtSignal(str)  # Signal emitting file path of added tab
     tabRemoved = QtCore.pyqtSignal(str)  # Signal emitting file path of removed tab
     allTabsRemoved = QtCore.pyqtSignal()  # Signal indicating all tabs have been removed
 
@@ -364,7 +366,6 @@ class TabManager(QtCore.QObject):
         """Adds a new tab with specified metadata and table data."""
         if file_path not in self._tabs:  # Check if the tab doesn't already exist
             self._tabs[file_path] = {"metadata": metadata, "tabledata": tabledata}
-            self.tabAdded.emit(file_path)
 
     def removeTab(self, file_path):
         """Removes the tab associated with the given file path."""
@@ -379,7 +380,7 @@ class TabManager(QtCore.QObject):
 
     def getTabData(self, file_path):
         """Returns the metatdata & data for the tab associated with the given file path."""
-        return self._tabs.get(file_path)
+        return self._tabs.get(file_path, {})
 
     def tabs(self):
         """Returns a read-only view of the currently managed tabs."""

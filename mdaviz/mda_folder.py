@@ -34,6 +34,7 @@ MVC implementation of mda files.
         ~setSavedSelection: Stores the selection state for future reference.
         ~updateDetectorSelection: Updates detector selections based on the PVs in the newly selected file.
         ~updateSelectionForNewPVs: Adjusts positioner and detector selections when switching to a new file.  
+        
         ~setSplitterSettingsName: Generates a unique key name for storing splitter positions in settings.
         ~setSplitterMoved: Manages and saves user-adjusted splitter positions.
         ~setSplitterWaitChanges: Waits for splitter position changes to settle before updating settings.
@@ -173,10 +174,10 @@ class MDA_MVC(QtWidgets.QWidget):
 
         # Tab connection:
         try:
-            self.mda_file.currentTabChanged.disconnect()
-        except TypeError:  # No slots connected yet
+            self.mda_file.tabChanged.disconnect()
+        except TypeError:
             pass
-        self.mda_file.currentTabChanged.connect(self.onCurrentTabChanged)
+        self.mda_file.tabChanged.connect(self.onTabChange)
 
         # save/restore splitter sizes in application settings
         for key in "hsplitter vsplitter".split():
@@ -323,9 +324,7 @@ class MDA_MVC(QtWidgets.QWidget):
         # TODO : need to keep track of which tab here? 1 tab is 1 tableview for one file
         ################################################################################
 
-    def onCurrentTabChanged(self, index):
-        # TODO: should this be moved to mda_file?
-
+    def onTabChange(self, index, file_path, file_data):
         """
         Updates UI to reflect the content of the newly selected tab or resets UI if no tab is selected.
 
@@ -344,37 +343,29 @@ class MDA_MVC(QtWidgets.QWidget):
                     --> self.currentTabChanged  [QtCore.pyqtSignal(new_tab_index)]
         In MDA_MVC:
             self.mda_file.currentTabChanged.connect [signal: emits new_tab_index]
-                --> self.onCurrentTabChanged(new_tab_index)
+                --> self.onTabChange(new_tab_index)
         """
 
-        print(f"\nEntering onCurrentTabChanged for {index=}")
+        print(f"\nEntering onTabChange for {index=}")
         # If there is no tab open:
         if index == -1:
             self.setCurrentFileTableview()  # Reset to indicate no active file table view
             self.setSelectionField()  # Reset selection field to default
             self.setStatus("No file currently selected.")
-            print(f"Leaving onCurrentTabChanged for {index=}")
+            print(f"Leaving onTabChange for {index=}")
             return
 
-        # Retrieve the table view and file path for the currently selected tab
-
+        # Retrieve the table view for the currently selected tab:
         new_tab_tableview = self.mda_file.tabWidget.widget(index)
-        tab_file_path = new_tab_tableview.filePath.text()
-
-        # TODO: Test oif this works now
-        # tab_file_path = self.mda_file.tabIndex2Path(index=index)
-
-        # Update the context to the new table view
         self.setCurrentFileTableview(new_tab_tableview)
 
         # Fetch and display the metadata and data associated with the file path
-        tab_info = self.mda_file.tabDict().get(tab_file_path, None)
-        if tab_info:
-            self.mda_file.displayMetadata(tab_info.get("metadata", None))
-            self.mda_file.displayData(tab_info.get("tabledata", None))
+        if file_data:
+            self.mda_file.displayMetadata(file_data.get("metadata", None))
+            self.mda_file.displayData(file_data.get("tabledata", None))
         else:
             self.setStatus("No data and/or metadata found.")
-        print(f"Leaving onCurrentTabChanged; {tab_file_path=}")
+        print(f"Leaving onTabChange; {index=}")
         # TODO: update selectionField? how to keep track of which selectionField goes with which tab?
         # It seems that the code is doing fine with that, so I am not sure if I will introduce more
         # problem by trying to track and update selection fields when changing tabs. Is it because
@@ -440,7 +431,7 @@ class MDA_MVC(QtWidgets.QWidget):
 
         new_pv_list = self.mda_file.data().get("pvList")
 
-        # addFileTab -> tabWidget.setCurrentIndex updates -> onCurrentTabChanged triggered
+        # addFileTab -> tabWidget.setCurrentIndex updates -> onTabChange triggered
         new_tab_tableview = self.currentFileTableview()
 
         # Manage signal connections for the new file selection.
@@ -464,12 +455,11 @@ class MDA_MVC(QtWidgets.QWidget):
 
     def disconnectSignals(self, tableview):
         """Disconnect signals for selection changes and checkbox state changes."""
-        if tableview is not None and hasattr(tableview, "selected"):
+        if tableview is not None:
             try:
                 tableview.selected.disconnect()
             except TypeError:  # No slots connected yet
                 pass
-        if tableview is not None and hasattr(tableview, "tableView"):
             try:
                 tableview.tableView.model().checkboxStateChanged.disconnect()
             except TypeError:  # No slots connected yet
@@ -520,7 +510,7 @@ class MDA_MVC(QtWidgets.QWidget):
             if not isinstance(widgetMpl, ChartView):
                 widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
             if action in ("replace"):
-                widgetMpl.clearPlot()  # do I need: self.mda_mvc.mda_file_visualization.clearAllContent()?
+                widgetMpl.clearPlot()  # do I need: self.mda_mvc.mda_file_visualization.clearContents()?
             for row, (ds, ds_options) in zip(y_rows, datasets):
                 kwargs = {"ds_options": ds_options, "plot_options": plot_options}
                 widgetMpl.plot(row, *ds, **kwargs)
@@ -529,7 +519,7 @@ class MDA_MVC(QtWidgets.QWidget):
         elif action in ("clear"):
             # widgetMpl.clearPlot()
             print("TESTTESTTEST")
-            self.mda_mvc.mda_file_visualization.clearAllContent()  # Clear all content from the viz panel
+            self.mda_mvc.mda_file_visualization.clearContents()  # Clear all content from the viz panel
             tableview.clearContents()
             # TODO: should close all tab => use tabManager?
 
@@ -587,7 +577,7 @@ class MDA_MVC(QtWidgets.QWidget):
         # TODO: do I need a flag here to prevent "onCheckbocChange" to apply
         # when selecting a new file: selecting a new file triggers it since
         # the checkbox status effectively changes. Created problem when I tried
-        # to clearAllContent in mda_vizualization
+        # to clearContents in mda_vizualization
 
         tableview = self.currentFileTableview()
         previous_selection = self.selectionField()
