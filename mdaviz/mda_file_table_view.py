@@ -1,7 +1,7 @@
 """
 Select data fields for plotting: QTableView.
 
-Uses :class:`select_fields_tablemodel.SelectFieldsTableModel`.
+Uses :class:`mda_file_table_model.MDAFileTableModel`.
 
 .. autosummary::
 

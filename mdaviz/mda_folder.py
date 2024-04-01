@@ -420,10 +420,6 @@ class MDA_MVC(QtWidgets.QWidget):
             - If a valid selection of positioner and detector is found, initiates plotting based on
             the selected mode. Otherwise, updates the status to indicate no valid pair was found.
             - Handles the case where no previous file was selected (e.g., at application start).
-
-        Note:
-            The method assumes that `mda_folder_tableview` and `select_fields_tableview` are
-            initialized and correctly set up to interact with the underlying data model and UI.
         """
         selectedFile = self.mdaFileList()[index.row()]
 
