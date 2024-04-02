@@ -44,14 +44,11 @@ class MDAFileVisualization(QtWidgets.QWidget):
         # tab=self.metadataPage
         self.metadata.setText(text)
 
-    # def setData(self, text, *args, **kwargs):  # TODO: am  I using this at all?
-    #     self.data.setText(text)
-
     def setPlot(self, plot_widget):
         layout = self.plotPageMpl.layout()
-        utils.removeAllLayoutWidgets(
-            layout
-        )  # TODO replace with mainWindow.clearContent? or clearPlotArea below?
+        # TODO replace removeAllLayoutWidgets with mainWindow.clearContent?
+        # or clearContents(plot=True, data=False, metadata=False)
+        utils.removeAllLayoutWidgets(layout)
         layout.addWidget(plot_widget)
 
     def isPlotBlank(self):
