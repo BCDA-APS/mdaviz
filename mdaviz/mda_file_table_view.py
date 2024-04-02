@@ -98,7 +98,6 @@ class MDAFileTableView(QtWidgets.QWidget):
         from .mda_file_table_model import MDAFileTableModel
         from .empty_table_model import EmptyTableModel
 
-        print("\nEntering displayTable")
         if self.data() is not None:
             fields = self.data()["fields"]
             data_model = MDAFileTableModel(
@@ -112,8 +111,6 @@ class MDAFileTableView(QtWidgets.QWidget):
             # No MDA files to display, show an empty table with headers
             empty_model = EmptyTableModel(HEADERS)
             self.tableView.setModel(empty_model)
-        print(f"{self.data()['fileInfo']['fileName']=}")
-        print("\nLeaving displayTable\n\n")
 
     def setStatus(self, text):
         self.mda_file.mda_mvc.setStatus(text)
