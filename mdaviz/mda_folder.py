@@ -298,6 +298,10 @@ class MDA_MVC(QtWidgets.QWidget):
         Returns:
             None: Updates the selection field directly if changes are made.
         """
+        if not old_selection:
+            print("No previous selection.")
+            return
+
         if verbose:
             print(f"\n----- Selection before clean up: {old_selection}\n")
         changes_made = False
@@ -402,7 +406,7 @@ class MDA_MVC(QtWidgets.QWidget):
             new_tab_tableview.tableView.model().checkboxStateChanged,
             self.onCheckboxStateChange,
         )
-        # selectionField() may have changed when calling addFileTab:
+        # selectionField() may have changed when calling addFileTab
         if self.selectionField():
             if old_pv_list is not None:
                 self.updateSelectionForNewPVs(
@@ -466,6 +470,7 @@ class MDA_MVC(QtWidgets.QWidget):
             self.mda_file.removeAllFileTabs()
             # Clear all content from the viz panel:
             # TODO: would become redundant if we decide to clear the plot in mda_file.removeAllFileTabs()
+            # (at the moment calls: self.mda_mvc.mda_file_viz.clearContents(plot=False))
             self.mda_file_viz.clearContents()
 
     def onTabChange(self, index, file_path, file_data, selection_field):
@@ -496,7 +501,7 @@ class MDA_MVC(QtWidgets.QWidget):
         if index == -1:
             self.setCurrentFileTableview()  # Reset to indicate no active file table view
             self.setSelectionField()  # Reset selection field to default
-            self.setStatus("No file currently selected.")
+            print("No file currently selected.")
             return
 
         # Retrieve the table view for the currently selected tab:
@@ -506,10 +511,11 @@ class MDA_MVC(QtWidgets.QWidget):
 
         # Fetch and display the metadata and data associated with the file path
         if file_data:
+            print(f"Displaying data and metadata for {file_path}.")
             self.mda_file.displayMetadata(file_data.get("metadata", None))
             self.mda_file.displayData(file_data.get("tabledata", None))
         else:
-            self.setStatus("No data and/or metadata found for display.")
+            print("No data and/or metadata found for display.")
         print(f"Leaving onTabChange for {file_path=}")
 
         # TODO:  disable UI elements or actions that require an active file to be meaningful:
@@ -543,19 +549,25 @@ class MDA_MVC(QtWidgets.QWidget):
         """
         Navigates to and selects the next file relative to the current selection in the folder table view.
         """
-        currentIndex = self.selectionModel().currentIndex()
-        nextIndex = currentIndex.sibling(currentIndex.row() + 1, currentIndex.column())
-        if nextIndex.isValid():
-            self.selectAndShowIndex(nextIndex)
+        if self.mdaFileList():
+            currentIndex = self.selectionModel().currentIndex()
+            nextIndex = currentIndex.sibling(
+                currentIndex.row() + 1, currentIndex.column()
+            )
+            if nextIndex.isValid():
+                self.selectAndShowIndex(nextIndex)
 
     def goToPrevious(self):
         """
         Navigates to and selects the previous file relative to the current selection in the folder table view.
         """
-        currentIndex = self.selectionModel().currentIndex()
-        prevIndex = currentIndex.sibling(currentIndex.row() - 1, currentIndex.column())
-        if prevIndex.isValid():
-            self.selectAndShowIndex(prevIndex)
+        if self.mdaFileList():
+            currentIndex = self.selectionModel().currentIndex()
+            prevIndex = currentIndex.sibling(
+                currentIndex.row() - 1, currentIndex.column()
+            )
+            if prevIndex.isValid():
+                self.selectAndShowIndex(prevIndex)
 
     def selectAndShowIndex(self, index):
         """
@@ -614,10 +626,10 @@ class MDA_MVC(QtWidgets.QWidget):
         mode = self.mda_file.mode()
 
         # Exceptions:
-        if not selection.get("Y"):  # no DET selected
+        if not selection.get("Y"):  # if no DET: clear plot
             widgetMpl.clearPlot()
             return
-        if not selection.get("X"):  # if no POS, default to index
+        if not selection.get("X"):  # if no POS: default to index
             widgetMpl.clearPlot()
             selection["X"] = 0
             tableview.tableView.model().checkCheckBox(0, "X")
@@ -647,6 +659,7 @@ class MDA_MVC(QtWidgets.QWidget):
             # TODO that is weird, why? only should clear if there is no Y left
             # that is the behavior that I observe in Auto-Replace
             # in Auto-Add, should remove it from the graph but it doesn't
+            # if there are curve from a different folder or file, that will be a problem
             # lots of stuff to fix here
 
         # Get dataset for the positioner/detector selection:
@@ -654,7 +667,6 @@ class MDA_MVC(QtWidgets.QWidget):
 
         self.setSelectionField(selection)
         y_rows = selection.get("Y", [])
-        # print(f"\nonCheckboxStateChange called:  {mode} {fileName} with {selection}")
         print(f"\nonCheckboxStateChange called:  {mode} with {selection}")
 
         if mode in ("Auto-replace", "Auto-add"):
