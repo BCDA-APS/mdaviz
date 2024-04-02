@@ -364,7 +364,9 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
 
     # ------------ reporting
 
-    #TODO: we never call plotField with fieldname. Remove choices_pretty?
+    # TODO: we never call plotField with fieldname. Remove choices_pretty?
+    # TODO: we have to reformat plotfield to match selectionField (ftm2mvc and mvc2ftm),
+    # maybe avoid this but formating plotfield directly the right way?
 
     def plotFields(self):
         """
