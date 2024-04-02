@@ -34,8 +34,6 @@ COLUMNS = [
 
 class MDAFileTableView(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
-    selected = QtCore.pyqtSignal(str, dict)  # TODO: not used here?
-    # fieldchange = QtCore.pyqtSignal(str, dict) # TODO: not used?
 
     def __init__(self, parent):
         """
