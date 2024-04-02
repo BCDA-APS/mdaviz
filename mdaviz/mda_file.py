@@ -61,7 +61,7 @@ class MDAFile(QtWidgets.QWidget):
         # Connect TabManager signals:
         self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
         self.tabManager.tabRemoved.connect(self.onTabRemoved)
-        # TODO - question: is this last signal redundant with tabCloseRequested?
+        # TODO - question: is this last signal redundant with tabCloseRequested? I think so
 
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
@@ -294,14 +294,12 @@ class MDAFile(QtWidgets.QWidget):
         """
         Removes all tabs from the tab widget.
         """
-        # TODO - question: do I want to remove all the content or just the data/metadata?
-        # ie. should we sync the tab open/close with the curves on the graph?
         while self.tabWidget.count() > 0:
             self.tabWidget.removeTab(self.tabWidget.count() - 1)
         # Clear all data associated with the tabs from the TabManager.
         self.tabManager.removeAllTabs()
-        # Optionally, clear all content from the visualization panel as well, if no tabs are open.
-        self.mda_mvc.mda_file_viz.clearContents(plot=False)
+        # Clear all content from the visualization panel as well, if no tabs are open.
+        self.mda_mvc.mda_file_viz.clearContents()
         # Update the status to reflect that all tabs have been closed.
         self.setStatus("All file tabs have been closed.")
 

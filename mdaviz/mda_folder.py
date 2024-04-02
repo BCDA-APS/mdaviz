@@ -466,12 +466,8 @@ class MDA_MVC(QtWidgets.QWidget):
         elif action in ("clear"):
             # widgetMpl.clearPlot()
             print("CLEAR CLEAR CLEAR")
-            # Clear all content from the file table view:
+            # Clear all content from the file table view & viz panel:
             self.mda_file.removeAllFileTabs()
-            # Clear all content from the viz panel:
-            # TODO - later: would become redundant if we decide to clear the plot in mda_file.removeAllFileTabs()
-            # (at the moment calls: self.mda_mvc.mda_file_viz.clearContents(plot=False))
-            self.mda_file_viz.clearContents()
 
     def onTabChange(self, index, file_path, file_data, selection_field):
         """
@@ -532,7 +528,7 @@ class MDA_MVC(QtWidgets.QWidget):
         Navigates to and selects the first file in the folder table view.
         """
         model = self.mda_folder_tableview.tableView.model()
-        if model.rowCount() > 0:
+        if model is not None and model.rowCount() > 0:
             firstIndex = model.index(0, 0)
             self.selectAndShowIndex(firstIndex)
 
@@ -541,7 +537,7 @@ class MDA_MVC(QtWidgets.QWidget):
         Navigates to and selects the last file in the folder table view.
         """
         model = self.mda_folder_tableview.tableView.model()
-        if model.rowCount() > 0:
+        if model is not None and model.rowCount() > 0:
             lastIndex = model.index(model.rowCount() - 1, 0)
             self.selectAndShowIndex(lastIndex)
 
@@ -549,25 +545,31 @@ class MDA_MVC(QtWidgets.QWidget):
         """
         Navigates to and selects the next file relative to the current selection in the folder table view.
         """
-        if self.mdaFileList():
-            currentIndex = self.selectionModel().currentIndex()
-            nextIndex = currentIndex.sibling(
-                currentIndex.row() + 1, currentIndex.column()
-            )
-            if nextIndex.isValid():
-                self.selectAndShowIndex(nextIndex)
+        try:
+            if self.mdaFileList() and self.selectionModel():
+                currentIndex = self.selectionModel().currentIndex()
+                nextIndex = currentIndex.sibling(
+                    currentIndex.row() + 1, currentIndex.column()
+                )
+                if nextIndex.isValid():
+                    self.selectAndShowIndex(nextIndex)
+        except RuntimeError as e:
+            print("The selection model is no longer valid:", e)
 
     def goToPrevious(self):
         """
         Navigates to and selects the previous file relative to the current selection in the folder table view.
         """
-        if self.mdaFileList():
-            currentIndex = self.selectionModel().currentIndex()
-            prevIndex = currentIndex.sibling(
-                currentIndex.row() - 1, currentIndex.column()
-            )
-            if prevIndex.isValid():
-                self.selectAndShowIndex(prevIndex)
+        try:
+            if self.mdaFileList() and self.selectionModel():
+                currentIndex = self.selectionModel().currentIndex()
+                prevIndex = currentIndex.sibling(
+                    currentIndex.row() - 1, currentIndex.column()
+                )
+                if prevIndex.isValid():
+                    self.selectAndShowIndex(prevIndex)
+        except RuntimeError as e:
+            print("The selection model is no longer valid:", e)
 
     def selectAndShowIndex(self, index):
         """

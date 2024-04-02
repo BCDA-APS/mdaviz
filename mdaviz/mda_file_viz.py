@@ -48,6 +48,7 @@ class MDAFileVisualization(QtWidgets.QWidget):
         layout = self.plotPageMpl.layout()
         # TODO- later: replace removeAllLayoutWidgets with mainWindow.clearContent?
         # or clearContents(plot=True, data=False, metadata=False)
+        # why are we removing all the layouts?
         utils.removeAllLayoutWidgets(layout)
         layout.addWidget(plot_widget)
 
@@ -82,7 +83,10 @@ class MDAFileVisualization(QtWidgets.QWidget):
             self.metadata.setText("")
         # Clear Data Table
         if data:
-            self.data_table_view.clearContents()
+            try:
+                self.data_table_view.clearContents()
+            except AttributeError:
+                pass  # data_table_view does not exist, so do nothing
 
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
