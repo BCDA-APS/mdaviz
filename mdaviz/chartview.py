@@ -177,8 +177,8 @@ class ChartView(QtWidgets.QWidget):
         # If removing the last curve, clear all content from vizualization panel:
         if label in self.line2D:
             if len(self.line2D) == 1:
-                self.mda_mvc.mda_file_viz.clearContents()
-                self.mda_mvc.currentFileTV().tableView.model().clearAllCheckboxes()
+                self.mda_mvc.mda_file_viz.clearContents(data=False, metadata=False)
+                self.mda_mvc.currentFileTableview().tableView.model().clearAllCheckboxes()
             else:
                 # Remove curve from graph
                 row = self.line2D[label]["row"]
@@ -188,7 +188,9 @@ class ChartView(QtWidgets.QWidget):
                 del self.line2D[label]
                 # Remove curve from comboBox
                 self.removeItemCurveBox(label)
-                self.mda_mvc.currentFileTV().tableView.model().uncheckCheckBox(row)
+                self.mda_mvc.currentFileTableview().tableView.model().uncheckCheckBox(
+                    row
+                )
                 # Update plot labels, legend and title
                 self.updatePlot()
 
