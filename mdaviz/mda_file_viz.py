@@ -46,7 +46,7 @@ class MDAFileVisualization(QtWidgets.QWidget):
 
     def setPlot(self, plot_widget):
         layout = self.plotPageMpl.layout()
-        # TODO replace removeAllLayoutWidgets with mainWindow.clearContent?
+        # TODO- later: replace removeAllLayoutWidgets with mainWindow.clearContent?
         # or clearContents(plot=True, data=False, metadata=False)
         utils.removeAllLayoutWidgets(layout)
         layout.addWidget(plot_widget)

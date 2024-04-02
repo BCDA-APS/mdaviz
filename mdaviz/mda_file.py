@@ -61,7 +61,7 @@ class MDAFile(QtWidgets.QWidget):
         # Connect TabManager signals:
         self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
         self.tabManager.tabRemoved.connect(self.onTabRemoved)
-        # TODO: is this last signal redundant with tabCloseRequested?
+        # TODO - question: is this last signal redundant with tabCloseRequested?
 
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
@@ -187,12 +187,12 @@ class MDAFile(QtWidgets.QWidget):
     # ------ Tabs management (UI):
 
     def onTabRemoved(self, file_path):
-        # TODO: handle the UI update or other actions needed when a new tab is removed
+        # FIXME - sync tab with graph: handle the UI update or other actions needed when a new tab is removed
         # Remove trace(s) from graph?
         pass
 
     def onAllTabsRemoved(self):
-        # TODO: handle the UI update or other actions needed when a all tabs are removed
+        # FIXME - sync tab with UI: handle the UI update or other actions needed when a all tabs are removed
         # e.g. disable certain UI elements that require a file to be selected (buttons?)
         pass
 
@@ -211,7 +211,7 @@ class MDAFile(QtWidgets.QWidget):
         - selection_field (dict): Specifies the fields (positioners/detectors) for display
         and plotting.
         """
-        # TODO implement auto-off: nothing happens?
+        # FIXME - auto-off when add tab: what should happen? nothing?
         # the addition of a new tab /update of existing tab will only happen when Replace or Add is pushed?
 
         # Get data for the selected file:
@@ -294,7 +294,7 @@ class MDAFile(QtWidgets.QWidget):
         """
         Removes all tabs from the tab widget.
         """
-        # TODO: do I want to remove all the content or just the data/metadata?
+        # TODO - question: do I want to remove all the content or just the data/metadata?
         # ie. should we sync the tab open/close with the curves on the graph?
         while self.tabWidget.count() > 0:
             self.tabWidget.removeTab(self.tabWidget.count() - 1)

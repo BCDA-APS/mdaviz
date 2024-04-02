@@ -265,8 +265,8 @@ class MDA_MVC(QtWidgets.QWidget):
         - Resets to None if given an empty dictionary.
         - Format for new_selection: {'X': positioner_index, 'Y': [detector_indices]}.
         """
-        # TODO: what if:
-        # - new_selection does not have X or Y key, or any of those key return a None value?
+        # BUG - how to enfore selectionField structure? what if new_selection
+        # does not have X or Y key, or any of those key return a None value? or is {}?
         self._selection_field = new_selection if new_selection != {} else None
 
     def applySelectionChanges(self, new_selection):
@@ -450,7 +450,7 @@ class MDA_MVC(QtWidgets.QWidget):
         if action in ("replace", "add"):
             # Get dataset for the positioner/detector selection:
             datasets, plot_options = tableview.data2Plot(selection)
-            # TODO: what if selection == None?
+            # BUG: what if selection == None?
             y_rows = selection.get("Y", [])
             if not isinstance(widgetMpl, ChartView):
                 widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
@@ -461,7 +461,7 @@ class MDA_MVC(QtWidgets.QWidget):
                 widgetMpl.plot(row, *ds, **kwargs)
             self.mda_file_viz.setPlot(widgetMpl)
 
-            # TODO: the button are more than just doPlot, it also needs to replace data and metadata.
+            # FIXME - pushButtons: the button are more than just doPlot, it also needs to replace data and metadata.
 
         elif action in ("clear"):
             # widgetMpl.clearPlot()
@@ -469,7 +469,7 @@ class MDA_MVC(QtWidgets.QWidget):
             # Clear all content from the file table view:
             self.mda_file.removeAllFileTabs()
             # Clear all content from the viz panel:
-            # TODO: would become redundant if we decide to clear the plot in mda_file.removeAllFileTabs()
+            # TODO - later: would become redundant if we decide to clear the plot in mda_file.removeAllFileTabs()
             # (at the moment calls: self.mda_mvc.mda_file_viz.clearContents(plot=False))
             self.mda_file_viz.clearContents()
 
@@ -518,12 +518,12 @@ class MDA_MVC(QtWidgets.QWidget):
             print("No data and/or metadata found for display.")
         print(f"Leaving onTabChange for {file_path=}")
 
-        # TODO:  disable UI elements or actions that require an active file to be meaningful:
+        # TODO - check:  disable UI elements or actions that require an active file to be meaningful:
         # For example: the add/replace button in auto-off need to be disabled if no files is selected
         # Implementing a method that updates the state of UI components based on the current context
         # (e.g., active tab, available data) would enhance usability. This method could be
         # called after tab changes, file selections, or other significant events.
-        # TODO:  disable UI elements or actions that require an active Folder to be meaningful: GoTo...
+        # TODO - check:  disable UI elements or actions that require an active Folder to be meaningful: GoTo...
 
     # # ------------ Folder Table View navigation & selection highlight:
 
@@ -605,7 +605,7 @@ class MDA_MVC(QtWidgets.QWidget):
         """TODO: write docstring: Slot: data field (for plotting) changes."""
         from .chartview import ChartView
 
-        # TODO: do I need a flag here to prevent "onCheckboxChange" to apply
+        # TODO - check: do I need a flag here to prevent "onCheckboxChange" to apply
         # when selecting a new file: selecting a new file triggers it since
         # the checkbox status effectively changes. Created problem when I tried
         # to clearContents in mda_vizualization
@@ -639,7 +639,7 @@ class MDA_MVC(QtWidgets.QWidget):
             if previous_selection.get("X") != selection.get("X"):
                 widgetMpl.clearPlot()
 
-            # TODO: if remove X and no X left, core dump:
+            # BUG: if remove X and no X left, core dump:
             # onCheckboxStateChange called:  Auto-replace with {'Y': [2], 'X': 0}
             # Traceback (most recent call last):
             #   File "/home/beams22/29IDUSER/bin/mdaviz/mdaviz/mda_folder.py", line 600, in onCheckboxStateChange
@@ -656,7 +656,7 @@ class MDA_MVC(QtWidgets.QWidget):
             if len(previous_selection.get("Y")) > len(selection.get("Y")):
                 widgetMpl.clearPlot()
 
-            # TODO that is weird, why? only should clear if there is no Y left
+            # BUG: that is weird, why? only should clear if there is no Y left
             # that is the behavior that I observe in Auto-Replace
             # in Auto-Add, should remove it from the graph but it doesn't
             # if there are curve from a different folder or file, that will be a problem
