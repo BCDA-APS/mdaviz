@@ -1,6 +1,5 @@
 from PyQt5 import QtCore
 from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt
-from . import utils
 
 
 class DataTableModel(QAbstractTableModel):
