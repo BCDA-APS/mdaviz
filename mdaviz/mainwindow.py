@@ -239,7 +239,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 if self.mvc_folder is not None:
                     # If MVC exists, display empty table views
                     self.mvc_folder.updateFolderView()
-                    self.mvc_folder.updateFieldsView(None)
+                    self.mvc_folder.mda_file.removeAllFileTabs()
 
     def setSubFolderPath(self, subfolder_name):
         if subfolder_name:
