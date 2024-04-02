@@ -18,7 +18,7 @@ from .mda_file_table_view import MDAFileTableView
 class MDAFile(QtWidgets.QWidget):
     ui_file = utils.getUiFileName(__file__)
     # Emit the action when button is pushed:
-    selected = QtCore.pyqtSignal(str)
+    buttonPushed = QtCore.pyqtSignal(str)
     # Emit the new tab index (int), file path (str), data (dict) and selection field (dict):
     tabChanged = QtCore.pyqtSignal(int, str, dict, dict)
 
@@ -161,13 +161,13 @@ class MDAFile(QtWidgets.QWidget):
             return
         metadata = utils.get_md(metadata)
         metadata = yaml.dump(metadata, default_flow_style=False)
-        self.mda_mvc.mda_file_visualization.setMetadata(metadata)
+        self.mda_mvc.mda_file_viz.setMetadata(metadata)
 
     def displayData(self, tabledata):
         """Display pos(s) & det(s) values as a tableview in the vizualization panel."""
         if not self.data():
             return
-        self.mda_mvc.mda_file_visualization.setTableData(tabledata)
+        self.mda_mvc.mda_file_viz.setTableData(tabledata)
 
     def defaultSelection(self, first_pos, first_det, selection_field):
         """Sets the default field selection if no selection is provided.
@@ -301,7 +301,7 @@ class MDAFile(QtWidgets.QWidget):
         # Clear all data associated with the tabs from the TabManager.
         self.tabManager.removeAllTabs()
         # Optionally, clear all content from the visualization panel as well, if no tabs are open.
-        self.mda_mvc.mda_file_visualization.clearContent(plot=False)
+        self.mda_mvc.mda_file_viz.clearContents(plot=False)
         # Update the status to reflect that all tabs have been closed.
         self.setStatus("All file tabs have been closed.")
 
@@ -317,18 +317,15 @@ class MDAFile(QtWidgets.QWidget):
             new_tab_index, new_file_path, new_tab_data, new_selection_field
         )
 
-    # ------ Slot methods:
+    # ------ Button methods:
 
     def responder(self, action):
         """Modify the plot with the described action.
         action:
             from buttons: add, clear, replace
         """
-        # TODO: need to use the UPDATED file_tableview, ie the one in the tab that is currently selected
-        # would this be handled with mda_folder when it connects to it? I m not sure since it emits the stuff
-        # from self.file_tableview
         print(f"\nResponder: {action=}")
-        self.selected.emit(action)
+        self.buttonPushed.emit(action)
 
     def updateButtonVisibility(self):
         """Check the current text in "mode" pull down and show/hide buttons accordingly"""

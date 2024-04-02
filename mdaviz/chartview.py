@@ -177,7 +177,7 @@ class ChartView(QtWidgets.QWidget):
         # If removing the last curve, clear all content from vizualization panel:
         if label in self.line2D:
             if len(self.line2D) == 1:
-                self.mda_mvc.mda_file_visualization.clearContents()
+                self.mda_mvc.mda_file_viz.clearContents()
                 self.mda_mvc.currentFileTV().tableView.model().clearAllCheckboxes()
             else:
                 # Remove curve from graph
