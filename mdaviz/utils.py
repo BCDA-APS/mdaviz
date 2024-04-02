@@ -334,3 +334,20 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
 def getUiFileName(py_file_name):
     """UI file name matches the Python file, different extension."""
     return f"{pathlib.Path(py_file_name).stem}.ui"
+
+
+def reconnect(signal, new_slot):
+    """
+    Disconnects any slots connected to the given signal and then connects the signal to the new_slot.
+
+    Parameters:
+    - signal: The signal to disconnect and then reconnect.
+    - new_slot: The new slot to connect to the signal.
+
+    Note: This function catches TypeError which occurs if the signal was not connected to any slots.
+    """
+    try:
+        signal.disconnect()
+    except TypeError:
+        pass
+    signal.connect(new_slot)
