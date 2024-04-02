@@ -229,7 +229,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs))
 
             else:
-                comment = f"{str(folder_path)!r} - invalid path."
+                comment = f"\n{str(folder_path)!r} - invalid path."
                 self._folderPath = None
                 self._dataPath = None
                 self._mdaFileList = []
