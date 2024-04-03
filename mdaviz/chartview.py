@@ -96,6 +96,7 @@ class ChartView(QtWidgets.QWidget):
 
         # Track curves and display in QComboBox:
         self.line2D = {}  # all the Line2D on the graph, key = label
+        # TODO - later: this will become a problem to plot 2 curve from same file name but different paths
         self.curveBox = self.mda_mvc.findChild(QtWidgets.QComboBox, "curveBox")
         self.curveBox.currentTextChanged.connect(self.curveSelected)
 
@@ -195,7 +196,6 @@ class ChartView(QtWidgets.QWidget):
                 self.updatePlot()
 
     def plot(self, row, *args, **kwargs):
-        # Extract label from kwargs, default to None if not present
         self._plot_options = kwargs.get("plot_options", {})
         ds_options = self._ds_options = kwargs.get("ds_options", {})
         path = self._plot_options["folderPath"]
