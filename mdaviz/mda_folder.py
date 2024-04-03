@@ -450,7 +450,7 @@ class MDA_MVC(QtWidgets.QWidget):
         if action in ("replace", "add"):
             # Get dataset for the positioner/detector selection:
             datasets, plot_options = tableview.data2Plot(selection)
-            # BUG: what if selection == None?
+            # BUG - what if selection == None?
             y_rows = selection.get("Y", [])
             if not isinstance(widgetMpl, ChartView):
                 widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
@@ -641,7 +641,7 @@ class MDA_MVC(QtWidgets.QWidget):
             if previous_selection.get("X") != selection.get("X"):
                 widgetMpl.clearPlot()
 
-            # BUG: if remove X and no X left, core dump:
+            # BUG - if remove X and no X left, core dump:
             # onCheckboxStateChange called:  Auto-replace with {'Y': [2], 'X': 0}
             # Traceback (most recent call last):
             #   File "/home/beams22/29IDUSER/bin/mdaviz/mdaviz/mda_folder.py", line 600, in onCheckboxStateChange
@@ -658,7 +658,7 @@ class MDA_MVC(QtWidgets.QWidget):
             if len(previous_selection.get("Y")) > len(selection.get("Y")):
                 widgetMpl.clearPlot()
 
-            # BUG: that is weird, why? only should clear if there is no Y left
+            # BUG - that is weird, why? only should clear if there is no Y left
             # that is the behavior that I observe in Auto-Replace
             # in Auto-Add, should remove it from the graph but it doesn't
             # if there are curve from a different folder or file, that will be a problem
