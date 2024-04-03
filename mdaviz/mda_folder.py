@@ -64,6 +64,7 @@ MVC implementation of mda files.
 
 import time
 from functools import partial
+from pathlib import Path
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QItemSelectionModel
@@ -265,8 +266,9 @@ class MDA_MVC(QtWidgets.QWidget):
         - Resets to None if given an empty dictionary.
         - Format for new_selection: {'X': positioner_index, 'Y': [detector_indices]}.
         """
-        # BUG - how to enfore selectionField structure? what if new_selection
-        # does not have X or Y key, or any of those key return a None value? or is {}?
+        # TODO - how to enfore selectionField structure? Turn it into a class!
+        # what if new_selectionvdoes not have X or Y key, or any of those key return
+        # a None value? or is {}?
         self._selection_field = new_selection if new_selection != {} else None
 
     def applySelectionChanges(self, new_selection):
@@ -303,17 +305,20 @@ class MDA_MVC(QtWidgets.QWidget):
             return
 
         if verbose:
-            print(f"\n----- Selection before clean up: {old_selection}\n")
+            print(f"\n----- Selection before clean up: {old_selection}")
         changes_made = False
         tableview = self.currentFileTableview()
-        new_selection = {"Y": [], "X": tableview.data()["fileInfo"]["firstPos"]}
+        new_selection = {"Y": [], "X": None}
         # Update Y selections: if either left operand or right operand is True, result will be True.
         changes_made |= self.updateDetectorSelection(
             oldPvList, old_selection, newPvList, new_selection, verbose
         )
         # Update X selection and check for changes
-        old_idx = old_selection["X"]
-        new_idx = new_selection["X"]
+        old_idx = old_selection.get("X")
+        if old_idx:
+            new_idx = tableview.data()["fileInfo"]["firstPos"]
+        else:
+            new_idx = 0
         if old_idx != new_idx:
             changes_made = True
             if verbose:
@@ -335,7 +340,7 @@ class MDA_MVC(QtWidgets.QWidget):
         - Returns True if changes were made, otherwise False.
         """
         changes_made = False
-        for old_index in old_selection["Y"]:
+        for old_index in old_selection.get("Y", []):
             if old_index < len(oldPvList):
                 old_pv = oldPvList[old_index]
                 if old_pv in newPvList:
@@ -435,7 +440,15 @@ class MDA_MVC(QtWidgets.QWidget):
         action = args[0]
         tableview = self.currentFileTableview()
         selection = self.selectionField()
-        if not tableview:
+
+        # Clear all content from the file table view & viz panel:
+        if action in ("clear"):
+            print("\n\nPushButton Clear...")
+            self.mda_file.removeAllFileTabs()
+            return
+
+        # If there is no file selected (ie no tableview) or no DET:
+        if not tableview or not selection.get("Y"):
             self.setStatus("Nothing to plot.")
             return
 
@@ -450,24 +463,20 @@ class MDA_MVC(QtWidgets.QWidget):
         if action in ("replace", "add"):
             # Get dataset for the positioner/detector selection:
             datasets, plot_options = tableview.data2Plot(selection)
-            # BUG - what if selection == None?
-            y_rows = selection.get("Y", [])
+            y_index = selection.get("Y", [])
             if not isinstance(widgetMpl, ChartView):
                 widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
             if action in ("replace"):
                 widgetMpl.clearPlot()  # do I need: self.mda_mvc.mda_file_visualization.clearContents()?
-            for row, (ds, ds_options) in zip(y_rows, datasets):
+            for i, (ds, ds_options) in zip(y_index, datasets):
+                # ds: [x_data, y_data]
+                # ds_options: {"label":y_label} (for legend)
+                # plot_options: {"x" (label), "x_unit", "y" (label), "y_unit", "title", "folderPath"}
                 kwargs = {"ds_options": ds_options, "plot_options": plot_options}
-                widgetMpl.plot(row, *ds, **kwargs)
+                widgetMpl.plot(i, *ds, **kwargs)
             self.mda_file_viz.setPlot(widgetMpl)
 
             # FIXME - pushButtons: the button are more than just doPlot, it also needs to replace data and metadata.
-
-        elif action in ("clear"):
-            # widgetMpl.clearPlot()
-            print("CLEAR CLEAR CLEAR")
-            # Clear all content from the file table view & viz panel:
-            self.mda_file.removeAllFileTabs()
 
     def onTabChange(self, index, file_path, file_data, selection_field):
         """
@@ -507,18 +516,14 @@ class MDA_MVC(QtWidgets.QWidget):
 
         # Fetch and display the metadata and data associated with the file path
         if file_data:
-            print(f"Displaying data and metadata for {file_path}.")
+            print(f"Displaying data and metadata for {Path(file_path).name}.")
             self.mda_file.displayMetadata(file_data.get("metadata", None))
             self.mda_file.displayData(file_data.get("tabledata", None))
         else:
             print("No data and/or metadata found for display.")
-        print(f"Leaving onTabChange for {file_path=}")
+        print(f"Leaving onTabChange.")
 
-        # TODO - check:  disable UI elements or actions that require an active file to be meaningful:
-        # For example: the add/replace button in auto-off need to be disabled if no files is selected
-        # Implementing a method that updates the state of UI components based on the current context
-        # (e.g., active tab, available data) would enhance usability. This method could be
-        # called after tab changes, file selections, or other significant events.
+        # TODO - check:  disable UI elements or actions that require an active file to be meaningful: Add, replace...
         # TODO - check:  disable UI elements or actions that require an active Folder to be meaningful: GoTo...
 
     # # ------------ Folder Table View navigation & selection highlight:
@@ -609,15 +614,15 @@ class MDA_MVC(QtWidgets.QWidget):
 
         # TODO - check: do I need a flag here to prevent "onCheckboxChange" to apply
         # when selecting a new file: selecting a new file triggers it since
-        # the checkbox status effectively changes. Created problem when I tried
-        # to clearContents in mda_vizualization
-
-        # I had this warning - is that true?
-        #         Checkbox State Change ---> onCheckboxStateChange ---> doPlot
-        # WARNING:             |___> doFileSelected (since it changes the selection)
+        # the checkbox status might changes (if set to default 1st POS 1st DET).
 
         tableview = self.currentFileTableview()
         previous_selection = self.selectionField()
+
+        print(f"\nonCheckboxStateChange called:")
+        print(f"\nCheckPoint #1:")
+        print(f"      - {selection=}")
+        print(f"      - {self.selectionField()=}")
 
         # Get the matplotlib chartview widget, if exists:
         layoutMpl = self.mda_file_viz.plotPageMpl.layout()
@@ -629,48 +634,42 @@ class MDA_MVC(QtWidgets.QWidget):
 
         # Exceptions:
         if not selection.get("Y"):  # if no DET: clear plot
-            widgetMpl.clearPlot()
+            # TODO: if in auto-add, don;t clear the plot,
+            # just remove the curve - there could be plot from other tableviews
+            # widgetMpl.clearPlot()
             return
         if not selection.get("X"):  # if no POS: default to index
             widgetMpl.clearPlot()
             selection["X"] = 0
             tableview.tableView.model().checkCheckBox(0, "X")
 
-        if previous_selection:
-            # if changing POS, clear the graph:
-            if previous_selection.get("X") != selection.get("X"):
-                widgetMpl.clearPlot()
+        # if previous_selection:   # TODO This needs to be changed, not that simple
+        #     # if changing POS, clear the graph:
+        #     if previous_selection.get("X") != selection.get("X"):
+        #         widgetMpl.clearPlot()
 
-            # BUG - if remove X and no X left, core dump:
-            # onCheckboxStateChange called:  Auto-replace with {'Y': [2], 'X': 0}
-            # Traceback (most recent call last):
-            #   File "/home/beams22/29IDUSER/bin/mdaviz/mdaviz/mda_folder.py", line 600, in onCheckboxStateChange
-            #     widgetMpl.plot(row, *ds, **kwargs)
-            #   File "/home/beams22/29IDUSER/bin/mdaviz/mdaviz/chartview.py", line 206, in plot
-            #     self.addCurve(row, path, *args, **ds_options)
-            #   File "/home/beams22/29IDUSER/bin/mdaviz/mdaviz/chartview.py", line 166, in addCurve
-            #     "y_data": args[1],
-            #               ~~~~^^^
-            # IndexError: tuple index out of range
-            # Aborted (core dumped)
+        #     # if removing DET, clear the graph:
+        #     if len(previous_selection.get("Y")) > len(selection.get("Y")):
+        #         widgetMpl.clearPlot()
 
-            # if removing DET, clear the graph:
-            if len(previous_selection.get("Y")) > len(selection.get("Y")):
-                widgetMpl.clearPlot()
+        #     # BUG - that is weird, why? only should clear if there is no Y left
+        #     # that is the behavior that I observe in Auto-Replace
+        #     # in Auto-Add, should remove it from the graph but it doesn't
+        #     # if there are curve from a different folder or file, that will be a problem
+        #     # lots of stuff to fix here
 
-            # BUG - that is weird, why? only should clear if there is no Y left
-            # that is the behavior that I observe in Auto-Replace
-            # in Auto-Add, should remove it from the graph but it doesn't
-            # if there are curve from a different folder or file, that will be a problem
-            # lots of stuff to fix here
+        print(f"\nCheckPoint #2:")
+        print(f"      - {selection=}")
+        print(f"      - {self.selectionField()=}")
 
         # Get dataset for the positioner/detector selection:
+        self.setSelectionField(selection)
         datasets, plot_options = tableview.data2Plot(self.selectionField())
 
-        self.setSelectionField(selection)
         y_rows = selection.get("Y", [])
-        print(f"\nonCheckboxStateChange called:  {mode} with {selection}")
-
+        print(f"\nCheckPoint #3:")
+        print(f"      - {selection=}")
+        print(f"      - {self.selectionField()=}")
         if mode in ("Auto-replace", "Auto-add"):
             if not isinstance(widgetMpl, ChartView):
                 widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
