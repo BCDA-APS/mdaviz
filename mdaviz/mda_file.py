@@ -59,9 +59,10 @@ class MDAFile(QtWidgets.QWidget):
         self.tabWidget.currentChanged.connect(self.onSwitchTab)
         self.tabWidget.tabCloseRequested.connect(self.removeFileTab)
         # Connect TabManager signals:
-        self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
-        self.tabManager.tabRemoved.connect(self.onTabRemoved)
-        # TODO - question: is this last signal redundant with tabCloseRequested? I think so
+        # self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
+        # self.tabManager.tabRemoved.connect(self.onTabRemoved)
+        # TODO - question: are those redundant with tabCloseRequested? I think so
+        # removeFileTab takes care of cleaning everything up when the last tab is closed
 
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
@@ -188,13 +189,17 @@ class MDAFile(QtWidgets.QWidget):
 
     def onTabRemoved(self, file_path):
         # FIXME - sync tab with graph: handle the UI update or other actions needed when a new tab is removed
-        # Remove trace(s) from graph?
+        # e.g.:    close tab ---> remove curve  NO !
+        # This can be handled by self.removeFileTabs() that gets triggered when a tab is removed.
+        # Unless we need something for the other way around:
+        # e.g.:    remove curve ---> close tab  YES
         pass
 
-    def onAllTabsRemoved(self):
-        # FIXME - sync tab with UI: handle the UI update or other actions needed when a all tabs are removed
-        # e.g. disable certain UI elements that require a file to be selected (buttons?)
-        pass
+    # def onAllTabsRemoved(self):
+    #     # TODO - question: same as bove: sync tab with UI: handle the UI update or other actions needed when a all tabs are removed
+    #     # e.g. disable certain UI elements that require a file to be selected (buttons?)
+    #     # This is already done by self.removeAllFileTabs() that gets triggered when the last tab is removed.
+    #     pass
 
     def addFileTab(self, index, selection_field):
         """
@@ -211,8 +216,6 @@ class MDAFile(QtWidgets.QWidget):
         - selection_field (dict): Specifies the fields (positioners/detectors) for display
         and plotting.
         """
-        # FIXME - auto-off when add tab: what should happen? nothing?
-        # the addition of a new tab /update of existing tab will only happen when Replace or Add is pushed?
 
         # Get data for the selected file:
         self.setData(index)
@@ -234,11 +237,11 @@ class MDAFile(QtWidgets.QWidget):
             tab_index = self.tabPath2Index(file_path)
             self.tabWidget.setCurrentIndex(tab_index)
         else:
-            mode = self.mode()  # ["Auto-replace", "Auto-add", "Auto-off"]
-            if mode == "Auto-add":
+            mode = self.mode()
+            if mode in ("Auto-add", "Auto-off"):
                 # Add this tab to the UI:
                 self.createNewTab(file_name, file_path, selection_field)
-            elif mode == "Auto-replace":
+            elif mode in ("Auto-replace"):
                 # Clear all existing tabs:
                 while self.tabWidget.count() > 0:
                     self.tabWidget.removeTab(0)
@@ -354,8 +357,9 @@ class TabManager(QtCore.QObject):
     - allTabRemoved: Emitted when all tabs are removed. No parameters.
     """
 
-    tabRemoved = QtCore.pyqtSignal(str)  # Signal emitting file path of removed tab
-    allTabsRemoved = QtCore.pyqtSignal()  # Signal indicating all tabs have been removed
+    # TODO - question: same as above, they are probably useless
+    # tabRemoved = QtCore.pyqtSignal(str)  # Signal emitting file path of removed tab
+    # allTabsRemoved = QtCore.pyqtSignal()  # Signal indicating all tabs have been removed
 
     def __init__(self):
         super().__init__()
@@ -370,12 +374,12 @@ class TabManager(QtCore.QObject):
         """Removes the tab associated with the given file path."""
         if file_path in self._tabs:  # Check if the tab exists
             del self._tabs[file_path]
-            self.tabRemoved.emit(file_path)
+            # self.tabRemoved.emit(file_path)
 
     def removeAllTabs(self):
         """Removes all tabs."""
         self._tabs.clear()
-        self.allTabsRemoved.emit()
+        # self.allTabsRemoved.emit()
 
     def getTabData(self, file_path):
         """Returns the metatdata & data for the tab associated with the given file path."""
