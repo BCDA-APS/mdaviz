@@ -40,10 +40,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
-        try:
-            self.open.released.disconnect()
-        except TypeError:  # No slots connected yet
-            pass
+        utils.reconnect(self.open.released, self.doOpen)
         self.open.released.connect(self.doOpen)
 
         self.folder.currentTextChanged.connect(self.setFolderPath)
