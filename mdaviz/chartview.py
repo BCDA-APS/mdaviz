@@ -95,7 +95,7 @@ class ChartView(QtWidgets.QWidget):
         self.setConfigPlot()
 
         # Track curves and display in QComboBox:
-        self.line2D = {}  # all the Line2D on the graph, key = label
+        self.line2D = {}  # all the Line2D on the graph, key = path+label
         # TODO - later: this will become a problem to plot 2 curve from same file name but different paths
         self.curveBox = self.mda_mvc.mda_file_viz.curveBox
         self.curveBox.currentTextChanged.connect(self.curveSelected)
@@ -112,8 +112,8 @@ class ChartView(QtWidgets.QWidget):
         self.removeCursor2.clicked.connect(partial(self.removeCursor, cursor_num=2))
 
         # Connect offset & factor QLineEdit:
-        self.offset_value = self.mda_mvc.findChild(QtWidgets.QLineEdit, "offset_value")
-        self.factor_value = self.mda_mvc.findChild(QtWidgets.QLineEdit, "factor_value")
+        self.offset_value = self.mda_mvc.mda_file_viz.offset_value
+        self.factor_value = self.mda_mvc.mda_file_viz.factor_value
         self.offset_value.editingFinished.connect(self.applyBasicMathToCurve)
         self.factor_value.editingFinished.connect(self.applyBasicMathToCurve)
 
@@ -154,6 +154,7 @@ class ChartView(QtWidgets.QWidget):
         self.updatePlot()
         # Add to the dictionary:
         label = kwargs.get("label", None)
+        # self.line2D[path + label] = {
         self.line2D[label] = {
             "line_obj": plot_obj[0],
             "x_data": args[0],
@@ -168,6 +169,7 @@ class ChartView(QtWidgets.QWidget):
 
     def removeCurve(self, *args, **kwargs):
         label = self.curveBox.currentText()
+        path = self.curveBox.currentText()
         # If removing the last curve, clear all content from vizualization panel:
         if label in self.line2D:
             if len(self.line2D) == 1:
@@ -243,7 +245,7 @@ class ChartView(QtWidgets.QWidget):
             self.main_axes.legend()
 
     def curveSelected(self, label):
-        filePathLabel = self.mda_mvc.findChild(QtWidgets.QLabel, "filePath_viz")
+        filePathLabel = self.mda_mvc.mda_viw.filePath_viz
         # Update QLineEdit & QLabel widgets with the values for the selected curve
         if label in self.line2D:
             self.offset_value.setText(str(self.line2D[label]["offset"]))
@@ -405,21 +407,13 @@ class ChartView(QtWidgets.QWidget):
         self.updateCursorInfo()
 
     def updateCursorInfo(self):
-        self.mda_mvc.findChild(QtWidgets.QLabel, "pos1_text").setText(
-            self.cursors["text1"]
-        )
-        self.mda_mvc.findChild(QtWidgets.QLabel, "pos2_text").setText(
-            self.cursors["text2"]
-        )
-        self.mda_mvc.findChild(QtWidgets.QLabel, "diff_text").setText(
-            self.cursors["diff"]
-        )
-        self.mda_mvc.findChild(QtWidgets.QLabel, "midpoint_text").setText(
-            self.cursors["midpoint"]
-        )
+        self.mda_mvc.mda_file_viz.pos1_text.setText(self.cursors["text1"])
+        self.mda_mvc.mda_file_viz.pos2_text.setText(self.cursors["text2"])
+        self.mda_mvc.mda_file_viz.diff_text.setText(self.cursors["diff"])
+        self.mda_mvc.mda_file_viz.midpoint_text.setText(self.cursors["midpoint"])
 
     def clearCursorInfo(self):
-        self.mda_mvc.findChild(QtWidgets.QLabel, "pos1_text").setText("middle click")
-        self.mda_mvc.findChild(QtWidgets.QLabel, "pos2_text").setText("right click")
-        self.mda_mvc.findChild(QtWidgets.QLabel, "diff_text").setText("n/a")
-        self.mda_mvc.findChild(QtWidgets.QLabel, "midpoint_text").setText("n/a")
+        self.mda_mvc.mda_file_viz.pos1_text.setText("middle click")
+        self.mda_mvc.mda_file_viz.pos2_text.setText("right click")
+        self.mda_mvc.mda_file_viz.diff_text.setText("n/a")
+        self.mda_mvc.mda_file_viz.midpoint_text.setText("n/a")
