@@ -266,9 +266,6 @@ class MDA_MVC(QtWidgets.QWidget):
         - Resets to None if given an empty dictionary.
         - Format for new_selection: {'X': positioner_index, 'Y': [detector_indices]}.
         """
-        # TODO - how to enfore selectionField structure? Turn it into a class!
-        # what if new_selectionvdoes not have X or Y key, or any of those key return
-        # a None value? or is {}?
         self._selection_field = new_selection if new_selection != {} else None
 
     def applySelectionChanges(self, new_selection):
@@ -313,7 +310,7 @@ class MDA_MVC(QtWidgets.QWidget):
         changes_made |= self.updateDetectorSelection(
             oldPvList, old_selection, newPvList, new_selection, verbose
         )
-        # Update X selection and check for changes
+        # Update X selection and check for changes: if X was 0 or None, set to 0; if not, set to 1st POS
         old_idx = old_selection.get("X")
         if old_idx:
             new_idx = tableview.data()["fileInfo"]["firstPos"]
@@ -434,7 +431,22 @@ class MDA_MVC(QtWidgets.QWidget):
             self.setStatus("Mode is set to Auto-off")
 
     def doPlot(self, *args, **kwargs):
-        """TODO: Update Slot: data field selected (for plotting) button is clicked."""
+        """
+        Initiates plotting based on the currently selected file & selection field, and the specified action
+        ('add', 'replace', or 'clear').
+        - Retrieves and plots datasets based on the selection for actions 'add' or 'replace'.
+        - Uses a ChartView widget for plotting within a specified layout.
+
+        Parameters:
+        - args[0] (str): The plotting action to be taken ('add', 'replace', or 'clear').
+        - kwargs (dict): Additional options for plotting, if any.
+
+        Behavior:
+        - 'clear': Removes all tabs and clears the visualization.
+        - 'add'/'replace': Plots new data according to the current selection, adding to existing plots or replacing them.
+        - Exits with a status message if no file is selected or no detectors (Y) are selected for plotting.
+        """
+
         from .chartview import ChartView
 
         action = args[0]
@@ -464,10 +476,10 @@ class MDA_MVC(QtWidgets.QWidget):
             # Get dataset for the positioner/detector selection:
             datasets, plot_options = tableview.data2Plot(selection)
             y_index = selection.get("Y", [])
-            if not isinstance(widgetMpl, ChartView):
-                widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
+            if not isinstance(widgetMpl, ChartView):  # Make a blank chart.
+                widgetMpl = ChartView(self, **plot_options)
             if action in ("replace"):
-                widgetMpl.clearPlot()  # do I need: self.mda_mvc.mda_file_visualization.clearContents()?
+                widgetMpl.clearPlot()
             for i, (ds, ds_options) in zip(y_index, datasets):
                 # ds: [x_data, y_data]
                 # ds_options: {"label":y_label} (for legend)
@@ -475,8 +487,6 @@ class MDA_MVC(QtWidgets.QWidget):
                 kwargs = {"ds_options": ds_options, "plot_options": plot_options}
                 widgetMpl.plot(i, *ds, **kwargs)
             self.mda_file_viz.setPlot(widgetMpl)
-
-            # FIXME - pushButtons: the button are more than just doPlot, it also needs to replace data and metadata.
 
     def onTabChange(self, index, file_path, file_data, selection_field):
         """
