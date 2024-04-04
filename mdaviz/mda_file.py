@@ -59,10 +59,10 @@ class MDAFile(QtWidgets.QWidget):
         self.tabWidget.currentChanged.connect(self.onSwitchTab)
         self.tabWidget.tabCloseRequested.connect(self.removeFileTab)
         # Connect TabManager signals:
-        # self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
-        # self.tabManager.tabRemoved.connect(self.onTabRemoved)
         # TODO - question: are those redundant with tabCloseRequested? I think so
         # removeFileTab takes care of cleaning everything up when the last tab is closed
+        # self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
+        # self.tabManager.tabRemoved.connect(self.onTabRemoved)
 
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
@@ -188,17 +188,18 @@ class MDAFile(QtWidgets.QWidget):
     # ------ Tabs management (UI):
 
     def onTabRemoved(self, file_path):
-        # FIXME - sync tab with graph: handle the UI update or other actions needed when a new tab is removed
+        # TODO - question: sync tab with graph? handle the UI update or other actions needed when a new tab is removed
         # e.g.:    close tab ---> remove curve  NO !
         # This can be handled by self.removeFileTabs() that gets triggered when a tab is removed.
         # Unless we need something for the other way around:
-        # e.g.:    remove curve ---> close tab  YES
+        # e.g.:    remove curve ---> close tab  YES? only in auto-add? or add a checkbox to enable sync tab with graph?
         pass
 
     # def onAllTabsRemoved(self):
-    #     # TODO - question: same as bove: sync tab with UI: handle the UI update or other actions needed when a all tabs are removed
+    #     # TODO - question: sync tab with UI? handle the UI update or other actions needed when a all tabs are removed
     #     # e.g. disable certain UI elements that require a file to be selected (buttons?)
     #     # This is already done by self.removeAllFileTabs() that gets triggered when the last tab is removed.
+    #     # but did I forgot anything?
     #     pass
 
     def addFileTab(self, index, selection_field):
