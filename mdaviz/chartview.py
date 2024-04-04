@@ -97,24 +97,17 @@ class ChartView(QtWidgets.QWidget):
         # Track curves and display in QComboBox:
         self.line2D = {}  # all the Line2D on the graph, key = label
         # TODO - later: this will become a problem to plot 2 curve from same file name but different paths
-        self.curveBox = self.mda_mvc.findChild(QtWidgets.QComboBox, "curveBox")
+        self.curveBox = self.mda_mvc.mda_file_viz.curveBox
         self.curveBox.currentTextChanged.connect(self.curveSelected)
 
         # Remove buttons
-        self.removeButton = self.mda_mvc.findChild(QtWidgets.QPushButton, "curveRemove")
-        self.removeCursor1 = self.mda_mvc.findChild(
-            QtWidgets.QPushButton, "cursor1_remove"
-        )
-        self.removeCursor2 = self.mda_mvc.findChild(
-            QtWidgets.QPushButton, "cursor2_remove"
-        )
-        # Remove button triggers removeCurve twice: once when pushed, once when released.
-        # This try-except solves the problem.
-        try:
-            self.removeButton.clicked.disconnect()
-        except TypeError:
-            pass  # No connection exists
-        self.removeButton.clicked.connect(self.removeCurve)
+        self.clearAll = self.mda_mvc.mda_file_viz.clearAll
+        self.removeButton = self.mda_mvc.mda_file_viz.curveRemove
+        self.removeCursor1 = self.mda_mvc.mda_file_viz.cursor1_remove
+        self.removeCursor2 = self.mda_mvc.mda_file_viz.cursor2_remove
+        # Connections:
+        utils.reconnect(self.clearAll.clicked, self.clearPlot)
+        utils.reconnect(self.removeButton.clicked, self.removeCurve)
         self.removeCursor1.clicked.connect(partial(self.removeCursor, cursor_num=1))
         self.removeCursor2.clicked.connect(partial(self.removeCursor, cursor_num=2))
 
