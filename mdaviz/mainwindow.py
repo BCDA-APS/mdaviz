@@ -256,7 +256,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if mda_files_path == []:
                 # If there are no MDA files, pass None to display empty table
                 self.mvc_folder.updateFolderView()
-                self.mvc_folder.mda_file.removeAllFileTabs()
+                # self.mvc_folder.mda_file.removeAllFileTabs()
 
                 self.setStatus("No MDA files found in the selected folder.")
 
