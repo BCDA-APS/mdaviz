@@ -139,23 +139,25 @@ class MDAFileTableView(QtWidgets.QWidget):
         if self.data() is not None:
             # extract scan info:
             fileName = self.data()["fileInfo"]["fileName"]
+            folderPath = self.data()["fileInfo"]["folderPath"]
             scanDict = self.data()["fileInfo"]["scanDict"]
             # extract x data:
             x_index = selections.get("X")
-            x_data = scanDict[x_index]["data"] if x_index in scanDict else None
+            x_data = scanDict[x_index].get("data") if x_index in scanDict else None
             # extract y(s) data:
             y_index = selections.get("Y", [])
             y_first_unit = y_first_name = ""
             for i, y in enumerate(y_index):
                 if y not in scanDict:
                     continue
-                y_data = scanDict[y]["data"]
-                y_name = scanDict[y]["name"]
-                y_unit = scanDict[y]["unit"]
-                y_label = f"{fileName}: {y_name} ({y_unit})"
+                y_data = scanDict[y].get("data")
+                y_name = scanDict[y].get("name", "n/a")
+                y_unit = scanDict[y].get("unit", "")
+                y_unit = f"({y_unit})" if y_unit else ""
+                y_label = f"{fileName}: {y_name} {y_unit}"
                 if i == 0:
                     y_first_unit = y_unit
-                    y_first_name = f"{y_name} ({y_unit})"
+                    y_first_name = f"{y_name} {y_unit}"
                 # append to dataset:
                 ds, ds_options = [], {}
                 ds_options["label"] = y_label
@@ -163,12 +165,15 @@ class MDAFileTableView(QtWidgets.QWidget):
                 datasets.append((ds, ds_options))
 
             plot_options = {
-                "x": scanDict[x_index]["name"] if x_index in scanDict else "",
-                "x_unit": scanDict[x_index]["unit"] if x_index in scanDict else "",
+                "x": scanDict[x_index].get("name", "") if x_index in scanDict else "",
+                "x_unit": (
+                    scanDict[x_index].get("unit", "") if x_index in scanDict else ""
+                ),
                 "y": y_first_name,
                 "y_unit": y_first_unit,
                 "title": "",
-                "folderPath": self.data()["fileInfo"]["folderPath"],
+                "folderPath": folderPath,
+                "fileName": fileName,
             }
 
         return datasets, plot_options
