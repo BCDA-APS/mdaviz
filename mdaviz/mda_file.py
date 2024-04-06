@@ -103,7 +103,7 @@ class MDAFile(QtWidgets.QWidget):
             "object": mda object X (scanPositioner or scanDetector)
             "type": "POS" (if scanPositioner) or "DET" (if scanDetector),
             "data": X.data or [],
-            "unit": byte2str(X.unit) if X.unit else "a.u.",
+            "unit": byte2str(X.unit) if X.unit else "",
             "name": byte2str(X.name) if X.name else "n/a",
             "desc": byte2str(X.desc) if X.desc else "",
             "fieldName": byte2str(X.fieldName)
@@ -302,8 +302,8 @@ class MDAFile(QtWidgets.QWidget):
             self.tabWidget.removeTab(self.tabWidget.count() - 1)
         # Clear all data associated with the tabs from the TabManager.
         self.tabManager.removeAllTabs()
-        # Clear all content from the visualization panel as well, if no tabs are open.
-        self.mda_mvc.mda_file_viz.clearContents()
+        # Clear all content from the visualization panel except for graph, if no tabs are open.
+        self.mda_mvc.mda_file_viz.clearContents(plot=False)
         # Update the status to reflect that all tabs have been closed.
         self.setStatus("All file tabs have been closed.")
 
