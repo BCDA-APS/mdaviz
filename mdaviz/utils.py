@@ -116,7 +116,7 @@ def get_det(mda_file_data):
     P0.name = "Index"  # name of EPICS PV this positioner wrote to
     P0.desc = "Index"  # description of 'name' PV
     P0.step_mode = ""  # 'LINEAR', 'TABLE', or 'FLY'
-    P0.unit = "a.u"  # units of 'name' PV
+    P0.unit = ""  # units of 'name' PV
     P0.readback_name = ""  # name of EPICS PV this positioner read from, if any
     P0.readback_desc = ""  # description of 'readback_name' PV
     P0.readback_unit = ""  # units of 'readback_name' PV
@@ -176,7 +176,7 @@ def get_scan(mda_file_data):
     # Set predefined properties for P0
     P0.number = 0
     P0.fieldName, P0.name, P0.desc = "P0", "Index", "Index"
-    P0.step_mode, P0.unit = "", "a.u"
+    P0.step_mode, P0.unit = "", ""
     P0.readback_name, P0.readback_desc, P0.readback_unit = "", "", ""
     P0.data = list(range(npts))
 
@@ -193,7 +193,7 @@ def get_scan(mda_file_data):
             "object": v,
             "type": "POS" if isinstance(v, scanPositioner) else "DET",
             "data": v.data or [],
-            "unit": byte2str(v.unit) if v.unit else "a.u.",
+            "unit": byte2str(v.unit) if v.unit else "",
             "name": byte2str(v.name) if v.name else "n/a",
             "desc": byte2str(v.desc) if v.desc else "",
             "fieldName": byte2str(v.fieldName),
