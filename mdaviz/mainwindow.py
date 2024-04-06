@@ -236,7 +236,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 if self.mvc_folder is not None:
                     # If MVC exists, display empty table views
                     self.mvc_folder.updateFolderView()
-                    self.mvc_folder.mda_file.removeAllFileTabs()
 
     def setSubFolderPath(self, subfolder_name):
         if subfolder_name:
@@ -256,8 +255,6 @@ class MainWindow(QtWidgets.QMainWindow):
             if mda_files_path == []:
                 # If there are no MDA files, pass None to display empty table
                 self.mvc_folder.updateFolderView()
-                # self.mvc_folder.mda_file.removeAllFileTabs()
-
                 self.setStatus("No MDA files found in the selected folder.")
 
     def setFolderList(self, folder_list=None):
