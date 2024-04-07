@@ -484,8 +484,8 @@ class MDA_MVC(QtWidgets.QWidget):
                 # ds: [x_data, y_data]
                 # ds_options: {"label":y_label} (for legend)
                 # plot_options: {"x" (label), "x_unit", "y" (label), "y_unit", "title", "folderPath"}
-                kwargs = {"ds_options": ds_options, "plot_options": plot_options}
-                widgetMpl.plot(i, *ds, **kwargs)
+                options = {"ds_options": ds_options, "plot_options": plot_options}
+                widgetMpl.plot(i, *ds, **options)
             self.mda_file_viz.setPlot(widgetMpl)
 
     def onTabChange(self, index, file_path, file_data, selection_field):
@@ -688,8 +688,8 @@ class MDA_MVC(QtWidgets.QWidget):
             for row, (ds, ds_options) in zip(y_rows, datasets):
                 # ds_options: label (for legend)
                 # plot_options: xlabel, ylabel, title
-                kwargs = {"ds_options": ds_options, "plot_options": plot_options}
-                widgetMpl.plot(row, *ds, **kwargs)
+                options = {"ds_options": ds_options, "plot_options": plot_options}
+                widgetMpl.plot(row, *ds, **options)
             self.mda_file_viz.setPlot(widgetMpl)
 
         elif mode in ("Auto-off"):
