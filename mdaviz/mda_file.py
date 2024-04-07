@@ -61,6 +61,7 @@ class MDAFile(QtWidgets.QWidget):
         # Connect TabManager signals:
         # TODO - question: are those redundant with tabCloseRequested? I think so
         # removeFileTab takes care of cleaning everything up when the last tab is closed
+        # does this mean I am not doing this right? Should the tabManager prevail?
         # self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
         # self.tabManager.tabRemoved.connect(self.onTabRemoved)
 
