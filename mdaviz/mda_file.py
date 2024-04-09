@@ -59,7 +59,7 @@ class MDAFile(QtWidgets.QWidget):
         self.tabWidget.currentChanged.connect(self.onSwitchTab)
         self.tabWidget.tabCloseRequested.connect(self.removeFileTab)
         # Connect TabManager signals:
-        # TODO - question: are those redundant with tabCloseRequested? I think so
+        # TODO - TODO TODO: are those redundant with tabCloseRequested? No see curveManager
         # removeFileTab takes care of cleaning everything up when the last tab is closed
         # does this mean I am not doing this right? Should the tabManager prevail?
         # self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
@@ -153,6 +153,22 @@ class MDAFile(QtWidgets.QWidget):
         if 0 <= index < self.tabWidget.count():
             tab_tableview = self.tabWidget.widget(index)
             return tab_tableview.filePath.text()
+        return None  # Return None if the index is out of range.
+
+    def tabPath2Tableview(self, file_path):
+        """Finds and returns the tableview of a tab based on its associated file path."""
+        if file_path is not None:
+            for tab_index in range(self.tabWidget.count()):
+                tab_tableview = self.tabWidget.widget(tab_index)
+                if tab_tableview.filePath.text() == file_path:
+                    return tab_tableview
+        return None  # Return None if the file_path is not found.
+
+    def tabIndex2Tableview(self, index):
+        """Returns the Tableview associated with a given tab index."""
+        if 0 <= index < self.tabWidget.count():
+            tab_tableview = self.tabWidget.widget(index)
+            return tab_tableview
         return None  # Return None if the index is out of range.
 
     # ------ Populating UIs with selected file content:
@@ -359,9 +375,10 @@ class TabManager(QtCore.QObject):
     - allTabRemoved: Emitted when all tabs are removed. No parameters.
     """
 
-    # TODO - question: same as above, they are probably useless
-    # tabRemoved = QtCore.pyqtSignal(str)  # Signal emitting file path of removed tab
-    # allTabsRemoved = QtCore.pyqtSignal()  # Signal indicating all tabs have been removed
+    # TODO - question: same as above, they are probably useless: NO!
+    tabAdded = QtCore.pyqtSignal(str)  # Signal emitting file path of removed tab
+    tabRemoved = QtCore.pyqtSignal(str)  # Signal emitting file path of removed tab
+    allTabsRemoved = QtCore.pyqtSignal()  # Signal indicating all tabs have been removed
 
     def __init__(self):
         super().__init__()
