@@ -351,3 +351,7 @@ def reconnect(signal, new_slot):
     except TypeError:
         pass
     signal.connect(new_slot)
+
+
+def debug_signal(*args, **kwargs):
+    print("\nSignal emitted with args:", args, "and kwargs:", kwargs)
