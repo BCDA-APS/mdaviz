@@ -479,7 +479,7 @@ class MDA_MVC(QtWidgets.QWidget):
             if not isinstance(widgetMpl, ChartView):  # Make a blank chart.
                 widgetMpl = ChartView(self, **plot_options)
             if action in ("replace"):
-                widgetMpl.clearPlot()
+                widgetMpl.curveManager.removeAllCurves()
             for i, (ds, ds_options) in zip(y_index, datasets):
                 # ds: [x_data, y_data]
                 # ds_options: {"label":y_label} (for legend)
@@ -520,7 +520,7 @@ class MDA_MVC(QtWidgets.QWidget):
             return
 
         # Retrieve the table view for the currently selected tab:
-        new_tab_tableview = self.mda_file.tabWidget.widget(index)
+        new_tab_tableview = self.mda_file.tabIndex2Tableview(index)
         self.setCurrentFileTableview(new_tab_tableview)
         self.setSelectionField(selection_field)
 
@@ -629,11 +629,6 @@ class MDA_MVC(QtWidgets.QWidget):
         tableview = self.currentFileTableview()
         previous_selection = self.selectionField()
 
-        print(f"\nonCheckboxStateChange called:")
-        print(f"\nCheckPoint #1:")
-        print(f"      - {selection=}")
-        print(f"      - {self.selectionField()=}")
-
         # Get the matplotlib chartview widget, if exists:
         layoutMpl = self.mda_file_viz.plotPageMpl.layout()
         if layoutMpl.count() != 1:  # in case something changes ...
@@ -646,7 +641,7 @@ class MDA_MVC(QtWidgets.QWidget):
         if not selection.get("Y"):  # if no DET: clear plot
             # TODO: if in auto-add, don;t clear the plot,
             # just remove the curve - there could be plot from other tableviews
-            # widgetMpl.clearPlot()
+            # widgetMpl.curveManager.removeAllCurves() #doNotClearCheckboxes = True or False
             return
         if not selection.get("X"):  # if no POS: default to index
             widgetMpl.clearPlot()
@@ -656,11 +651,11 @@ class MDA_MVC(QtWidgets.QWidget):
         # if previous_selection:   # TODO This needs to be changed, not that simple
         #     # if changing POS, clear the graph:
         #     if previous_selection.get("X") != selection.get("X"):
-        #         widgetMpl.clearPlot()
+        #         widgetMpl.curveManager.removeAllCurves() #doNotClearCheckboxes = True or False
 
         #     # if removing DET, clear the graph:
         #     if len(previous_selection.get("Y")) > len(selection.get("Y")):
-        #         widgetMpl.clearPlot()
+        #         widgetMpl.curveManager.removeAllCurves() #doNotClearCheckboxes = True or False
 
         #     # BUG - that is weird, why? only should clear if there is no Y left
         #     # that is the behavior that I observe in Auto-Replace
@@ -668,23 +663,16 @@ class MDA_MVC(QtWidgets.QWidget):
         #     # if there are curve from a different folder or file, that will be a problem
         #     # lots of stuff to fix here
 
-        print(f"\nCheckPoint #2:")
-        print(f"      - {selection=}")
-        print(f"      - {self.selectionField()=}")
-
         # Get dataset for the positioner/detector selection:
         self.setSelectionField(selection)
         datasets, plot_options = tableview.data2Plot(self.selectionField())
 
         y_rows = selection.get("Y", [])
-        print(f"\nCheckPoint #3:")
-        print(f"      - {selection=}")
-        print(f"      - {self.selectionField()=}")
         if mode in ("Auto-replace", "Auto-add"):
             if not isinstance(widgetMpl, ChartView):
                 widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
             if mode in ("Auto-replace"):
-                widgetMpl.clearPlot()
+                widgetMpl.curveManager.removeAllCurves()
             for row, (ds, ds_options) in zip(y_rows, datasets):
                 # ds_options: label (for legend)
                 # plot_options: xlabel, ylabel, title
