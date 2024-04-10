@@ -46,13 +46,13 @@ class MDAFileVisualization(QtWidgets.QWidget):
 
     def setPlot(self, plot_widget):
         layout = self.plotPageMpl.layout()
-        # TODO- later: replace removeAllLayoutWidgets with mainWindow.clearContent?
+        # TODO - question: # why are we removing all the layouts? What are we doing here?
+        # TODO - later: replace removeAllLayoutWidgets with mainWindow.clearContent?
         # or clearContents(plot=True, data=False, metadata=False)
-        # why are we removing all the layouts?
         utils.removeAllLayoutWidgets(layout)
         layout.addWidget(plot_widget)
 
-    # # TODO: I do not think we use this:
+    # # TODO: unused? I do not think we use this:
     # def isPlotBlank(self):
     #     layout = self.plotPageMpl.layout()
     #     if layout.count() == 0:
