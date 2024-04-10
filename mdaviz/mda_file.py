@@ -4,6 +4,24 @@ Display content of the currently selected files.
 .. autosummary::
 
     ~MDAFile
+    ~tabManager
+    
+    User: tabCloseRequested.connect (emit: index)
+            --> onTabCloseRequested(index)
+            --> tabManager.removeTab(file_path)  
+            --> tabManager.tabRemoved.emit(file_path) 
+            --> onTabRemoved(file_path) 
+            --> removeTabUI (file_path)
+
+User: clearButton.clicked (emit: no data)
+        --> onClearAllTabsRequested()
+        --> tabManager.removeAllTabs()
+        --> tabManager.allTabsRemoved.emit()
+        --> onAllTabsRemoved()
+        --> removeAllFileTabs()
+
+
+    
 """
 
 from mda import readMDA
@@ -55,15 +73,15 @@ class MDAFile(QtWidgets.QWidget):
         self.autoBox.currentTextChanged.connect(self.setMode)
         self.autoBox.currentTextChanged.connect(self.updateButtonVisibility)
 
+        # Connect TabManager signals:
+        # TODO: implement proper signal/slot tab managment via tabManager, see curveManager
+        self.tabManager.tabAdded.connect(self.onTabRemoved)
+        self.tabManager.tabRemoved.connect(self.onTabRemoved)
+        self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
+
         # Tab handling:
         self.tabWidget.currentChanged.connect(self.onSwitchTab)
-        self.tabWidget.tabCloseRequested.connect(self.removeFileTab)
-        # Connect TabManager signals:
-        # TODO - TODO TODO: are those redundant with tabCloseRequested? No see curveManager
-        # removeFileTab takes care of cleaning everything up when the last tab is closed
-        # does this mean I am not doing this right? Should the tabManager prevail?
-        # self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
-        # self.tabManager.tabRemoved.connect(self.onTabRemoved)
+        self.tabWidget.tabCloseRequested.connect(self.onTabCloseRequested)
 
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
@@ -204,20 +222,25 @@ class MDAFile(QtWidgets.QWidget):
 
     # ------ Tabs management (UI):
 
-    def onTabRemoved(self, file_path):
-        # TODO - question: sync tab with graph? handle the UI update or other actions needed when a new tab is removed
-        # e.g.:    close tab ---> remove curve  NO !
-        # This can be handled by self.removeFileTabs() that gets triggered when a tab is removed.
-        # Unless we need something for the other way around:
-        # e.g.:    remove curve ---> close tab  YES? only in auto-add? or add a checkbox to enable sync tab with graph?
+    def onTabCloseRequested(self, index):
+        file_path = self.tabIndex2Path(index)
+        if file_path:
+            self.tabManager.removeTab(file_path)
+
+    def onTabAdded(self, file_path):
         pass
 
-    # def onAllTabsRemoved(self):
-    #     # TODO - question: sync tab with UI? handle the UI update or other actions needed when a all tabs are removed
-    #     # e.g. disable certain UI elements that require a file to be selected (buttons?)
-    #     # This is already done by self.removeAllFileTabs() that gets triggered when the last tab is removed.
-    #     # but did I forgot anything?
-    #     pass
+    def onTabRemoved(self, file_path):
+        index = self.tabPath2Index(file_path)
+        if index is not None:
+            self.removeTabUI(index)
+
+    def onAllTabsRemoved(self):
+        # TODO - question: sync tab with UI? handle the UI update or other actions needed when a all tabs are removed
+        # e.g. disable certain UI elements that require a file to be selected (buttons?)
+        # This is already done by self.removeAllFileTabs() that gets triggered when the last tab is removed.
+        # but did I forgot anything?
+        pass
 
     def addFileTab(self, index, selection_field):
         """
@@ -289,27 +312,19 @@ class MDAFile(QtWidgets.QWidget):
         tableview.displayTable(selection_field)
         tableview.filePath.setText(file_path)
 
-    def removeFileTab(self, index=None):
+    def removeTabUI(self, index=None):
         """
         Removes a tab from the tab widget based on its index. If it's the last tab,
         it calls removeAllTabs() to ensure consistent cleanup.
         """
-        if self.tabWidget.count() == 1:
+        """
+        Removes a tab from the tab widget based on its index. If it's the last tab,
+        it calls removeAllTabs() to ensure consistent cleanup.
+        """
+        if self.tabWidget.count() == 1 and index == 0:
             self.removeAllFileTabs()
         elif index is not None and index < self.tabWidget.count():
-            current_tab = self.tabWidget.widget(index)
-            file_path = current_tab.filePath.text() if current_tab else None
-            # Ensure filepath is in tab_dict before attempting to remove:
-            if file_path and self.tabManager.getTabData(file_path):
-                self.tabWidget.removeTab(index)
-                self.tabManager.removeTab(file_path)
-                self.setStatus(f"Closed file tab {index=}, {file_path=}")
-            else:
-                self.setStatus(
-                    f"Cannot find corresponding file tab: {index}, {file_path}"
-                )
-        else:
-            self.setStatus("Invalid tab index provided.")
+            self.tabWidget.removeTab(index)
 
     def removeAllFileTabs(self):
         """
@@ -362,7 +377,8 @@ class MDAFile(QtWidgets.QWidget):
 class TabManager(QtCore.QObject):
     """
     Manages only the data aspects of tabs; does not handle UI elements (i.e. nothing
-    related to tab index, such as switching tabs).
+    related to tab index, such as switching tabs),  maintaining a clear separation
+    between the application's data layer and its presentation (UI) layer.
 
     Features:
     - Tracks metadata and table data for each open tab.
@@ -393,7 +409,7 @@ class TabManager(QtCore.QObject):
         """Removes the tab associated with the given file path."""
         if file_path in self._tabs:  # Check if the tab exists
             del self._tabs[file_path]
-            # self.tabRemoved.emit(file_path)
+            self.tabRemoved.emit(file_path)
 
     def removeAllTabs(self):
         """Removes all tabs."""
@@ -443,7 +459,7 @@ class TabManager(QtCore.QObject):
 #         Ensure they're implemented to handle any necessary UI adjustments when
 #         tabs change.
 
-#     Removal of Tabs and Associated Data: In removeFileTab, you handle the
+#     Removal of Tabs and Associated Data: In removeTabUI, you handle the
 #         removal process properly by checking if the tab exists in TabManager
 #         before attempting to remove it. Just make sure this also covers any
 #         associated data cleanup that might be needed to prevent memory leaks
