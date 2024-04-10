@@ -53,6 +53,7 @@ def auto_symbol():
 
 
 class ChartView(QtWidgets.QWidget):
+    # TODO: docstrings
     def __init__(self, parent, **kwargs):
         # parent=<mdaviz.mda_folder.MDA_MVC object at 0x10e7ff520>
         self.mda_mvc = parent
@@ -97,7 +98,7 @@ class ChartView(QtWidgets.QWidget):
         self.curveManager.curveUpdated.connect(self.onCurveUpdated)
         self.curveManager.curveRemoved.connect(self.onCurveRemoved)
         self.curveManager.allCurvesRemoved.connect(self.onAllCurvesRemoved)
-
+        # Debug signals:
         self.curveManager.curveAdded.connect(utils.debug_signal)
         self.curveManager.curveRemoved.connect(utils.debug_signal)
         self.curveManager.curveUpdated.connect(utils.debug_signal)
