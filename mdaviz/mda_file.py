@@ -7,11 +7,10 @@ Display content of the currently selected files.
     ~tabManager
     
     User: tabCloseRequested.connect (emit: index)
-            --> onTabCloseRequested(index)
-            --> tabManager.removeTab(file_path)  
-            --> tabManager.tabRemoved.emit(file_path) 
-            --> onTabRemoved(file_path) 
-            --> removeTabUI (file_path)
+            --> onTabCloseRequested(index --> file_path)
+            --> tabManager.removeTab(file_path, index)  
+            --> tabManager.tabRemoved.emit(file_path, index) 
+            --> onTabRemoved(file_path, index) 
 
 User: clearButton.clicked (emit: no data)
         --> onClearAllTabsRequested()
@@ -225,15 +224,20 @@ class MDAFile(QtWidgets.QWidget):
     def onTabCloseRequested(self, index):
         file_path = self.tabIndex2Path(index)
         if file_path:
-            self.tabManager.removeTab(file_path)
+            self.tabManager.removeTab(file_path, index)
 
     def onTabAdded(self, file_path):
         pass
 
-    def onTabRemoved(self, file_path):
-        index = self.tabPath2Index(file_path)
-        if index is not None:
-            self.removeTabUI(index)
+    def onTabRemoved(self, file_path, index):
+        """
+        Removes a tab from the tab widget based on its index. If it's the last tab,
+        it calls removeAllTabs() to ensure consistent cleanup.
+        """
+        if self.tabWidget.count() == 1 and index == 0:
+            self.removeAllFileTabs()
+        elif index is not None and index < self.tabWidget.count():
+            self.tabWidget.removeTab(index)
 
     def onAllTabsRemoved(self):
         # TODO - question: sync tab with UI? handle the UI update or other actions needed when a all tabs are removed
@@ -312,20 +316,6 @@ class MDAFile(QtWidgets.QWidget):
         tableview.displayTable(selection_field)
         tableview.filePath.setText(file_path)
 
-    def removeTabUI(self, index=None):
-        """
-        Removes a tab from the tab widget based on its index. If it's the last tab,
-        it calls removeAllTabs() to ensure consistent cleanup.
-        """
-        """
-        Removes a tab from the tab widget based on its index. If it's the last tab,
-        it calls removeAllTabs() to ensure consistent cleanup.
-        """
-        if self.tabWidget.count() == 1 and index == 0:
-            self.removeAllFileTabs()
-        elif index is not None and index < self.tabWidget.count():
-            self.tabWidget.removeTab(index)
-
     def removeAllFileTabs(self):
         """
         Removes all tabs from the tab widget.
@@ -393,7 +383,9 @@ class TabManager(QtCore.QObject):
 
     # TODO - question: same as above, they are probably useless: NO!
     tabAdded = QtCore.pyqtSignal(str)  # Signal emitting file path of removed tab
-    tabRemoved = QtCore.pyqtSignal(str)  # Signal emitting file path of removed tab
+    tabRemoved = QtCore.pyqtSignal(
+        str, int
+    )  # Signal emitting file path & index of removed tab
     allTabsRemoved = QtCore.pyqtSignal()  # Signal indicating all tabs have been removed
 
     def __init__(self):
@@ -404,17 +396,18 @@ class TabManager(QtCore.QObject):
         """Adds a new tab with specified metadata and table data."""
         if file_path not in self._tabs:  # Check if the tab doesn't already exist
             self._tabs[file_path] = {"metadata": metadata, "tabledata": tabledata}
+            self.tabAdded.emit(file_path)
 
-    def removeTab(self, file_path):
+    def removeTab(self, file_path, index):
         """Removes the tab associated with the given file path."""
         if file_path in self._tabs:  # Check if the tab exists
             del self._tabs[file_path]
-            self.tabRemoved.emit(file_path)
+            self.tabRemoved.emit(file_path, index)
 
     def removeAllTabs(self):
         """Removes all tabs."""
         self._tabs.clear()
-        # self.allTabsRemoved.emit()
+        self.allTabsRemoved.emit()
 
     def getTabData(self, file_path):
         """Returns the metatdata & data for the tab associated with the given file path."""
