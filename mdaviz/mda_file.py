@@ -6,11 +6,11 @@ Display content of the currently selected files.
     ~MDAFile
     ~tabManager
     
-    User: tabCloseRequested.connect (emit: index)
-            --> onTabCloseRequested(index --> file_path)
-            --> tabManager.removeTab(file_path, index)  
-            --> tabManager.tabRemoved.emit(file_path, index) 
-            --> onTabRemoved(file_path, index) 
+User: tabCloseRequested.connect (emit: index)
+        --> onTabCloseRequested(index --> file_path)
+        --> tabManager.removeTab(file_path, index)  
+        --> tabManager.tabRemoved.emit(file_path, index) 
+        --> onTabRemoved(file_path, index) 
 
 User: clearButton.clicked (emit: no data)
         --> onClearAllTabsRequested()
@@ -74,13 +74,25 @@ class MDAFile(QtWidgets.QWidget):
 
         # Connect TabManager signals:
         # TODO: implement proper signal/slot tab managment via tabManager, see curveManager
-        self.tabManager.tabAdded.connect(self.onTabRemoved)
+        self.tabManager.tabAdded.connect(self.onTabAdded)
         self.tabManager.tabRemoved.connect(self.onTabRemoved)
         self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
 
         # Tab handling:
         self.tabWidget.currentChanged.connect(self.onSwitchTab)
         self.tabWidget.tabCloseRequested.connect(self.onTabCloseRequested)
+
+        # Debug signals:
+        self.addButton.clicked.connect(utils.debug_signal)
+        self.clearButton.clicked.connect(utils.debug_signal)
+        self.replaceButton.clicked.connect(utils.debug_signal)
+        self.autoBox.currentTextChanged.connect(utils.debug_signal)
+        self.autoBox.currentTextChanged.connect(utils.debug_signal)
+        self.tabManager.tabAdded.connect(utils.debug_signal)
+        self.tabManager.tabRemoved.connect(utils.debug_signal)
+        self.tabManager.allTabsRemoved.connect(utils.debug_signal)
+        self.tabWidget.currentChanged.connect(utils.debug_signal)
+        self.tabWidget.tabCloseRequested.connect(utils.debug_signal)
 
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""

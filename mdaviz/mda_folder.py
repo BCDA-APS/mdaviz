@@ -137,10 +137,19 @@ class MDA_MVC(QtWidgets.QWidget):
         self.mda_folder_tableview.nextButton.clicked.connect(self.goToNext)
 
         # MDAFile Tab connection:
-        utils.reconnect(self.mda_file.tabChanged, self.onTabChange)
+        utils.reconnect(self.mda_file.tabChanged, self.onTabChanged)
 
         # MDAFile Push buttons connection:
         utils.reconnect(self.mda_file.buttonPushed, self.doPlot)
+
+        # Debug signals:
+        self.mda_folder_tableview.tableView.doubleClicked.connect(utils.debug_signal)
+        self.mda_folder_tableview.firstButton.clicked.connect(utils.debug_signal)
+        self.mda_folder_tableview.lastButton.clicked.connect(utils.debug_signal)
+        self.mda_folder_tableview.backButton.clicked.connect(utils.debug_signal)
+        self.mda_folder_tableview.nextButton.clicked.connect(utils.debug_signal)
+        # self.mda_file.tabChanged(utils.debug_signal)
+        # self.mda_file.buttonPushed(utils.debug_signal)
 
         # save/restore splitter sizes in application settings
         for key in "hsplitter vsplitter".split():
@@ -374,7 +383,7 @@ class MDA_MVC(QtWidgets.QWidget):
 
         This method ensures the selection of positioners and detectors reflects the PVs available
         in the newly selected file, accounting for  index changes from the previously selected file.
-            - addFileTab -> tabWidget.setCurrentIndex updates -> onTabChange triggered
+            - addFileTab -> tabWidget.setCurrentIndex updates -> onTabChanged triggered
                          -> setCurrentFileTableview()
                          -> updateSelectionField() (if selectionField was None only)
                          -> mda_file.setData()
@@ -488,7 +497,7 @@ class MDA_MVC(QtWidgets.QWidget):
                 widgetMpl.plot(i, *ds, **options)
             self.mda_file_viz.setPlot(widgetMpl)
 
-    def onTabChange(self, index, file_path, file_data, selection_field):
+    def onTabChanged(self, index, file_path, file_data, selection_field):
         """
         Updates UI to reflect the content of the newly selected tab or resets UI if no tab is selected.
         - Activates the corresponding table view for the new tab, displaying the selected file's metadata and data.
@@ -509,10 +518,9 @@ class MDA_MVC(QtWidgets.QWidget):
                         emits: new_tab_index, _file_path, _tab_data, _selection_field
         In MDA_MVC:
             self.mda_file.tabChanged.connect
-                --> self.onTabChange(new_tab_index, _file_path, _tab_data, _selection_field)
+                --> self.onTabChanged(new_tab_index, _file_path, _tab_data, _selection_field)
         """
 
-        print(f"\nEntering onTabChange for {index=}")
         if index == -1:
             self.setCurrentFileTableview()  # Reset to indicate no active file table view
             self.setSelectionField()  # Reset selection field to default
@@ -529,9 +537,6 @@ class MDA_MVC(QtWidgets.QWidget):
             print(f"Displaying data and metadata for {Path(file_path).name}.")
             self.mda_file.displayMetadata(file_data.get("metadata", None))
             self.mda_file.displayData(file_data.get("tabledata", None))
-        else:
-            print("No data and/or metadata found for display.")
-        print(f"Leaving onTabChange.")
 
         # TODO - check:  disable UI elements or actions that require an active file to be meaningful: Add, replace...
         # TODO - check:  disable UI elements or actions that require an active Folder to be meaningful: GoTo...
