@@ -15,19 +15,19 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
-    <number>7</number>
+    <number>-1</number>
    </property>
    <property name="leftMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <item>
     <widget class="QScrollArea" name="scrollArea">
@@ -42,25 +42,25 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1344</width>
-        <height>706</height>
+        <width>1356</width>
+        <height>718</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
-        <number>10</number>
+        <number>6</number>
        </property>
        <property name="leftMargin">
-        <number>10</number>
+        <number>6</number>
        </property>
        <property name="topMargin">
         <number>12</number>
        </property>
        <property name="rightMargin">
-        <number>10</number>
+        <number>6</number>
        </property>
        <property name="bottomMargin">
-        <number>10</number>
+        <number>6</number>
        </property>
        <item>
         <widget class="QTabWidget" name="tabWidget">
@@ -73,13 +73,16 @@
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <property name="leftMargin">
-            <number>12</number>
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
            </property>
            <property name="rightMargin">
-            <number>12</number>
+            <number>6</number>
            </property>
            <property name="bottomMargin">
-            <number>12</number>
+            <number>6</number>
            </property>
            <item>
             <widget class="QWidget" name="plotMPL" native="true"/>
@@ -91,8 +94,23 @@
            <string>Data</string>
           </attribute>
           <layout class="QVBoxLayout" name="vblayout_4">
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="topMargin">
+            <number>10</number>
+           </property>
+           <property name="rightMargin">
+            <number>10</number>
+           </property>
+           <property name="bottomMargin">
+            <number>10</number>
+           </property>
            <item>
             <widget class="QTableView" name="tableView">
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
              <property name="alternatingRowColors">
               <bool>true</bool>
              </property>
@@ -111,6 +129,9 @@
            <string>Metadata</string>
           </attribute>
           <layout class="QVBoxLayout" name="vblayout_3">
+           <property name="topMargin">
+            <number>20</number>
+           </property>
            <item>
             <widget class="QTextBrowser" name="metadata">
              <property name="font">
@@ -118,6 +139,9 @@
                <family>Monospace</family>
                <pointsize>10</pointsize>
               </font>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
              </property>
             </widget>
            </item>
@@ -147,7 +171,7 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <property name="spacing">
-           <number>7</number>
+           <number>-1</number>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -603,16 +627,16 @@
                <number>0</number>
               </property>
               <property name="leftMargin">
-               <number>6</number>
+               <number>0</number>
               </property>
               <property name="topMargin">
-               <number>6</number>
+               <number>0</number>
               </property>
               <property name="rightMargin">
                <number>0</number>
               </property>
               <property name="bottomMargin">
-               <number>6</number>
+               <number>0</number>
               </property>
               <item>
                <widget class="QWidget" name="basixStats" native="true">
@@ -628,6 +652,9 @@
                  </property>
                  <property name="bottomMargin">
                   <number>0</number>
+                 </property>
+                 <property name="verticalSpacing">
+                  <number>-1</number>
                  </property>
                  <item row="1" column="0">
                   <widget class="QWidget" name="minMax" native="true">
@@ -803,8 +830,14 @@
                  <item row="1" column="1">
                   <widget class="QWidget" name="comMean" native="true">
                    <layout class="QGridLayout" name="gridLayout_4">
+                    <property name="leftMargin">
+                     <number>12</number>
+                    </property>
                     <property name="topMargin">
                      <number>0</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>12</number>
                     </property>
                     <property name="bottomMargin">
                      <number>0</number>
@@ -930,10 +963,13 @@
                <number>0</number>
               </property>
               <property name="leftMargin">
-               <number>12</number>
+               <number>0</number>
               </property>
               <property name="topMargin">
-               <number>5</number>
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
               </property>
               <property name="bottomMargin">
                <number>0</number>
