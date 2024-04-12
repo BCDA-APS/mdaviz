@@ -67,6 +67,7 @@ from functools import partial
 from pathlib import Path
 
 from PyQt5 import QtWidgets
+from PyQt5 import QtCore
 from PyQt5.QtCore import QItemSelectionModel
 from PyQt5.QtWidgets import QAbstractItemView
 
@@ -75,6 +76,10 @@ from . import utils
 
 class MDA_MVC(QtWidgets.QWidget):
     """Model View Controller class for mda files."""
+
+    detRemoved = QtCore.pyqtSignal(
+        str, int
+    )  # Emit the filepath and row when a DET checkbox is unchecked
 
     ui_file = utils.getUiFileName(__file__)
     motion_wait_time = 1
@@ -148,8 +153,6 @@ class MDA_MVC(QtWidgets.QWidget):
         self.mda_folder_tableview.lastButton.clicked.connect(utils.debug_signal)
         self.mda_folder_tableview.backButton.clicked.connect(utils.debug_signal)
         self.mda_folder_tableview.nextButton.clicked.connect(utils.debug_signal)
-        # self.mda_file.tabChanged(utils.debug_signal)
-        # self.mda_file.buttonPushed(utils.debug_signal)
 
         # save/restore splitter sizes in application settings
         for key in "hsplitter vsplitter".split():
@@ -539,6 +542,8 @@ class MDA_MVC(QtWidgets.QWidget):
             self.mda_file.displayData(file_data.get("tabledata", None))
 
         # TODO - check:  disable UI elements or actions that require an active file to be meaningful: Add, replace...
+        # This is already done by self.removeAllFileTabs() that gets triggered when the last tab is removed.
+        # but did I forgot anything?
         # TODO - check:  disable UI elements or actions that require an active Folder to be meaningful: GoTo...
 
     # # ------------ Folder Table View navigation & selection highlight:
@@ -623,16 +628,17 @@ class MDA_MVC(QtWidgets.QWidget):
 
     # # ------------ Checkbox methods:
 
-    def onCheckboxStateChange(self, selection):
-        """TODO: write docstring: Slot: data field (for plotting) changes."""
+    def onCheckboxStateChange(self, selection, det_removed):
+        """TODO: write docstring: Slot: data field (for plotting) changes.
+
+
+        Note: when checkboxStateChanged is emitted, self.mda_file....updateCheckboxes
+        is called, which in turn set the selectionField with the new selection (in updateMdaMvcSelection).
+        """
         from .chartview import ChartView
 
-        # TODO - check: do I need a flag here to prevent "onCheckboxChange" to apply
-        # when selecting a new file: selecting a new file triggers it since
-        # the checkbox status might changes (if set to default 1st POS 1st DET).
-
         tableview = self.currentFileTableview()
-        previous_selection = self.selectionField()
+        new_y_selection = selection.get("Y", [])
 
         # Get the matplotlib chartview widget, if exists:
         layoutMpl = self.mda_file_viz.plotPageMpl.layout()
@@ -642,51 +648,44 @@ class MDA_MVC(QtWidgets.QWidget):
 
         mode = self.mda_file.mode()
 
-        # Exceptions:
-        if not selection.get("Y"):  # if no DET: clear plot
-            # TODO: if in auto-add, don;t clear the plot,
-            # just remove the curve - there could be plot from other tableviews
-            # widgetMpl.curveManager.removeAllCurves() #doNotClearCheckboxes = True or False
+        # ----------- Exceptions:
+
+        # In auto-off mode: no synchronisation - user needs to push a button.
+        if mode in ("Auto-off"):
             return
-        if not selection.get("X"):  # if no POS: default to index
+
+        # if no DET and there is only 1 tab open: clear the graph
+        if not new_y_selection and self.mda_file.tabWidget.count() == 1:
+            widgetMpl.curveManager.removeAllCurves()
+            return
+
+        # if no POS: default to index
+        if not selection.get("X"):
             widgetMpl.clearPlot()
             selection["X"] = 0
             tableview.tableView.model().checkCheckBox(0, "X")
 
-        # if previous_selection:   # TODO This needs to be changed, not that simple
-        #     # if changing POS, clear the graph:
-        #     if previous_selection.get("X") != selection.get("X"):
-        #         widgetMpl.curveManager.removeAllCurves() #doNotClearCheckboxes = True or False
-
-        #     # if removing DET, clear the graph:
-        #     if len(previous_selection.get("Y")) > len(selection.get("Y")):
-        #         widgetMpl.curveManager.removeAllCurves() #doNotClearCheckboxes = True or False
-
-        #     # BUG - that is weird, why? only should clear if there is no Y left
-        #     # that is the behavior that I observe in Auto-Replace
-        #     # in Auto-Add, should remove it from the graph but it doesn't
-        #     # if there are curve from a different folder or file, that will be a problem
-        #     # lots of stuff to fix here
+        # if a DET is uncheked:
+        if det_removed:
+            for y in det_removed:
+                tab_index = self.mda_file.tabWidget.currentIndex()
+                path = self.mda_file.tabIndex2Path(tab_index)
+                self.detRemoved.emit(path, y)
+                return
 
         # Get dataset for the positioner/detector selection:
-        self.setSelectionField(selection)
-        datasets, plot_options = tableview.data2Plot(self.selectionField())
+        datasets, plot_options = tableview.data2Plot(selection)
 
-        y_rows = selection.get("Y", [])
-        if mode in ("Auto-replace", "Auto-add"):
-            if not isinstance(widgetMpl, ChartView):
-                widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
-            if mode in ("Auto-replace"):
-                widgetMpl.curveManager.removeAllCurves()
-            for row, (ds, ds_options) in zip(y_rows, datasets):
-                # ds_options: label (for legend)
-                # plot_options: xlabel, ylabel, title
-                options = {"ds_options": ds_options, "plot_options": plot_options}
-                widgetMpl.plot(row, *ds, **options)
-            self.mda_file_viz.setPlot(widgetMpl)
-
-        elif mode in ("Auto-off"):
-            return
+        if not isinstance(widgetMpl, ChartView):
+            widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
+        if mode in ("Auto-replace"):
+            widgetMpl.curveManager.removeAllCurves()
+        for row, (ds, ds_options) in zip(new_y_selection, datasets):
+            # ds_options: label (for legend)
+            # plot_options: xlabel, ylabel, title
+            options = {"ds_options": ds_options, "plot_options": plot_options}
+            widgetMpl.plot(row, *ds, **options)
+        self.mda_file_viz.setPlot(widgetMpl)
 
     # # ------------ splitter methods
 

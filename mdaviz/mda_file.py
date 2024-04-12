@@ -73,7 +73,8 @@ class MDAFile(QtWidgets.QWidget):
         self.autoBox.currentTextChanged.connect(self.updateButtonVisibility)
 
         # Connect TabManager signals:
-        # TODO: implement proper signal/slot tab managment via tabManager, see curveManager
+        # TODO: implement proper signal/slot tab managment via tabManager for tabAdded and allTabsRemoved
+        #       - tabAdded: should doFileSelected emit a signal monitored by the tabManager?
         self.tabManager.tabAdded.connect(self.onTabAdded)
         self.tabManager.tabRemoved.connect(self.onTabRemoved)
         self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
@@ -82,17 +83,17 @@ class MDAFile(QtWidgets.QWidget):
         self.tabWidget.currentChanged.connect(self.onSwitchTab)
         self.tabWidget.tabCloseRequested.connect(self.onTabCloseRequested)
 
-        # Debug signals:
-        self.addButton.clicked.connect(utils.debug_signal)
-        self.clearButton.clicked.connect(utils.debug_signal)
-        self.replaceButton.clicked.connect(utils.debug_signal)
-        self.autoBox.currentTextChanged.connect(utils.debug_signal)
-        self.autoBox.currentTextChanged.connect(utils.debug_signal)
-        self.tabManager.tabAdded.connect(utils.debug_signal)
-        self.tabManager.tabRemoved.connect(utils.debug_signal)
-        self.tabManager.allTabsRemoved.connect(utils.debug_signal)
-        self.tabWidget.currentChanged.connect(utils.debug_signal)
-        self.tabWidget.tabCloseRequested.connect(utils.debug_signal)
+        # # Debug signals:
+        # self.addButton.clicked.connect(utils.debug_signal)
+        # self.clearButton.clicked.connect(utils.debug_signal)
+        # self.replaceButton.clicked.connect(utils.debug_signal)
+        # self.autoBox.currentTextChanged.connect(utils.debug_signal)
+        # self.autoBox.currentTextChanged.connect(utils.debug_signal)
+        # self.tabManager.tabAdded.connect(utils.debug_signal)
+        # self.tabManager.tabRemoved.connect(utils.debug_signal)
+        # self.tabManager.allTabsRemoved.connect(utils.debug_signal)
+        # self.tabWidget.currentChanged.connect(utils.debug_signal)
+        # self.tabWidget.tabCloseRequested.connect(utils.debug_signal)
 
     def dataPath(self):
         """Path (obj) of the data folder (folder comboBox + subfolder comboBox)."""
@@ -152,7 +153,7 @@ class MDAFile(QtWidgets.QWidget):
         scanDict, first_pos, first_det = utils.get_scan(file_data)
         pvList = [v["name"] for v in scanDict.values()]
         self._data = {
-            "fileName": file_name.rsplit(".mda", 1)[0],
+            "fileName": file_path.stem,  # file_name.rsplit(".mda", 1)[0]
             "filePath": str(file_path),
             "folderPath": str(folder_path),
             "metadata": file_metadata,
@@ -252,10 +253,6 @@ class MDAFile(QtWidgets.QWidget):
             self.tabWidget.removeTab(index)
 
     def onAllTabsRemoved(self):
-        # TODO - question: sync tab with UI? handle the UI update or other actions needed when a all tabs are removed
-        # e.g. disable certain UI elements that require a file to be selected (buttons?)
-        # This is already done by self.removeAllFileTabs() that gets triggered when the last tab is removed.
-        # but did I forgot anything?
         pass
 
     def addFileTab(self, index, selection_field):

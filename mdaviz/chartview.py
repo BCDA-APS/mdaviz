@@ -6,6 +6,7 @@ import datetime
 from functools import partial
 from itertools import cycle
 import numpy
+from pathlib import Path
 from PyQt5 import QtCore, QtWidgets
 from . import utils
 
@@ -109,11 +110,15 @@ class ChartView(QtWidgets.QWidget):
         self.removeButton = self.mda_mvc.mda_file_viz.curveRemove
         self.removeCursor1 = self.mda_mvc.mda_file_viz.cursor1_remove
         self.removeCursor2 = self.mda_mvc.mda_file_viz.cursor2_remove
-        # Remove buttons connections:
+
+        # Remove button connections:
         utils.reconnect(self.clearAll.clicked, self.curveManager.allCurvesRemoved)
         utils.reconnect(self.removeButton.clicked, self.onRemoveButtonClicked)
         self.removeCursor1.clicked.connect(partial(self.onRemoveCursor, cursor_num=1))
         self.removeCursor2.clicked.connect(partial(self.onRemoveCursor, cursor_num=2))
+
+        self.mda_mvc.detRemoved.connect(self.onDetRemoved)
+        self.mda_mvc.detRemoved.connect(utils.debug_signal)
 
         # Connect offset & factor QLineEdit:
         self.offset_value = self.mda_mvc.mda_file_viz.offset_value
@@ -166,8 +171,8 @@ class ChartView(QtWidgets.QWidget):
     def setYlabel(self, txt=""):
         self._ylabel = txt
 
-    def getFullPath(self, path, file):
-        return f"{path}/{file}.mda"
+    # def getFullPath(self, path, file):
+    #     return f"{path}/{file}.mda"
 
     def getSelectedCurveID(self):
         return self.curveBox.currentText()
@@ -216,7 +221,7 @@ class ChartView(QtWidgets.QWidget):
         row = curveData["row"]
         path = curveData["path"]
         file = curveData["file"]
-        full_path = self.getFullPath(path, file)
+        full_path = f"{path}/{file}.mda"
         tableview = self.mda_mvc.mda_file.tabPath2Tableview(full_path)
         if tableview and tableview.tableView.model():
             tableview.tableView.model().uncheckCheckBox(row)
@@ -234,6 +239,11 @@ class ChartView(QtWidgets.QWidget):
                 tableview = self.mda_mvc.mda_file.tabIndex2Tableview(index)
                 if tableview and tableview.tableView.model():
                     tableview.tableView.model().clearAllCheckboxes()
+
+    def onDetRemoved(self, path, row):
+        curveID = self.curveManager.findCurveID(path, row)
+        if curveID:
+            self.curveManager.removeCurve(curveID)
 
     ########################################## UI methods:
 
@@ -523,6 +533,9 @@ class CurveManager(QtCore.QObject):
     def removeCurve(self, curveID):
         """Remove a curve from the manager."""
         if curveID in self._curves:
+            path = self._curves[curveID]["path"]
+            file = self._curves[curveID]["file"]
+            print(f"{path}/{file}.mda")
             curveData = self._curves[curveID]
             del self._curves[curveID]
             self.curveRemoved.emit(curveID, curveData)
@@ -589,3 +602,27 @@ class CurveManager(QtCore.QObject):
             else:
                 break  # If the label doesn't exist already, it's automatically unique.
         return label
+
+    def findCurveID(self, full_path, row):
+        """
+        Find the curveID based on the filepath, filename, and row number.
+
+        Parameters:
+        - full_path (str): The full path of the file associated with the curve.
+        - row (int): The row number in the file tableview associated with the curve.
+
+        Returns:
+        - str: The curveID if a matching curve is found; otherwise, None.
+        """
+        path_obj = Path(full_path)
+        path = str(path_obj.parent)
+        file = path_obj.stem
+
+        for curveID, curveData in self._curves.items():
+            if (
+                curveData["path"] == path
+                and curveData["file"] == file
+                and curveData["row"] == row
+            ):
+                return curveID
+        return None

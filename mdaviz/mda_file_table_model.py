@@ -116,7 +116,9 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
     # Signals in PyQt5 should be class attributes, not instance attributes, to work properly.
     # They need to be defined at the class level so that PyQt can set them up correctly when instances of the class are created.
 
-    checkboxStateChanged = QtCore.pyqtSignal(dict)  # emit field selection
+    checkboxStateChanged = QtCore.pyqtSignal(
+        dict, list
+    )  # emit field selection and the list containing the DET (Y field) that have been removed
 
     def __init__(self, columns, fields, selection_field, parent=None):
         """
@@ -195,6 +197,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
 
     def setCheckbox(self, index, state):
         """Set the checkbox state."""
+        old_selection = ftm2mda(self.selections)
         row, column = index.row(), index.column()
         column_name = self.columnName(column)
         checked = state == QtCore.Qt.Checked
@@ -203,8 +206,9 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         changes = self.selections[row] != prior
         changes = self.applySelectionRules(index, changes)
         if changes:
-            self.updateCheckboxes()
-            self.checkboxStateChanged.emit(self.plotFields()[0])
+            det_removed = self.updateCheckboxes(old_selection)
+            # TODO: emit removed_y too
+            self.checkboxStateChanged.emit(self.plotFields()[0], det_removed)
 
     def checkCheckBox(self, row, column_name):
         self.selections[row] = (
@@ -254,7 +258,9 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
                         changes = True
         return changes
 
-    def updateCheckboxes(self, new_selection=None, update_mda_mvc=True):
+    def updateCheckboxes(
+        self, old_selection=None, new_selection=None, update_mda_mvc=True
+    ):
         """Update checkboxes to agree with self.selections."""
         if new_selection is None:
             new_selection = self.selections
@@ -271,9 +277,13 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         # prune empty data from new_selection
         new_selection = {k: v for k, v in new_selection.items() if v is not None}
         self.selections = new_selection
+        old_y_selection = old_selection.get("Y", []) if old_selection else []
+        new_y_selection = ftm2mda(new_selection).get("Y", []) if new_selection else []
+        det_removed = [y for y in old_y_selection if y not in new_y_selection]
         # Update the mda_mvc selection if needed:
         if update_mda_mvc:
             self.updateMdaMvcSelection(new_selection)
+        return det_removed
 
     def updateMdaMvcSelection(self, new_selection):
         if new_selection is None:
