@@ -35,6 +35,7 @@ from dataclasses import KW_ONLY
 from dataclasses import dataclass
 
 from PyQt5 import QtCore
+from PyQt5.QtGui import QBrush, QColor
 
 
 class ColumnDataType:
@@ -140,6 +141,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
 
         super().__init__()
         self.updateCheckboxes()
+        self.highlight_row = None
 
     # ------------ methods required by Qt's view
 
@@ -159,6 +161,9 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         elif role == QtCore.Qt.DisplayRole:
             if index.column() in self.textColumns:
                 return self.fieldText(index)
+        elif role == QtCore.Qt.BackgroundRole:
+            if index.row() == self.highlight_row:
+                return QBrush(QColor(210, 226, 247))  # 228, 233, 240
 
     def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
         """Column headers.  Called by QTableView."""
@@ -186,6 +191,10 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
             # use a checkbox in this column
             return original_flags | QtCore.Qt.ItemIsUserCheckable
         return original_flags
+
+    def setHighlightRow(self, row=None):
+        self.highlight_row = row
+        self.layoutChanged.emit()  # Refresh the view
 
     # ------------ checkbox methods
 

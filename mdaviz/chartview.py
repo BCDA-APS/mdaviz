@@ -241,6 +241,7 @@ class ChartView(QtWidgets.QWidget):
                 tableview = self.mda_mvc.mda_file.tabIndex2Tableview(index)
                 if tableview and tableview.tableView.model():
                     tableview.tableView.model().clearAllCheckboxes()
+                    tableview.tableView.model().setHighlightRow()
 
     def onDetRemoved(self, file_path, row):
         curveID = self.curveManager.findCurveID(file_path, row)
@@ -312,9 +313,12 @@ class ChartView(QtWidgets.QWidget):
         # Update QLineEdit & QLabel widgets with the values for the selected curve
         if curveID in self.plotObjects and curveID in self.curveManager.curves():
             curve_data = self.curveManager.getCurveData(curveID)
+            file_path = curve_data["file_path"]
+            row = curve_data["row"]
             self.offset_value.setText(str(curve_data["offset"]))
             self.factor_value.setText(str(curve_data["factor"]))
-            self.setPathLabelText(curve_data["file_path"])
+            self.setPathLabelText(file_path)
+            self.mda_mvc.mda_file.highlightRowInTab(file_path, row)
         else:
             self.offset_value.setText("0")
             self.factor_value.setText("1")

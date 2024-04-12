@@ -164,14 +164,6 @@ class MDA_MVC(QtWidgets.QWidget):
 
     # # ------------ set & get methods:
 
-    def setSelectionModel(self, selection=None):
-        """
-        Sets the selection model for managing view selections.
-
-        Args:
-            selection (QItemSelectionModel, optional): The selection model to be associated with the view. Defaults to None.
-        """
-
     def dataPath(self):
         """
         Retrieves the path of the currently selected data folder.

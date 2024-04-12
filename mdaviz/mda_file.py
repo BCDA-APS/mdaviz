@@ -26,6 +26,8 @@ User: clearButton.clicked (emit: no data)
 from mda import readMDA
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import QItemSelectionModel
+from PyQt5.QtWidgets import QAbstractItemView
 import yaml
 
 from . import utils
@@ -56,7 +58,9 @@ class MDAFile(QtWidgets.QWidget):
     def setup(self):
         from functools import partial
 
+        # Initialize attributes:
         self.setData()
+        self.setSelectionModel()
         self.tabManager = TabManager()  # Instantiate TabManager
 
         # Buttons handling:
@@ -165,6 +169,26 @@ class MDAFile(QtWidgets.QWidget):
             "index": index,
         }
 
+    def setSelectionModel(self, selection=None):
+        """
+        Sets the selection model for managing view selections.
+
+        Args:
+            selection (QItemSelectionModel, optional): The selection model to be associated
+            with the view. Defaults to None.
+        """
+        self._selection_model = selection
+
+    def selectionModel(self):
+        """
+        Accesses the selection model of the view managing the selection state.
+
+        Returns:
+            QItemSelectionModel: The selection model associated with a view,
+            managing which rows/items are selected.
+        """
+        return self._selection_model
+
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
 
@@ -173,11 +197,8 @@ class MDAFile(QtWidgets.QWidget):
     def tabPath2Index(self, file_path):
         """Finds and returns the index of a tab based on its associated file path."""
         if file_path is not None:
-            print(f"\nIn tabPath2Index: {file_path=}")
             for tab_index in range(self.tabWidget.count()):
-                print(f"{tab_index=}")
                 tab_tableview = self.tabWidget.widget(tab_index)
-                print(f"{tab_tableview.filePath.text()=}")
                 if tab_tableview.filePath.text() == file_path:
                     return tab_index
         return None  # Return None if the file_path is not found.
@@ -332,6 +353,12 @@ class MDAFile(QtWidgets.QWidget):
         tableview.displayTable(selection_field)
         tableview.filePath.setText(file_path)
 
+        # Field Selection Model :
+        model = tableview.tableView.model()
+        if model is not None:
+            selection_model = tableview.tableView.selectionModel()
+            self.setSelectionModel(selection_model)
+
     def removeAllFileTabs(self):
         """
         Removes all tabs from the tab widget.
@@ -356,6 +383,39 @@ class MDAFile(QtWidgets.QWidget):
         self.tabChanged.emit(
             new_tab_index, new_file_path, new_tab_data, new_selection_field
         )
+
+    def highlightRowInTab(self, file_path, row):
+        tab_index = self.tabPath2Index(file_path)
+        self.tabWidget.setCurrentIndex(tab_index)
+        tableview = self.tabWidget.widget(tab_index)
+        model = tableview.tableView.model()
+        if model is not None:
+            self.selectAndShowRow(tab_index, row)
+
+    def selectAndShowRow(self, tab_index, row):
+        """
+        Selects a file by its row in the folder table view and ensures it is visible to the user
+        by adjusting scroll position based on the field's position in the list
+
+        Parameters:
+        - row (int): row of the selected field.
+
+        Details:
+        - .
+        """
+        tableview = self.tabWidget.widget(tab_index)
+        model = tableview.tableView.model()
+        model.setHighlightRow(row)
+        rowCount = model.rowCount()
+
+        scrollHint = QAbstractItemView.EnsureVisible
+        if row == 0:
+            scrollHint = QAbstractItemView.PositionAtTop
+        elif row == rowCount - 1:
+            scrollHint = QAbstractItemView.PositionAtBottom
+        # Get the QModelIndex for the specified row
+        index = model.index(row, 0)
+        tableview.tableView.scrollTo(index, scrollHint)
 
     # ------ Button methods:
 
