@@ -26,7 +26,6 @@ User: clearButton.clicked (emit: no data)
 from mda import readMDA
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import QItemSelectionModel
 from PyQt5.QtWidgets import QAbstractItemView
 import yaml
 
@@ -60,7 +59,6 @@ class MDAFile(QtWidgets.QWidget):
 
         # Initialize attributes:
         self.setData()
-        self.setSelectionModel()
         self.tabManager = TabManager()  # Instantiate TabManager
 
         # Buttons handling:
@@ -168,26 +166,6 @@ class MDAFile(QtWidgets.QWidget):
             "pvList": pvList,
             "index": index,
         }
-
-    def setSelectionModel(self, selection=None):
-        """
-        Sets the selection model for managing view selections.
-
-        Args:
-            selection (QItemSelectionModel, optional): The selection model to be associated
-            with the view. Defaults to None.
-        """
-        self._selection_model = selection
-
-    def selectionModel(self):
-        """
-        Accesses the selection model of the view managing the selection state.
-
-        Returns:
-            QItemSelectionModel: The selection model associated with a view,
-            managing which rows/items are selected.
-        """
-        return self._selection_model
 
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
@@ -352,12 +330,6 @@ class MDAFile(QtWidgets.QWidget):
         self.tabWidget.setCurrentIndex(tab_index)
         tableview.displayTable(selection_field)
         tableview.filePath.setText(file_path)
-
-        # Field Selection Model :
-        model = tableview.tableView.model()
-        if model is not None:
-            selection_model = tableview.tableView.selectionModel()
-            self.setSelectionModel(selection_model)
 
     def removeAllFileTabs(self):
         """
