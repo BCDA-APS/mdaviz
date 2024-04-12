@@ -326,6 +326,7 @@ class ChartView(QtWidgets.QWidget):
             try:
                 self.mda_mvc.mda_file.highlightRowInTab(file_path, row)
             except:
+                print("highlightRowInTab failed.")
                 pass
         else:
             self.offset_value.setText("0")

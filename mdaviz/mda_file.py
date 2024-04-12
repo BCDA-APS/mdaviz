@@ -381,12 +381,11 @@ class MDAFile(QtWidgets.QWidget):
             row (int): _description_
         """
         tab_index = self.tabPath2Index(file_path)
-        if tab_index:
-            self.tabWidget.setCurrentIndex(tab_index)
-            tableview = self.tabWidget.widget(tab_index)
-            model = tableview.tableView.model()
-            if model is not None:
-                self.selectAndShowRow(tab_index, row)
+        self.tabWidget.setCurrentIndex(tab_index)
+        tableview = self.tabWidget.widget(tab_index)
+        model = tableview.tableView.model()
+        if model is not None:
+            self.selectAndShowRow(tab_index, row)
 
     def selectAndShowRow(self, tab_index, row):
         """
