@@ -99,11 +99,11 @@ class ChartView(QtWidgets.QWidget):
         self.curveManager.curveUpdated.connect(self.onCurveUpdated)
         self.curveManager.curveRemoved.connect(self.onCurveRemoved)
         self.curveManager.allCurvesRemoved.connect(self.onAllCurvesRemoved)
-        # Debug signals:
-        self.curveManager.curveAdded.connect(utils.debug_signal)
-        self.curveManager.curveRemoved.connect(utils.debug_signal)
-        self.curveManager.curveUpdated.connect(utils.debug_signal)
-        self.curveManager.allCurvesRemoved.connect(utils.debug_signal)
+        # # Debug signals:
+        # self.curveManager.curveAdded.connect(utils.debug_signal)
+        # self.curveManager.curveRemoved.connect(utils.debug_signal)
+        # self.curveManager.curveUpdated.connect(utils.debug_signal)
+        # self.curveManager.allCurvesRemoved.connect(utils.debug_signal)
 
         # Remove buttons definitions:
         self.clearAll = self.mda_mvc.mda_file_viz.clearAll
@@ -117,6 +117,8 @@ class ChartView(QtWidgets.QWidget):
         self.removeCursor1.clicked.connect(partial(self.onRemoveCursor, cursor_num=1))
         self.removeCursor2.clicked.connect(partial(self.onRemoveCursor, cursor_num=2))
 
+        # File tableview & graph synchronization:
+        self.mda_mvc.mda_file.tabManager.tabRemoved.connect(self.onTabRemoved)
         self.mda_mvc.detRemoved.connect(self.onDetRemoved)
         self.mda_mvc.detRemoved.connect(utils.debug_signal)
 
@@ -171,9 +173,6 @@ class ChartView(QtWidgets.QWidget):
     def setYlabel(self, txt=""):
         self._ylabel = txt
 
-    # def getFullPath(self, path, file):
-    #     return f"{path}/{file}.mda"
-
     def getSelectedCurveID(self):
         return self.curveBox.currentText()
 
@@ -211,7 +210,8 @@ class ChartView(QtWidgets.QWidget):
             else:
                 self.curveManager.removeCurve(curveID)
 
-    def onCurveRemoved(self, curveID, curveData):
+    def onCurveRemoved(self, *arg):
+        curveID, curveData, count = arg
         # Remove curve from graph & plotObject dict
         if curveID in self.plotObjects:
             curve_obj = self.plotObjects[curveID]
@@ -219,16 +219,18 @@ class ChartView(QtWidgets.QWidget):
             del self.plotObjects[curveID]
         # Remove checkbox from corresponding tableview
         row = curveData["row"]
-        path = curveData["path"]
-        file = curveData["file"]
-        full_path = f"{path}/{file}.mda"
-        tableview = self.mda_mvc.mda_file.tabPath2Tableview(full_path)
+        file_path = curveData["file_path"]
+        tableview = self.mda_mvc.mda_file.tabPath2Tableview(file_path)
         if tableview and tableview.tableView.model():
             tableview.tableView.model().uncheckCheckBox(row)
         # Remove curve from comboBox
         self.removeItemCurveBox(curveID)
         # Update plot labels, legend and title
         self.updatePlot(update_title=False)
+        # If this was the last curve for this file, remove the tab
+        if count == 0 and self.mda_mvc.mda_file.mode() == "Auto-add":
+            print("HELLLOOOOOO")
+            self.mda_mvc.mda_file.tabManager.removeTab(file_path)
 
     def onAllCurvesRemoved(self, doNotClearCheckboxes=True):
         # Clears the plot completely, removing all curve representations.
@@ -240,10 +242,16 @@ class ChartView(QtWidgets.QWidget):
                 if tableview and tableview.tableView.model():
                     tableview.tableView.model().clearAllCheckboxes()
 
-    def onDetRemoved(self, path, row):
-        curveID = self.curveManager.findCurveID(path, row)
+    def onDetRemoved(self, file_path, row):
+        curveID = self.curveManager.findCurveID(file_path, row)
         if curveID:
             self.curveManager.removeCurve(curveID)
+
+    def onTabRemoved(self, file_path):
+        if self.mda_mvc.mda_file.mode() in ["Auto-add"]:
+            for curveID in self.curveManager.curves().keys():
+                if self.curveManager.curves()[curveID]["file_path"] == file_path:
+                    self.curveManager.removeCurve(curveID)
 
     ########################################## UI methods:
 
@@ -306,7 +314,7 @@ class ChartView(QtWidgets.QWidget):
             curve_data = self.curveManager.getCurveData(curveID)
             self.offset_value.setText(str(curve_data["offset"]))
             self.factor_value.setText(str(curve_data["factor"]))
-            self.setPathLabelText(curve_data["path"])
+            self.setPathLabelText(curve_data["file_path"])
         else:
             self.offset_value.setText("0")
             self.factor_value.setText("1")
@@ -487,9 +495,9 @@ class ChartView(QtWidgets.QWidget):
 
 class CurveManager(QtCore.QObject):
     curveAdded = QtCore.pyqtSignal(str)  # Emit curveID when a curve is added
-    curveRemoved = QtCore.pyqtSignal(
-        str, dict
-    )  # Emit curveID & its corresponding data when a curve is removed
+    curveRemoved = QtCore.pyqtSignal(str, dict, int)
+    # Emit curveID & its corresponding data when a curve is removed, plus the
+    # number of curves left on the graph for this file
     curveUpdated = QtCore.pyqtSignal(
         str, bool
     )  # Emit curveID and recompute_y (bool) when a curve is updated
@@ -507,9 +515,9 @@ class CurveManager(QtCore.QObject):
         plot_options = options.get("plot_options", {})
         ds_options = options.get("ds_options", {})
         label = ds_options.get("label", "unknown label")
-        path = plot_options.get("folderPath", "unknown path")
+        file_path = plot_options.get("filePath", "unknown path")
         # Generate unique label & update options:
-        ds_options["label"] = curveID = self.generateCurveID(label, path)
+        ds_options["label"] = curveID = self.generateCurveID(label, file_path)
         # Add new curve if not already present on the graph:
         if curveID not in self._curves:
             self._curves[curveID] = {
@@ -517,8 +525,8 @@ class CurveManager(QtCore.QObject):
                 "offset": 0,  # default offset
                 "factor": 1,  # default factor
                 "row": row,  # checkbox row in the file tableview
-                "path": plot_options.get("folderPath", "unknown path"),  # file path
-                "file": plot_options.get("fileName", "unknown path"),  # without ext
+                "file_path": file_path,
+                "file_name": plot_options.get("fileName", ""),  # without ext
                 "plot_options": plot_options,
                 "ds_options": ds_options,
             }
@@ -533,12 +541,17 @@ class CurveManager(QtCore.QObject):
     def removeCurve(self, curveID):
         """Remove a curve from the manager."""
         if curveID in self._curves:
-            path = self._curves[curveID]["path"]
-            file = self._curves[curveID]["file"]
-            print(f"{path}/{file}.mda")
             curveData = self._curves[curveID]
+            file_path = curveData["file_path"]
+            # Remove curve entry from self.curves & emit signal:
             del self._curves[curveID]
-            self.curveRemoved.emit(curveID, curveData)
+            # How many curves are left for this file:
+            count = 0
+            for curve_data in self._curves.values():
+                if curve_data["file_path"] == file_path:
+                    count += 1
+            # Emit signal:
+            self.curveRemoved.emit(curveID, curveData, count)
 
     def removeAllCurves(self, doNotClearCheckboxes=True):
         """Remove all curves from the manager."""
@@ -569,14 +582,14 @@ class CurveManager(QtCore.QObject):
                 curve_data["factor"] = new_factor
                 self.updateCurve(curveID, curve_data, recompute_y=True)
 
-    def generateCurveID(self, label, path):
+    def generateCurveID(self, label, file_path):
         """
         Generates a unique curve label for a given label, considering the file path.
 
         Parameters:
         - label (str): The original label for the curve:
                 "file_name: PV_name (PV_unit)" or "file_name: PV_name" (if no PV_unit)
-        - path (str): The file path associated with the curve.
+        - file_path (str): The file path associated with the curve.
 
         Returns:
         - str: A unique curve label. If the exact label already exists for different file path,
@@ -593,36 +606,28 @@ class CurveManager(QtCore.QObject):
         while True:
             # Check if the current label exists:
             if label in self._curves:
-                existing_path = self._curves[label].get("path")
-                if existing_path != path:
+                existing_path = self._curves[label].get("file_path")
+                if existing_path != file_path:
                     label = f"{original_label} ({counter})"
                     counter += 1
                 else:
-                    break  # If path is equal, then the curve is already on the graph.
+                    break  # If file_path is equal, then the curve is already on the graph.
             else:
                 break  # If the label doesn't exist already, it's automatically unique.
         return label
 
-    def findCurveID(self, full_path, row):
+    def findCurveID(self, file_path, row):
         """
-        Find the curveID based on the filepath, filename, and row number.
+        Find the curveID based on the file path and row number.
 
         Parameters:
-        - full_path (str): The full path of the file associated with the curve.
+        - file_path (str): The path of the file associated with the curve.
         - row (int): The row number in the file tableview associated with the curve.
 
         Returns:
         - str: The curveID if a matching curve is found; otherwise, None.
         """
-        path_obj = Path(full_path)
-        path = str(path_obj.parent)
-        file = path_obj.stem
-
         for curveID, curveData in self._curves.items():
-            if (
-                curveData["path"] == path
-                and curveData["file"] == file
-                and curveData["row"] == row
-            ):
+            if curveData["file_path"] == file_path and curveData["row"] == row:
                 return curveID
         return None

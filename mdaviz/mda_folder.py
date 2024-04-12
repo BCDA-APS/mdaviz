@@ -18,7 +18,7 @@ MVC implementation of mda files.
         
         User interaction handling methods:
         - doRefresh: Refreshes the view to display updated MDA files from the selected folder.
-        - doFileSelected: Handles user selection of MDA files, updating UI and initiating data plotting.
+        - onFileSelected: Handles user selection of MDA files, updating UI and initiating data plotting.
         - doPlot: Initiates data plotting based on user selections and current plot mode. It checks for the
         selected positioner and detectors, retrieves the corresponding data, and plots it in the visualization panel.
         - onCheckboxStateChange: Responds to user changes in checkbox states within the MDA file table, 
@@ -51,7 +51,7 @@ MVC implementation of mda files.
             |___> mda_folder_tableview.displayTable()   (to reload folder content)
 
         File Selection (Double Click or Navigation Button)
-        |___> doFileSelected
+        |___> onFileSelected
             |___> Update UI (Tabs, Metadata, Data Display)
             |___> doPlot (Based on current mode and selections)
                 |___> Retrieve and plot data based on selected positioner and detectors
@@ -77,9 +77,10 @@ from . import utils
 class MDA_MVC(QtWidgets.QWidget):
     """Model View Controller class for mda files."""
 
+    # TODO - question: should this signal be emitted here or in MDA_FILE_TM?
     detRemoved = QtCore.pyqtSignal(
         str, int
-    )  # Emit the filepath and row when a DET checkbox is unchecked
+    )  # Emit the file path and row when a DET checkbox is unchecked
 
     ui_file = utils.getUiFileName(__file__)
     motion_wait_time = 1
@@ -135,7 +136,7 @@ class MDA_MVC(QtWidgets.QWidget):
             self.setSelectionModel(selection_model)
 
         # Folder table view signal/slot connections:
-        self.mda_folder_tableview.tableView.doubleClicked.connect(self.doFileSelected)
+        self.mda_folder_tableview.tableView.doubleClicked.connect(self.onFileSelected)
         self.mda_folder_tableview.firstButton.clicked.connect(self.goToFirst)
         self.mda_folder_tableview.lastButton.clicked.connect(self.goToLast)
         self.mda_folder_tableview.backButton.clicked.connect(self.goToPrevious)
@@ -369,7 +370,7 @@ class MDA_MVC(QtWidgets.QWidget):
 
     # # ------------ File selection methods:
 
-    def doFileSelected(self, index, verbose=True):
+    def onFileSelected(self, index, verbose=True):
         """
         - Handles the selection of a new file in the folder table view.
         - Updates the UI to:
@@ -516,7 +517,7 @@ class MDA_MVC(QtWidgets.QWidget):
         Notes: This method is connected to the `tabChanged` signal of the MDAFile's QTabWidget:
         In MDAFile:
             self.mda_file.tabWidget.currentChanged.connect [signal: emits new_tab_index]
-                --> self.mda_file.onSwitchTab(new_tab_index) [slot]
+                --> self.mda_file.updateCurrentTabInfo(new_tab_index) [slot]
                     --> self.mda_file.tabChanged.emit  [QtCore.pyqtSignal]
                         emits: new_tab_index, _file_path, _tab_data, _selection_field
         In MDA_MVC:
@@ -606,7 +607,7 @@ class MDA_MVC(QtWidgets.QWidget):
         Details:
         - Focuses on the table view for visual feedback (blue highlight in Mac OS).
         - Adjusts scroll position based on the file's position in the list.
-        - Trigger actions associated with file selection (doFileSelected).
+        - Trigger actions associated with file selection (onFileSelected).
         """
         # Ensure the table view has focus:
         self.mda_folder_tableview.tableView.setFocus()
@@ -624,7 +625,7 @@ class MDA_MVC(QtWidgets.QWidget):
         )
         self.mda_folder_tableview.tableView.scrollTo(index, scrollHint)
         # Trigger actions associated with file selection
-        self.doFileSelected(index)
+        self.onFileSelected(index)
 
     # # ------------ Checkbox methods:
 
@@ -669,8 +670,8 @@ class MDA_MVC(QtWidgets.QWidget):
         if det_removed:
             for y in det_removed:
                 tab_index = self.mda_file.tabWidget.currentIndex()
-                path = self.mda_file.tabIndex2Path(tab_index)
-                self.detRemoved.emit(path, y)
+                file_path = self.mda_file.tabIndex2Path(tab_index)
+                self.detRemoved.emit(file_path, y)
                 return
 
         # Get dataset for the positioner/detector selection:

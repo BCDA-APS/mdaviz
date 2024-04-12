@@ -206,7 +206,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         changes = self.selections[row] != prior
         changes = self.applySelectionRules(index, changes)
         if changes:
-            det_removed = self.updateCheckboxes(old_selection)
+            det_removed = self.updateCheckboxes(old_selection=old_selection)
             # TODO: emit removed_y too
             self.checkboxStateChanged.emit(self.plotFields()[0], det_removed)
 
@@ -259,7 +259,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         return changes
 
     def updateCheckboxes(
-        self, old_selection=None, new_selection=None, update_mda_mvc=True
+        self, new_selection=None, old_selection=None, update_mda_mvc=True
     ):
         """Update checkboxes to agree with self.selections."""
         if new_selection is None:

@@ -8,9 +8,9 @@ Display content of the currently selected files.
     
 User: tabCloseRequested.connect (emit: index)
         --> onTabCloseRequested(index --> file_path)
-        --> tabManager.removeTab(file_path, index)  
-        --> tabManager.tabRemoved.emit(file_path, index) 
-        --> onTabRemoved(file_path, index) 
+        --> tabManager.removeTab(file_path)  
+        --> tabManager.tabRemoved.emit(file_path) 
+        --> onTabRemoved(file_path --> index) 
 
 User: clearButton.clicked (emit: no data)
         --> onClearAllTabsRequested()
@@ -29,6 +29,7 @@ from PyQt5 import QtWidgets
 import yaml
 
 from . import utils
+from .chartview import ChartView
 from .mda_file_table_view import MDAFileTableView
 
 
@@ -80,7 +81,7 @@ class MDAFile(QtWidgets.QWidget):
         self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
 
         # Tab handling:
-        self.tabWidget.currentChanged.connect(self.onSwitchTab)
+        self.tabWidget.currentChanged.connect(self.updateCurrentTabInfo)
         self.tabWidget.tabCloseRequested.connect(self.onTabCloseRequested)
 
         # # Debug signals:
@@ -172,8 +173,11 @@ class MDAFile(QtWidgets.QWidget):
     def tabPath2Index(self, file_path):
         """Finds and returns the index of a tab based on its associated file path."""
         if file_path is not None:
+            print(f"\nIn tabPath2Index: {file_path=}")
             for tab_index in range(self.tabWidget.count()):
+                print(f"{tab_index=}")
                 tab_tableview = self.tabWidget.widget(tab_index)
+                print(f"{tab_tableview.filePath.text()=}")
                 if tab_tableview.filePath.text() == file_path:
                     return tab_index
         return None  # Return None if the file_path is not found.
@@ -232,21 +236,22 @@ class MDAFile(QtWidgets.QWidget):
         self.mda_mvc.setSelectionField(default)
         return default
 
-    # ------ Tabs management (UI):
+    # ------ Slots (UI):
 
     def onTabCloseRequested(self, index):
         file_path = self.tabIndex2Path(index)
         if file_path:
-            self.tabManager.removeTab(file_path, index)
+            self.tabManager.removeTab(file_path)
 
     def onTabAdded(self, file_path):
         pass
 
-    def onTabRemoved(self, file_path, index):
+    def onTabRemoved(self, file_path):
         """
-        Removes a tab from the tab widget based on its index. If it's the last tab,
-        it calls removeAllTabs() to ensure consistent cleanup.
+        Removes a tab from the tab widget based on its file_path.
+        If it's the last tab, it calls removeAllTabs() to ensure consistent cleanup.
         """
+        index = self.tabPath2Index(file_path)
         if self.tabWidget.count() == 1 and index == 0:
             self.removeAllFileTabs()
         elif index is not None and index < self.tabWidget.count():
@@ -254,6 +259,8 @@ class MDAFile(QtWidgets.QWidget):
 
     def onAllTabsRemoved(self):
         pass
+
+    # ------ Tabs management:
 
     def addFileTab(self, index, selection_field):
         """
@@ -312,7 +319,7 @@ class MDAFile(QtWidgets.QWidget):
         - Adds a new tab to the tab widget.
         - Labels the new tab with the file's name.
         - Sets the new tab as the current active tab.
-        - Updates the filePath Qlabel within MDAFileTableView to reflect the selected file's path.
+        - Updates the file path Qlabel (named filePath) within MDAFileTableView to reflect the selected file's path.
 
         Parameters:
         - file_name (str): The name of the file, used as the tab's label.
@@ -338,7 +345,7 @@ class MDAFile(QtWidgets.QWidget):
         # Update the status to reflect that all tabs have been closed.
         self.setStatus("All file tabs have been closed.")
 
-    def onSwitchTab(self, new_tab_index):
+    def updateCurrentTabInfo(self, new_tab_index):
         new_file_path = self.tabIndex2Path(new_tab_index)
         new_tab_data = self.tabManager.getTabData(new_file_path) or {}
         new_tab_tableview = self.tabWidget.widget(new_tab_index)
@@ -390,11 +397,8 @@ class TabManager(QtCore.QObject):
     - allTabRemoved: Emitted when all tabs are removed. No parameters.
     """
 
-    # TODO - question: same as above, they are probably useless: NO!
     tabAdded = QtCore.pyqtSignal(str)  # Signal emitting file path of removed tab
-    tabRemoved = QtCore.pyqtSignal(
-        str, int
-    )  # Signal emitting file path & index of removed tab
+    tabRemoved = QtCore.pyqtSignal(str)  # Signal emitting file path of removed tab
     allTabsRemoved = QtCore.pyqtSignal()  # Signal indicating all tabs have been removed
 
     def __init__(self):
@@ -403,15 +407,18 @@ class TabManager(QtCore.QObject):
 
     def addTab(self, file_path, metadata, tabledata):
         """Adds a new tab with specified metadata and table data."""
-        if file_path not in self._tabs:  # Check if the tab doesn't already exist
+        if file_path not in self._tabs:
             self._tabs[file_path] = {"metadata": metadata, "tabledata": tabledata}
             self.tabAdded.emit(file_path)
 
-    def removeTab(self, file_path, index):
-        """Removes the tab associated with the given file path."""
-        if file_path in self._tabs:  # Check if the tab exists
+    def removeTab(self, file_path):
+        """
+        Removes the tab associated with the given file path.
+        Emits corresponding file path & index.
+        """
+        if file_path in self._tabs:
             del self._tabs[file_path]
-            self.tabRemoved.emit(file_path, index)
+            self.tabRemoved.emit(file_path)
 
     def removeAllTabs(self):
         """Removes all tabs."""
@@ -467,7 +474,7 @@ class TabManager(QtCore.QObject):
 #         associated data cleanup that might be needed to prevent memory leaks
 #         or stale data.
 
-#     Switching Tabs: When switching tabs (onSwitchTab), ensure that any
+#     Switching Tabs: When switching tabs (updateCurrentTabInfo), ensure that any
 #         context-sensitive UI elements (like metadata display, data tables,
 #         etc.) update to reflect the content of the newly active tab.
 

@@ -139,7 +139,7 @@ class MDAFileTableView(QtWidgets.QWidget):
         if self.data() is not None:
             # extract scan info:
             fileName = self.data()["fileInfo"]["fileName"]
-            folderPath = self.data()["fileInfo"]["folderPath"]
+            filePath = self.data()["fileInfo"]["filePath"]
             scanDict = self.data()["fileInfo"]["scanDict"]
             # extract x data:
             x_index = selections.get("X")
@@ -172,7 +172,7 @@ class MDAFileTableView(QtWidgets.QWidget):
                 "y": y_first_name,
                 "y_unit": y_first_unit,
                 "title": "",
-                "folderPath": folderPath,
+                "filePath": filePath,
                 "fileName": fileName,
             }
 
