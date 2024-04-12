@@ -120,7 +120,7 @@ class ChartView(QtWidgets.QWidget):
         # File tableview & graph synchronization:
         self.mda_mvc.mda_file.tabManager.tabRemoved.connect(self.onTabRemoved)
         self.mda_mvc.detRemoved.connect(self.onDetRemoved)
-        self.mda_mvc.detRemoved.connect(utils.debug_signal)
+        # self.mda_mvc.detRemoved.connect(utils.debug_signal)
 
         # Connect offset & factor QLineEdit:
         self.offset_value = self.mda_mvc.mda_file_viz.offset_value
@@ -191,7 +191,7 @@ class ChartView(QtWidgets.QWidget):
         # Add to the comboBox
         self.curveBox.addItem(curveID)
 
-    def onCurveUpdated(self, curveID, recompute_y=False):
+    def onCurveUpdated(self, curveID, recompute_y=False, update_x=False):
         curve_data = self.curveManager.getCurveData(curveID)
         if curve_data and recompute_y:
             factor = curve_data.get("factor", 1)
@@ -200,6 +200,11 @@ class ChartView(QtWidgets.QWidget):
             new_y = numpy.multiply(ds[1], factor) + offset
             if curveID in self.plotObjects:
                 self.plotObjects[curveID].set_ydata(new_y)
+        if curve_data and update_x:
+            ds = curve_data["ds"]
+            new_x = curve_data["ds"][0]
+            if curveID in self.plotObjects:
+                self.plotObjects[curveID].set_xdata(new_x)
         self.updatePlot(update_title=False)
 
     def onRemoveButtonClicked(self):
@@ -318,7 +323,10 @@ class ChartView(QtWidgets.QWidget):
             self.offset_value.setText(str(curve_data["offset"]))
             self.factor_value.setText(str(curve_data["factor"]))
             self.setPathLabelText(file_path)
-            self.mda_mvc.mda_file.highlightRowInTab(file_path, row)
+            try:
+                self.mda_mvc.mda_file.highlightRowInTab(file_path, row)
+            except:
+                pass
         else:
             self.offset_value.setText("0")
             self.factor_value.setText("1")
@@ -503,8 +511,8 @@ class CurveManager(QtCore.QObject):
     # Emit curveID & its corresponding data when a curve is removed, plus the
     # number of curves left on the graph for this file
     curveUpdated = QtCore.pyqtSignal(
-        str, bool
-    )  # Emit curveID and recompute_y (bool) when a curve is updated
+        str, bool, bool
+    )  # Emit curveID, recompute_y (bool) & update_x (bool) when a curve is updated
     allCurvesRemoved = QtCore.pyqtSignal(
         bool
     )  # Emit a doNotClearCheckboxes bool when all curve are removed
@@ -522,25 +530,41 @@ class CurveManager(QtCore.QObject):
         file_path = plot_options.get("filePath", "unknown path")
         # Generate unique label & update options:
         ds_options["label"] = curveID = self.generateCurveID(label, file_path)
+        x_data = ds[0]
+        if curveID in self._curves:
+            # Check if x_data is the same
+            existing_x_data = self._curves[curveID]["ds"][0]
+            if numpy.array_equal(x_data, existing_x_data):
+                print(" x_data is the same, do not add or update the curve")
+                # x_data is the same, do not add or update the curve
+                return
+            else:
+                print(" x_data is different, update the curve")
+                # x_data is different, update the curve:
+                curveData = self._curves[curveID]
+                curveData["ds"] = ds
+                curveData["plot_options"] = plot_options
+                self.updateCurve(curveID, curveData, update_x=True)
+                return
         # Add new curve if not already present on the graph:
-        if curveID not in self._curves:
-            self._curves[curveID] = {
-                "ds": ds,  # ds = [x_data, y_data]
-                "offset": 0,  # default offset
-                "factor": 1,  # default factor
-                "row": row,  # checkbox row in the file tableview
-                "file_path": file_path,
-                "file_name": plot_options.get("fileName", ""),  # without ext
-                "plot_options": plot_options,
-                "ds_options": ds_options,
-            }
-            self.curveAdded.emit(curveID)
+        self._curves[curveID] = {
+            "ds": ds,  # ds = [x_data, y_data]
+            "offset": 0,  # default offset
+            "factor": 1,  # default factor
+            "row": row,  # DET checkbox row in the file tableview
+            "file_path": file_path,
+            "file_name": plot_options.get("fileName", ""),  # without ext
+            "plot_options": plot_options,
+            "ds_options": ds_options,
+        }
+        self.curveAdded.emit(curveID)
 
-    def updateCurve(self, curveID, curveData, recompute_y=False):
+    def updateCurve(self, curveID, curveData, recompute_y=False, update_x=False):
         """Update an existing curve."""
         if curveID in self._curves:
+            print(f"Emits curveUpdated {curveID=}, {recompute_y=}, {update_x=}")
             self._curves[curveID] = curveData
-            self.curveUpdated.emit(curveID, recompute_y)
+            self.curveUpdated.emit(curveID, recompute_y, update_x)
 
     def removeCurve(self, curveID):
         """Remove a curve from the manager."""

@@ -21,7 +21,7 @@ MVC implementation of mda files.
         - onFileSelected: Handles user selection of MDA files, updating UI and initiating data plotting.
         - doPlot: Initiates data plotting based on user selections and current plot mode. It checks for the
         selected positioner and detectors, retrieves the corresponding data, and plots it in the visualization panel.
-        - onCheckboxStateChange: Responds to user changes in checkbox states within the MDA file table, 
+        - onCheckboxStateChanged: Responds to user changes in checkbox states within the MDA file table, 
         triggering a re-plot of selected data.
         - handlePlotBasedOnMode: Determines plot updates based on the user-selected mode, e.g. Auto-add or Auto-replace.
     
@@ -57,7 +57,7 @@ MVC implementation of mda files.
                 |___> Retrieve and plot data based on selected positioner and detectors
         
         Checkbox State Change in File View
-        |___> onCheckboxStateChange
+        |___> onCheckboxStateChanged
             |___> doPlot (Replot based on new selections)
                 |___> Retrieve and plot data based on selected positioner and detectors  
 """
@@ -149,11 +149,11 @@ class MDA_MVC(QtWidgets.QWidget):
         utils.reconnect(self.mda_file.buttonPushed, self.doPlot)
 
         # Debug signals:
-        self.mda_folder_tableview.tableView.doubleClicked.connect(utils.debug_signal)
-        self.mda_folder_tableview.firstButton.clicked.connect(utils.debug_signal)
-        self.mda_folder_tableview.lastButton.clicked.connect(utils.debug_signal)
-        self.mda_folder_tableview.backButton.clicked.connect(utils.debug_signal)
-        self.mda_folder_tableview.nextButton.clicked.connect(utils.debug_signal)
+        # self.mda_folder_tableview.tableView.doubleClicked.connect(utils.debug_signal)
+        # self.mda_folder_tableview.firstButton.clicked.connect(utils.debug_signal)
+        # self.mda_folder_tableview.lastButton.clicked.connect(utils.debug_signal)
+        # self.mda_folder_tableview.backButton.clicked.connect(utils.debug_signal)
+        # self.mda_folder_tableview.nextButton.clicked.connect(utils.debug_signal)
 
         # save/restore splitter sizes in application settings
         for key in "hsplitter vsplitter".split():
@@ -411,14 +411,18 @@ class MDA_MVC(QtWidgets.QWidget):
         # Manage signal connections for the new file selection.
         utils.reconnect(
             new_tab_tableview.tableView.model().checkboxStateChanged,
-            self.onCheckboxStateChange,
+            self.onCheckboxStateChanged,
         )
         # selectionField() may have changed when calling addFileTab
         if self.selectionField():
             if old_pv_list is not None:
-                self.updateSelectionForNewPVs(
-                    old_selection, old_pv_list, new_pv_list, verbose
-                )
+                # TODO - later: find out why this sometimes fails - not that important:
+                try:
+                    self.updateSelectionForNewPVs(
+                        old_selection, old_pv_list, new_pv_list, verbose
+                    )
+                except:
+                    pass
             self.handlePlotBasedOnMode()
         else:
             self.setStatus("Could not find a (positioner,detector) pair to plot.")
@@ -537,7 +541,8 @@ class MDA_MVC(QtWidgets.QWidget):
         # TODO - check:  disable UI elements or actions that require an active file to be meaningful: Add, replace...
         # This is already done by self.removeAllFileTabs() that gets triggered when the last tab is removed.
         # but did I forgot anything?
-        # TODO - check:  disable UI elements or actions that require an active Folder to be meaningful: GoTo...
+        # TODO - check:  disable UI elements or actions that require an active Folder to be meaningful:
+        # "GoTo" buttons ect... but, did I forgot anything?
 
     # # ------------ Folder Table View navigation & selection highlight:
 
@@ -621,15 +626,28 @@ class MDA_MVC(QtWidgets.QWidget):
 
     # # ------------ Checkbox methods:
 
-    def onCheckboxStateChange(self, selection, det_removed):
-        """TODO: write docstring: Slot: data field (for plotting) changes.
-
-
-        Note: when checkboxStateChanged is emitted, self.mda_file....updateCheckboxes
-        is called, which in turn set the selectionField with the new selection (in updateMdaMvcSelection).
+    def onCheckboxStateChanged(self, selection, det_removed):
         """
+        Responds to changes in checkbox states within the file's data view.
+         - adjusts the plot based on the selection of detectors.
+         - updates the selection field with the new selection and initiates plotting based
+         on the current mode (Auto-add, Auto-replace, or Auto-off).
+
+        Parameters:
+        - selection (dict): The current selection of detectors (Y) and positioner (X) for plotting.
+        - det_removed (bool): Indicates if a detector has been removed (unchecked).
+
+        Notes:
+        - The selection dict format: {'X': int, 'Y': list[int]}.
+        - If 'Auto-off' mode is active, the method returns without updating the plot.
+        - If no positioner is selected, default to Index.
+        - If no detectors are selected or if all curves are removed, the plot is cleared.
+        - If a detector is unchecked, the corresponding curve is removed from the plot.
+        """
+
         from .chartview import ChartView
 
+        mode = self.mda_file.mode()
         tableview = self.currentFileTableview()
         new_y_selection = selection.get("Y", [])
 
@@ -639,26 +657,23 @@ class MDA_MVC(QtWidgets.QWidget):
             raise RuntimeError("Expected exactly one widget in this layout!")
         widgetMpl = layoutMpl.itemAt(0).widget()
 
-        mode = self.mda_file.mode()
-
         # ----------- Exceptions:
 
         # In auto-off mode: no synchronisation - user needs to push a button.
         if mode in ("Auto-off"):
             return
 
-        # if no DET and there is only 1 tab open: clear the graph
+        # If no POS, default to index:
+        if not selection.get("X"):
+            selection["X"] = 0
+            tableview.tableView.model().checkCheckBox(0, "X")
+
+        # If no DET and there is only 1 tab open, clear the graph
         if not new_y_selection and self.mda_file.tabWidget.count() == 1:
             widgetMpl.curveManager.removeAllCurves()
             return
 
-        # if no POS: default to index
-        if not selection.get("X"):
-            widgetMpl.clearPlot()
-            selection["X"] = 0
-            tableview.tableView.model().checkCheckBox(0, "X")
-
-        # if a DET is uncheked:
+        # If a DET is uncheked:
         if det_removed:
             for y in det_removed:
                 tab_index = self.mda_file.tabWidget.currentIndex()

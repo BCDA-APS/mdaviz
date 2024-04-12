@@ -109,12 +109,18 @@ class MDAFile(QtWidgets.QWidget):
     # ------ Get & set methods:
 
     def mode(self):
+        """
+        "Auto-replace", "Auto-add", "Auto-off"
+        """
         return self._mode
 
     def setMode(self, *args):
         self._mode = args[0]
 
     def data(self):
+        """
+        The data to display in the table view.
+        """
         return self._data
 
     def setData(self, index=None):
@@ -238,11 +244,15 @@ class MDAFile(QtWidgets.QWidget):
     # ------ Slots (UI):
 
     def onTabCloseRequested(self, index):
+        """
+        Handles tab close request by calling the tab manager.
+        """
         file_path = self.tabIndex2Path(index)
         if file_path:
             self.tabManager.removeTab(file_path)
 
     def onTabAdded(self, file_path):
+        """To be implemented"""
         pass
 
     def onTabRemoved(self, file_path):
@@ -257,6 +267,7 @@ class MDAFile(QtWidgets.QWidget):
             self.tabWidget.removeTab(index)
 
     def onAllTabsRemoved(self):
+        """To be implemented"""
         pass
 
     # ------ Tabs management:
@@ -345,6 +356,11 @@ class MDAFile(QtWidgets.QWidget):
         self.setStatus("All file tabs have been closed.")
 
     def updateCurrentTabInfo(self, new_tab_index):
+        """
+        When the current tab is changed, sends a signal to the MDA_MVC with the info
+        corresponding to the new selected tab:
+            new_tab_index, new_file_path, new_tab_data, new_selection_field
+        """
         new_file_path = self.tabIndex2Path(new_tab_index)
         new_tab_data = self.tabManager.getTabData(new_file_path) or {}
         new_tab_tableview = self.tabWidget.widget(new_tab_index)
@@ -357,29 +373,33 @@ class MDAFile(QtWidgets.QWidget):
         )
 
     def highlightRowInTab(self, file_path, row):
+        """
+        Switch to the tab corresponding to the given file path and highlight a specific row.
+
+        Args:
+            file_path (str): _description_
+            row (int): _description_
+        """
         tab_index = self.tabPath2Index(file_path)
-        self.tabWidget.setCurrentIndex(tab_index)
-        tableview = self.tabWidget.widget(tab_index)
-        model = tableview.tableView.model()
-        if model is not None:
-            self.selectAndShowRow(tab_index, row)
+        if tab_index:
+            self.tabWidget.setCurrentIndex(tab_index)
+            tableview = self.tabWidget.widget(tab_index)
+            model = tableview.tableView.model()
+            if model is not None:
+                self.selectAndShowRow(tab_index, row)
 
     def selectAndShowRow(self, tab_index, row):
         """
-        Selects a file by its row in the folder table view and ensures it is visible to the user
+        Selects a field by its row in the file table view and ensures it is visible to the user
         by adjusting scroll position based on the field's position in the list
 
-        Parameters:
+        Args:
         - row (int): row of the selected field.
-
-        Details:
-        - .
         """
         tableview = self.tabWidget.widget(tab_index)
         model = tableview.tableView.model()
         model.setHighlightRow(row)
         rowCount = model.rowCount()
-
         scrollHint = QAbstractItemView.EnsureVisible
         if row == 0:
             scrollHint = QAbstractItemView.PositionAtTop
@@ -559,7 +579,7 @@ class TabManager(QtCore.QObject):
 
 #     Field Selection and Plotting Logic: The logic handling field selection for
 #         plotting and subsequent plot updates (in methods like
-#         onCheckboxStateChange and doPlot) should be robust against changes in
+#         onCheckboxStateChanged and doPlot) should be robust against changes in
 #         the underlying data model. Ensure that selections are valid and that
 #         the plotting functionality reacts correctly to changes in selected
 #         fields.

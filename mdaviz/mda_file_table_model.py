@@ -163,7 +163,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
                 return self.fieldText(index)
         elif role == QtCore.Qt.BackgroundRole:
             if index.row() == self.highlight_row:
-                return QBrush(QColor(210, 226, 247))  # 228, 233, 240
+                return QBrush(QColor(210, 226, 247))
 
     def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
         """Column headers.  Called by QTableView."""
@@ -216,7 +216,6 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         changes = self.applySelectionRules(index, changes)
         if changes:
             det_removed = self.updateCheckboxes(old_selection=old_selection)
-            # TODO: emit removed_y too
             self.checkboxStateChanged.emit(self.plotFields()[0], det_removed)
 
     def checkCheckBox(self, row, column_name):
@@ -384,8 +383,9 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
     # ------------ reporting
 
     # TODO - later: we never call plotField with fieldname. Remove choices_pretty?
-    # TODO - later: we have to reformat plotfield to match selectionField (ftm2mvc and mvc2ftm),
-    # maybe avoid this but formating plotfield directly the right way?
+    # TODO - later: we have to reformat plotfield to match selectionField and vice versa
+    # (ftm2mvc <-> mvc2ftm), maybe avoid this but formating plotfield directly the right way?
+    # Or, if it ain't broken, don't fix it...
 
     def plotFields(self):
         """
