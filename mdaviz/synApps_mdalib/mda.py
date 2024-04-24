@@ -14,12 +14,12 @@ import os
 import string
 
 have_fast_xdr = False
-#try:
-#	import f_xdrlib as xdr
-#	have_fast_xdr = True
-#except:
-#	import xdrlib as xdr
-import xdrlib as xdr
+try:
+    import f_xdrlib as xdr
+
+    have_fast_xdr = True
+except:
+    import xdrlib as xdr
 
 try:
 	import Tkinter
