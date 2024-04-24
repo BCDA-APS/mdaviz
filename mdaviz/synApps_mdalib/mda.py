@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+# 2024-04-24: update try..except for xrdlib (for Py3.13 readiness)
 # version 2.1.1 Pete Jemian 2022-09-02
 #   fix errors encountered with Python 3.10.6
 # version 2.1 Tim Mooney 2/15/2012
