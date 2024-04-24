@@ -26,23 +26,12 @@ jobs:
       # TODO:
       # - uses: actions/setup-python@v5
       #   with:
-      #     python-version: "3.11"
+      #     python-version: "3.12"
 
-      # - name: Install Dependencies
-      #   run: |
-      #     python -m pip install --upgrade pip
-      #     pip install flake8
-
-      # - name: Run flake8
-      #   run: flake8
-
-      # - name: Run black
-      #   uses: rickstaa/action-black@v1
+      # - name: Run ruff
+      #   uses: davidslusser/actions_python_ruff@v1.0.1
       #   with:
-      #     black_args: ". --check"
-
-      # - name: Run isort
-      #   uses: isort/isort-action@master
+      #     python_version: "3.12"
 
   tests:
     name: Python ${{ matrix.python-version }}
