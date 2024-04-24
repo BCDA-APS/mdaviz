@@ -66,6 +66,7 @@ html_title = f"{project} {version}"
 # https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autodoc_mock_imports
 autodoc_mock_imports = """
     matplotlib
+    mda
     numpy
     PyQt5
     yaml
