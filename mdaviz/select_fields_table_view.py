@@ -89,8 +89,11 @@ class SelectFieldsTableView(QtWidgets.QWidget):
         return self._fileName
 
     def data(self):
-        """Return the data from the table view:
-        e.g. self.data=([TableField(name='P0', selection=None,...
+        """Return the data from the table view.
+
+        e.g.::
+
+            self.data=([TableField(name='P0', selection=None,...
                 ...desc='Index', pv='Index', unit='a.u')
         """
         return self._data
