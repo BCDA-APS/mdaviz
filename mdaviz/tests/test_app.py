@@ -1,6 +1,6 @@
 from contextlib import nullcontext as does_not_raise
 
-from PyQt5 import QtWidgets
+# TODO: (below) from PyQt5 import QtWidgets
 
 from ..mainwindow import MainWindow
 
