@@ -56,7 +56,6 @@ dependencies = [
   # "synApps-mdalib",
   # "https://raw.githubusercontent.com/EPICS-synApps/support/master/utils/mdaPythonUtils/mdalib-2022.post9-py2.py3-none-any.whl",
   "PyQt5",
-  "pyRestTable",
   "PyYAML",
   "tiled",
 ]
