@@ -8,7 +8,7 @@ Uses :class:`select_fields_tablemodel.SelectFieldsTableModel`.
     ~SelectFieldsTableView
 """
 
-from mda import readMDA
+from .synApps_mdalib.mda import readMDA
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 import yaml
