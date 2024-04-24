@@ -24,8 +24,7 @@ metadata = toml["project"]
 
 gh_org = "BCDA-APS"
 project = metadata["name"]
-# copyright = toml["tool"]["copyright"]["copyright"]
-copyright = toml["tool"].get("copyright", {}).get("copyright", "copyright goes here")
+copyright = toml["tool"]["copyright"]["copyright"]
 author = "Fanny Rodolakis, Pete Jemian"
 description = metadata["description"]
 rst_prolog = f".. |author| replace:: {author}"
