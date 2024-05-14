@@ -1,0 +1,22 @@
+Metadata-Version: 2.1
+Name: mdalib
+Version: 2022.post9
+Summary: MDA support library
+Home-page: https://github.com/EPICS-synApps/utils/tree/master/mdaPythonUtils
+Author: Tim Mooney
+Author-email: mooney@aps.anl.gov
+License: EPICS
+Platform: UNKNOWN
+
+
+    Python support library for EPICS synApps MDA-format data files
+    
+    Install the Python mda support library:
+    
+        cd synApps/support/utils/mdaPythonUtils
+        python ./setup.py install
+        # -or-
+        pip install .
+    
+    
+
