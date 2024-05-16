@@ -14,8 +14,8 @@ from . import utils
 HEADERS = "Prefix", "Scan #", "Points", "Dim", "Positioner", "Date", "Size"
 
 
-class MDAFolderTableModel(QtCore.QAbstractTableModel):    
-    
+class MDAFolderTableModel(QtCore.QAbstractTableModel):
+
     def __init__(self, data, parent):
         """
         Create the model and connect with its parent.
@@ -25,7 +25,7 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
         parent object:
             Instance of mdaviz.mda_folder.MDAMVC
         """
-        
+
         self.mda_mvc = parent
         super().__init__()
 
