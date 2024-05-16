@@ -158,8 +158,12 @@ class MDAFile(QtWidgets.QWidget):
         folder_path = self.dataPath()
         file_name = self.mdaFileList()[index]
         file_path = self.dataPath() / file_name
-        file_metadata, file_data = readMDA(file_path)
-        scanDict, first_pos, first_det = utils.get_scan(file_data)
+        file_metadata, file_data_dim1, *_ = readMDA(file_path)
+        if file_metadata["rank"] > 1:
+            self.setStatus(
+                "WARNING: Multidimensional data not supported - ignoring ranks > 1."
+            )
+        scanDict, first_pos, first_det = utils.get_scan(file_data_dim1)
         pvList = [v["name"] for v in scanDict.values()]
         self._data = {
             "fileName": file_path.stem,  # file_name.rsplit(".mda", 1)[0]
@@ -341,6 +345,8 @@ class MDAFile(QtWidgets.QWidget):
         self.tabWidget.setCurrentIndex(tab_index)
         tableview.displayTable(selection_field)
         tableview.filePath.setText(file_path)
+        self.tabWidget.setTabToolTip(tab_index, file_path)
+        # TODO: set tab tool tip for Data & Metadata tabs too and update dynamically when switching file?
 
     def removeAllFileTabs(self):
         """
