@@ -5,7 +5,7 @@ Uses :class:`mda_file_table_model.MDAFileTableModel`.
 
 .. autosummary::
 
-    MDAFileTableView
+    ~MDAFileTableView
 """
 
 from PyQt5 import QtCore
