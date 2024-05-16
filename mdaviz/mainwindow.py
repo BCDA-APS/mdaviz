@@ -210,6 +210,7 @@ class MainWindow(QtWidgets.QMainWindow):
                                 )
                     except PermissionError:
                         print(f"Permission denied for folder: {folder_path}")
+                    subfolder_list = list(dict.fromkeys(sorted(subfolder_list)))
 
                     return subfolder_list
 
@@ -226,13 +227,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs))
 
             else:
-                comment = f"\n{str(folder_path)!r} - invalid path."
                 self._folderPath = None
                 self._dataPath = None
                 self._mdaFileList = []
                 self._mdaFileCount = 0
                 self.setSubfolderList([])
-                self.setStatus(comment)
+                self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
                 if self.mvc_folder is not None:
                     # If MVC exists, display empty table views
                     self.mvc_folder.updateFolderView()
