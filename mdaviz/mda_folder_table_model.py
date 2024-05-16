@@ -6,7 +6,7 @@ QAbstractTableModel of folder content.
     ~MDAFolderTableModel
 """
 
-from mda import readMDA
+from .synApps_mdalib.mda import readMDA
 from pathlib import Path
 from PyQt5 import QtCore
 from . import utils

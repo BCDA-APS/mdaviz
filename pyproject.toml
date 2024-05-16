@@ -73,3 +73,6 @@ include_trailing_comma = true
 
 [tool.black]
 line_length = 88
+
+[tool.copyright]
+copyright = "2023-2024, UChicago Argonne, LLC"

@@ -17,6 +17,7 @@ Support functions for this demo project.
 import datetime
 import pathlib
 import threading
+from .synApps_mdalib.mda import scanPositioner
 
 
 def human_readable_size(size, decimal_places=2):
