@@ -52,17 +52,6 @@ class MDAFileVisualization(QtWidgets.QWidget):
         utils.removeAllLayoutWidgets(layout)
         layout.addWidget(plot_widget)
 
-    # # TODO: unused? I do not think we use this:
-    # def isPlotBlank(self):
-    #     layout = self.plotPageMpl.layout()
-    #     if layout.count() == 0:
-    #         return True
-    #     plot_widget = layout.itemAt(0).widget()
-    #     # Check if the plot widget is an instance of chartView and has data items
-    #     if isinstance(plot_widget, ChartView):
-    #         return not plot_widget.hasDataItems()
-    #     return True  # If not a chartView instance, consider it as blank
-
     def clearContents(self, plot=True, data=True, metadata=True):
         """
         Clears content from the specified components of the visualization.
