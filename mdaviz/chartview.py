@@ -54,7 +54,8 @@ def auto_symbol():
 
 
 class ChartView(QtWidgets.QWidget):
-    # TODO: docstrings
+    """TODO: docstrings"""
+
     def __init__(self, parent, **kwargs):
         # parent=<mdaviz.mda_folder.MDA_MVC object at 0x10e7ff520>
         self.mda_mvc = parent

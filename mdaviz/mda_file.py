@@ -130,9 +130,8 @@ class MDAFile(QtWidgets.QWidget):
         If no index is provided, `_data` is set to an empty dictionary.
 
         Parameters:
-        - index (int, optional): The index of the file in the MDA
-        file list to read and extract data from.
-        Defaults to None, resulting in self._data = {}.
+        - index (int, optional): The index of the file in the MDA file list to read and extract data from.
+          Defaults to None, resulting in self._data = {}.
 
         The populated `_data` dictionary includes:
         - fileName (str): The name of the file without its extension.
@@ -231,11 +230,14 @@ class MDAFile(QtWidgets.QWidget):
         self.mda_mvc.mda_file_viz.setTableData(tabledata)
 
     def defaultSelection(self, first_pos, first_det, selection_field):
-        """Sets the default field selection if no selection is provided.
+        """
+        Sets the default field selection if no selection is provided.
+
         Args:
             first_pos (int): The index of the first positioner.
             first_det (int): The index of the first detector.
             selection_field (dict): The current selection fields, if any.
+
         Returns:
             dict: The updated selection field.
         """
@@ -439,9 +441,10 @@ class MDAFile(QtWidgets.QWidget):
 
 class TabManager(QtCore.QObject):
     """
-    Manages only the data aspects of tabs; does not handle UI elements (i.e. nothing
-    related to tab index, such as switching tabs),  maintaining a clear separation
-    between the application's data layer and its presentation (UI) layer.
+    Manages the content of the currently opened tabs (data aspect only).
+
+    The TabManager does not handle UI elements (i.e. nothing related to tab index, such as switching tabs),
+    maintaining a clear separation between the application's data layer and its presentation (UI) layer.
 
     Features:
     - Tracks metadata and table data for each open tab.
