@@ -406,11 +406,6 @@ class ChartView(QtWidgets.QWidget):
         y_mean = numpy.mean(y_array)
         return (x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean
 
-    # TODO: question: I do not think we use this - used for isPlotBlank that is not used
-    # def hasDataItems(self):
-    #     # Return whether any artists have been added to the Axes (bool)
-    #     return self.main_axes.has_data()
-
     ########################################## Cursors methods:
 
     def onRemoveCursor(self, cursor_num):
