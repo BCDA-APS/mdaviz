@@ -152,9 +152,6 @@ class ChartView(QtWidgets.QWidget):
     def setLeftAxisText(self, text):
         self.main_axes.set_ylabel(text, fontsize=FONTSIZE, labelpad=20)
 
-    def setPathLabelText(self, text):
-        self.mda_mvc.mda_file_viz.filePath_viz.setText(text)
-
     def title(self):
         return self._title
 
@@ -189,7 +186,10 @@ class ChartView(QtWidgets.QWidget):
         # Update plot
         self.updatePlot(update_title=True)
         # Add to the comboBox
+        index = self.curveBox.count()  # Get the next index
         self.curveBox.addItem(curveID)
+        file_path = curveData.get("file_path", "No file path available")
+        self.curveBox.setItemData(index, file_path, QtCore.Qt.ToolTipRole)
 
     def onCurveUpdated(self, curveID, recompute_y=False, update_x=False):
         curve_data = self.curveManager.getCurveData(curveID)
@@ -234,7 +234,6 @@ class ChartView(QtWidgets.QWidget):
         self.updatePlot(update_title=False)
         # If this was the last curve for this file, remove the tab
         if count == 0 and self.mda_mvc.mda_file.mode() == "Auto-add":
-            print("HELLLOOOOOO")
             self.mda_mvc.mda_file.tabManager.removeTab(file_path)
 
     def onAllCurvesRemoved(self, doNotClearCheckboxes=True):
@@ -322,7 +321,7 @@ class ChartView(QtWidgets.QWidget):
             row = curve_data["row"]
             self.offset_value.setText(str(curve_data["offset"]))
             self.factor_value.setText(str(curve_data["factor"]))
-            self.setPathLabelText(file_path)
+            self.curveBox.setToolTip(file_path)
             try:
                 self.mda_mvc.mda_file.highlightRowInTab(file_path, row)
             except:
@@ -331,7 +330,7 @@ class ChartView(QtWidgets.QWidget):
         else:
             self.offset_value.setText("0")
             self.factor_value.setText("1")
-            self.setPathLabelText("")
+            self.curveBox.setToolTip("Selected curve")
         # Update basic math info:
         self.updateBasicMathInfo(curveID)
 

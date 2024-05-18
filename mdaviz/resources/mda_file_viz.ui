@@ -218,7 +218,7 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
-             <item>
+             <!-- <item>
               <widget class="QLabel" name="filePath_viz">
                <property name="toolTip">
                 <string>Selected curve file path</string>
@@ -238,7 +238,7 @@
                 <number>5</number>
                </property>
               </widget>
-             </item>
+             </item> -->
              <item>
               <widget class="QWidget" name="curves" native="true">
                <property name="sizePolicy">
@@ -278,7 +278,7 @@
                    </sizepolicy>
                   </property>
                   <property name="toolTip">
-                   <string>Selected curve</string>
+                   <string/>
                   </property>
                  </widget>
                 </item>
