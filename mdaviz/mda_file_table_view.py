@@ -58,24 +58,30 @@ class MDAFileTableView(QtWidgets.QWidget):
 
     def data(self):
         """Return the data from the table view:
-              self.data= fileInfo, fields
-        with:
-        - fileInfo (dict): A dictionary of all the file information:
-            - fileName (str): The name of the file without its extension.
-            - filePath (str): The full path of the file.
-            - folderPath (str): The full path of the parent folder.
-            - metadata (dict): The extracted metadata from the file.
-            - scanDict (dict): A dictionary of positioner & detector dataset for plot.
-            - firstPos (float): The first positioner (P1, or if no positioner, P0 = index).
-            - firstDet (float): The first detector (D01).
-            - pvList (list of str): List of detectors PV names as strings.
-        - field (list): List of TableField object, one for each det/pos:
-                ([TableField(name='P0', selection=None,...
-                ...desc='Index', pv='Index', unit='a.u'),...])
+        self.data= fileInfo, fields
         """
         return self._data
 
     def setData(self):
+        """
+        Populates the `_data` attribute with file information and data extracted
+        from a file.
+
+        The populated `_data` dictionary includes:
+            - fileInfo (dict): A dictionary of all the file information:
+                - fileName (str): The name of the file without its extension.
+                - filePath (str): The full path of the file.
+                - folderPath (str): The full path of the parent folder.
+                - metadata (dict): The extracted metadata from the file.
+                - scanDict (dict): A dictionary of positioner & detector dataset for plot.
+                - firstPos (float): The first positioner (P1, or if no positioner, P0 = index).
+                - firstDet (float): The first detector (D01).
+                - pvList (list of str): List of detectors PV names as strings.
+            - field (list): List of TableField object, one for each det/pos:
+                    ([TableField(name='P0', selection=None,...
+                    ...desc='Index', pv='Index', unit='a.u'),...])
+        """
+
         self._data = {}
         if self.mda_file.data() != {}:
             fileInfo = self.mda_file.data()
