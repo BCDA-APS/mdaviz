@@ -180,10 +180,10 @@ def get_scan(mda_file_data):
 
     # Make the Index scanPositioner the positioner 0 and build d:
     d[0] = p0
-    for e, p in enumerate(p_list):
-        d[e + 1] = p
-    for e, d in enumerate(d_list):
-        d[e + 1 + np] = d
+    for e, pos in enumerate(p_list):
+        d[e + 1] = pos
+    for e, det in enumerate(d_list):
+        d[e + 1 + np] = det
 
     datasets = {}
     for k, v in d.items():
