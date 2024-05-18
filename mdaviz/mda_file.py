@@ -371,7 +371,7 @@ class MDAFile(QtWidgets.QWidget):
         new_tab_data = self.tabManager.getTabData(new_file_path) or {}
         new_tab_tableview = self.tabWidget.widget(new_tab_index)
         if new_tab_tableview and new_tab_tableview.tableView.model():
-            new_selection_field = new_tab_tableview.tableView.model().plotFields()[0]
+            new_selection_field = new_tab_tableview.tableView.model().plotFields()
         else:
             new_selection_field = {}
         self.tabChanged.emit(

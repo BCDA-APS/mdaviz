@@ -216,7 +216,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         changes = self.applySelectionRules(index, changes)
         if changes:
             det_removed = self.updateCheckboxes(old_selection=old_selection)
-            self.checkboxStateChanged.emit(self.plotFields()[0], det_removed)
+            self.checkboxStateChanged.emit(self.plotFields(), det_removed)
 
     def checkCheckBox(self, row, column_name):
         self.selections[row] = (
@@ -382,7 +382,6 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
 
     # ------------ reporting
 
-    # TODO - later: we never call plotField with fieldname. Remove choices_pretty?
     # TODO - later: we have to reformat plotfield to match selectionField and vice versa
     # (ftm2mvc <-> mvc2ftm), maybe avoid this but formating plotfield directly the right way?
     # Or, if it ain't broken, don't fix it...
@@ -394,17 +393,14 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         key=column_name, value= row_number(s) or fieldName(s)
         """
         choices = dict(Y=[])
-        choices_pretty = dict(Y=[])
         for row, column_name in self.selections.items():
             field_name = self.fieldName(row)
             column_number = self.columnNumber(column_name)
             if column_number in self.uniqueSelectionColumns:
                 choices[column_name] = row
-                choices_pretty[column_name] = field_name
             elif column_number in self.multipleSelectionColumns:
                 choices[column_name].append(row)
-                choices_pretty[column_name].append(field_name)
-        return choices, choices_pretty
+        return choices
 
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
