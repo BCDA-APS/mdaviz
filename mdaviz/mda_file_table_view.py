@@ -58,7 +58,7 @@ class MDAFileTableView(QtWidgets.QWidget):
 
     def data(self):
         """Return the data from the table view:
-        self.data= fileInfo, fields
+        self.data=  {"fileInfo": fileInfo, "fields": fields}
         """
         return self._data
 
@@ -129,13 +129,13 @@ class MDAFileTableView(QtWidgets.QWidget):
 
         Parameters:
         - selections: A dictionary with keys "X" and "Y", where "X" is the index for the x-axis data
-        and "Y" is a list of indices for the y-axis data.
+          and "Y" is a list of indices for the y-axis data.
 
         Returns:
         - A tuple of (datasets, plot_options), where datasets is a list of tuples containing the
-        data and options (label) for each dataset, and plot_options contains overall plotting configurations.
+          data and options (label) for each dataset, and plot_options contains overall plotting configurations.
 
-        Note:
+        ..note::
         scanDict = {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...',
             'type':...}}.
         """
