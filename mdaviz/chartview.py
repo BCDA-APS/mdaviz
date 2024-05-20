@@ -611,18 +611,18 @@ class CurveManager(QtCore.QObject):
         Generates a unique curve label for a given label, considering the file path.
 
         Parameters:
-        - label (str): The original label for the curve:
-                "file_name: PV_name (PV_unit)" or "file_name: PV_name" (if no PV_unit)
+
+        - label (str): The original label for the curve: "file_name: PV_name (PV_unit)" or "file_name: PV_name" (if no PV_unit)
+
         - file_path (str): The file path associated with the curve.
 
         Returns:
-        - str: A unique curve label. If the exact label already exists for different file path,
-        a numeric suffix is appended:
-                "file_name: PV_name (PV_unit) (1)" or "file_name: PV_name (1)"
 
-        Notes:
-        - This method allows each curve to be uniquely identified and selected, even if their base
-        labels are identical, by considering their file paths.
+        - str: A unique curve label. If the exact label already exists for different file path,
+          a numeric suffix is appended: "file_name: PV_name (PV_unit) (1)" or "file_name: PV_name (1)"
+
+        .. note:: This method allows each curve to be uniquely identified and selected, even if their base
+           labels are identical, by considering their file paths.
         """
         counter = 1
         original_label = label

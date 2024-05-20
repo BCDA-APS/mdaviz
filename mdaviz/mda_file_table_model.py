@@ -130,18 +130,15 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         parent object:
             Instance of mdaviz.mda_folder.MDAMVC
         """
-
+        super().__init__()
         self.mda_mvc = parent
         self.selections = mda2ftm(selection_field)
-
         self._columns_locked, self._fields_locked = False, False
         self.setColumns(columns)
         self.setFields(fields)
         self._columns_locked, self._fields_locked = True, True
-
-        super().__init__()
         self.updateCheckboxes()
-        self.highlight_row = None
+        self.highlightedRow = None
 
     # ------------ methods required by Qt's view
 
@@ -162,8 +159,9 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
             if index.column() in self.textColumns:
                 return self.fieldText(index)
         elif role == QtCore.Qt.BackgroundRole:
-            if index.row() == self.highlight_row:
+            if index.row() == self.highlightedRow:
                 return QBrush(QColor(210, 226, 247))
+        return None
 
     def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
         """Column headers.  Called by QTableView."""
@@ -193,8 +191,13 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         return original_flags
 
     def setHighlightRow(self, row=None):
-        self.highlight_row = row
+        self.highlightedRow = row
         self.layoutChanged.emit()  # Refresh the view
+
+    def unhighlightRow(self, row):
+        if self.highlightedRow == row:
+            self.highlightedRow = None
+            self.layoutChanged.emit()
 
     # ------------ checkbox methods
 

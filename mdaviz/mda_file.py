@@ -60,6 +60,13 @@ class MDAFile(QtWidgets.QWidget):
         # Initialize attributes:
         self.setData()
         self.tabManager = TabManager()  # Instantiate TabManager
+        self.currentHighlightedRow = None  # To store the current highlighted row
+        self.currentHighlightedFilePath = (
+            None  # To store the current highlighted row's file path
+        )
+        self.currentHighlightedModel = (
+            None  # To store the current highlighted's row model
+        )
 
         # Buttons handling:
         self.addButton.hide()
@@ -393,7 +400,24 @@ class MDAFile(QtWidgets.QWidget):
         tableview = self.tabWidget.widget(tab_index)
         model = tableview.tableView.model()
         if model is not None:
+            # Unhighlight the previous row if it exists
+            if (
+                self.currentHighlightedRow is not None
+                and self.currentHighlightedModel is not None
+            ):
+                print(
+                    f"Unhighlighting row {self.currentHighlightedRow} in previous model"
+                )
+                self.currentHighlightedModel.unhighlightRow(self.currentHighlightedRow)
+
+            # Highlight the new row
+            print(f"Highlighting row {row} in file {file_path}")
             self.selectAndShowRow(tab_index, row)
+
+            # Update the current highlighted row, file path, and model
+            self.currentHighlightedRow = row
+            self.currentHighlightedFilePath = file_path
+            self.currentHighlightedModel = model
 
     def selectAndShowRow(self, tab_index, row):
         """
