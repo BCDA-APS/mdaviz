@@ -405,13 +405,9 @@ class MDAFile(QtWidgets.QWidget):
                 self.currentHighlightedRow is not None
                 and self.currentHighlightedModel is not None
             ):
-                print(
-                    f"Unhighlighting row {self.currentHighlightedRow} in previous model"
-                )
                 self.currentHighlightedModel.unhighlightRow(self.currentHighlightedRow)
 
             # Highlight the new row
-            print(f"Highlighting row {row} in file {file_path}")
             self.selectAndShowRow(tab_index, row)
 
             # Update the current highlighted row, file path, and model
