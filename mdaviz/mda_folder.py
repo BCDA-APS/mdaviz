@@ -229,6 +229,11 @@ class MDA_MVC(QtWidgets.QWidget):
         """Clear existing data and set new data for the folder tableview"""
         self.mda_folder_tableview.clearContents()
         self.mda_folder_tableview.displayTable()
+        model = self.mda_folder_tableview.tableView.model()
+        if model is not None and len(self.mdaFileList()) > 0:
+            self.mda_folder_tableview.tableView.setFocus()
+            selection_model = self.mda_folder_tableview.tableView.selectionModel()
+            self.setSelectionModel(selection_model)
 
     def doRefresh(self):
         """
