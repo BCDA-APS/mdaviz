@@ -405,8 +405,13 @@ class MDA_MVC(QtWidgets.QWidget):
         Args:
             index (QModelIndex): The model index of the selected file in the file list.
         """
+
         selected_file = self.mdaFileList()[index.row()]
         self.setStatus(f"\n\n========= {selected_file} in {str(self.dataPath())}")
+
+        # Ensures the table view scrolls to the selected item.
+        if isinstance(index, QtCore.QModelIndex):
+            self.mda_folder_tableview.tableView.scrollTo(index)
 
         # If there is no Folder Table View, do nothing
         if self.mda_folder_tableview.tableView.model() is None:
