@@ -144,13 +144,14 @@ class MDA_MVC(QtWidgets.QWidget):
         )
 
         # Folder table view signal/slot connections:
-        utils.reconnect(self.selectionModel().currentChanged, self.onFileSelected)
         self.mda_folder_tableview.tableView.doubleClicked.connect(self.onFileSelected)
         self.mda_folder_tableview.tableView.clicked.connect(self.onFileSelected)
         self.mda_folder_tableview.firstButton.clicked.connect(self.goToFirst)
         self.mda_folder_tableview.lastButton.clicked.connect(self.goToLast)
         self.mda_folder_tableview.backButton.clicked.connect(self.goToPrevious)
         self.mda_folder_tableview.nextButton.clicked.connect(self.goToNext)
+        if self.selectionModel():
+            utils.reconnect(self.selectionModel().currentChanged, self.onFileSelected)
 
         # MDAFile Tab connection:
         utils.reconnect(self.mda_file.tabChanged, self.onTabChanged)
