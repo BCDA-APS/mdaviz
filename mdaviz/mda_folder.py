@@ -128,15 +128,25 @@ class MDA_MVC(QtWidgets.QWidget):
         self.setSelectionModel()
         self.setCurrentFileTableview()
 
-        # File Selection Model & Focus for keyboard arrow keys:
+        # Set Selection Model & Focus for keyboard arrow keys to Folder Table View:
         model = self.mda_folder_tableview.tableView.model()
         if model is not None and len(self.mdaFileList()) > 0:
             self.mda_folder_tableview.tableView.setFocus()
             selection_model = self.mda_folder_tableview.tableView.selectionModel()
             self.setSelectionModel(selection_model)
+        # Ensure focus policy and selection mode for keyboard navigation
+        self.mda_folder_tableview.tableView.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.mda_folder_tableview.tableView.setSelectionMode(
+            QAbstractItemView.SingleSelection
+        )
+        self.mda_folder_tableview.tableView.setSelectionBehavior(
+            QAbstractItemView.SelectRows
+        )
 
         # Folder table view signal/slot connections:
+        utils.reconnect(self.selectionModel().currentChanged, self.onFileSelected)
         self.mda_folder_tableview.tableView.doubleClicked.connect(self.onFileSelected)
+        self.mda_folder_tableview.tableView.clicked.connect(self.onFileSelected)
         self.mda_folder_tableview.firstButton.clicked.connect(self.goToFirst)
         self.mda_folder_tableview.lastButton.clicked.connect(self.goToLast)
         self.mda_folder_tableview.backButton.clicked.connect(self.goToPrevious)
@@ -234,6 +244,7 @@ class MDA_MVC(QtWidgets.QWidget):
             self.mda_folder_tableview.tableView.setFocus()
             selection_model = self.mda_folder_tableview.tableView.selectionModel()
             self.setSelectionModel(selection_model)
+            utils.reconnect(self.selectionModel().currentChanged, self.onFileSelected)
 
     def doRefresh(self):
         """
