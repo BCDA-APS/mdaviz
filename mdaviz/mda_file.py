@@ -248,7 +248,7 @@ class MDAFile(QtWidgets.QWidget):
         Returns:
             dict: The updated selection field.
         """
-        if selection_field:
+        if selection_field and selection_field.get("Y"):
             return selection_field
         default = {"X": first_pos, "Y": [first_det]}
         self.mda_mvc.setSelectionField(default)

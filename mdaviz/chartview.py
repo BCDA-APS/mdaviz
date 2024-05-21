@@ -211,6 +211,8 @@ class ChartView(QtWidgets.QWidget):
     def onRemoveButtonClicked(self):
         curveID = self.getSelectedCurveID()
         if curveID in self.curveManager.curves():
+            curveID = self.getSelectedCurveID()
+        if curveID in self.curveManager.curves():
             if len(self.curveManager.curves()) == 1:
                 self.curveManager.removeAllCurves(doNotClearCheckboxes=False)
             else:
@@ -240,6 +242,8 @@ class ChartView(QtWidgets.QWidget):
     def onAllCurvesRemoved(self, doNotClearCheckboxes=True):
         # Clears the plot completely, removing all curve representations.
         self.clearPlot()
+        for curveID in self.curveManager.curves().keys():
+            self.curveManager.removeCurve(curveID)
         if not doNotClearCheckboxes:
             # Iterates over each tab, accessing its associated tableview to clear all checkbox selections.
             for index in range(self.mda_mvc.mda_file.tabWidget.count()):
@@ -311,6 +315,10 @@ class ChartView(QtWidgets.QWidget):
         self.figure.canvas.draw()
         self.plotObjects = {}
         self.curveBox.clear()
+
+    def hasDataItems(self):
+        # Return whether any artists have been added to the Axes (bool)
+        return self.main_axes.has_data()
 
     ########################################## Interaction with UI elements:
 
