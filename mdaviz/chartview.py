@@ -281,14 +281,22 @@ class ChartView(QtWidgets.QWidget):
         self.canvas.draw()
 
     def updatePlot(self, update_title=True):
-        # Update labels and title:
+        # Collect positioner PVs from all curves and update x label:
+        x_label_set = set()
+        for curveID in self.curveManager.curves():
+            plot_options = self.curveManager.getCurveData(curveID).get("plot_options")
+            x_label = plot_options.get("x", "")
+            if x_label:
+                x_label_set.add(x_label)
+        self.setXlabel(", ".join(list(x_label_set)))
+        # Update the y-axis label and basic math based on the selected curve
         curveID = self.getSelectedCurveID()
         if curveID in self.curveManager.curves():
             self.updateBasicMathInfo(curveID)
             plot_options = self.curveManager.getCurveData(curveID).get("plot_options")
             if plot_options:
-                self.setXlabel(plot_options.get("x", ""))
                 self.setYlabel(plot_options.get("y", ""))
+        # Update title:
         if update_title:
             now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             self.setTitle(f"Plot Date & Time: {now}")
