@@ -40,10 +40,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
-        try:
-            self.open.released.disconnect()
-        except TypeError:  # No slots connected yet
-            pass
+        utils.reconnect(self.open.released, self.doOpen)
         self.open.released.connect(self.doOpen)
 
         self.folder.currentTextChanged.connect(self.setFolderPath)
@@ -213,6 +210,7 @@ class MainWindow(QtWidgets.QMainWindow):
                                 )
                     except PermissionError:
                         print(f"Permission denied for folder: {folder_path}")
+                    subfolder_list = list(dict.fromkeys(sorted(subfolder_list)))
 
                     return subfolder_list
 
@@ -229,17 +227,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs))
 
             else:
-                comment = f"{str(folder_path)!r} - invalid path."
                 self._folderPath = None
                 self._dataPath = None
                 self._mdaFileList = []
                 self._mdaFileCount = 0
                 self.setSubfolderList([])
-                self.setStatus(comment)
+                self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
                 if self.mvc_folder is not None:
                     # If MVC exists, display empty table views
                     self.mvc_folder.updateFolderView()
-                    self.mvc_folder.updateFieldsView(None)
 
     def setSubFolderPath(self, subfolder_name):
         if subfolder_name:
@@ -258,7 +254,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.mvc_folder.updateFolderView()
             if mda_files_path == []:
                 # If there are no MDA files, pass None to display empty table
-                self.mvc_folder.updateFieldsView(None)
+                self.mvc_folder.updateFolderView()
                 self.setStatus("No MDA files found in the selected folder.")
 
     def setFolderList(self, folder_list=None):

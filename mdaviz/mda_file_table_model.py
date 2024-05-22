@@ -35,6 +35,7 @@ from dataclasses import KW_ONLY
 from dataclasses import dataclass
 
 from PyQt5 import QtCore
+from PyQt5.QtGui import QBrush, QColor
 
 
 class ColumnDataType:
@@ -84,7 +85,7 @@ class TableField:
     unit: str = ""  # the "unit" column
 
 
-class SelectFieldsTableModel(QtCore.QAbstractTableModel):
+class MDAFileTableModel(QtCore.QAbstractTableModel):
     """
     Select fields for plots.
 
@@ -116,7 +117,9 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
     # Signals in PyQt5 should be class attributes, not instance attributes, to work properly.
     # They need to be defined at the class level so that PyQt can set them up correctly when instances of the class are created.
 
-    checkboxStateChanged = QtCore.pyqtSignal(dict)  # emit field selection
+    checkboxStateChanged = QtCore.pyqtSignal(
+        dict, list
+    )  # emit field selection and the list containing the DET (Y field) that have been removed
 
     def __init__(self, columns, fields, selection_field, parent=None):
         """
@@ -127,17 +130,15 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         parent object:
             Instance of mdaviz.mda_folder.MDAMVC
         """
-
+        super().__init__()
         self.mda_mvc = parent
         self.selections = mda2ftm(selection_field)
-
         self._columns_locked, self._fields_locked = False, False
         self.setColumns(columns)
         self.setFields(fields)
         self._columns_locked, self._fields_locked = True, True
-
-        super().__init__()
         self.updateCheckboxes()
+        self.highlightedRow = None
 
     # ------------ methods required by Qt's view
 
@@ -157,6 +158,10 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         elif role == QtCore.Qt.DisplayRole:
             if index.column() in self.textColumns:
                 return self.fieldText(index)
+        elif role == QtCore.Qt.BackgroundRole:
+            if index.row() == self.highlightedRow:
+                return QBrush(QColor(210, 226, 247))
+        return None
 
     def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
         """Column headers.  Called by QTableView."""
@@ -165,19 +170,9 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
                 return self.columnName(section)
             elif orientation == QtCore.Qt.Vertical:
                 # Return the text from the first column as the vertical header label
-                index = self.index(
-                    section, 0
-                )  # Assuming the first column holds the label
+                index = self.index(section, 0)
                 return self.fieldText(index)
         return None
-
-    # def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
-    #     """Column headers.  Called by QTableView."""
-    #     if role == QtCore.Qt.DisplayRole:
-    #         if orientation == QtCore.Qt.Horizontal:
-    #             return self.columnName(section)
-    #         else:
-    #             return str(section + 1)  # may want to alter at some point
 
     def setData(self, index, value, role):
         """Toggle the checkboxes.  Called by QTableView."""
@@ -195,6 +190,15 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
             return original_flags | QtCore.Qt.ItemIsUserCheckable
         return original_flags
 
+    def setHighlightRow(self, row=None):
+        self.highlightedRow = row
+        self.layoutChanged.emit()  # Refresh the view
+
+    def unhighlightRow(self, row):
+        if self.highlightedRow == row:
+            self.highlightedRow = None
+            self.layoutChanged.emit()
+
     # ------------ checkbox methods
 
     def checkbox(self, index):
@@ -205,6 +209,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
 
     def setCheckbox(self, index, state):
         """Set the checkbox state."""
+        old_selection = ftm2mda(self.selections)
         row, column = index.row(), index.column()
         column_name = self.columnName(column)
         checked = state == QtCore.Qt.Checked
@@ -213,8 +218,8 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         changes = self.selections[row] != prior
         changes = self.applySelectionRules(index, changes)
         if changes:
-            self.updateCheckboxes()
-            self.checkboxStateChanged.emit(self.plotFields()[0])
+            det_removed = self.updateCheckboxes(old_selection=old_selection)
+            self.checkboxStateChanged.emit(self.plotFields(), det_removed)
 
     def checkCheckBox(self, row, column_name):
         self.selections[row] = (
@@ -250,7 +255,7 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
             topLeftIndex, bottomRightIndex, [QtCore.Qt.CheckStateRole]
         )
         # Update the mda_mvc selection
-        self.mda_mvc.updateSelectionField(None)
+        self.mda_mvc.setSelectionField()
 
     def applySelectionRules(self, index, changes=False):
         """Apply selection rules 2-4."""
@@ -264,7 +269,9 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
                         changes = True
         return changes
 
-    def updateCheckboxes(self, new_selection=None, update_mda_mvc=True):
+    def updateCheckboxes(
+        self, new_selection=None, old_selection=None, update_mda_mvc=True
+    ):
         """Update checkboxes to agree with self.selections."""
         if new_selection is None:
             new_selection = self.selections
@@ -281,15 +288,19 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         # prune empty data from new_selection
         new_selection = {k: v for k, v in new_selection.items() if v is not None}
         self.selections = new_selection
+        old_y_selection = old_selection.get("Y", []) if old_selection else []
+        new_y_selection = ftm2mda(new_selection).get("Y", []) if new_selection else []
+        det_removed = [y for y in old_y_selection if y not in new_y_selection]
         # Update the mda_mvc selection if needed:
         if update_mda_mvc:
             self.updateMdaMvcSelection(new_selection)
+        return det_removed
 
     def updateMdaMvcSelection(self, new_selection):
         if new_selection is None:
             return
         new_selection = ftm2mda(new_selection)
-        self.mda_mvc.updateSelectionField(new_selection)
+        self.mda_mvc.setSelectionField(new_selection)
 
     def logCheckboxSelections(self):
         print("checkbox selections:")
@@ -374,6 +385,10 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
 
     # ------------ reporting
 
+    # TODO - later: we have to reformat plotfield to match selectionField and vice versa
+    # (ftm2mvc <-> mvc2ftm), maybe avoid this but formating plotfield directly the right way?
+    # Or, if it ain't broken, don't fix it...
+
     def plotFields(self):
         """
         Returns a dictionary with the selected fields to be plotted.
@@ -381,17 +396,14 @@ class SelectFieldsTableModel(QtCore.QAbstractTableModel):
         key=column_name, value= row_number(s) or fieldName(s)
         """
         choices = dict(Y=[])
-        choices_pretty = dict(Y=[])
         for row, column_name in self.selections.items():
             field_name = self.fieldName(row)
             column_number = self.columnNumber(column_name)
             if column_number in self.uniqueSelectionColumns:
                 choices[column_name] = row
-                choices_pretty[column_name] = field_name
             elif column_number in self.multipleSelectionColumns:
                 choices[column_name].append(row)
-                choices_pretty[column_name].append(field_name)
-        return choices, choices_pretty
+        return choices
 
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)

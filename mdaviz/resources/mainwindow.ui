@@ -15,20 +15,35 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+    <property name="spacing">
+     <number>0</number>
+    </property>
     <property name="leftMargin">
-     <number>6</number>
+     <number>1</number>
     </property>
     <property name="topMargin">
-     <number>6</number>
+     <number>1</number>
     </property>
     <property name="rightMargin">
-     <number>6</number>
+     <number>1</number>
     </property>
     <property name="bottomMargin">
-     <number>6</number>
+     <number>1</number>
     </property>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,1,0,0,0,0,1,0,0,0">
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>6</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>6</number>
+      </property>
       <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
@@ -74,15 +89,18 @@
       </item>
       <item>
        <widget class="QLabel" name="folder_label">
+        <property name="toolTip">
+         <string>Selected parent folder</string>
+        </property>
         <property name="text">
-         <string>Path:   </string>
+         <string>Full Path:</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QComboBox" name="folder">
         <property name="toolTip">
-         <string>Selected path</string>
+         <string>Selected parent folder</string>
         </property>
        </widget>
       </item>
@@ -131,15 +149,18 @@
       </item>
       <item>
        <widget class="QLabel" name="subfolder_label">
+        <property name="toolTip">
+         <string>Select folder or subfolder from full path</string>
+        </property>
         <property name="text">
-         <string>Folder:</string>
+         <string>Subfolder(s):</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QComboBox" name="subfolder">
         <property name="toolTip">
-         <string>Select folder from parent path</string>
+         <string>Select folder or subfolder from full path</string>
         </property>
        </widget>
       </item>
@@ -185,16 +206,16 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <property name="leftMargin">
-        <number>6</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
-        <number>6</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>6</number>
+        <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>6</number>
+        <number>0</number>
        </property>
        <item>
         <widget class="QWidget" name="widget" native="true">

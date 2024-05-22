@@ -6,12 +6,14 @@ import datetime
 from functools import partial
 from itertools import cycle
 import numpy
-from PyQt5 import QtWidgets
+from pathlib import Path
+from PyQt5 import QtCore, QtWidgets
 from . import utils
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+
 
 FONTSIZE = 10
 LEFT_BUTTON = 1
@@ -52,10 +54,14 @@ def auto_symbol():
 
 
 class ChartView(QtWidgets.QWidget):
+    """TODO: docstrings"""
+
     def __init__(self, parent, **kwargs):
         # parent=<mdaviz.mda_folder.MDA_MVC object at 0x10e7ff520>
         self.mda_mvc = parent
         super().__init__()
+
+        ############# UI initialization:
 
         # Create a Matplotlib figure and canvas
         self.figure = Figure()
@@ -74,6 +80,55 @@ class ChartView(QtWidgets.QWidget):
         # Apply the QVBoxLayout to the ChartView widget
         self.setLayout(layout)
 
+        # Plot configuration
+        plot_options = kwargs.get("plot_options", {})
+        self.setTitle(plot_options.get("title", ""))
+        self.setXlabel(plot_options.get("y", ""))
+        self.setYlabel(plot_options.get("x", ""))
+        self.configPlot()
+
+        ############# Signals & slots:
+
+        # Track curves and display in QComboBox:
+        self.plotObjects = {}  # all the Line2D on the graph, key = curveID
+        self.curveBox = self.mda_mvc.mda_file_viz.curveBox
+        self.curveBox.currentTextChanged.connect(self.onCurveSelected)
+
+        # Initialize CurveManager
+        self.curveManager = CurveManager(self)
+        self.curveManager.curveAdded.connect(self.onCurveAdded)
+        self.curveManager.curveUpdated.connect(self.onCurveUpdated)
+        self.curveManager.curveRemoved.connect(self.onCurveRemoved)
+        self.curveManager.allCurvesRemoved.connect(self.onAllCurvesRemoved)
+        # # Debug signals:
+        # self.curveManager.curveAdded.connect(utils.debug_signal)
+        # self.curveManager.curveRemoved.connect(utils.debug_signal)
+        # self.curveManager.curveUpdated.connect(utils.debug_signal)
+        # self.curveManager.allCurvesRemoved.connect(utils.debug_signal)
+
+        # Remove buttons definitions:
+        self.clearAll = self.mda_mvc.mda_file_viz.clearAll
+        self.removeButton = self.mda_mvc.mda_file_viz.curveRemove
+        self.removeCursor1 = self.mda_mvc.mda_file_viz.cursor1_remove
+        self.removeCursor2 = self.mda_mvc.mda_file_viz.cursor2_remove
+
+        # Remove button connections:
+        utils.reconnect(self.clearAll.clicked, self.curveManager.allCurvesRemoved)
+        utils.reconnect(self.removeButton.clicked, self.onRemoveButtonClicked)
+        self.removeCursor1.clicked.connect(partial(self.onRemoveCursor, cursor_num=1))
+        self.removeCursor2.clicked.connect(partial(self.onRemoveCursor, cursor_num=2))
+
+        # File tableview & graph synchronization:
+        self.mda_mvc.mda_file.tabManager.tabRemoved.connect(self.onTabRemoved)
+        self.mda_mvc.detRemoved.connect(self.onDetRemoved)
+        # self.mda_mvc.detRemoved.connect(utils.debug_signal)
+
+        # Connect offset & factor QLineEdit:
+        self.offset_value = self.mda_mvc.mda_file_viz.offset_value
+        self.factor_value = self.mda_mvc.mda_file_viz.factor_value
+        self.offset_value.editingFinished.connect(self.onOffsetUpdated)
+        self.factor_value.editingFinished.connect(self.onFactorUpdated)
+
         # Connect the click event to a handler
         self.cid = self.figure.canvas.mpl_connect("button_press_event", self.onclick)
         self.cursors = {
@@ -87,41 +142,7 @@ class ChartView(QtWidgets.QWidget):
             "midpoint": "n/a",
         }
 
-        # Plot configuration
-        self._plot_options = kwargs.get("plot_options", {})
-        self._title = self.plot_options().get("title", "")
-        self._ylabel = self.plot_options().get("y", "")
-        self._xlabel = self.plot_options().get("x", "")
-        self.setConfigPlot()
-
-        # Track curves and display in QComboBox:
-        self.line2D = {}  # all the Line2D on the graph, key = label
-        self.curveBox = self.mda_mvc.findChild(QtWidgets.QComboBox, "curveBox")
-        self.curveBox.currentTextChanged.connect(self.curveSelected)
-
-        # Remove buttons
-        self.removeButton = self.mda_mvc.findChild(QtWidgets.QPushButton, "curveRemove")
-        self.removeCursor1 = self.mda_mvc.findChild(
-            QtWidgets.QPushButton, "cursor1_remove"
-        )
-        self.removeCursor2 = self.mda_mvc.findChild(
-            QtWidgets.QPushButton, "cursor2_remove"
-        )
-        # Remove button triggers removeCurve twice: once when pushed, once when released.
-        # This try-except solves the problem.
-        try:
-            self.removeButton.clicked.disconnect()
-        except TypeError:
-            pass  # No connection exists
-        self.removeButton.clicked.connect(self.removeCurve)
-        self.removeCursor1.clicked.connect(partial(self.removeCursor, cursor_num=1))
-        self.removeCursor2.clicked.connect(partial(self.removeCursor, cursor_num=2))
-
-        # Connect offset & factor QLineEdit:
-        self.offset_value = self.mda_mvc.findChild(QtWidgets.QLineEdit, "offset_value")
-        self.factor_value = self.mda_mvc.findChild(QtWidgets.QLineEdit, "factor_value")
-        self.offset_value.editingFinished.connect(self.applyBasicMathToCurve)
-        self.factor_value.editingFinished.connect(self.applyBasicMathToCurve)
+    ########################################## Set & get methods:
 
     def setPlotTitle(self, text):
         self.main_axes.set_title(text, fontsize=FONTSIZE, y=1.03)
@@ -132,16 +153,6 @@ class ChartView(QtWidgets.QWidget):
     def setLeftAxisText(self, text):
         self.main_axes.set_ylabel(text, fontsize=FONTSIZE, labelpad=20)
 
-    def setConfigPlot(self, grid=True):
-        self.setLeftAxisText(self.ylabel())
-        self.setBottomAxisText(self.xlabel())
-        self.setPlotTitle(self.title())
-        if grid:
-            self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
-        else:
-            self.main_axes.grid(False)
-        self.canvas.draw()
-
     def title(self):
         return self._title
 
@@ -151,60 +162,156 @@ class ChartView(QtWidgets.QWidget):
     def ylabel(self):
         return self._ylabel
 
-    def plot_options(self):
-        return self._plot_options
+    def setTitle(self, txt=""):
+        self._title = txt
 
-    def addCurve(self, row, *args, **kwargs):
+    def setXlabel(self, txt=""):
+        self._xlabel = txt
+
+    def setYlabel(self, txt=""):
+        self._ylabel = txt
+
+    def getSelectedCurveID(self):
+        return self.curveBox.currentText()
+
+    ########################################## Slot methods:
+
+    def onCurveAdded(self, curveID):
         # Add to graph
-        plot_obj = self.main_axes.plot(*args, **kwargs)
-        self.updatePlot()
-        # Add to the dictionary:
-        label = kwargs.get("label", None)
-        self.line2D[label] = {
-            "line_obj": plot_obj[0],
-            "x_data": args[0],
-            "y_data": args[1],
-            "offset": 0,  # default offset
-            "factor": 1,  # default factor
-            "row": row,
-            "path": str(self.mda_mvc.select_fields_tableview.file().parent),
-        }
+        curveData = self.curveManager.getCurveData(curveID)
+        ds = curveData["ds"]
+        ds_options = curveData["ds_options"]
+        # Plot and store the plot object associated with curveID:
+        plot_obj = self.main_axes.plot(*ds, **ds_options)[0]
+        self.plotObjects[curveID] = plot_obj
+        # Update plot
+        self.updatePlot(update_title=True)
         # Add to the comboBox
-        self.addIemCurveBox(label)
+        index = self.curveBox.count()  # Get the next index
+        self.curveBox.addItem(curveID)
+        file_path = curveData.get("file_path", "No file path available")
+        self.curveBox.setItemData(index, file_path, QtCore.Qt.ToolTipRole)
 
-    def removeCurve(self, *args, **kwargs):
-        label = self.curveBox.currentText()
-        # If removing the last curve, clear plot:
-        if label in self.line2D:
-            if len(self.line2D) == 1:
-                self.clearPlot()
-                self.mda_mvc.select_fields_tableview.tableView.model().clearAllCheckboxes()
+    def onCurveUpdated(self, curveID, recompute_y=False, update_x=False):
+        curve_data = self.curveManager.getCurveData(curveID)
+        if curve_data and recompute_y:
+            factor = curve_data.get("factor", 1)
+            offset = curve_data.get("offset", 0)
+            ds = curve_data["ds"]
+            new_y = numpy.multiply(ds[1], factor) + offset
+            if curveID in self.plotObjects:
+                self.plotObjects[curveID].set_ydata(new_y)
+        if curve_data and update_x:
+            ds = curve_data["ds"]
+            new_x = curve_data["ds"][0]
+            if curveID in self.plotObjects:
+                self.plotObjects[curveID].set_xdata(new_x)
+        self.updatePlot(update_title=False)
 
+    def onRemoveButtonClicked(self):
+        curveID = self.getSelectedCurveID()
+        if curveID in self.curveManager.curves():
+            curveID = self.getSelectedCurveID()
+        if curveID in self.curveManager.curves():
+            if len(self.curveManager.curves()) == 1:
+                self.curveManager.removeAllCurves(doNotClearCheckboxes=False)
             else:
-                # Remove curve from graph
-                row = self.line2D[label]["row"]
-                line = self.line2D[label]["line_obj"]
-                line.remove()
-                # Remove curve from dictionary
-                del self.line2D[label]
+                self.curveManager.removeCurve(curveID)
 
-                # Remove curve from comboBox
-                self.removeItemCurveBox(label)
-                self.mda_mvc.select_fields_tableview.tableView.model().uncheckCheckBox(
-                    row
-                )
-                # Update plot labels, legend and title
-                self.updatePlot()
+    def onCurveRemoved(self, *arg):
+        curveID, curveData, count = arg
+        # Remove curve from graph & plotObject dict
+        if curveID in self.plotObjects:
+            curve_obj = self.plotObjects[curveID]
+            curve_obj.remove()
+            del self.plotObjects[curveID]
+        # Remove checkbox from corresponding tableview
+        row = curveData["row"]
+        file_path = curveData["file_path"]
+        tableview = self.mda_mvc.mda_file.tabPath2Tableview(file_path)
+        if tableview and tableview.tableView.model():
+            tableview.tableView.model().uncheckCheckBox(row)
+        # Remove curve from comboBox
+        self.removeItemCurveBox(curveID)
+        # Update plot labels, legend and title
+        self.updatePlot(update_title=False)
+        # If this was the last curve for this file, remove the tab
+        if count == 0 and self.mda_mvc.mda_file.mode() == "Auto-add":
+            self.mda_mvc.mda_file.tabManager.removeTab(file_path)
 
-    def plot(self, row, *args, **kwargs):
-        # Extract label from kwargs, default to None if not present
-        self._plot_options = kwargs.get("plot_options")
-        ds_options = self._ds_options = kwargs.get("ds_options")
-        label = ds_options.get("label", None)
+    def onAllCurvesRemoved(self, doNotClearCheckboxes=True):
+        # Clears the plot completely, removing all curve representations.
+        self.clearPlot()
+        for curveID in self.curveManager.curves().keys():
+            self.curveManager.removeCurve(curveID)
+        if not doNotClearCheckboxes:
+            # Iterates over each tab, accessing its associated tableview to clear all checkbox selections.
+            for index in range(self.mda_mvc.mda_file.tabWidget.count()):
+                tableview = self.mda_mvc.mda_file.tabIndex2Tableview(index)
+                if tableview and tableview.tableView.model():
+                    tableview.tableView.model().clearAllCheckboxes()
+                    tableview.tableView.model().setHighlightRow()
+
+    def onDetRemoved(self, file_path, row):
+        curveID = self.curveManager.findCurveID(file_path, row)
+        if curveID:
+            self.curveManager.removeCurve(curveID)
+
+    def onTabRemoved(self, file_path):
+        if self.mda_mvc.mda_file.mode() in ["Auto-add"]:
+            for curveID in self.curveManager.curves().keys():
+                if self.curveManager.curves()[curveID]["file_path"] == file_path:
+                    self.curveManager.removeCurve(curveID)
+
+    ########################################## UI methods:
+
+    def plot(self, row, *ds, **options):
+        """The main method called by MDA_MVC"""
         self.main_axes.axis("on")
-        if label:
-            if label not in self.line2D:
-                self.addCurve(row, *args, **ds_options)
+        self.curveManager.addCurve(row, *ds, **options)
+
+    def configPlot(self, grid=True):
+        self.setLeftAxisText(self.ylabel())
+        self.setBottomAxisText(self.xlabel())
+        self.setPlotTitle(self.title())
+        if grid:
+            self.main_axes.grid(True, color="#cccccc", linestyle="-", linewidth=0.5)
+        else:
+            self.main_axes.grid(False)
+        self.canvas.draw()
+
+    def updatePlot(self, update_title=True):
+        # Collect positioner PVs from all curves and update x label:
+        x_label_set = set()
+        for curveID in self.curveManager.curves():
+            plot_options = self.curveManager.getCurveData(curveID).get("plot_options")
+            x_label = plot_options.get("x", "")
+            if x_label:
+                x_label_set.add(x_label)
+        self.setXlabel(", ".join(list(x_label_set)))
+        # Update the y-axis label and basic math based on the selected curve
+        curveID = self.getSelectedCurveID()
+        if curveID in self.curveManager.curves():
+            self.updateBasicMathInfo(curveID)
+            plot_options = self.curveManager.getCurveData(curveID).get("plot_options")
+            if plot_options:
+                self.setYlabel(plot_options.get("y", ""))
+        # Update title:
+        if update_title:
+            now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            self.setTitle(f"Plot Date & Time: {now}")
+        # Recompute the axes limits and autoscale:
+        self.main_axes.relim()
+        self.main_axes.autoscale_view()
+        self.updateLegend()
+        self.configPlot()
+        self.canvas.draw()
+
+    def updateLegend(self):
+        labels = self.main_axes.get_legend_handles_labels()[1]
+        valid_labels = [label for label in labels if not label.startswith("_")]
+        if valid_labels:
+            self.main_axes.legend()
 
     def clearPlot(self):
         self.main_axes.clear()
@@ -214,79 +321,85 @@ class ChartView(QtWidgets.QWidget):
         self.clearCursorInfo()
         self.clearBasicMath()
         self.figure.canvas.draw()
-        self.line2D = {}
+        self.plotObjects = {}
         self.curveBox.clear()
 
-    def addIemCurveBox(self, label):
-        next_index = self.curveBox.count() + 1
-        self.curveBox.addItem(label, next_index)
+    def hasDataItems(self):
+        # Return whether any artists have been added to the Axes (bool)
+        return self.main_axes.has_data()
 
-    def removeItemCurveBox(self, label):
-        i = self.curveBox.findText(
-            label
-        )  # Returns the index of the item containing the given text ; otherwise returns -1.
-        if i >= 0:
-            self.curveBox.removeItem(i)
+    ########################################## Interaction with UI elements:
 
-    def updatePlot(self):
-        # Update labels and title:
-        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self._title = f"Plot Date & Time: {now}"
-        self._xlabel = self._plot_options.get("x", "")
-        if self.curveBox.count() <= 0:
-            self._ylabel = self._plot_options.get("y", "")
-        else:  # New ylabel is the first curve on the pull down menu
-            self._ylabel = self.curveBox.currentText().split(" ", 1)[1]
-        # Recompute the axes limits and autoscale:
-        self.main_axes.relim()
-        self.main_axes.autoscale_view()
-        self.updateLegend()
-        self.setConfigPlot()
-        self.canvas.draw()
-
-    def updateLegend(self):
-        labels = self.main_axes.get_legend_handles_labels()[1]
-        valid_labels = [label for label in labels if not label.startswith("_")]
-        if valid_labels:
-            self.main_axes.legend()
-
-    def curveSelected(self, label):
-        filePathLabel = self.mda_mvc.findChild(QtWidgets.QLabel, "filePath_viz")
+    def onCurveSelected(self, curveID):
         # Update QLineEdit & QLabel widgets with the values for the selected curve
-        if label in self.line2D:
-            self.offset_value.setText(str(self.line2D[label]["offset"]))
-            self.factor_value.setText(str(self.line2D[label]["factor"]))
-            filePathLabel.setText(self.line2D[label]["path"])
+        if curveID in self.plotObjects and curveID in self.curveManager.curves():
+            curve_data = self.curveManager.getCurveData(curveID)
+            file_path = curve_data["file_path"]
+            row = curve_data["row"]
+            self.offset_value.setText(str(curve_data["offset"]))
+            self.factor_value.setText(str(curve_data["factor"]))
+            self.curveBox.setToolTip(file_path)
+            try:
+                self.mda_mvc.mda_file.highlightRowInTab(file_path, row)
+            except:
+                print("highlightRowInTab failed.")
+                pass
         else:
             self.offset_value.setText("0")
             self.factor_value.setText("1")
-            filePathLabel.setText("")
+            self.curveBox.setToolTip("Selected curve")
         # Update basic math info:
-        self.updateBasicMathInfo(label)
+        self.updateBasicMathInfo(curveID)
 
-    def applyBasicMathToCurve(self):
-        # Get the current text from the QLineEdit widgets & convert to float:
+    def removeItemCurveBox(self, curveID):
+        # Returns the index of the item containing the given text ; otherwise returns -1.
+        i = self.curveBox.findText(curveID)
+        if i >= 0:
+            self.curveBox.removeItem(i)
+
+    def onOffsetUpdated(self):
+        curveID = self.getSelectedCurveID()
         try:
             offset = float(self.offset_value.text())
         except ValueError:
             offset = 0
+            # Reset to default if conversion fails
+            self.offset_value.setText(str(offset))
+            return
+        self.curveManager.updateCurveOffset(curveID, offset)
+
+    def onFactorUpdated(self):
+        curveID = self.getSelectedCurveID()
         try:
             factor = float(self.factor_value.text())
         except ValueError:
             factor = 1
-        # Get the current curve
-        label = self.curveBox.currentText()
-        if label in self.line2D:
-            # Update the stored parameters for the current curve
-            self.line2D[label]["offset"] = offset
-            self.line2D[label]["factor"] = factor
-            # Apply factor and offset to the selected curve
-            curve = self.line2D[label]
-            new_y = numpy.multiply(curve["y_data"], factor) + offset
-            # Update the Line2D object with the new y-values
-            curve["line_obj"].set_ydata(new_y)
-            # Refresh the plot
-            self.updatePlot()
+            # Reset to default if conversion fails or zero
+            self.factor_value.setText(str(factor))
+            return
+        self.curveManager.updateCurveFactor(curveID, factor)
+
+    ########################################## Basic maths methods:
+
+    def updateBasicMathInfo(self, curveID):
+        if curveID and curveID in self.curveManager.curves():
+            curve_data = self.curveManager.getCurveData(curveID)
+            x = curve_data["ds"][0]
+            y = curve_data["ds"][1]
+            stats = self.calculateBasicMath(x, y)
+            for i, txt in zip(stats, ["min_text", "max_text", "com_text", "mean_text"]):
+                if isinstance(i, tuple):
+                    result = f"({utils.num2fstr(i[0])}, {utils.num2fstr(i[1])})"
+                else:
+                    result = f"{utils.num2fstr(i)}" if i else "n/a"
+                self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText(result)
+        else:
+            for txt in ["min_text", "max_text", "com_text", "mean_text"]:
+                self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText("n/a")
+
+    def clearBasicMath(self):
+        for txt in ["min_text", "max_text", "com_text", "mean_text"]:
+            self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText("n/a")
 
     def calculateBasicMath(self, x_data, y_data):
         x_array = numpy.array(x_data)
@@ -309,33 +422,9 @@ class ChartView(QtWidgets.QWidget):
         y_mean = numpy.mean(y_array)
         return (x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean
 
-    def updateBasicMathInfo(self, label):
-        if label and label in self.line2D:
-            curve_data = self.line2D[label]
-            x = curve_data["x_data"]
-            y = curve_data["y_data"]
-            stats = self.calculateBasicMath(x, y)
-            for i, txt in zip(stats, ["min_text", "max_text", "com_text", "mean_text"]):
-                if isinstance(i, tuple):
-                    result = f"({utils.num2fstr(i[0])}, {utils.num2fstr(i[1])})"
-                else:
-                    result = f"{utils.num2fstr(i)}" if i else "n/a"
-                self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText(result)
-        else:
-            for txt in ["min_text", "max_text", "com_text", "mean_text"]:
-                self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText("n/a")
-
-    def clearBasicMath(self):
-        for txt in ["min_text", "max_text", "com_text", "mean_text"]:
-            self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText("n/a")
-
-    def hasDataItems(self):
-        # Return whether any artists have been added to the Axes (bool)
-        return self.main_axes.has_data()
-
     ########################################## Cursors methods:
 
-    def removeCursor(self, cursor_num):
+    def onRemoveCursor(self, cursor_num):
         cross = self.cursors.get(cursor_num)
         if cross:
             cross.remove()
@@ -353,8 +442,8 @@ class ChartView(QtWidgets.QWidget):
         self.canvas.draw()
 
     def clearCursors(self):
-        self.removeCursor(1)
-        self.removeCursor(2)
+        self.onRemoveCursor(1)
+        self.onRemoveCursor(2)
 
     def onclick(self, event):
         # Check if the click was in the main_axes
@@ -413,21 +502,172 @@ class ChartView(QtWidgets.QWidget):
         self.updateCursorInfo()
 
     def updateCursorInfo(self):
-        self.mda_mvc.findChild(QtWidgets.QLabel, "pos1_text").setText(
-            self.cursors["text1"]
-        )
-        self.mda_mvc.findChild(QtWidgets.QLabel, "pos2_text").setText(
-            self.cursors["text2"]
-        )
-        self.mda_mvc.findChild(QtWidgets.QLabel, "diff_text").setText(
-            self.cursors["diff"]
-        )
-        self.mda_mvc.findChild(QtWidgets.QLabel, "midpoint_text").setText(
-            self.cursors["midpoint"]
-        )
+        self.mda_mvc.mda_file_viz.pos1_text.setText(self.cursors["text1"])
+        self.mda_mvc.mda_file_viz.pos2_text.setText(self.cursors["text2"])
+        self.mda_mvc.mda_file_viz.diff_text.setText(self.cursors["diff"])
+        self.mda_mvc.mda_file_viz.midpoint_text.setText(self.cursors["midpoint"])
 
     def clearCursorInfo(self):
-        self.mda_mvc.findChild(QtWidgets.QLabel, "pos1_text").setText("middle click")
-        self.mda_mvc.findChild(QtWidgets.QLabel, "pos2_text").setText("right click")
-        self.mda_mvc.findChild(QtWidgets.QLabel, "diff_text").setText("n/a")
-        self.mda_mvc.findChild(QtWidgets.QLabel, "midpoint_text").setText("n/a")
+        self.mda_mvc.mda_file_viz.pos1_text.setText("middle click")
+        self.mda_mvc.mda_file_viz.pos2_text.setText("right click")
+        self.mda_mvc.mda_file_viz.diff_text.setText("n/a")
+        self.mda_mvc.mda_file_viz.midpoint_text.setText("n/a")
+
+
+# ------ Curves management (data):
+
+
+class CurveManager(QtCore.QObject):
+    curveAdded = QtCore.pyqtSignal(str)  # Emit curveID when a curve is added
+    curveRemoved = QtCore.pyqtSignal(str, dict, int)
+    # Emit curveID & its corresponding data when a curve is removed, plus the
+    # number of curves left on the graph for this file
+    curveUpdated = QtCore.pyqtSignal(
+        str, bool, bool
+    )  # Emit curveID, recompute_y (bool) & update_x (bool) when a curve is updated
+    allCurvesRemoved = QtCore.pyqtSignal(
+        bool
+    )  # Emit a doNotClearCheckboxes bool when all curve are removed
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._curves = {}  # Store curves with a unique identifier as the key
+
+    def addCurve(self, row, *ds, **options):
+        """Add a new curve to the manager if not already present on the graph."""
+        # Extract info:
+        plot_options = options.get("plot_options", {})
+        ds_options = options.get("ds_options", {})
+        label = ds_options.get("label", "unknown label")
+        file_path = plot_options.get("filePath", "unknown path")
+        # Generate unique label & update options:
+        ds_options["label"] = curveID = self.generateCurveID(label, file_path)
+        x_data = ds[0]
+        if curveID in self._curves:
+            # Check if x_data is the same
+            existing_x_data = self._curves[curveID]["ds"][0]
+            if numpy.array_equal(x_data, existing_x_data):
+                print(" x_data is the same, do not add or update the curve")
+                # x_data is the same, do not add or update the curve
+                return
+            else:
+                print(" x_data is different, update the curve")
+                # x_data is different, update the curve:
+                curveData = self._curves[curveID]
+                curveData["ds"] = ds
+                curveData["plot_options"] = plot_options
+                self.updateCurve(curveID, curveData, update_x=True)
+                return
+        # Add new curve if not already present on the graph:
+        self._curves[curveID] = {
+            "ds": ds,  # ds = [x_data, y_data]
+            "offset": 0,  # default offset
+            "factor": 1,  # default factor
+            "row": row,  # DET checkbox row in the file tableview
+            "file_path": file_path,
+            "file_name": plot_options.get("fileName", ""),  # without ext
+            "plot_options": plot_options,
+            "ds_options": ds_options,
+        }
+        self.curveAdded.emit(curveID)
+
+    def updateCurve(self, curveID, curveData, recompute_y=False, update_x=False):
+        """Update an existing curve."""
+        if curveID in self._curves:
+            print(f"Emits curveUpdated {curveID=}, {recompute_y=}, {update_x=}")
+            self._curves[curveID] = curveData
+            self.curveUpdated.emit(curveID, recompute_y, update_x)
+
+    def removeCurve(self, curveID):
+        """Remove a curve from the manager."""
+        if curveID in self._curves:
+            curveData = self._curves[curveID]
+            file_path = curveData["file_path"]
+            # Remove curve entry from self.curves & emit signal:
+            del self._curves[curveID]
+            # How many curves are left for this file:
+            count = 0
+            for curve_data in self._curves.values():
+                if curve_data["file_path"] == file_path:
+                    count += 1
+            # Emit signal:
+            self.curveRemoved.emit(curveID, curveData, count)
+
+    def removeAllCurves(self, doNotClearCheckboxes=True):
+        """Remove all curves from the manager."""
+        self._curves.clear()
+        self.allCurvesRemoved.emit(doNotClearCheckboxes)
+
+    def getCurveData(self, curveID):
+        """Get curve data by ID."""
+        return self._curves.get(curveID, None)
+
+    def curves(self):
+        """Returns a read-only view of the currently managed curves."""
+        return dict(self._curves)
+
+    def updateCurveOffset(self, curveID, new_offset):
+        curve_data = self.getCurveData(curveID)
+        if curve_data:
+            offset = curve_data["offset"]
+            if offset != new_offset:
+                curve_data["offset"] = new_offset
+                self.updateCurve(curveID, curve_data, recompute_y=True)
+
+    def updateCurveFactor(self, curveID, new_factor):
+        curve_data = self.getCurveData(curveID)
+        if curve_data:
+            factor = curve_data["factor"]
+            if factor != new_factor:
+                curve_data["factor"] = new_factor
+                self.updateCurve(curveID, curve_data, recompute_y=True)
+
+    def generateCurveID(self, label, file_path):
+        """
+        Generates a unique curve label for a given label, considering the file path.
+
+        Parameters:
+
+        - label (str): The original label for the curve: "file_name: PV_name (PV_unit)" or "file_name: PV_name" (if no PV_unit)
+
+        - file_path (str): The file path associated with the curve.
+
+        Returns:
+
+        - str: A unique curve label. If the exact label already exists for different file path,
+          a numeric suffix is appended: "file_name: PV_name (PV_unit) (1)" or "file_name: PV_name (1)"
+
+        .. note:: This method allows each curve to be uniquely identified and selected, even if their base
+           labels are identical, by considering their file paths.
+        """
+        counter = 1
+        original_label = label
+        # Loop through existing labels:
+        while True:
+            # Check if the current label exists:
+            if label in self._curves:
+                existing_path = self._curves[label].get("file_path")
+                if existing_path != file_path:
+                    label = f"{original_label} ({counter})"
+                    counter += 1
+                else:
+                    break  # If file_path is equal, then the curve is already on the graph.
+            else:
+                break  # If the label doesn't exist already, it's automatically unique.
+        return label
+
+    def findCurveID(self, file_path, row):
+        """
+        Find the curveID based on the file path and row number.
+
+        Parameters:
+        - file_path (str): The path of the file associated with the curve.
+        - row (int): The row number in the file tableview associated with the curve.
+
+        Returns:
+        - str: The curveID if a matching curve is found; otherwise, None.
+        """
+        for curveID, curveData in self._curves.items():
+            if curveData["file_path"] == file_path and curveData["row"] == row:
+                return curveID
+        return None

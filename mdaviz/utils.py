@@ -21,7 +21,7 @@ from .synApps_mdalib.mda import scanPositioner
 
 
 def human_readable_size(size, decimal_places=2):
-    for unit in ["B", "KB", "MB", "GB", "TB"]:
+    for unit in ["B", "kB", "MB", "GB", "TB"]:
         if size < 1024.0:
             break
         size /= 1024.0
@@ -54,7 +54,16 @@ def num2fstr(x):
 
 
 def byte2str(byte_literal):
-    """Convert byte literals to strings."""
+    """
+    Converts a byte literal to a UTF-8 encoded string.
+    If the input is not a byte literal, it is returned as is without any conversion.
+
+    Parameters:
+    - byte_literal (bytes | Any): The byte literal to be decoded or any input to be returned as is if not bytes.
+
+    Returns:
+    - str | Any: The decoded string if the input is a byte literal, otherwise the original input.
+    """
     return (
         byte_literal.decode("utf-8")
         if isinstance(byte_literal, bytes)
@@ -63,38 +72,129 @@ def byte2str(byte_literal):
 
 
 def get_det(mda_file_data):
-    """det_dict = { index: [fieldname, pv, desc, unit]}"""
-    D = {}
-    p_list = [
-        mda_file_data.p[i] for i in range(0, mda_file_data.np)
-    ]  # mda_file_data.np = number of positioners
-    d_list = [
-        mda_file_data.d[i] for i in range(0, mda_file_data.nd)
-    ]  # mda_file_data.nd = number of detectors
-    first_pos = 1 if mda_file_data.np else 0
-    first_det = mda_file_data.np + 1
+    """
+    Extracts scan positioners and detectors from an MDA file data object.
+
+    This function processes an mda.scanDim object to extract its scanPositioner and scanDetector instances.
+    It organizes these instances into a dictionary, with their indexes as keys in the order of p0, P1,... Px, D01, D02,... DX.
+    p0 is a default scanPositioner object representing the point index. If additional positioners exist, they follow p0 in sequence.
+    The first detector is labeled D01 and subsequent detectors follow in numerical order.
+
+    Parameters:
+    - mda_file_data: An instance of an mda.scanDim object, which contains the MDA file data to be processed.
+
+    Returns:
+    - A tuple containing:
+      - A dictionary (d) where keys are indexes, mapping to either scanPositioner or scanDetector objects.
+        The dictionary is structured as {0: p0, 1: P1, ..., np: D01, np+1: D02, ..., np+nd: DX}.
+      - The index (first_pos) of the first positioner in the returned dictionary. This is 1 if a positioner
+        other than the default index positioner exists, otherwise 0.
+      - The index (first_det) of the first detector in the returned dictionary, which directly follows the last positioner.
+
+    Note:
+    - p0 is created by default and corresponds to the point index, described as an 'Index' scanPositioner object with predefined properties.
+    - np is the total number of positioners, nd the number of detectors, and npts the number of data points actually acquired.
+    """
+
+    d = {}
+    print(f"\n\n{mda_file_data=}\n\n")
+
+    p_list = mda_file_data.p  # list of scanDetector instances
+    d_list = mda_file_data.d  # list of scanPositioner instances
+    np = mda_file_data.np  # number of pos
+    npts = mda_file_data.curr_pt = 0  # number of data points actually acquired
+
+    first_pos = 1 if np else 0
+    first_det = np + 1
 
     # Defining a default scanPositioner Object for "Index" at for key=0:
-    P0 = scanPositioner()
-    P0.number = 0  # positioner number in sscan record
-    P0.fieldName = "P0"  # name of sscanRecord PV
-    P0.name = "Index"  # name of EPICS PV this positioner wrote to
-    P0.desc = "Index"  # description of 'name' PV
-    P0.step_mode = ""  # 'LINEAR', 'TABLE', or 'FLY'
-    P0.unit = "a.u"  # units of 'name' PV
-    P0.readback_name = ""  # name of EPICS PV this positioner read from, if any
-    P0.readback_desc = ""  # description of 'readback_name' PV
-    P0.readback_unit = ""  # units of 'readback_name' PV
-    P0.data = list(
-        range(0, mda_file_data.curr_pt)
-    )  # list of values written to 'name' PV.  If rank==2, lists of lists, etc.
-    D[0] = P0
+    p0 = scanPositioner()
+    p0.number = 0  # positioner number in sscan record
+    p0.fieldName = "p0"  # name of sscanRecord PV
+    p0.name = "Index"  # name of EPICS PV this positioner wrote to
+    p0.desc = "Index"  # description of 'name' PV
+    p0.step_mode = ""  # 'LINEAR', 'TABLE', or 'FLY'
+    p0.unit = ""  # units of 'name' PV
+    p0.readback_name = ""  # name of EPICS PV this positioner read from, if any
+    p0.readback_desc = ""  # description of 'readback_name' PV
+    p0.readback_unit = ""  # units of 'readback_name' PV
+    p0.data = list(range(npts))  # list of values written to 'Index' PV.
 
+    # Make the Index scanPositioner the positioner 0 and build d:
+    d[0] = p0
     for e, p in enumerate(p_list):
-        D[e + 1] = p
+        d[e + 1] = p
     for e, d in enumerate(d_list):
-        D[e + 1 + mda_file_data.np] = d
-    return D, first_pos, first_det
+        d[e + 1 + np] = d
+    return d, first_pos, first_det
+
+
+def get_scan(mda_file_data):
+    """
+    Extracts scan positioners and detectors from an MDA file data object and prepares datasets.
+
+    Processes an mda.scanDim object to extract scanPositioner and scanDetector
+    instances, organizing them into a dictionary with additional metadata like
+    data, units, and names. A default scanPositioner object representing the
+    point index (p0) is included. If additional positioners exist, they follow
+    p0 in sequence. The first detector is labeled D01 and subsequent detectors
+    follow in numerical order: p0, p1,... px, d01, d02,... dX.
+
+    Parameters:
+    - mda_file_data: An instance of an mda.scanDim object to be processed.
+
+    Returns:
+    - A tuple containing:
+      - A dictionary keyed by index, each mapping to a sub-dictionary containing
+        the scan object ('object') along with its 'data', 'unit', 'name' and 'type'.
+        Structure:
+        {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...',
+             'type':...}}.
+      - The index (first_pos) of the first positioner in the returned dictionary. This
+        is 1 if a positioner other than the default index positioner exists, otherwise 0.
+      - The index (first_det) of the first detector in the returned dictionary, which
+        directly follows the last positioner.
+    """
+
+    d = {}
+
+    p_list = mda_file_data.p  # list of scanDetector instances
+    d_list = mda_file_data.d  # list of scanPositioner instances
+    np = mda_file_data.np  # number of positioners
+    npts = mda_file_data.curr_pt  # number of data points actually acquired
+
+    first_pos_index = 1 if np else 0
+    first_det_index = np + 1
+
+    # Defining a default scanPositioner Object for "Index":
+    p0 = scanPositioner()
+    # Set predefined properties for p0
+    p0.number = 0
+    p0.fieldName, p0.name, p0.desc = "p0", "Index", "Index"
+    p0.step_mode, p0.unit = "", ""
+    p0.readback_name, p0.readback_desc, p0.readback_unit = "", "", ""
+    p0.data = list(range(npts))
+
+    # Make the Index scanPositioner the positioner 0 and build d:
+    d[0] = p0
+    for e, pos in enumerate(p_list):
+        d[e + 1] = pos
+    for e, det in enumerate(d_list):
+        d[e + 1 + np] = det
+
+    datasets = {}
+    for k, v in d.items():
+        datasets[k] = {
+            "object": v,
+            "type": "POS" if isinstance(v, scanPositioner) else "DET",
+            "data": v.data or [],
+            "unit": byte2str(v.unit) if v.unit else "",
+            "name": byte2str(v.name) if v.name else "n/a",
+            "desc": byte2str(v.desc) if v.desc else "",
+            "fieldName": byte2str(v.fieldName),
+        }
+
+    return datasets, first_pos_index, first_det_index
 
 
 def get_md(mda_file_metadata):
@@ -229,3 +329,24 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
 def getUiFileName(py_file_name):
     """UI file name matches the Python file, different extension."""
     return f"{pathlib.Path(py_file_name).stem}.ui"
+
+
+def reconnect(signal, new_slot):
+    """
+    Disconnects any slots connected to the given signal and then connects the signal to the new_slot.
+
+    Parameters:
+    - signal: The signal to disconnect and then reconnect.
+    - new_slot: The new slot to connect to the signal.
+
+    Note: This function catches TypeError which occurs if the signal was not connected to any slots.
+    """
+    try:
+        signal.disconnect()
+    except TypeError:
+        pass
+    signal.connect(new_slot)
+
+
+def debug_signal(*args, **kwargs):
+    print("\nSignal emitted with args:", args, "and kwargs:", kwargs)

@@ -46,14 +46,6 @@ class MDAFolderTableView(QtWidgets.QWidget):
         if len(data) > 0:
             data_model = MDAFolderTableModel(data, self.mda_mvc)
             self.tableView.setModel(data_model)
-            # Sets the tab label to be the folder name
-            folder_path = self.mda_mvc.dataPath()
-            # Make sure to strip the trailing slash if it exists
-            folder_path = (
-                folder_path.rstrip("/") if isinstance(folder_path, str) else folder_path
-            )
-            folder_name = folder_path.parts[-1] if folder_path.parts else None
-            self.tabWidget.setTabText(0, folder_name)
             labels = data_model.columnLabels
 
             def centerColumn(label):

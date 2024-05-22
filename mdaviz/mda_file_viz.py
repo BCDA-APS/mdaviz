@@ -44,26 +44,50 @@ class MDAFileVisualization(QtWidgets.QWidget):
         # tab=self.metadataPage
         self.metadata.setText(text)
 
-    def setData(self, text, *args, **kwargs):
-        self.data.setText(text)
-
     def setPlot(self, plot_widget):
         layout = self.plotPageMpl.layout()
-        utils.removeAllLayoutWidgets(
-            layout
-        )  # TODO replace with mainWindow.clearContent?
+        utils.removeAllLayoutWidgets(layout)
         layout.addWidget(plot_widget)
-        self.tabWidget.setCurrentWidget(self.plotPageMpl)
 
     def isPlotBlank(self):
         layout = self.plotPageMpl.layout()
         if layout.count() == 0:
+            print("NO LAYOUT: blank")
             return True
         plot_widget = layout.itemAt(0).widget()
         # Check if the plot widget is an instance of chartView and has data items
         if isinstance(plot_widget, ChartView):
+            print("HAS DATA ITEM")
             return not plot_widget.hasDataItems()
+        print("NOT A CHARTVIEW INSTANCE")
         return True  # If not a chartView instance, consider it as blank
+
+    def clearContents(self, plot=True, data=True, metadata=True):
+        """
+        Clears content from the specified components of the visualization.
+
+        Parameters:
+        - plot (bool, optional): If True, clears the plot content. Defaults to True.
+        - data (bool, optional): If True, clears the data table content. Defaults to True.
+        - metadata (bool, optional): If True, clears the metadata content. Defaults to True.
+        """
+        # Clear Plot
+        if plot:
+            layout = self.plotPageMpl.layout()
+            if layout.count() > 0:
+                plot_widget = layout.itemAt(0).widget()
+                if isinstance(plot_widget, ChartView):
+                    plot_widget.clearPlot()
+                    plot_widget.curveManager.removeAllCurves()
+        # Clear Metadata
+        if metadata:
+            self.metadata.setText("")
+        # Clear Data Table
+        if data:
+            try:
+                self.data_table_view.clearContents()
+            except AttributeError:
+                pass  # data_table_view does not exist, so do nothing
 
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)

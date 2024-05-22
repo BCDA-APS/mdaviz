@@ -18,16 +18,16 @@
     <number>-1</number>
    </property>
    <property name="leftMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>6</number>
+    <number>0</number>
    </property>
    <item>
     <widget class="QScrollArea" name="scrollArea">
@@ -42,25 +42,25 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1344</width>
-        <height>706</height>
+        <width>1356</width>
+        <height>718</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
-        <number>10</number>
+        <number>6</number>
        </property>
        <property name="leftMargin">
-        <number>10</number>
+        <number>6</number>
        </property>
        <property name="topMargin">
         <number>12</number>
        </property>
        <property name="rightMargin">
-        <number>10</number>
+        <number>6</number>
        </property>
        <property name="bottomMargin">
-        <number>10</number>
+        <number>6</number>
        </property>
        <item>
         <widget class="QTabWidget" name="tabWidget">
@@ -73,13 +73,16 @@
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <property name="leftMargin">
-            <number>12</number>
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
            </property>
            <property name="rightMargin">
-            <number>12</number>
+            <number>6</number>
            </property>
            <property name="bottomMargin">
-            <number>12</number>
+            <number>6</number>
            </property>
            <item>
             <widget class="QWidget" name="plotMPL" native="true"/>
@@ -91,8 +94,23 @@
            <string>Data</string>
           </attribute>
           <layout class="QVBoxLayout" name="vblayout_4">
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="topMargin">
+            <number>10</number>
+           </property>
+           <property name="rightMargin">
+            <number>10</number>
+           </property>
+           <property name="bottomMargin">
+            <number>10</number>
+           </property>
            <item>
             <widget class="QTableView" name="tableView">
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
              <property name="alternatingRowColors">
               <bool>true</bool>
              </property>
@@ -111,6 +129,9 @@
            <string>Metadata</string>
           </attribute>
           <layout class="QVBoxLayout" name="vblayout_3">
+           <property name="topMargin">
+            <number>20</number>
+           </property>
            <item>
             <widget class="QTextBrowser" name="metadata">
              <property name="font">
@@ -118,6 +139,9 @@
                <family>Monospace</family>
                <pointsize>10</pointsize>
               </font>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
              </property>
             </widget>
            </item>
@@ -194,7 +218,7 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
-             <item>
+             <!-- <item>
               <widget class="QLabel" name="filePath_viz">
                <property name="toolTip">
                 <string>Selected curve file path</string>
@@ -204,6 +228,7 @@
     background-color: rgb(248, 248, 248);
     border: none;
     padding: 2px;
+    color: rgb(100, 100, 100); /* Light grey text */
 }</string>
                </property>
                <property name="text">
@@ -213,7 +238,7 @@
                 <number>5</number>
                </property>
               </widget>
-             </item>
+             </item> -->
              <item>
               <widget class="QWidget" name="curves" native="true">
                <property name="sizePolicy">
@@ -230,7 +255,7 @@
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_1">
                 <property name="spacing">
-                 <number>-1</number>
+                 <number>7</number>
                 </property>
                 <property name="leftMargin">
                  <number>6</number>
@@ -253,7 +278,7 @@
                    </sizepolicy>
                   </property>
                   <property name="toolTip">
-                   <string>Selected curve</string>
+                   <string/>
                   </property>
                  </widget>
                 </item>
@@ -274,6 +299,13 @@
                     <width>14</width>
                     <height>14</height>
                    </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="clearAll">
+                  <property name="text">
+                   <string>Clear Graph</string>
                   </property>
                  </widget>
                 </item>
@@ -305,7 +337,7 @@
                     <number>0</number>
                    </property>
                    <property name="horizontalSpacing">
-                    <number>-1</number>
+                    <number>7</number>
                    </property>
                    <property name="verticalSpacing">
                     <number>0</number>
@@ -428,7 +460,7 @@
                     <number>0</number>
                    </property>
                    <property name="horizontalSpacing">
-                    <number>-1</number>
+                    <number>7</number>
                    </property>
                    <property name="verticalSpacing">
                     <number>0</number>
@@ -595,16 +627,16 @@
                <number>0</number>
               </property>
               <property name="leftMargin">
-               <number>6</number>
+               <number>0</number>
               </property>
               <property name="topMargin">
-               <number>6</number>
+               <number>0</number>
               </property>
               <property name="rightMargin">
                <number>0</number>
               </property>
               <property name="bottomMargin">
-               <number>6</number>
+               <number>0</number>
               </property>
               <item>
                <widget class="QWidget" name="basixStats" native="true">
@@ -621,6 +653,9 @@
                  <property name="bottomMargin">
                   <number>0</number>
                  </property>
+                 <property name="verticalSpacing">
+                  <number>-1</number>
+                 </property>
                  <item row="1" column="0">
                   <widget class="QWidget" name="minMax" native="true">
                    <layout class="QGridLayout" name="gridLayout_3">
@@ -631,7 +666,7 @@
                      <number>0</number>
                     </property>
                     <property name="horizontalSpacing">
-                     <number>-1</number>
+                     <number>7</number>
                     </property>
                     <property name="verticalSpacing">
                      <number>0</number>
@@ -795,14 +830,20 @@
                  <item row="1" column="1">
                   <widget class="QWidget" name="comMean" native="true">
                    <layout class="QGridLayout" name="gridLayout_4">
+                    <property name="leftMargin">
+                     <number>12</number>
+                    </property>
                     <property name="topMargin">
                      <number>0</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>12</number>
                     </property>
                     <property name="bottomMargin">
                      <number>0</number>
                     </property>
                     <property name="horizontalSpacing">
-                     <number>-1</number>
+                     <number>7</number>
                     </property>
                     <property name="verticalSpacing">
                      <number>0</number>
@@ -915,17 +956,20 @@
             </widget>
             <widget class="QWidget" name="advancedTab">
              <attribute name="title">
-              <string>Advanced</string>
+              <string>Fit</string>
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_1">
               <property name="spacing">
                <number>0</number>
               </property>
               <property name="leftMargin">
-               <number>12</number>
+               <number>0</number>
               </property>
               <property name="topMargin">
-               <number>5</number>
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
               </property>
               <property name="bottomMargin">
                <number>0</number>
@@ -955,7 +999,7 @@
                      <number>0</number>
                     </property>
                     <property name="horizontalSpacing">
-                     <number>-1</number>
+                     <number>7</number>
                     </property>
                     <property name="verticalSpacing">
                      <number>0</number>
@@ -983,7 +1027,7 @@
                      <number>0</number>
                     </property>
                     <property name="horizontalSpacing">
-                     <number>-1</number>
+                     <number>7</number>
                     </property>
                     <property name="verticalSpacing">
                      <number>0</number>
