@@ -23,7 +23,7 @@ User: clearButton.clicked (emit: no data)
     
 """
 
-from mda import readMDA
+from .synApps_mdalib.mda import readMDA
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView

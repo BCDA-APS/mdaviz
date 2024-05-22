@@ -95,7 +95,6 @@ def get_det(mda_file_data):
     - p0 is created by default and corresponds to the point index, described as an 'Index' scanPositioner object with predefined properties.
     - np is the total number of positioners, nd the number of detectors, and npts the number of data points actually acquired.
     """
-    from mda import scanPositioner
 
     d = {}
     print(f"\n\n{mda_file_data=}\n\n")
@@ -156,8 +155,6 @@ def get_scan(mda_file_data):
       - The index (first_det) of the first detector in the returned dictionary, which
         directly follows the last positioner.
     """
-
-    from mda import scanPositioner
 
     d = {}
 
