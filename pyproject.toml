@@ -1,17 +1,13 @@
 [build-system]
-# qt ==5
-# pyqt ==5
 requires = [
-  "pyRestTable",
-  "setuptools>=61.0",
-  "setuptools_scm[toml]>=6.2",
-  "tiled"
+  "setuptools>=64",
+  "setuptools_scm[toml]>=8",
 ]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "mdaviz"
-description = "Visualize Bluesky data from tiled server."
+description = "Python Qt5 application to visualize MDA data."
 authors = [
   { name="Fanny Rodolakis", email="rodolakis@anl.gov" },
   { name="Pete Jemian", email="prjemian@gmail.com" },
@@ -34,11 +30,12 @@ classifiers = [
     "License :: Freely Distributable",
     "License :: Public Domain",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python",
     "Topic :: Scientific/Engineering :: Astronomy",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
@@ -52,7 +49,16 @@ classifiers = [
     "Topic :: Utilities",
 ]
 
-[tool.setuptools_scm]
+# qt ==5
+# pyqt ==5
+dependencies = [
+  "matplotlib",
+  # "synApps-mdalib",
+  # "https://raw.githubusercontent.com/EPICS-synApps/support/master/utils/mdaPythonUtils/mdalib-2022.post9-py2.py3-none-any.whl",
+  "PyQt5",
+  "PyYAML",
+  "tiled",
+]
 
 [project.urls]
 "Homepage" = "https://github.com/BCDA-APS/mdaviz"
@@ -61,9 +67,57 @@ classifiers = [
 [project.scripts]
 mdaviz = "mdaviz.app:main"
 
+[tool.black]
+line_length = 88
+target-version = ['py311']
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | \.pytest_cache
+    | _build
+    | build
+    | conda
+    | dist
+    | docs
+    | ideas
+    | resources
+  )/
+  | _version.py
+)
+'''
+
+[tool.copyright]
+copyright = "2023-2024, UChicago Argonne, LLC"
+
+[tool.coverage.run]
+concurrency = [
+    "thread",
+    "multiprocessing"
+]
+omit = [
+    # omit anything under the installed packages directory
+    "*/site-packages/*",
+    # omit these individual files
+]
+relative_files = true
+
 [tool.flake8]
 max-line-length = 88
 extend-ignore = ["E501"]
+exclude = [
+  ".git",
+  "__pycache__",
+  "build",
+  "dist",
+  "docs/source",
+]
 
 [tool.isort]
  force_single_line = true
@@ -71,8 +125,98 @@ extend-ignore = ["E501"]
 line_length = 88
 include_trailing_comma = true
 
-[tool.black]
-line_length = 88
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
 
-[tool.copyright]
-copyright = "2023-2024, UChicago Argonne, LLC"
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+
+# Same as Black.
+line-length = 115
+indent-width = 4
+
+# Assume Python 3.11
+target-version = "py311"
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+select = ["E4", "E7", "E9", "F"]
+ignore = ["E402", "E741", "F405"]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]
+"**/{tests,docs,tools}/*" = ["E402"]
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+# Enable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+#
+# This is currently disabled by default, but it is planned for this
+# to be opt-out in the future.
+docstring-code-format = false
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"
+
+[tool.setuptools]
+py-modules = ["mdaviz"]
+
+[tool.setuptools.packages.find]
+include = ["mdaviz*"]  # package names should match these glob patterns (["*"] by default)
+
+[tool.setuptools_scm]
