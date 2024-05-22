@@ -24,7 +24,7 @@ keywords = ["bluesky", "databroker", "tiled", "catalog"]
 license = {file = "mdaviz/LICENSE"}
 # https://pypi.org/classifiers/
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Environment :: Console",
     "Intended Audience :: Science/Research",
     "License :: Freely Distributable",
