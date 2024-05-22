@@ -8,6 +8,9 @@ on:
     tags:
       - "*" # all tags
 
+permissions:
+  id-token: write
+
 jobs:
   pypi:
     name: Build and publish Python 🐍 distributions 📦 to PyPI and TestPyPI
