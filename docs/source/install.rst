@@ -31,7 +31,7 @@ To install from the source directory using ``pip`` in editable mode::
 Required Libraries
 ------------------
 
-The repository's ``environment.yml`` file lists the additional packages
+The repository's ``env.yml`` file lists the additional packages
 required by ``mdaviz``.  Most packages are available as conda packages
 from https://anaconda.org.  The others are available on
 https://PyPI.python.org.
