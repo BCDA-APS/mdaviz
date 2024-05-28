@@ -2,14 +2,6 @@
 mdaviz: MDA Data Viewer
 =======================
 
-.. list-table::
-   :widths: 2 1
-
-   * - ..  figure:: _static/mdaviz_gui.png
-           :alt: fig.mdaviz_gui
-     - * Visualize mda data (1-D plots now)
-       * Basic math info and cursor utilities
-
 .. icons: https://fonts.google.com/icons
 .. grid:: 3
 
@@ -24,6 +16,13 @@ mdaviz: MDA Data Viewer
     .. grid-item-card:: :material-regular:`api;3em` API
       :link: api
       :link-type: doc
+
+* Visualize mda data (1-D plots now)
+* Basic math info and cursor utilities
+
+.. figure:: _static/mdaviz_gui.png
+   :alt: fig.mdaviz_gui
+   :width: 100%
 
 .. toctree::
    :maxdepth: 1
