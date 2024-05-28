@@ -10,8 +10,6 @@ mdaviz: MDA Data Viewer
      - * Visualize mda data (1-D plots now)
        * Basic math info and cursor utilities
 
-
-
 .. icons: https://fonts.google.com/icons
 .. grid:: 3
 
