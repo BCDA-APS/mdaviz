@@ -3,7 +3,7 @@ mdaviz: MDA Data Viewer
 =======================
 
 .. list-table::
-   :widths: 1 2
+   :widths: 2 1
 
    * - ..  figure:: _static/mdaviz_gui.png
            :alt: fig.mdaviz_gui
