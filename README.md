@@ -2,30 +2,21 @@
 
 Python Qt5 application to visualize mda data.
 
+GH tag | GH release | PyPI
+--- | --- | --- 
+[![tag](https://img.shields.io/github/tag/BCDA-APS/mdaviz.svg)](https://github.com/BCDA-APS/mdaviz/tags) | [![release](https://img.shields.io/github/release/BCDA-APS/mdaviz.svg)](https://github.com/BCDA-APS/mdaviz/releases) | [![PyPi](https://img.shields.io/pypi/v/mdaviz.svg)](https://pypi.python.org/pypi/mdaviz)
+
+Python version(s) | Unit Tests | Code Coverage | License
+--- | --- | --- | ---
+[![Python version](https://img.shields.io/pypi/pyversions/mdaviz.svg)](https://pypi.python.org/pypi/mdaviz) | [![Unit Tests](https://github.com/BCDA-APS/mdaviz/workflows/Unit%20Tests%20%26%20Code%20Coverage/badge.svg)](https://github.com/BCDA-APS/mdaviz/actions/workflows/unit_tests.yml) | [![Coverage Status](https://coveralls.io/repos/github/BCDA-APS/mdaviz/badge.svg?branch=main)](https://coveralls.io/github/BCDA-APS/mdaviz?branch=main) | [![license: ANL](https://img.shields.io/badge/license-ANL-brightgreen)](/LICENSE.txt)
+
 ## How to run this code?
 
-First said, this software application is pre-release and may contain significant unhandled
+First said, this software application is in first release and may contain significant unhandled
 bugs.  Please [report any you encounter](https://github.com/BCDA-APS/mdaviz/issues/new) or
 feature requests, too.
 
-Suggested installation for developers is to use
-`pip` with its *editable* mode:
-
-This project is still in development.
-We have [plans for production
-release](https://github.com/orgs/BCDA-APS/projects/6).
-Until the production release, you should run `mdaviz`
-as would a developer by following these instructions:
-
-1. Navigate to a directory where you have similar software projects
-2. `git clone https://github.com/BCDA-APS/mdaviz`
-   - only need to do this once, assumes you have `git` command
-3. `cd mdaviz`
-4. `conda env create --force -n mdaviz -f ./env.yml`
-   - only need to do this once, assumes you have `conda` command
-5. `conda activate mdaviz`
-6. `pip install -e .`
-7. `mdaviz &`
+For complete installation guide, see [https://bcda-aps.github.io/mdaviz/](https://bcda-aps.github.io/mdaviz/).
 
 ## Acknowledgements
 
