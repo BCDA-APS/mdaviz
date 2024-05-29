@@ -1,5 +1,5 @@
 """
-    .. autosummary::
+.. autosummary::
 
     ~DataTableModel
 
