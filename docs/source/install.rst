@@ -3,7 +3,7 @@ Installation Guide
 ====================================
 
 The ``mdaviz`` package is available for installation by ``pip`` or from source.
-Please report any issues you encounter (https://github.com/BCDA-APS/mdaviz/issues/new) or feature requests, too.
+Please [report](https://github.com/BCDA-APS/mdaviz/issues/new) any issues you encounter  or feature requests, too.
 
 pip
 ---
