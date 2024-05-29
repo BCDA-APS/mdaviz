@@ -37,7 +37,7 @@ Documentation
    :figclass: align-center
    :figwidth: 100%
    
-   Screenshot of the mdaviz GUI displaying a sample data set. 
+   Screenshot of the mdaviz GUI displaying sample data. 
 
 .. toctree::
    :maxdepth: 1
