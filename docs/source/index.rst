@@ -2,6 +2,18 @@
 mdaviz: MDA Data Viewer
 =======================
 
+
+
+Key Features
+============
+
+* Visualize MDA data (currently supports 1-D plots)
+* Basic mathematical information and cursor utilities
+* Fitting functionality coming soon
+
+Documentation
+=============
+
 .. icons: https://fonts.google.com/icons
 .. grid:: 3
 
@@ -17,12 +29,15 @@ mdaviz: MDA Data Viewer
       :link: api
       :link-type: doc
 
-* Visualize mda data (1-D plots now)
-* Basic math info and cursor utilities
 
 .. figure:: _static/mdaviz_gui.png
    :alt: fig.mdaviz_gui
    :width: 100%
+   :align: center
+   :figclass: align-center
+   :figwidth: 100%
+   
+   Screenshot of the mdaviz GUI displaying a sample data set. 
 
 .. toctree::
    :maxdepth: 1
@@ -36,6 +51,9 @@ mdaviz: MDA Data Viewer
    changes
    license
 
+About
+=====
+
 :home: https://bcda-aps.github.io/mdaviz/
 :bug tracker: https://github.com/BCDA-APS/mdaviz/issues
 :source: https://github.com/BCDA-APS/mdaviz
@@ -48,7 +66,7 @@ mdaviz: MDA Data Viewer
 :search: :ref:`search`
 
 Acknowledgements
-====================
+================
 
 "This product includes software produced by UChicago Argonne, LLC 
 under Contract No. DE-AC02-06CH11357 with the Department of Energy."
