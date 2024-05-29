@@ -16,7 +16,7 @@ First said, this software application is in first release and may contain signif
 bugs.  Please [report any you encounter](https://github.com/BCDA-APS/mdaviz/issues/new) or
 feature requests, too.
 
-For complete installation guide, see [bcda-aps.github.io/mdaviz/](bcda-aps.github.io/mdaviz/).
+For complete installation guide, see [https://bcda-aps.github.io/mdaviz/](https://bcda-aps.github.io/mdaviz/).
 
 ## Acknowledgements
 
