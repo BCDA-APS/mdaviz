@@ -128,16 +128,15 @@ class MDAFileTableView(QtWidgets.QWidget):
         Extracts selected datasets for plotting from scanDict based on user selections.
 
         Parameters:
-        - selections: A dictionary with keys "X" and "Y", where "X" is the index for the x-axis data
-          and "Y" is a list of indices for the y-axis data.
+            - selections: A dictionary with keys "X" and "Y", where "X" is the index for the x-axis data
+              and "Y" is a list of indices for the y-axis data.
 
         Returns:
-        - A tuple of (datasets, plot_options), where datasets is a list of tuples containing the
-          data and options (label) for each dataset, and plot_options contains overall plotting configurations.
+            - A tuple of (datasets, plot_options), where datasets is a list of tuples containing the
+              data and options (label) for each dataset, and plot_options contains overall plotting configurations.
 
         ..note::
-        scanDict = {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...',
-            'type':...}}.
+        scanDict = {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...','type':...}}.
         """
 
         datasets, plot_options = [], {}

@@ -33,6 +33,8 @@ mdaviz: MDA Data Viewer
    user_guide
    install
    api
+   changes
+   license
 
 :home: https://bcda-aps.github.io/mdaviz/
 :bug tracker: https://github.com/BCDA-APS/mdaviz/issues

@@ -55,14 +55,13 @@ def num2fstr(x):
 
 def byte2str(byte_literal):
     """
-    Converts a byte literal to a UTF-8 encoded string.
-    If the input is not a byte literal, it is returned as is without any conversion.
+    Converts a byte literal to a UTF-8 encoded string. If the input is not a byte literal, it is returned as is without any conversion.
 
     Parameters:
-    - byte_literal (bytes | Any): The byte literal to be decoded or any input to be returned as is if not bytes.
+        - byte_literal (bytes | Any): The byte literal to be decoded or any input to be returned as is if not bytes.
 
     Returns:
-    - str | Any: The decoded string if the input is a byte literal, otherwise the original input.
+        - str | Any: The decoded string if the input is a byte literal, otherwise the original input.
     """
     return (
         byte_literal.decode("utf-8")
@@ -81,19 +80,19 @@ def get_det(mda_file_data):
     The first detector is labeled D01 and subsequent detectors follow in numerical order.
 
     Parameters:
-    - mda_file_data: An instance of an mda.scanDim object, which contains the MDA file data to be processed.
+        - mda_file_data: An instance of an mda.scanDim object, which contains the MDA file data to be processed.
 
     Returns:
-    - A tuple containing:
-      - A dictionary (d) where keys are indexes, mapping to either scanPositioner or scanDetector objects.
-        The dictionary is structured as {0: p0, 1: P1, ..., np: D01, np+1: D02, ..., np+nd: DX}.
-      - The index (first_pos) of the first positioner in the returned dictionary. This is 1 if a positioner
-        other than the default index positioner exists, otherwise 0.
-      - The index (first_det) of the first detector in the returned dictionary, which directly follows the last positioner.
+        - A tuple containing:
+            - A dictionary (d) where keys are indexes, mapping to either scanPositioner or scanDetector objects.
+                The dictionary is structured as {0: p0, 1: P1, ..., np: D01, np+1: D02, ..., np+nd: DX}.
+            - The index (first_pos) of the first positioner in the returned dictionary. This is 1 if a positioner
+                other than the default index positioner exists, otherwise 0.
+            - The index (first_det) of the first detector in the returned dictionary, which directly follows the last positioner.
 
-    Note:
-    - p0 is created by default and corresponds to the point index, described as an 'Index' scanPositioner object with predefined properties.
-    - np is the total number of positioners, nd the number of detectors, and npts the number of data points actually acquired.
+    ..note::
+        - p0 is created by default and corresponds to the point index, described as an 'Index' scanPositioner object with predefined properties.
+        - np is the total number of positioners, nd the number of detectors, and npts the number of data points actually acquired.
     """
 
     d = {}
@@ -141,19 +140,18 @@ def get_scan(mda_file_data):
     follow in numerical order: p0, p1,... px, d01, d02,... dX.
 
     Parameters:
-    - mda_file_data: An instance of an mda.scanDim object to be processed.
+        - mda_file_data: An instance of an mda.scanDim object to be processed.
 
     Returns:
-    - A tuple containing:
-      - A dictionary keyed by index, each mapping to a sub-dictionary containing
-        the scan object ('object') along with its 'data', 'unit', 'name' and 'type'.
-        Structure:
-        {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...',
-             'type':...}}.
-      - The index (first_pos) of the first positioner in the returned dictionary. This
-        is 1 if a positioner other than the default index positioner exists, otherwise 0.
-      - The index (first_det) of the first detector in the returned dictionary, which
-        directly follows the last positioner.
+        - A tuple containing:
+            - A dictionary keyed by index, each mapping to a sub-dictionary containing
+              the scan object ('object') along with its 'data', 'unit', 'name' and 'type'.
+              Structure:
+              {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...','type':...}}.
+            - The index (first_pos) of the first positioner in the returned dictionary. This
+              is 1 if a positioner other than the default index positioner exists, otherwise 0.
+            - The index (first_det) of the first detector in the returned dictionary, which
+              directly follows the last positioner.
     """
 
     d = {}
