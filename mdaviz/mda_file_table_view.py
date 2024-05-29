@@ -135,7 +135,8 @@ class MDAFileTableView(QtWidgets.QWidget):
             - A tuple of (datasets, plot_options), where datasets is a list of tuples containing the
               data and options (label) for each dataset, and plot_options contains overall plotting configurations.
 
-        ..note::
+        .. note::
+
         scanDict = {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...','type':...}}.
         """
 
