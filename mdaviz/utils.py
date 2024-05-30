@@ -75,22 +75,22 @@ def get_det(mda_file_data):
     Extracts scan positioners and detectors from an MDA file data object.
 
     This function processes an mda.scanDim object to extract its scanPositioner and scanDetector instances.
-    It organizes these instances into a dictionary, with their indexes as keys in the order of p0, P1,... Px, D01, D02,... DX.
-    p0 is a default scanPositioner object representing the point index. If additional positioners exist, they follow p0 in sequence.
-    The first detector is labeled D01 and subsequent detectors follow in numerical order.
+    It organizes these instances into a dictionary, with their indexes as keys in the order of ``p0, P1,... Px, D01, D02,... DX``.
+    ``p0`` is a default scanPositioner object representing the point index. If additional positioners exist, they follow ``p0`` in sequence.
+    The first detector is labeled ``D01`` and subsequent detectors follow in numerical order.
 
     Parameters:
         - mda_file_data: An instance of an mda.scanDim object, which contains the MDA file data to be processed.
 
     Returns:
-        - A tuple containing:
+        A tuple containing:
             - A dictionary (d) where keys are indexes, mapping to either scanPositioner or scanDetector objects.
-                The dictionary is structured as {0: p0, 1: P1, ..., np: D01, np+1: D02, ..., np+nd: DX}.
+                The dictionary is structured as ``{0: p0, 1: P1, ..., np: D01, np+1: D02, ..., np+nd: DX}``.
             - The index (first_pos) of the first positioner in the returned dictionary. This is 1 if a positioner
                 other than the default index positioner exists, otherwise 0.
             - The index (first_det) of the first detector in the returned dictionary, which directly follows the last positioner.
 
-    ..note::
+    Notes:
         - p0 is created by default and corresponds to the point index, described as an 'Index' scanPositioner object with predefined properties.
         - np is the total number of positioners, nd the number of detectors, and npts the number of data points actually acquired.
     """
