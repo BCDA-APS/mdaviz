@@ -135,22 +135,19 @@ class MDAFileTableView(QtWidgets.QWidget):
             - A tuple of (datasets, plot_options), where datasets is a list of tuples containing the
               data and options (label) for each dataset, and plot_options contains overall plotting configurations.
 
-        .. note::
-
-        scanDict = {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...','type':...}}.
         """
 
         datasets, plot_options = [], {}
 
         if self.data() is not None:
-            # extract scan info:
+            # ------ extract scan info:
             fileName = self.data()["fileInfo"]["fileName"]
             filePath = self.data()["fileInfo"]["filePath"]
             scanDict = self.data()["fileInfo"]["scanDict"]
-            # extract x data:
+            # ------ extract x data:
             x_index = selections.get("X")
-            x_data = scanDict[x_index].get("data") if x_index in scanDict else None
-            # extract y(s) data:
+            x_data = scanDict[x_index].get("data") if x_index in scanDict else None # scanDict = {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...','type':...}}.            
+            # ------ extract y(s) data:
             y_index = selections.get("Y", [])
             y_first_unit = y_first_name = ""
             for i, y in enumerate(y_index):
