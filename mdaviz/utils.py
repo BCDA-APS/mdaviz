@@ -226,10 +226,10 @@ def mda2ftm(selection):
     This is used to sync selection states between SelectFieldsTableModel and MDA_MVC.
 
     Parameters:
-    - selection (dict): The selection in MVC format to be converted.
+        - selection (dict): The selection in MVC format to be converted.
 
     Returns:
-    - dict: The selection converted to TM format.
+        - dict: The selection converted to TM format.
     """
     if selection is not None:
         ftm_selection = {
@@ -250,10 +250,10 @@ def ftm2mda(selection):
     Used to update MDA_MVC selection state (self.selectionField()) based on changes in SelectFieldsTableModel.
 
     Parameters:
-    - selection (dict): The selection in TM format to be converted.
+        - selection (dict): The selection in TM format to be converted.
 
     Returns:
-    - dict: The selection converted to MVC format.
+        - dict: The selection converted to MVC format.
     """
     mda_selection = {}
     if selection is not None:
@@ -334,10 +334,11 @@ def reconnect(signal, new_slot):
     Disconnects any slots connected to the given signal and then connects the signal to the new_slot.
 
     Parameters:
-    - signal: The signal to disconnect and then reconnect.
-    - new_slot: The new slot to connect to the signal.
+        - signal: The signal to disconnect and then reconnect.
+        - new_slot: The new slot to connect to the signal.
 
-    Note: This function catches TypeError which occurs if the signal was not connected to any slots.
+    Note: 
+        - this function catches TypeError which occurs if the signal was not connected to any slots.
     """
     try:
         signal.disconnect()
