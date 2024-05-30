@@ -146,7 +146,7 @@ class MDAFileTableView(QtWidgets.QWidget):
             scanDict = self.data()["fileInfo"]["scanDict"]
             # ------ extract x data:
             x_index = selections.get("X")
-            x_data = scanDict[x_index].get("data") if x_index in scanDict else None # scanDict = {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...','type':...}}.            
+            x_data = scanDict[x_index].get("data") if x_index in scanDict else None            
             # ------ extract y(s) data:
             y_index = selections.get("Y", [])
             y_first_unit = y_first_name = ""
@@ -166,7 +166,7 @@ class MDAFileTableView(QtWidgets.QWidget):
                 ds_options["label"] = y_label
                 ds = [x_data, y_data] if x_data is not None else [y_data]
                 datasets.append((ds, ds_options))
-
+            # scanDict = {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...','type':...}}
             plot_options = {
                 "x": scanDict[x_index].get("name", "") if x_index in scanDict else "",
                 "x_unit": (
