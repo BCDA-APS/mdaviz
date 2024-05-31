@@ -5,6 +5,7 @@ mdaviz: Python Qt5 application to visualize Bluesky data from tiled server.
 """
 
 import logging
+import pathlib
 import sys
 
 
@@ -41,6 +42,21 @@ def command_line_interface():
     )
     # fmt: on
 
+    parser.add_argument(
+        "directory",
+        default=".",
+        help=(
+            "Directory for the new instrument."
+            "  If omitted, use the present working directory"
+            f" ({pathlib.Path('.').absolute()})."
+            "  The directory will be created if it does not exist."
+            "  If the directory exists and it is not empty, this"
+            " program will stop before any action is taken."
+        ),
+        nargs="?",
+        type=str,
+    )
+
     parser.add_argument("-v", "--version", action="version", version=__version__)
 
     return parser.parse_args()
@@ -50,6 +66,8 @@ def main():  # for future command-line options
     global logger
 
     options = command_line_interface()
+
+    print(f"{options.directory=!r}")
 
     logging.basicConfig(level=options.log.upper())
     logger = logging.getLogger(__name__)
