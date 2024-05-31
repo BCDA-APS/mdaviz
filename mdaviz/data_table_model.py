@@ -1,25 +1,32 @@
+"""
+.. autosummary::
+
+    ~DataTableModel
+
+"""
+
 from PyQt5 import QtCore
 from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt
 
 
 class DataTableModel(QAbstractTableModel):
-    """
-    This model is designed to handle data represented as a dictionary where keys correspond to column labels and values are lists of data points for each column.
+    """This model is designed to handle data represented as a dictionary where keys correspond to column labels and values are lists of data points for each column.
 
-    Parameters:
-    - scanDict (dict): A dictionary where keys are pos/det indexes and values are dictionaries:
-        {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...','type':...}}.
-    - parent (QObject, optional): The parent object for this table model, default is None.
+
+    Args:
+        - scanDict (dict): A dictionary where keys are pos/det indexes and values are dictionaries:
+          {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...','type':...}}.
+        - parent (QObject, optional): The parent object for this table model, default is None.
 
     Methods:
-    - rowCount: Returns the number of rows in the table model.
-    - columnCount: Returns the number of columns in the table model.
-    - data: Returns the data to be displayed for a given index and role.
-    - headerData: Provides the header labels for the table model.
-    - columnLabels: Returns a list of column labels.
-    - setColumnLabels: Sets the column labels based on keys from the input dictionary.
-    - allData: Returns the current data stored in the model.
-    - setAllData: Sets the model's data using the input dictionary.
+        - rowCount: Returns the number of rows in the table model.
+        - columnCount: Returns the number of columns in the table model.
+        - data: Returns the data to be displayed for a given index and role.
+        - headerData: Provides the header labels for the table model.
+        - columnLabels: Returns a list of column labels.
+        - setColumnLabels: Sets the column labels based on keys from the input dictionary.
+        - allData: Returns the current data stored in the model.
+        - setAllData: Sets the model's data using the input dictionary.
 
     The model dynamically adjusts to changes in the input data, updating both the data displayed and the column headers as necessary.
     """

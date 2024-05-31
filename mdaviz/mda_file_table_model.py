@@ -23,9 +23,9 @@ such a 'list(object)' or 'dict(str=object)', then change both 'columns()' and
 
 .. autosummary::
 
-    ~SelectFieldsTableModel
+    ~MDAFileTableModel
     ~ColumnDataType
-    ~FieldSelectionRuleType
+    ~FieldRuleType
     ~TableColumn
     ~TableField
 """

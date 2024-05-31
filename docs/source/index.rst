@@ -1,26 +1,18 @@
-======
-mdaviz
-======
+=======================
+mdaviz: MDA Data Viewer
+=======================
 
-Python Qt5 application to visualize mda data.
 
-.. from gemviz
-   .. list-table::
-      :widths: 1 2
 
-      * - ..  figure:: _static/gemviz_gui.png
-            :alt: fig.gemviz_gui
-      - * Browse catalogs of Bluesky data
-         * Search for data by keywords or date
-         * Visualize (1-D plots now)
+Key Features
+============
 
-.. toctree::
-   :maxdepth: 1
-   :hidden:
+* Visualize MDA data (currently supports 1-D plots)
+* Basic mathematical information and cursor utilities
+* Fitting functionality coming soon
 
-   user_guide
-   install
-   api
+Documentation
+=============
 
 .. icons: https://fonts.google.com/icons
 .. grid:: 3
@@ -38,9 +30,43 @@ Python Qt5 application to visualize mda data.
       :link-type: doc
 
 
-Indices and tables
-==================
+.. figure:: _static/mdaviz_gui.png
+   :alt: fig.mdaviz_gui
+   :width: 100%
+   :align: center
+   :figclass: align-center
+   :figwidth: 100%
+   
+   Screenshot of the mdaviz GUI displaying sample data. 
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. toctree::
+   :maxdepth: 1
+   :glob:
+   :caption: Contents:
+   :hidden:
+
+   user_guide
+   install
+   api
+   changes
+   license
+
+About
+=====
+
+:home: https://bcda-aps.github.io/mdaviz/
+:bug tracker: https://github.com/BCDA-APS/mdaviz/issues
+:source: https://github.com/BCDA-APS/mdaviz
+:license: :ref:`license`
+:full version: |release|
+:published: |today|
+:revisions: :ref:`History of code changes <changes>`
+:index: :ref:`genindex`
+:module: :ref:`modindex`
+:search: :ref:`search`
+
+Acknowledgements
+================
+
+"This product includes software produced by UChicago Argonne, LLC 
+under Contract No. DE-AC02-06CH11357 with the Department of Energy."
