@@ -49,6 +49,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
+        self.setFolderPath(self.directory)
 
     @property
     def status(self):
