@@ -271,7 +271,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
                 if self.mvc_folder is not None:
                     # If MVC exists, display empty table views
-                    self.mvc_folder.updateFolderView()
+                    self.mvc_folder.mda_folder_tableview.clearContents()
+                    # self.mvc_folder.updateFolderView()
 
     def setSubFolderPath(self, subfolder_name):
         if subfolder_name:
