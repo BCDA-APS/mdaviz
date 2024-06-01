@@ -18,7 +18,6 @@ from .opendialog import DIR_SETTINGS_KEY
 
 UI_FILE = utils.getUiFileName(__file__)
 MAX_RECENT_DIRS = 10
-DATA_FOLDER_INVALID = Path(__file__).parent / "fake_folder"
 MAX_DEPTH = 4
 MAX_SUBFOLDERS_PER_DEPTH = 10
 
@@ -298,7 +297,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """Set the list of recent folder and remove duplicate"""
         unique_paths = set()
         new_path_list = []
-        candidate_paths = [self.directory, str(DATA_FOLDER_INVALID), "Other..."]
+        candidate_paths = [self.directory, "Other..."]
         if not folder_list:
             recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)
             recent_dirs = recent_dirs_str.split(",") if recent_dirs_str else []
