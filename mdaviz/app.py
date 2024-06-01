@@ -9,15 +9,17 @@ import pathlib
 import sys
 
 
-def gui():
+def gui(directory):
     """Display the main window"""
     from PyQt5 import QtWidgets
 
     from .mainwindow import MainWindow
 
     app = QtWidgets.QApplication(sys.argv)
-    main_window = MainWindow()
-    main_window.setStatus("Application started ...")
+    main_window = MainWindow(directory=directory)
+    main_window.setStatus(
+        f"Application started, loading {pathlib.Path(directory).absolute()} ..."
+    )
     main_window.show()
     sys.exit(app.exec())
 
@@ -46,12 +48,9 @@ def command_line_interface():
         "directory",
         default=".",
         help=(
-            "Directory for the new instrument."
+            "Directory loaded at start up."
             "  If omitted, use the present working directory"
             f" ({pathlib.Path('.').absolute()})."
-            "  The directory will be created if it does not exist."
-            "  If the directory exists and it is not empty, this"
-            " program will stop before any action is taken."
         ),
         nargs="?",
         type=str,
@@ -77,7 +76,7 @@ def main():  # for future command-line options
     for package in "httpcore httpx PyQt5 tiled".split():
         logging.getLogger(package).setLevel(logging.WARNING)
 
-    gui()
+    gui(options.directory)
 
 
 if __name__ == "__main__":

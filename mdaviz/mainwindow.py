@@ -18,8 +18,9 @@ MAX_SUBFOLDERS_PER_DEPTH = 10
 class MainWindow(QtWidgets.QMainWindow):
     """The main window of the app, built in Qt designer."""
 
-    def __init__(self):
+    def __init__(self, directory):
         super().__init__()
+        self.directory = directory
         utils.myLoadUi(UI_FILE, baseinstance=self)
         icon_path = Path(__file__).parent / "resources" / "viz.jpg"
         self.setWindowIcon(QIcon(str(icon_path)))
