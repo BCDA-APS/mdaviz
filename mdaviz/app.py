@@ -1,7 +1,13 @@
 #!/usr/bin/env python
 
 """
-mdaviz: Python Qt5 application to visualize Bluesky data from tiled server.
+mdaviz: Python Qt5 application to visualize mda data.
+
+.. autosummary::
+
+    ~gui
+    ~command_line_interface
+    ~main
 """
 
 import logging
@@ -46,13 +52,7 @@ def command_line_interface():
 
     parser.add_argument(
         "directory",
-        default=".",
-        help=(
-            "Directory loaded at start up."
-            "  If omitted, use the present working directory"
-            f" ({pathlib.Path('.').absolute()})."
-        ),
-        nargs="?",
+        help=("Directory loaded at start up. This argument is required."),
         type=str,
     )
 
@@ -62,11 +62,35 @@ def command_line_interface():
 
 
 def main():  # for future command-line options
+    from pathlib import Path
+
     global logger
 
-    options = command_line_interface()
+    try:
+        options = command_line_interface()
+    except SystemExit as e:
+        print(
+            "\n\nERROR: You must specified the directory:\n\tmdaviz /path/to/mda/data\n"
+        )
+        sys.exit(1)
 
-    print(f"{options.directory=!r}")
+    # Resolve the directory to an absolute path and remove trailing slash
+    directory_path = Path(options.directory).resolve()
+    directory = directory_path.as_posix().rstrip("/")
+
+    # Ensure the path is absolute (starts with a "/")
+    if not directory.startswith("/"):
+        print(
+            f"\n\nERROR: The specified directory is not an absolute path:\n\t{directory}\n"
+        )
+        sys.exit(1)
+
+    # Check if the directory exists
+    if not directory_path.exists() or not directory_path.is_dir():
+        print(
+            f"\n\nERROR: The specified directory does not exist or is not a directory:\n\t{directory}\n"
+        )
+        sys.exit(1)
 
     logging.basicConfig(level=options.log.upper())
     logger = logging.getLogger(__name__)
@@ -76,7 +100,7 @@ def main():  # for future command-line options
     for package in "httpcore httpx PyQt5 tiled".split():
         logging.getLogger(package).setLevel(logging.WARNING)
 
-    gui(options.directory)
+    gui(directory)
 
 
 if __name__ == "__main__":
