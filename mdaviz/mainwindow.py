@@ -30,7 +30,6 @@ class MainWindow(QtWidgets.QMainWindow):
         ~setup
         ~status
         ~setStatus
-        ~updateRecentFolders
         ~doAboutDialog
         ~closeEvent
         ~doClose
@@ -47,6 +46,9 @@ class MainWindow(QtWidgets.QMainWindow):
         ~setSubfolderList
         ~setFolderPath
         ~setSubFolderPath
+        ~setFolderList
+        ~updateRecentFolders
+        ~updateFolderList
     """
 
     def __init__(self, directory):
@@ -79,28 +81,10 @@ class MainWindow(QtWidgets.QMainWindow):
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
         self.setFolderPath(self.directory)
-        self.updateRecentFolders(self.directory)
 
     @property
     def status(self):
         return self.statusbar.currentMessage()
-
-    def updateRecentFolders(self, folder_name):
-        recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)
-        recent_dirs = recent_dirs_str.split(",") if recent_dirs_str else []
-        if folder_name in recent_dirs:
-            recent_dirs.remove(folder_name)
-        recent_dirs.insert(0, str(folder_name))
-        recent_dirs = recent_dirs[:MAX_RECENT_DIRS]
-        recent_dirs = [dir for dir in recent_dirs if dir != "."]
-        settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs))
-
-    def updateFolderList(self, folder_list):
-        """Sets the recent folder list, updating the internal folder list & populate the QComboBox"""
-        self.setFolderList(folder_list)
-        folder_list = self.folderList()
-        self.folder.clear()
-        self.folder.addItems(folder_list)
 
     def setStatus(self, text, timeout=0):
         """Write new status to the main window and terminal output."""
@@ -271,7 +255,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 if self.mvc_folder is not None:
                     # If MVC exists, display empty table views
                     self.mvc_folder.mda_folder_tableview.clearContents()
-                    # self.mvc_folder.updateFolderView()
 
     def setSubFolderPath(self, subfolder_name):
         if subfolder_name:
@@ -310,3 +293,20 @@ class MainWindow(QtWidgets.QMainWindow):
                 unique_paths.add(p)
                 new_path_list.append(p)
         self._folderList = new_path_list
+
+    def updateRecentFolders(self, folder_name):
+        recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)
+        recent_dirs = recent_dirs_str.split(",") if recent_dirs_str else []
+        if folder_name in recent_dirs:
+            recent_dirs.remove(folder_name)
+        recent_dirs.insert(0, str(folder_name))
+        recent_dirs = recent_dirs[:MAX_RECENT_DIRS]
+        recent_dirs = [dir for dir in recent_dirs if dir != "."]
+        settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs))
+
+    def updateFolderList(self, folder_list):
+        """Sets the recent folder list, updating the internal folder list & populate the QComboBox"""
+        self.setFolderList(folder_list)
+        folder_list = self.folderList()
+        self.folder.clear()
+        self.folder.addItems(folder_list)
