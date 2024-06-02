@@ -46,9 +46,9 @@ class MainWindow(QtWidgets.QMainWindow):
         ~setSubfolderList
         ~setFolderPath
         ~setSubFolderPath
+        ~cleanFolderList
         ~setFolderList
         ~updateRecentFolders
-        ~updateFolderList
     """
 
     def __init__(self, directory):
@@ -68,7 +68,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.mvc_folder = None
 
         self.setWindowTitle(APP_TITLE)
-        self.updateFolderList(None)
+        self.setFolderList(None)
+
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
@@ -132,7 +133,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 folder_list[0] = dir_name
             else:
                 folder_list.insert(0, dir_name)
-            self.updateFolderList(folder_list)
+            self.setFolderList(folder_list)
 
     def dataPath(self):
         """
@@ -276,8 +277,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.mvc_folder.updateFolderView()
                 self.setStatus("No MDA files found in the selected folder.")
 
-    def setFolderList(self, folder_list=None):
-        """Set the list of recent folder and remove duplicate"""
+    def cleanFolderList(self, folder_list=None):
+        """Check the list of recent folder and remove duplicate"""
         unique_paths = set()
         new_path_list = []
         candidate_paths = [self.directory, "Other..."]
@@ -292,7 +293,14 @@ class MainWindow(QtWidgets.QMainWindow):
             if p not in unique_paths:
                 unique_paths.add(p)
                 new_path_list.append(p)
-        self._folderList = new_path_list
+        return new_path_list
+
+    def setFolderList(self, folder_list):
+        """Sets the folder list, updating the internal folder list & populate the QComboBox"""
+        folder_list = self.cleanFolderList(folder_list)
+        self.folder.clear()
+        self.folder.addItems(folder_list)
+        self._folderList = folder_list
 
     def updateRecentFolders(self, folder_name):
         recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)
@@ -303,10 +311,3 @@ class MainWindow(QtWidgets.QMainWindow):
         recent_dirs = recent_dirs[:MAX_RECENT_DIRS]
         recent_dirs = [dir for dir in recent_dirs if dir != "."]
         settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs))
-
-    def updateFolderList(self, folder_list):
-        """Sets the recent folder list, updating the internal folder list & populate the QComboBox"""
-        self.setFolderList(folder_list)
-        folder_list = self.folderList()
-        self.folder.clear()
-        self.folder.addItems(folder_list)
