@@ -21,16 +21,8 @@ def test_app_startup(qtbot):
         # FIXME: dumps core
         # app = QtWidgets.QApplication([])
         # assert app is not None
-        # Create a temporary directory
-        with tempfile.TemporaryDirectory() as temp_dir:
-            # Create necessary files in temp_dir
-            # For example, if MainWindow requires an MDA file:
-            mda_file_path = os.path.join(temp_dir, "sample.mda")
-            with open(mda_file_path, "w") as f:
-                f.write("Sample MDA content")  # Replace with minimal valid MDA content
-
-            # Pass the temporary directory to MainWindow
-            main_window = MainWindow(directory=temp_dir)
+        test_data_dir = os.path.join(os.path.dirname(__file__), "test_data")
+        main_window = MainWindow(directory=test_data_dir)
         assert main_window is not None
         # main_window.setStatus("Application started ...")
         # main_window.show()
