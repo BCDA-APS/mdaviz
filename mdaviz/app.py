@@ -66,13 +66,7 @@ def main():  # for future command-line options
 
     global logger
 
-    try:
-        options = command_line_interface()
-    except SystemExit as e:
-        print(
-            "\n\nERROR: You must specified the directory:\n\tmdaviz /path/to/mda/data\n"
-        )
-        sys.exit(1)
+    options = command_line_interface()
 
     # Resolve the directory to an absolute path and remove trailing slash
     directory_path = Path(options.directory).resolve()
