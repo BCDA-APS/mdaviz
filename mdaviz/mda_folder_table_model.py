@@ -7,7 +7,7 @@ QAbstractTableModel of folder content.
 """
 
 from .synApps_mdalib.mda import readMDA
-from pathlib import Path
+import re
 from PyQt5 import QtCore
 from . import utils
 
@@ -63,10 +63,21 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
     # ------------ local methods
 
     def get_file_info(self, file):
+
+        def extract_prefix(filename, scan_number):
+            scan_number = str(scan_number)
+            pattern = rf"^(.*?)(_?0*{scan_number})\.mda$"
+            match = re.match(pattern, filename)
+            if match:
+                prefix = match.group(1).rstrip("_")
+                return prefix
+            return None
+
         file_path = self.mda_mvc.dataPath() / file
         file_data = readMDA(str(file_path))[1]
-        file_prefix = file.rsplit("_", 1)[0]
-        file_num = int(file.rsplit("_", 1)[1].split(".")[0])
+        file_metadata = readMDA(str(file_path))[0]
+        file_num = file_metadata.get("scan_number", None)
+        file_prefix = extract_prefix(file, file_num)
         file_size = utils.human_readable_size(file_path.stat().st_size)
         file_date = utils.byte2str(file_data.time).split(".")[0]
         file_pts = file_data.curr_pt
