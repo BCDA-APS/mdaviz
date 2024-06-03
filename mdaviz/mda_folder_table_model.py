@@ -65,12 +65,14 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
     def get_file_info(self, file):
 
         def extract_prefix(filename, scan_number):
+            """Create a pattern that matches the prefix followed by an optional separator and the scan number with possible leading zeros
+            The separators considered here are underscore (_), hyphen (-), dot (.), and space ( )
+            """
             scan_number = str(scan_number)
-            pattern = rf"^(.*?)(_?0*{scan_number})\.mda$"
+            pattern = rf"^(.*?)[_\-\. ]?0*{scan_number}\.mda$"
             match = re.match(pattern, filename)
             if match:
-                prefix = match.group(1).rstrip("_")
-                return prefix
+                return match.group(1)
             return None
 
         file_path = self.mda_mvc.dataPath() / file
