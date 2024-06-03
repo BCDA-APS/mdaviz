@@ -58,19 +58,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setup()
 
     def setup(self):
-        # self._dataPath = None  # the combined data path obj (folder.parent + subfolder)
-        # self._folderPath = None  # the path obj from pull down 1
-        # self._folderList = []  # the list of folder in pull down 1
-        # self._subFolderPath = None  # the subfolder path obj selected in pull down 2
-        # self._subFolderList = []  # the list of subfolder in pull down 2
-        # self._mdaFileList = []  # the list of mda file NAME str (name only)
         self._dataPath = None  # the combined data path obj (folder.parent + subfolder)
         self._folderPath = None  # the path obj from pull down 1
-
+        self._folderList = []  # the list of folder in pull down 1
         self._subFolderPath = None  # the subfolder path obj selected in pull down 2
-        self._subFolderList = []  # the list of subfolder in pull down 2
+        # self._subFolderList = []  # the list of subfolder in pull down 2
+        # self._mdaFileList = []  # the list of mda file NAME str (name only)
 
-        self.setFolderList()  # the list of folder in pull down 1
+        self.setSubFolderList([])  # the list of folder in pull down 1
         self.setMdaFileList()  # the list of mda file NAME str (name only)
 
         self.mvc_folder = None
@@ -179,7 +174,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def setSubFolderName(self):
         self._subFolderPath = Path(self.subfolder.currentText())
 
-    def setSubfolderList(self, subfolder_list):
+    def setSubFolderList(self, subfolder_list):
         """Set the subfolders path list in the pop-up list."""
         self._subFolderList = subfolder_list
         self.subfolder.clear()
@@ -248,13 +243,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
                     return subfolder_list
 
-                self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
+                self.setSubFolderList(get_all_subfolders(folder_path, folder_path.name))
                 self.updateRecentFolders(str(folder_path))
             else:
                 self._folderPath = None
                 self._dataPath = None
                 self.setMdaFileList(None)
-                self.setSubfolderList([])
+                self.setSubFolderList([])
                 self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
                 if self.mvc_folder is not None:
                     # If MVC exists, display empty table views
