@@ -350,7 +350,7 @@ class MDA_MVC(QtWidgets.QWidget):
             print(f"----- Selection After clean up: {self.selectionField()}\n")
 
     def updateDetectorSelection(
-        self, oldPvList, old_selection, newPvList, new_selection, verbose
+        self, oldPvList, old_selection, newPvList, new_selection, verbose=False
     ):
         """
         Helper function to update detector selections in the new selection field.
@@ -379,7 +379,7 @@ class MDA_MVC(QtWidgets.QWidget):
 
     # # ------------ File selection methods:
 
-    def onFileSelected(self, index, verbose=True):
+    def onFileSelected(self, index, verbose=False):
         """
         - Handles the selection of a new file in the folder table view.
         - Updates the UI to:
@@ -407,7 +407,7 @@ class MDA_MVC(QtWidgets.QWidget):
         """
 
         selected_file = self.mdaFileList()[index.row()]
-        self.setStatus(f"\n\n========= {selected_file} in {str(self.dataPath())}")
+        self.setStatus(f"\nLoading {str(self.dataPath())}/{selected_file}")
 
         # Ensures the table view scrolls to the selected item.
         if isinstance(index, QtCore.QModelIndex):
