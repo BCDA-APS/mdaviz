@@ -32,7 +32,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self._subFolderPath = None  # the subfolder path obj selected in pull down 2
         self._subFolderList = []  # the list of subfolder in pull down 2
         self._mdaFileList = []  # the list of mda file NAME str (name only)
-        self._mdaFileCount = 0  # the number of mda files in the list
         self.mvc_folder = None
 
         self.setWindowTitle(APP_TITLE)
@@ -127,10 +126,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
         return self._mdaFileList
-
-    def mdaFileCount(self):
-        """Number of mda files in the selected folder."""
-        return self._mdaFileCount
 
     def setMdaFileList(self, data_path):
         if data_path:
@@ -230,7 +225,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 self._folderPath = None
                 self._dataPath = None
                 self._mdaFileList = []
-                self._mdaFileCount = 0
                 self.setSubfolderList([])
                 self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
                 if self.mvc_folder is not None:
@@ -243,9 +237,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self._dataPath = data_path
             layout = self.groupbox.layout()
             mda_files_path = list(data_path.glob("*.mda"))
-            self._mdaFileCount = len(mda_files_path)
             self.setMdaFileList(data_path)
-            self.info.setText(f"{self._mdaFileCount} mda files")
+            self.info.setText(f"{len(mda_files_path)} mda files")
             if self.mvc_folder is None:
                 self.mvc_folder = MDA_MVC(self)
                 layout.addWidget(self.mvc_folder)
