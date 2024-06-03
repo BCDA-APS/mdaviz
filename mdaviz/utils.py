@@ -109,7 +109,7 @@ def get_det(mda_file_data):
     # Defining a default scanPositioner Object for "Index" at for key=0:
     p0 = scanPositioner()
     p0.number = 0  # positioner number in sscan record
-    p0.fieldName = "p0"  # name of sscanRecord PV
+    p0.fieldName = "P0"  # name of sscanRecord PV
     p0.name = "Index"  # name of EPICS PV this positioner wrote to
     p0.desc = "Index"  # description of 'name' PV
     p0.step_mode = ""  # 'LINEAR', 'TABLE', or 'FLY'
@@ -337,7 +337,7 @@ def reconnect(signal, new_slot):
         - signal: The signal to disconnect and then reconnect.
         - new_slot: The new slot to connect to the signal.
 
-    Note: 
+    Note:
         - this function catches TypeError which occurs if the signal was not connected to any slots.
     """
     try:
