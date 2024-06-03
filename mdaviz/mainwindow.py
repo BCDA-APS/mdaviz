@@ -58,12 +58,21 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setup()
 
     def setup(self):
+        # self._dataPath = None  # the combined data path obj (folder.parent + subfolder)
+        # self._folderPath = None  # the path obj from pull down 1
+        # self._folderList = []  # the list of folder in pull down 1
+        # self._subFolderPath = None  # the subfolder path obj selected in pull down 2
+        # self._subFolderList = []  # the list of subfolder in pull down 2
+        # self._mdaFileList = []  # the list of mda file NAME str (name only)
         self._dataPath = None  # the combined data path obj (folder.parent + subfolder)
         self._folderPath = None  # the path obj from pull down 1
-        self._folderList = []  # the list of folder in pull down 1
+
         self._subFolderPath = None  # the subfolder path obj selected in pull down 2
         self._subFolderList = []  # the list of subfolder in pull down 2
-        self._mdaFileList = []  # the list of mda file NAME str (name only)
+
+        self.setFolderList()  # the list of folder in pull down 1
+        self.setMdaFileList()  # the list of mda file NAME str (name only)
+
         self.mvc_folder = None
 
         self.setWindowTitle(APP_TITLE)
@@ -161,7 +170,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """List of mda file (name only) in the selected folder."""
         return self._mdaFileList
 
-    def setMdaFileList(self, data_path):
+    def setMdaFileList(self, data_path=None):
         if data_path:
             self._mdaFileList = sorted([file.name for file in data_path.glob("*.mda")])
         else:
@@ -244,7 +253,7 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self._folderPath = None
                 self._dataPath = None
-                self._mdaFileList = []
+                self.setMdaFileList(None)
                 self.setSubfolderList([])
                 self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
                 if self.mvc_folder is not None:
