@@ -1,3 +1,11 @@
+"""
+Defines MainWindow class.
+
+.. autosummary::
+
+    ~MainWindow
+"""
+
 from pathlib import Path
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
@@ -9,20 +17,44 @@ from .user_settings import settings
 from .opendialog import DIR_SETTINGS_KEY
 
 UI_FILE = utils.getUiFileName(__file__)
-MAX_RECENT_DIRS = 5
-DATA_FOLDER_INVALID = Path(__file__).parent / "fake_folder"
+MAX_RECENT_DIRS = 10
 MAX_DEPTH = 4
 MAX_SUBFOLDERS_PER_DEPTH = 10
 
 
 class MainWindow(QtWidgets.QMainWindow):
-    """The main window of the app, built in Qt designer."""
+    """The main window of the app, built in Qt designer.
 
-    def __init__(self):
+    .. autosummary::
+
+        ~setup
+        ~status
+        ~setStatus
+        ~doAboutDialog
+        ~closeEvent
+        ~doClose
+        ~doOpen
+        ~dataPath
+        ~subFolderPath
+        ~folderPath
+        ~folderList
+        ~subFolderList
+        ~mdaFileList
+        ~mdaFileCount
+        ~setMdaFileList
+        ~setSubFolderName
+        ~setSubfolderList
+        ~setFolderPath
+        ~setSubFolderPath
+        ~cleanFolderList
+        ~setFolderList
+        ~updateRecentFolders
+    """
+
+    def __init__(self, directory):
         super().__init__()
+        self.directory = directory
         utils.myLoadUi(UI_FILE, baseinstance=self)
-        icon_path = Path(__file__).parent / "resources" / "viz.jpg"
-        self.setWindowIcon(QIcon(str(icon_path)))
         self.setup()
 
     def setup(self):
@@ -36,7 +68,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.mvc_folder = None
 
         self.setWindowTitle(APP_TITLE)
-        self.setRecent(None)
+        self.setFolderList(None)
+
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
@@ -48,6 +81,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
+        self.setFolderPath(self.directory)
 
     @property
     def status(self):
@@ -99,7 +133,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 folder_list[0] = dir_name
             else:
                 folder_list.insert(0, dir_name)
-            self.setRecent(folder_list)
+            self.setFolderList(folder_list)
 
     def dataPath(self):
         """
@@ -149,14 +183,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def setFolderPath(self, folder_name):
         """A folder was selected (from the open dialog)."""
-
         if folder_name == "Other...":
             self.doOpen()
-
         else:
             folder_path = Path(folder_name)
-            layout = self.groupbox.layout()
-
             if folder_path.exists() and folder_path.is_dir():  # folder exists
                 self._folderPath = folder_path
 
@@ -215,17 +245,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     return subfolder_list
 
                 self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
-
-                # Update the list of recent directories in settings
-                recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)
-                recent_dirs = recent_dirs_str.split(",") if recent_dirs_str else []
-                if folder_name in recent_dirs:
-                    recent_dirs.remove(folder_name)
-                recent_dirs.insert(0, str(folder_path))
-                recent_dirs = recent_dirs[:MAX_RECENT_DIRS]
-                recent_dirs = [dir for dir in recent_dirs if dir != "."]
-                settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs))
-
+                self.updateRecentFolders(str(folder_path))
             else:
                 self._folderPath = None
                 self._dataPath = None
@@ -235,7 +255,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
                 if self.mvc_folder is not None:
                     # If MVC exists, display empty table views
-                    self.mvc_folder.updateFolderView()
+                    self.mvc_folder.mda_folder_tableview.clearContents()
 
     def setSubFolderPath(self, subfolder_name):
         if subfolder_name:
@@ -257,11 +277,11 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.mvc_folder.updateFolderView()
                 self.setStatus("No MDA files found in the selected folder.")
 
-    def setFolderList(self, folder_list=None):
-        """Set the list of recent folder and remove duplicate"""
+    def cleanFolderList(self, folder_list=None):
+        """Check the list of recent folder and remove duplicate"""
         unique_paths = set()
         new_path_list = []
-        candidate_paths = ["", str(DATA_FOLDER_INVALID), "Other..."]
+        candidate_paths = [self.directory, "Other..."]
         if not folder_list:
             recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)
             recent_dirs = recent_dirs_str.split(",") if recent_dirs_str else []
@@ -273,61 +293,21 @@ class MainWindow(QtWidgets.QMainWindow):
             if p not in unique_paths:
                 unique_paths.add(p)
                 new_path_list.append(p)
-        self._folderList = new_path_list
+        return new_path_list
 
-    def setRecent(self, folder_list):
-        """Sets the recent folder list, updating the internal folder list & populate the QComboBox"""
-        self.setFolderList(folder_list)
-        folder_list = self.folderList()
+    def setFolderList(self, folder_list):
+        """Sets the folder list, updating the internal folder list & populate the QComboBox"""
+        folder_list = self.cleanFolderList(folder_list)
         self.folder.clear()
         self.folder.addItems(folder_list)
+        self._folderList = folder_list
 
-    ### Not in use at the moment, save for later?
-    # Was working but I decided to keep empty table views (header only)
-    # instead of removing the widgets completely.
-    #
-    # def clearContent(
-    #     self,
-    #     clear_sub=True,
-    #     clear_folder_view=True,
-    #     clear_field_view=True,
-    #     clear_visualization=True,
-    #     clear_all_layout=False,
-    # ):
-    #     if self.mvc_folder is not None:
-    #         # Clear widgets from the folder view group box
-    #         if clear_folder_view:
-    #             layout_folder = self.mvc_folder.folder_groupbox.layout()
-    #             for i in reversed(range(layout_folder.count())):
-    #                 item = layout_folder.itemAt(i)
-    #                 widget = item.widget() if item is not None else None
-    #                 if widget is not None:
-    #                     layout_folder.removeWidget(widget)
-    #                     widget.deleteLater()
-
-    #         # Clear widgets from the field view group box
-    #         if clear_field_view:
-    #             layout_field = self.mvc_folder.mda_groupbox.layout()
-    #             for i in reversed(range(layout_field.count())):
-    #                 item = layout_field.itemAt(i)
-    #                 widget = item.widget() if item is not None else None
-    #                 if widget is not None:
-    #                     layout_field.removeWidget(widget)
-    #                     widget.deleteLater()
-
-    #         # Clear widgets from the visualization group box
-    #         if clear_visualization:
-    #             layout_viz = self.mvc_folder.viz_groupbox.layout()
-    #             for i in reversed(range(layout_viz.count())):
-    #                 item = layout_viz.itemAt(i)
-    #                 widget = item.widget() if item is not None else None
-    #                 if widget is not None:
-    #                     layout_viz.removeWidget(widget)
-    #                     widget.deleteLater()
-
-    #     if clear_sub:
-    #         self.subfolder.clear()
-
-    #     if clear_all_layout:
-    #         layout = self.groupbox.layout()
-    #         utils.removeAllLayoutWidgets(layout)
+    def updateRecentFolders(self, folder_name):
+        recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)
+        recent_dirs = recent_dirs_str.split(",") if recent_dirs_str else []
+        if folder_name in recent_dirs:
+            recent_dirs.remove(folder_name)
+        recent_dirs.insert(0, str(folder_name))
+        recent_dirs = recent_dirs[:MAX_RECENT_DIRS]
+        recent_dirs = [dir for dir in recent_dirs if dir != "."]
+        settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs))

@@ -1,4 +1,5 @@
 from contextlib import nullcontext as does_not_raise
+import os
 
 # TODO: (below) from PyQt5 import QtWidgets
 
@@ -19,8 +20,8 @@ def test_app_startup(qtbot):
         # FIXME: dumps core
         # app = QtWidgets.QApplication([])
         # assert app is not None
-
-        main_window = MainWindow()
+        test_data_dir = os.path.join(os.path.dirname(__file__), "test_data")
+        main_window = MainWindow(directory=test_data_dir)
         assert main_window is not None
         # main_window.setStatus("Application started ...")
         # main_window.show()
