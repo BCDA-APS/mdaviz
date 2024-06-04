@@ -58,6 +58,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setup()
 
     def setup(self):
+        self.setWindowTitle(APP_TITLE)
+
         self._dataPath = None  # the combined data path obj (folder.parent + subfolder)
         self._folderPath = None  # the path obj from pull down 1
         self._folderList = []  # the list of folder in pull down 1
@@ -66,7 +68,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self._mdaFileList = []  # the list of mda file NAME str (name only)
         self.mvc_folder = None
 
-        self.setWindowTitle(APP_TITLE)
         self.setFolderList(None)
 
         self.actionOpen.triggered.connect(self.doOpen)
@@ -248,7 +249,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.setSubFolderList([])
                 self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
                 if self.mvc_folder is not None:
-                    # If MVC exists, display empty table views
+                    # If MVC exists, clear table
                     self.mvc_folder.mda_folder_tableview.clearContents()
 
     def setSubFolderPath(self, subfolder_name):
@@ -266,8 +267,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 # Always update the folder view since it is a new subfolder
                 self.mvc_folder.updateFolderView()
             if mda_files_path == []:
-                # If there are no MDA files, pass None to display empty table
-                self.mvc_folder.updateFolderView()
+                # If there are no MDA files, clear table view:
+                self.mvc_folder.mda_folder_tableview.clearContents()
                 self.setStatus("No MDA files found in the selected folder.")
 
     def cleanFolderList(self, folder_list=None):
