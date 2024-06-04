@@ -35,14 +35,12 @@ class MainWindow(QtWidgets.QMainWindow):
         ~doClose
         ~doOpen
         ~dataPath
-        ~subFolderPath
         ~folderPath
         ~folderList
         ~subFolderList
         ~mdaFileList
         ~mdaFileCount
         ~setMdaFileList
-        ~setSubFolderName
         ~setSubFolderList
         ~setFolderPath
         ~setSubFolderPath
@@ -63,7 +61,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self._dataPath = None  # the combined data path obj (folder.parent + subfolder)
         self._folderPath = None  # the path obj from pull down 1
         self._folderList = []  # the list of folder in pull down 1
-        self._subFolderPath = None  # the subfolder path obj selected in pull down 2
         self._subFolderList = []  # the list of subfolder in pull down 2
         self._mdaFileList = []  # the list of mda file NAME str (name only)
         self.mvc_folder = None
@@ -136,10 +133,6 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         return self._dataPath
 
-    def subFolderPath(self):
-        """Subfolder name (str) of the selected subfolder."""
-        return self._subFolderPath
-
     def folderPath(self):
         """Full path (obj) of the selected folder."""
         return self._folderPath
@@ -161,10 +154,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self._mdaFileList = sorted([file.name for file in data_path.glob("*.mda")])
         else:
             self._mdaFileList = []
-
-    def setSubFolderName(self):
-        # TODO setSubFolderName is redundant with setSubFolderPath, not used?
-        self._subFolderPath = Path(self.subfolder.currentText())
 
     def setFolderPath(self, folder_name):
         """A folder was selected (from the open dialog)."""
