@@ -43,7 +43,7 @@ class MainWindow(QtWidgets.QMainWindow):
         ~mdaFileCount
         ~setMdaFileList
         ~setSubFolderName
-        ~setSubfolderList
+        ~setSubFolderList
         ~setFolderPath
         ~setSubFolderPath
         ~cleanFolderList
@@ -170,7 +170,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def setSubFolderName(self):
         self._subFolderPath = Path(self.subfolder.currentText())
 
-    def setSubfolderList(self, subfolder_list):
+    def setSubFolderList(self, subfolder_list):
         """Set the subfolders path list in the pop-up list."""
         self._subFolderList = subfolder_list
         self.subfolder.clear()
@@ -239,13 +239,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
                     return subfolder_list
 
-                self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
+                self.setSubFolderList(get_all_subfolders(folder_path, folder_path.name))
                 self.updateRecentFolders(str(folder_path))
             else:
                 self._folderPath = None
                 self._dataPath = None
                 self._mdaFileList = []
-                self.setSubfolderList([])
+                self.setSubFolderList([])
                 self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
                 if self.mvc_folder is not None:
                     # If MVC exists, display empty table views
