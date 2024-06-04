@@ -112,9 +112,7 @@ class MainWindow(QtWidgets.QMainWindow):
         User chose exit (or quit), or closeEvent() was called.
         """
         self.setStatus("Application quitting ...")
-
         settings.saveWindowGeometry(self, "mainwindow_geometry")
-
         self.close()
 
     def doOpen(self, *args, **kw):
@@ -165,13 +163,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self._mdaFileList = []
 
     def setSubFolderName(self):
+        # TODO setSubFolderName is redundant with setSubFolderPath, not used?
         self._subFolderPath = Path(self.subfolder.currentText())
-
-    def setSubFolderList(self, subfolder_list):
-        """Set the subfolders path list in the pop-up list."""
-        self._subFolderList = subfolder_list
-        self.subfolder.clear()
-        self.subfolder.addItems(subfolder_list)
 
     def setFolderPath(self, folder_name):
         """A folder was selected (from the open dialog)."""
@@ -251,9 +244,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def setSubFolderPath(self, subfolder_name):
         if subfolder_name:
             data_path = self.folderPath().parent / Path(subfolder_name)
-            self._dataPath = data_path
+            self._dataPath = (
+                data_path  # TODO should be using setDataPath, not _dataPath
+            )
             layout = self.groupbox.layout()
             mda_files_path = list(data_path.glob("*.mda"))
+            # TODO I am building twice this list, here and in setMdaFileList? Only diff if here it is not sorted
             self.setMdaFileList(data_path)
             self.info.setText(f"{len(mda_files_path)} mda files")
             if self.mvc_folder is None:
@@ -261,17 +257,25 @@ class MainWindow(QtWidgets.QMainWindow):
                 layout.addWidget(self.mvc_folder)
             else:
                 # Always update the folder view since it is a new subfolder
+                # TODO:should I check if it is the same subfolder? so I don;t reload if not necessary?
                 self.mvc_folder.updateFolderView()
             if mda_files_path == []:
                 # If there are no MDA files, clear table view:
                 self.mvc_folder.mda_folder_tableview.clearContents()
                 self.setStatus("No MDA files found in the selected folder.")
 
-    def setFolderList(self, folder_list=None):
-        """Set the folder list, updating the internal folder list & populating the QComboBox.
+    def setSubFolderList(self, subfolder_list):
+        """Set the subfolders path list and populate the subfolder QComboBox."""
+        self.subfolder.clear()
+        self.subfolder.addItems(subfolder_list)
+        self._subFolderList = subfolder_list
 
-        If folder_list is None, the call to buildFolderList will take care of building the list
-        based on the recent list of folder saved in the app settings.
+    def setFolderList(self, folder_list=None):
+        """Set the folder path list & populating the folder QComboBox.
+
+        - If folder_list is not None, it will remove its duplicates.
+        - If folder_list is None, the call to buildFolderList will take care of building the list
+          based on the recent list of folder saved in the app settings.
 
         Args:
             folder_list (list, optional): the current list of recent folders. Defaults to None.
@@ -288,7 +292,6 @@ class MainWindow(QtWidgets.QMainWindow):
         - If folder_list is None, it grabs the list of recent folder from the app settings.
           The directory loaded at start-up and the "Other..." option will be added at index
           0 and -1, respectively.
-        - Only used in self.setFolderList.
 
         Args:
             folder_list (list, optional): a list folders. Defaults to None.
@@ -317,9 +320,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _updateRecentFolders(self, folder_path):
         """Add a new folder path to the list of recent folders in the app settings.
-
-        - The number of paths saved is limited to MAX_RECENT_DIRS
-        - Only used in self.setFolderPath.
 
         Args:
             folder_path (str): The path of the folder to be added.
