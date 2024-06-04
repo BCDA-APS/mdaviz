@@ -68,19 +68,19 @@ class MainWindow(QtWidgets.QMainWindow):
         self._mdaFileList = []  # the list of mda file NAME str (name only)
         self.mvc_folder = None
 
-        self.setFolderList(None)
+        self.setFolderList()
 
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
         utils.reconnect(self.open.released, self.doOpen)
-
         self.folder.currentTextChanged.connect(self.setFolderPath)
         self.subfolder.currentTextChanged.connect(self.setSubFolderPath)
 
+        self.setFolderPath(self.directory)
+
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
-        self.setFolderPath(self.directory)
 
     @property
     def status(self):
@@ -128,10 +128,7 @@ class MainWindow(QtWidgets.QMainWindow):
         dir_name = open_dialog.getExistingDirectory(self, "Select a Directory")
         if dir_name:
             folder_list = self.folderList()
-            if folder_list[0] == "":
-                folder_list[0] = dir_name
-            else:
-                folder_list.insert(0, dir_name)
+            folder_list.insert(0, dir_name)
             self.setFolderList(folder_list)
 
     def dataPath(self):
@@ -270,11 +267,24 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.mvc_folder.mda_folder_tableview.clearContents()
                 self.setStatus("No MDA files found in the selected folder.")
 
-    def cleanFolderList(self, folder_list=None):
-        """Check the list of recent folder and remove duplicate"""
+    def buildFolderList(self, folder_list=None):
+        """Build the list of recent folders and remove duplicates from the folder list.
+
+        - If folder_list is not None (after a doOpen call), it just removes duplicates.
+        - If folder_list is None, it grabs the list of recent folder from the app settings.
+          The directory loaded at start-up and the "Other..." option will be added at index
+          0 and -1, respectively.
+
+        Args:
+            folder_list (list, optional): a list folders. Defaults to None.
+
+        Returns:
+            list: list of folders to be populated in the QComboBox
+        """
         unique_paths = set()
         new_path_list = []
         candidate_paths = [self.directory, "Other..."]
+        print(f"{folder_list=}")
         if not folder_list:
             recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)
             recent_dirs = recent_dirs_str.split(",") if recent_dirs_str else []
@@ -286,21 +296,34 @@ class MainWindow(QtWidgets.QMainWindow):
             if p not in unique_paths:
                 unique_paths.add(p)
                 new_path_list.append(p)
+        print(f"{new_path_list=}")
         return new_path_list
 
-    def setFolderList(self, folder_list):
-        """Sets the folder list, updating the internal folder list & populate the QComboBox"""
-        folder_list = self.cleanFolderList(folder_list)
+    def setFolderList(self, folder_list=None):
+        """Set the folder list, updating the internal folder list & populating the QComboBox.
+
+        If folder_list is None, the call to buildFolderList will take care of building the list
+        based on the recent list of folder saved in the app settings.
+
+        Args:
+            folder_list (list, optional): the current list of recent folders. Defaults to None.
+        """
+        folder_list = self.buildFolderList(folder_list)
         self.folder.clear()
         self.folder.addItems(folder_list)
         self._folderList = folder_list
 
-    def updateRecentFolders(self, folder_name):
+    def updateRecentFolders(self, folder_path):
+        """Add a new folder path to the list of recent folder in the app setting.
+
+        Args:
+            folder_name (string): the path of the folder to be added.
+        """
         recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)
         recent_dirs = recent_dirs_str.split(",") if recent_dirs_str else []
-        if folder_name in recent_dirs:
-            recent_dirs.remove(folder_name)
-        recent_dirs.insert(0, str(folder_name))
+        if folder_path in recent_dirs:
+            recent_dirs.remove(folder_path)
+        recent_dirs.insert(0, str(folder_path))
         recent_dirs = recent_dirs[:MAX_RECENT_DIRS]
         recent_dirs = [dir for dir in recent_dirs if dir != "."]
         settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs))
