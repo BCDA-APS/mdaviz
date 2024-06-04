@@ -74,7 +74,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
         utils.reconnect(self.open.released, self.doOpen)
-        self.open.released.connect(self.doOpen)
 
         self.folder.currentTextChanged.connect(self.setFolderPath)
         self.subfolder.currentTextChanged.connect(self.setSubFolderPath)
@@ -249,7 +248,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.setSubFolderList([])
                 self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
                 if self.mvc_folder is not None:
-                    # If MVC exists, clear table
+                    # If MVC exists, clear table view:
                     self.mvc_folder.mda_folder_tableview.clearContents()
 
     def setSubFolderPath(self, subfolder_name):
