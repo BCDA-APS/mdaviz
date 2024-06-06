@@ -42,7 +42,19 @@ class MDAFolderTableView(QtWidgets.QWidget):
         from .mda_folder_table_model import MDAFolderTableModel
         from .empty_table_model import EmptyTableModel
 
+        from pathlib import Path
+
         data = self.mdaFileList()
+        # data_path = Path(self.mda_mvc.dataPath())
+        # data_path = (
+        #     Path(self.mda_mvc.mainWindow.folder.currentText()).parent
+        #     / self.mda_mvc.mainWindow.subfolder.currentText()
+        # )
+        # print(f"==== {data_path=}")
+        # data = [file for file in data if (data_path / file).is_file()]
+        if data:
+            print(f"==== {data[0]=}")
+
         if len(data) > 0:
             data_model = MDAFolderTableModel(data, self.mda_mvc)
             self.tableView.setModel(data_model)
