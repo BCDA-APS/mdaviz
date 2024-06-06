@@ -58,7 +58,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def setup(self):
         self.setWindowTitle(APP_TITLE)
 
-        self._dataPath = None  # the combined data path obj (folder.parent + subfolder)
+        self.setDataPath()  # the combined data path obj (folder.parent + subfolder)
+        # self._dataPath = None
         self._folderPath = None  # the path obj from pull down 1
         self._folderList = []  # the list of folder in pull down 1
         self._subFolderList = []  # the list of subfolder in pull down 2
@@ -149,9 +150,12 @@ class MainWindow(QtWidgets.QMainWindow):
         """List of mda file (name only) in the selected folder."""
         return self._mdaFileList
 
-    def setMdaFileList(self, data_path):
-        if data_path:
-            self._mdaFileList = sorted([file.name for file in data_path.glob("*.mda")])
+    def setDataPath(self, path=None):
+        self._dataPath = path
+
+    def setMdaFileList(self, path):
+        if path:
+            self._mdaFileList = sorted([file.name for file in path.glob("*.mda")])
         else:
             self._mdaFileList = []
 
@@ -222,7 +226,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self._updateRecentFolders(str(folder_path))
             else:
                 self._folderPath = None
-                self._dataPath = None
+                self.setDataPath()
                 self._mdaFileList = []
                 self.setSubFolderList([])
                 self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
@@ -233,9 +237,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def setSubFolderPath(self, subfolder_name):
         if subfolder_name:
             data_path = self.folderPath().parent / Path(subfolder_name)
-            self._dataPath = (
-                data_path  # TODO should be using setDataPath, not _dataPath
-            )
+            self.setDataPath(data_path)
             layout = self.groupbox.layout()
             mda_files_path = list(data_path.glob("*.mda"))
             # TODO I am building twice this list, here and in setMdaFileList? Only diff if here it is not sorted
