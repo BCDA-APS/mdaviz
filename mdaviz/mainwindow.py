@@ -58,13 +58,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def setup(self):
         self.setWindowTitle(APP_TITLE)
 
+        self.mvc_folder = None
         self.setDataPath()  # the combined data path obj (folder.parent + subfolder)
         # self._dataPath = None
-        self._folderPath = None  # the path obj from pull down 1
+        # self._folderPath = None  # the path obj from pull down 1
         self._folderList = []  # the list of folder in pull down 1
         self.setSubFolderList()  # the list of subfolder in pull down 2
         self.setMdaFileList()  # the list of mda file NAME str (name only)
-        self.mvc_folder = None
 
         self.setFolderList()
 
