@@ -63,7 +63,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._folderPath = None  # the path obj from pull down 1
         self._folderList = []  # the list of folder in pull down 1
         self._subFolderList = []  # the list of subfolder in pull down 2
-        self._mdaFileList = []  # the list of mda file NAME str (name only)
+        self.setMdaFileList()  # the list of mda file NAME str (name only)
         self.mvc_folder = None
 
         self.setFolderList()
@@ -153,11 +153,10 @@ class MainWindow(QtWidgets.QMainWindow):
     def setDataPath(self, path=None):
         self._dataPath = path
 
-    def setMdaFileList(self, path):
-        if path:
-            self._mdaFileList = sorted([file.name for file in path.glob("*.mda")])
-        else:
-            self._mdaFileList = []
+    def setMdaFileList(self, path=None):
+        self._mdaFileList = (
+            sorted([file.name for file in path.glob("*.mda")]) if path else []
+        )
 
     def setFolderPath(self, folder_name):
         """A folder was selected (from the open dialog)."""
@@ -227,7 +226,7 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self._folderPath = None
                 self.setDataPath()
-                self._mdaFileList = []
+                self.setMdaFileList()
                 self.setSubFolderList([])
                 self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
                 if self.mvc_folder is not None:
