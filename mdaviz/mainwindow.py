@@ -62,7 +62,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # self._dataPath = None
         self._folderPath = None  # the path obj from pull down 1
         self._folderList = []  # the list of folder in pull down 1
-        self._subFolderList = []  # the list of subfolder in pull down 2
+        self.setSubFolderList()  # the list of subfolder in pull down 2
         self.setMdaFileList()  # the list of mda file NAME str (name only)
         self.mvc_folder = None
 
@@ -254,7 +254,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.mvc_folder.mda_folder_tableview.clearContents()
                 self.setStatus("No MDA files found in the selected folder.")
 
-    def setSubFolderList(self, subfolder_list):
+    def setSubFolderList(self, subfolder_list=[]):
         """Set the subfolders path list and populate the subfolder QComboBox."""
         self.subfolder.clear()
         self.subfolder.addItems(subfolder_list)
