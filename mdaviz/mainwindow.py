@@ -56,27 +56,27 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setup()
 
     def setup(self):
-        self.setWindowTitle(APP_TITLE)
+        self.initialize()
+        self.connect()
+        self.setFolderPath(self.directory)
+        settings.restoreWindowGeometry(self, "mainwindow_geometry")
+        print("Settings are saved in:", settings.fileName())
 
+    def initialize(self):
+        self.setWindowTitle(APP_TITLE)
         self.mvc_folder = None
         self.setDataPath()  # the combined data path obj (folder.parent + subfolder)
-        self.setFolderList()  # the list of folder in pull down 1
-        self.setSubFolderList()  # the list of subfolder in pull down 2
+        self.setFolderList()  # the list of folder in pull down 1 (folder QCombobox)
+        self.setSubFolderList()  # the list of subfolder in pull down 2 (subfolder QCombobox)
         self.setMdaFileList()  # the list of mda file NAME str (name only)
 
-        self.setFolderList()
-
+    def connect(self):
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
         utils.reconnect(self.open.released, self.doOpen)
         self.folder.currentTextChanged.connect(self.setFolderPath)
         self.subfolder.currentTextChanged.connect(self.setSubFolderPath)
-
-        self.setFolderPath(self.directory)
-
-        settings.restoreWindowGeometry(self, "mainwindow_geometry")
-        print("Settings are saved in:", settings.fileName())
 
     @property
     def status(self):
