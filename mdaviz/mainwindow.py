@@ -16,9 +16,8 @@ from .user_settings import settings
 from .opendialog import DIR_SETTINGS_KEY
 
 UI_FILE = utils.getUiFileName(__file__)
+MAX_FILES = 100
 MAX_RECENT_DIRS = 10
-MAX_DEPTH = 4
-MAX_SUBFOLDERS_PER_DEPTH = 10
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -36,13 +35,10 @@ class MainWindow(QtWidgets.QMainWindow):
         ~dataPath
         ~folderPath
         ~folderList
-        ~subFolderList
         ~mdaFileList
         ~mdaFileCount
         ~setMdaFileList
-        ~setSubFolderList
         ~setFolderPath
-        ~setSubFolderPath
         ~setFolderList
         ~_buildFolderList
         ~_updateRecentFolders
@@ -55,9 +51,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.directory = directory
         self.mvc_folder = None
-        self.setDataPath()  # the combined data path obj (folder.parent + subfolder)
-        self.setFolderList()  # the list of recent folders in pull down 1 (folder QCombobox)
-        self.setSubFolderList()  # the list of subfolder in pull down 2 (subfolder QCombobox)
+        self.setDataPath()  # the combined data path obj
+        self.setFolderList()  # the list of recent folders in folder QCombobox
         self.setMdaFileList()  # the list of mda file NAME str (name only)
         self.setMdaInfoList()
 
@@ -72,8 +67,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
         utils.reconnect(self.open.released, self.doOpen)
-        self.folder.currentTextChanged.connect(self.setFolderPath)
-        self.subfolder.currentTextChanged.connect(self.setSubFolderPath)
+        self.folder.currentTextChanged.connect(self.onFolderSelected)
 
     @property
     def status(self):
@@ -125,7 +119,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def dataPath(self):
         """
         Full path object for the displayed data:
-            dataPath = folderPath.parent + subFolderPath
+            dataPath = folderPath
         """
         return self._dataPath
 
@@ -136,10 +130,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def folderList(self):
         """Folder path (str) list in the pull down menu."""
         return self._folderList
-
-    def subFolderList(self):
-        """Subfolder path (str) list in the pull down menu."""
-        return self._subFolderList
 
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
@@ -154,60 +144,51 @@ class MainWindow(QtWidgets.QMainWindow):
     def setDataPath(self, path=None):
         self._dataPath = path
 
-    def setMdaFileList(self, path=None):
-        self._mdaFileList = (
-            sorted([file.name for file in path.glob("*.mda")]) if path else []
-        )
+    def setMdaFileList(self, mda_file_list=None):
+        self._mdaFileList = mda_file_list if mda_file_list else []
 
-    def setFolderPath(self, folder_name):
-        """A folder was selected (from the open dialog)."""
+    def setFolderPath(self, folder_path=None):
+        self._folderPath = folder_path
+
+    def onFolderSelected(self, folder_name):
+        """A folder was selected (from the open dialog or pull down menu)."""
         if folder_name == "Other...":
             self.doOpen()
         else:
             folder_path = Path(folder_name)
             if folder_path.exists() and folder_path.is_dir():  # folder exists
-                self._folderPath = folder_path
+                self.setFolderPath(folder_path)
                 mda_list = [utils.get_file_info(f) for f in folder_path.glob("*.mda")]
-                mda_list = sorted(mda_list, key=lambda x: x["Name"])
-                self.setMdaInfoList(mda_list)
-                self.setSubFolderList([str(folder_path)])
-                self._updateRecentFolders(str(folder_path))
+                if mda_list:
+                    mda_list = sorted(mda_list, key=lambda x: x["Name"])
+                    mda_name_list = [entry["Name"] for entry in mda_list]
+                    self.info.setText(f"{len(mda_list)} mda files")
+                    self.setMdaInfoList(mda_list)
+                    self.setMdaFileList(mda_name_list)
+                    self.setDataPath(folder_path)
+                    self._updateRecentFolders(str(folder_path))
+                    layout = self.groupbox.layout()
+                    if self.mvc_folder is None:
+                        self.mvc_folder = MDA_MVC(self)
+                        layout.addWidget(self.mvc_folder)
+                    else:
+                        # Always update the folder view since it is a new folder
+                        self.mvc_folder.updateFolderView()
+                else:
+                    self.reset_mainwindow()
+                    self.setStatus("No MDA files found in the selected folder.")
             else:
-                self._folderPath = None
-                self.setDataPath()
-                self.setMdaFileList()
-                self.setSubFolderList()
+                self.reset_mainwindow()
                 self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
-                if self.mvc_folder is not None:
-                    # If MVC exists, clear table view:
-                    self.mvc_folder.mda_folder_tableview.clearContents()
 
-    def setSubFolderPath(self, subfolder_name):
-        if subfolder_name:
-            data_path = self.folderPath().parent / Path(subfolder_name)
-            self.setDataPath(data_path)
-            layout = self.groupbox.layout()
-            mda_files_path = list(data_path.glob("*.mda"))
-            # TODO I am building twice this list, here and in setMdaFileList? Only diff if here it is not sorted
-            self.setMdaFileList(data_path)
-            self.info.setText(f"{len(mda_files_path)} mda files")
-            if self.mvc_folder is None:
-                self.mvc_folder = MDA_MVC(self)
-                layout.addWidget(self.mvc_folder)
-            else:
-                # Always update the folder view since it is a new subfolder
-                # TODO:should I check if it is the same subfolder? so I don;t reload if not necessary?
-                self.mvc_folder.updateFolderView()
-            if mda_files_path == []:
-                # If there are no MDA files, clear table view:
-                self.mvc_folder.mda_folder_tableview.clearContents()
-                self.setStatus("No MDA files found in the selected folder.")
-
-    def setSubFolderList(self, subfolder_list=[]):
-        """Set the subfolders path list and populate the subfolder QComboBox."""
-        self.subfolder.clear()
-        self.subfolder.addItems(subfolder_list)
-        self._subFolderList = subfolder_list
+    def reset_mainwindow(self):
+        self.setFolderPath()
+        self.setDataPath()
+        self.setMdaInfoList()
+        self.setMdaFileList()
+        if self.mvc_folder is not None:
+            # If MVC exists, clear table view:
+            self.mvc_folder.mda_folder_tableview.clearContents()
 
     def setFolderList(self, folder_list=None):
         """Set the folder path list & populating the folder QComboBox.
