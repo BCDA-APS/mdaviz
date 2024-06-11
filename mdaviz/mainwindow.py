@@ -8,8 +8,6 @@ Defines MainWindow class.
 
 from pathlib import Path
 from PyQt5 import QtWidgets
-import re
-from .synApps_mdalib.mda import readMDA
 
 from . import APP_TITLE
 from .mda_folder import MDA_MVC
@@ -17,7 +15,6 @@ from . import utils
 from .user_settings import settings
 from .opendialog import DIR_SETTINGS_KEY
 
-HEADERS = "Prefix", "Scan #", "Points", "Dim", "Positioner", "Date", "Size"
 UI_FILE = utils.getUiFileName(__file__)
 MAX_RECENT_DIRS = 10
 MAX_DEPTH = 4
@@ -170,7 +167,7 @@ class MainWindow(QtWidgets.QMainWindow):
             folder_path = Path(folder_name)
             if folder_path.exists() and folder_path.is_dir():  # folder exists
                 self._folderPath = folder_path
-                mda_list = [self._get_file_info(f) for f in folder_path.glob("*.mda")]
+                mda_list = [utils.get_file_info(f) for f in folder_path.glob("*.mda")]
                 mda_list = sorted(mda_list, key=lambda x: x["Name"])
                 self.setMdaInfoList(mda_list)
                 self.setSubFolderList([str(folder_path)])
@@ -179,7 +176,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self._folderPath = None
                 self.setDataPath()
                 self.setMdaFileList()
-                self.setSubFolderList([])
+                self.setSubFolderList()
                 self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
                 if self.mvc_folder is not None:
                     # If MVC exists, clear table view:
@@ -276,43 +273,3 @@ class MainWindow(QtWidgets.QMainWindow):
         recent_dirs.insert(0, str(folder_path))
         recent_dirs = [dir for dir in recent_dirs if dir != "."]
         settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs[:MAX_RECENT_DIRS]))
-
-    def _get_file_info(self, file_path):
-        file_name = file_path.name
-        file_data = readMDA(str(file_path))[1]
-        file_metadata = readMDA(str(file_path))[0]
-        file_num = file_metadata.get("scan_number", None)
-        file_prefix = self._extract_prefix(file_name, file_num)
-        file_size = utils.human_readable_size(file_path.stat().st_size)
-        file_date = utils.byte2str(file_data.time).split(".")[0]
-        file_pts = file_data.curr_pt
-        file_dim = file_data.dim
-        pv = utils.byte2str(file_data.p[0].name) if len(file_data.p) else "index"
-        desc = utils.byte2str(file_data.p[0].desc) if len(file_data.p) else "index"
-        file_pos = desc if desc else pv
-
-        fileInfo = {"Name": file_name}
-        # HEADERS = "Prefix", "Scan #", "Points", "Dim", "Positioner", "Date", "Size"
-        values = [
-            file_prefix,
-            file_num,
-            file_pts,
-            file_dim,
-            file_pos,
-            file_date,
-            file_size,
-        ]
-        for k, v in zip(HEADERS, values):
-            fileInfo[k] = v
-        return fileInfo
-
-    def _extract_prefix(self, file_name, scan_number):
-        """Create a pattern that matches the prefix followed by an optional separator and the scan number with possible leading zeros
-        The separators considered here are underscore (_), hyphen (-), dot (.), and space ( )
-        """
-        scan_number = str(scan_number)
-        pattern = rf"^(.*?)[_\-\. ]?0*{scan_number}\.mda$"
-        match = re.match(pattern, file_name)
-        if match:
-            return match.group(1)
-        return None
