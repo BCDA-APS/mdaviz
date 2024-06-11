@@ -78,7 +78,7 @@ def get_file_info(file_path):
     file_data = readMDA(str(file_path))[1]
     file_metadata = readMDA(str(file_path))[0]
     file_num = file_metadata.get("scan_number", None)
-    file_prefix = extract_prefix(file_name, file_num)
+    file_prefix = extract_file_prefix(file_name, file_num)
     file_size = human_readable_size(file_path.stat().st_size)
     file_date = byte2str(file_data.time).split(".")[0]
     file_pts = file_data.curr_pt
@@ -102,7 +102,7 @@ def get_file_info(file_path):
     return fileInfo
 
 
-def extract_prefix(file_name, scan_number):
+def extract_file_prefix(file_name, scan_number):
     """Create a pattern that matches the prefix followed by an optional separator and the scan number with possible leading zeros
     The separators considered here are underscore (_), hyphen (-), dot (.), and space ( )
     """
