@@ -33,12 +33,10 @@ class MainWindow(QtWidgets.QMainWindow):
         ~doClose
         ~doOpen
         ~dataPath
-        ~folderPath
         ~folderList
         ~mdaFileList
         ~mdaFileCount
         ~setMdaFileList
-        ~setFolderPath
         ~setFolderList
         ~_buildFolderList
         ~_updateRecentFolders
@@ -54,10 +52,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setDataPath()  # the combined data path obj
         self.setFolderList()  # the list of recent folders in folder QCombobox
         self.setMdaFileList()  # the list of mda file NAME str (name only)
-        self.setMdaInfoList()
+        self.setMdaInfoList()  # the list of mda file Info (all the data necessary to fill the table view)
 
         self.connect()
-        self.setFolderPath(self.directory)
+        self.setDataPath(self.directory)
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
@@ -123,13 +121,13 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         return self._dataPath
 
-    def folderPath(self):
-        """Full path (obj) of the selected folder."""
-        return self._folderPath
+    # def folderPath(self):
+    #     """Full path (obj) of the selected folder."""
+    #     return self._folderPath
 
-    def folderList(self):
-        """Folder path (str) list in the pull down menu."""
-        return self._folderList
+    # def folderList(self):
+    #     """Folder path (str) list in the pull down menu."""
+    #     return self._folderList
 
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
@@ -147,8 +145,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def setMdaFileList(self, mda_file_list=None):
         self._mdaFileList = mda_file_list if mda_file_list else []
 
-    def setFolderPath(self, folder_path=None):
-        self._folderPath = folder_path
+    # def setFolderPath(self, folder_path=None):
+    #     self._folderPath = folder_path
 
     def onFolderSelected(self, folder_name):
         """A folder was selected (from the open dialog or pull down menu)."""
@@ -157,7 +155,8 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             folder_path = Path(folder_name)
             if folder_path.exists() and folder_path.is_dir():  # folder exists
-                self.setFolderPath(folder_path)
+                # self.setFolderPath(folder_path)
+                self.setDataPath(folder_path)
                 mda_list = [utils.get_file_info(f) for f in folder_path.glob("*.mda")]
                 if mda_list:
                     mda_list = sorted(mda_list, key=lambda x: x["Name"])
@@ -165,7 +164,6 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.info.setText(f"{len(mda_list)} mda files")
                     self.setMdaInfoList(mda_list)
                     self.setMdaFileList(mda_name_list)
-                    self.setDataPath(folder_path)
                     self._updateRecentFolders(str(folder_path))
                     layout = self.groupbox.layout()
                     if self.mvc_folder is None:
@@ -182,7 +180,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
 
     def reset_mainwindow(self):
-        self.setFolderPath()
+        # self.setFolderPath()
         self.setDataPath()
         self.setMdaInfoList()
         self.setMdaFileList()
