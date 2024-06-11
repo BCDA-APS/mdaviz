@@ -222,9 +222,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
             self.checkboxStateChanged.emit(self.plotFields(), det_removed)
 
     def checkCheckBox(self, row, column_name):
-        self.selections[row] = (
-            column_name  # Mark the checkbox as checked by updating 'selections'
-        )
+        self.selections[row] = column_name  # Mark the checkbox as checked by updating 'selections'
         col = self.columnNumber(column_name)  # Translate column name to its index
         index = self.index(row, col)
         self.dataChanged.emit(index, index, [QtCore.Qt.CheckStateRole])  # Update view
@@ -251,9 +249,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         self.selections.clear()
         topLeftIndex = self.index(0, 0)
         bottomRightIndex = self.index(self.rowCount() - 1, self.columnCount() - 1)
-        self.dataChanged.emit(
-            topLeftIndex, bottomRightIndex, [QtCore.Qt.CheckStateRole]
-        )
+        self.dataChanged.emit(topLeftIndex, bottomRightIndex, [QtCore.Qt.CheckStateRole])
         # Update the mda_mvc selection
         self.mda_mvc.setSelectionField()
 
@@ -269,9 +265,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
                         changes = True
         return changes
 
-    def updateCheckboxes(
-        self, new_selection=None, old_selection=None, update_mda_mvc=True
-    ):
+    def updateCheckboxes(self, new_selection=None, old_selection=None, update_mda_mvc=True):
         """Update checkboxes to agree with self.selections."""
         if new_selection is None:
             new_selection = self.selections

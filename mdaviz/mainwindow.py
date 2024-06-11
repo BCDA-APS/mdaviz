@@ -8,7 +8,6 @@ Defines MainWindow class.
 
 from pathlib import Path
 from PyQt5 import QtWidgets
-from PyQt5.QtGui import QIcon
 
 from . import APP_TITLE
 from .mda_folder import MDA_MVC
@@ -149,9 +148,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._dataPath = path
 
     def setMdaFileList(self, path=None):
-        self._mdaFileList = (
-            sorted([file.name for file in path.glob("*.mda")]) if path else []
-        )
+        self._mdaFileList = sorted([file.name for file in path.glob("*.mda")]) if path else []
 
     def setFolderPath(self, folder_name):
         """A folder was selected (from the open dialog)."""
@@ -184,18 +181,11 @@ class MainWindow(QtWidgets.QMainWindow):
                     try:
                         for item in folder_path.iterdir():
                             # Check if we have collected enough subfolders for the current depth
-                            if (
-                                depth_counter[current_depth + 1]
-                                >= max_subfolders_per_depth
-                            ):
+                            if depth_counter[current_depth + 1] >= max_subfolders_per_depth:
                                 break
 
                             if item.is_dir() and not item.name.startswith("."):
-                                full_path = (
-                                    f"{parent_path}/{item.name}"
-                                    if parent_path
-                                    else item.name
-                                )
+                                full_path = f"{parent_path}/{item.name}" if parent_path else item.name
                                 subfolder_list.append(full_path)
                                 # Addition of a subfolder that exists at one level deeper than the current level
                                 depth_counter[current_depth + 1] += 1
@@ -287,20 +277,12 @@ class MainWindow(QtWidgets.QMainWindow):
         unique_paths = set()
         candidate_paths = [self.directory, "Other..."]
         if not folder_list:
-            recent_dirs = (
-                settings.getKey(DIR_SETTINGS_KEY).split(",")
-                if settings.getKey(DIR_SETTINGS_KEY)
-                else []
-            )
+            recent_dirs = settings.getKey(DIR_SETTINGS_KEY).split(",") if settings.getKey(DIR_SETTINGS_KEY) else []
             if recent_dirs:
                 candidate_paths[1:1] = recent_dirs
         else:
             candidate_paths = folder_list
-        new_path_list = [
-            p
-            for p in candidate_paths
-            if p not in unique_paths and (unique_paths.add(p) or True)
-        ]
+        new_path_list = [p for p in candidate_paths if p not in unique_paths and (unique_paths.add(p) or True)]
         return new_path_list
 
     def _updateRecentFolders(self, folder_path):
@@ -309,11 +291,7 @@ class MainWindow(QtWidgets.QMainWindow):
         Args:
             folder_path (str): The path of the folder to be added.
         """
-        recent_dirs = (
-            settings.getKey(DIR_SETTINGS_KEY).split(",")
-            if settings.getKey(DIR_SETTINGS_KEY)
-            else []
-        )
+        recent_dirs = settings.getKey(DIR_SETTINGS_KEY).split(",") if settings.getKey(DIR_SETTINGS_KEY) else []
         if folder_path in recent_dirs:
             recent_dirs.remove(folder_path)
         recent_dirs.insert(0, str(folder_path))

@@ -42,8 +42,6 @@ class MDAFolderTableView(QtWidgets.QWidget):
         from .mda_folder_table_model import MDAFolderTableModel
         from .empty_table_model import EmptyTableModel
 
-        from pathlib import Path
-
         data = self.mdaFileList()
         # data_path = Path(self.mda_mvc.dataPath())
         # data_path = (

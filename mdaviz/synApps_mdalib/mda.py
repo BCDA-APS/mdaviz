@@ -199,7 +199,7 @@ def oldDetName(i):
 	else:
 		return "?"
 
-# Given a positioner number, , return the name of the associated sscanRecord PV, "P1'-'P4' 
+# Given a positioner number, , return the name of the associated sscanRecord PV, "P1'-'P4'
 def posName(i):
 	if i < 4:
 		return "P%d" % (i+1)
@@ -233,7 +233,7 @@ def readScan(scanFile, verbose=0, out=sys.stdout, unpacker=None):
 			out.write("\nreadScan('0x%x'): entry\n" % (unpacker.get_position()))
 		else:
 			out.write("\nreadScan('%s'): entry\n" % (scanFile.name))
-			
+
 
 	scan = scanDim()	# data structure to hold scan info and data
 	buf = scanFile.read(100000) # enough to read scan header and info
@@ -349,7 +349,7 @@ def readScan(scanFile, verbose=0, out=sys.stdout, unpacker=None):
 		scan.p[j].data = data[start:end]
 		start = end
 		end += scan.npts
-        
+
 	# detectors
 	if have_fast_xdr:
 		data = u.unpack_farray_float(scan.npts*scan.nd)
@@ -801,7 +801,7 @@ def readMDA(fname=None, maxdim=4, verbose=0, showHelp=0, outFile=None, useNumpy=
 			value = ''
 			count = 0
 			if EPICS_type != 0:   # not DBR_STRING; array is permitted
-				count = u.unpack_int()  # 
+				count = u.unpack_int()  #
 				if verbose: out.write("\tcount = %d\n" % count)
 				n = u.unpack_int()      # length of unit string
 				if n: unit = u.unpack_string()
@@ -1086,14 +1086,14 @@ def packScanData(scan, cpt):
 	p = xdr.Packer()
 	if (len(cpt) == 0): # 1D array
 		for i in range(scan.np):
-			p.pack_farray(scan.npts, scan.p[i].data, p.pack_double)    
+			p.pack_farray(scan.npts, scan.p[i].data, p.pack_double)
 		for i in range(scan.nd):
 			p.pack_farray(scan.npts, scan.d[i].data, p.pack_float)
-	
+
 	elif (len(cpt) == 1): # 2D array
 		j = cpt[0]
 		for i in range(scan.np):
-			p.pack_farray(scan.npts, scan.p[i].data[j], p.pack_double)    
+			p.pack_farray(scan.npts, scan.p[i].data[j], p.pack_double)
 		for i in range(scan.nd):
 			p.pack_farray(scan.npts, scan.d[i].data[j], p.pack_float)
 
@@ -1101,7 +1101,7 @@ def packScanData(scan, cpt):
 		j = cpt[0]
 		k = cpt[1]
 		for i in range(scan.np):
-			p.pack_farray(scan.npts, scan.p[i].data[j][k], p.pack_double)    
+			p.pack_farray(scan.npts, scan.p[i].data[j][k], p.pack_double)
 		for i in range(scan.nd):
 			p.pack_farray(scan.npts, scan.d[i].data[j][k], p.pack_float)
 
@@ -1544,7 +1544,7 @@ def opMDA_scalar(op, d1, scalar):
 			for k in range(s[2].npts):
 				for l in range(s[3].npts):
 					s[3].d[i].data[j][k][l] = op(s[3].d[i].data[j][k][l], scalar)
-			
+
 	if (len(s) == 4): return s
 	# 4D op
 	for i in range(s[4].nd):
@@ -1620,7 +1620,7 @@ def opMDA(op, d1, d2):
 		for j in range(s[1].npts):
 			for k in range(s[2].npts):
 				s[3].d[i].data[j][k] = map(op, s[3].d[i].data[j][k], d2[3].d[i].data[j][k])
-			
+
 	if (len(s) == 4): return s
 	# 3D op
 	if s[4].nd != d2[4].nd:
@@ -1669,4 +1669,3 @@ def main():
 
 if __name__ == "__main__":
         main()
-

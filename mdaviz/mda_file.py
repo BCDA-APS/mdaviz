@@ -5,12 +5,12 @@ Display content of the currently selected files.
 
     ~MDAFile
     ~tabManager
-    
+
 User: tabCloseRequested.connect (emit: index)
         --> onTabCloseRequested(index --> file_path)
-        --> tabManager.removeTab(file_path)  
-        --> tabManager.tabRemoved.emit(file_path) 
-        --> onTabRemoved(file_path --> index) 
+        --> tabManager.removeTab(file_path)
+        --> tabManager.tabRemoved.emit(file_path)
+        --> onTabRemoved(file_path --> index)
 
 User: clearButton.clicked (emit: no data)
         --> onClearAllTabsRequested()
@@ -20,7 +20,7 @@ User: clearButton.clicked (emit: no data)
         --> removeAllFileTabs()
 
 
-    
+
 """
 
 from .synApps_mdalib.mda import readMDA
@@ -30,7 +30,6 @@ from PyQt5.QtWidgets import QAbstractItemView
 import yaml
 
 from . import utils
-from .chartview import ChartView
 from .mda_file_table_view import MDAFileTableView
 
 
@@ -61,12 +60,8 @@ class MDAFile(QtWidgets.QWidget):
         self.setData()
         self.tabManager = TabManager()  # Instantiate TabManager
         self.currentHighlightedRow = None  # To store the current highlighted row
-        self.currentHighlightedFilePath = (
-            None  # To store the current highlighted row's file path
-        )
-        self.currentHighlightedModel = (
-            None  # To store the current highlighted's row model
-        )
+        self.currentHighlightedFilePath = None  # To store the current highlighted row's file path
+        self.currentHighlightedModel = None  # To store the current highlighted's row model
 
         # Buttons handling:
         self.addButton.hide()
@@ -166,9 +161,7 @@ class MDAFile(QtWidgets.QWidget):
         file_path = self.dataPath() / file_name
         file_metadata, file_data_dim1, *_ = readMDA(file_path)
         if file_metadata["rank"] > 1:
-            self.setStatus(
-                "WARNING: Multidimensional data not supported - ignoring ranks > 1."
-            )
+            self.setStatus("WARNING: Multidimensional data not supported - ignoring ranks > 1.")
         scanDict, first_pos, first_det = utils.get_scan(file_data_dim1)
         pvList = [v["name"] for v in scanDict.values()]
         self._data = {
@@ -383,9 +376,7 @@ class MDAFile(QtWidgets.QWidget):
             new_selection_field = new_tab_tableview.tableView.model().plotFields()
         else:
             new_selection_field = {}
-        self.tabChanged.emit(
-            new_tab_index, new_file_path, new_tab_data, new_selection_field
-        )
+        self.tabChanged.emit(new_tab_index, new_file_path, new_tab_data, new_selection_field)
 
     def highlightRowInTab(self, file_path, row):
         """
@@ -401,10 +392,7 @@ class MDAFile(QtWidgets.QWidget):
         model = tableview.tableView.model()
         if model is not None:
             # Unhighlight the previous row if it exists
-            if (
-                self.currentHighlightedRow is not None
-                and self.currentHighlightedModel is not None
-            ):
+            if self.currentHighlightedRow is not None and self.currentHighlightedModel is not None:
                 self.currentHighlightedModel.unhighlightRow(self.currentHighlightedRow)
 
             # Highlight the new row

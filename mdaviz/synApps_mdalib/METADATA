@@ -10,13 +10,10 @@ Platform: UNKNOWN
 
 
     Python support library for EPICS synApps MDA-format data files
-    
+
     Install the Python mda support library:
-    
+
         cd synApps/support/utils/mdaPythonUtils
         python ./setup.py install
         # -or-
         pip install .
-    
-    
-

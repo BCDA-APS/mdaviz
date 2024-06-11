@@ -15,7 +15,6 @@ HEADERS = "Prefix", "Scan #", "Points", "Dim", "Positioner", "Date", "Size"
 
 
 class MDAFolderTableModel(QtCore.QAbstractTableModel):
-
     def __init__(self, data, parent):
         """
         Create the model and connect with its parent.
@@ -63,7 +62,6 @@ class MDAFolderTableModel(QtCore.QAbstractTableModel):
     # ------------ local methods
 
     def get_file_info(self, file):
-
         def extract_prefix(filename, scan_number):
             """Create a pattern that matches the prefix followed by an optional separator and the scan number with possible leading zeros
             The separators considered here are underscore (_), hyphen (-), dot (.), and space ( )

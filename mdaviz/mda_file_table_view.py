@@ -8,7 +8,6 @@ Uses :class:`mda_file_table_model.MDAFileTableModel`.
     ~MDAFileTableView
 """
 
-from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 
@@ -104,9 +103,7 @@ class MDAFileTableView(QtWidgets.QWidget):
 
         if self.data() is not None:
             fields = self.data()["fields"]
-            data_model = MDAFileTableModel(
-                COLUMNS, fields, selection_field, self.mda_file.mda_mvc
-            )
+            data_model = MDAFileTableModel(COLUMNS, fields, selection_field, self.mda_file.mda_mvc)
             self.tableView.setModel(data_model)
             # Hide Field/Mon/Norm columns (Field = vertical header, Mon & Norm not yet implemented)
             for i in [0, 3, 4]:
@@ -146,7 +143,7 @@ class MDAFileTableView(QtWidgets.QWidget):
             scanDict = self.data()["fileInfo"]["scanDict"]
             # ------ extract x data:
             x_index = selections.get("X")
-            x_data = scanDict[x_index].get("data") if x_index in scanDict else None            
+            x_data = scanDict[x_index].get("data") if x_index in scanDict else None
             # ------ extract y(s) data:
             y_index = selections.get("Y", [])
             y_first_unit = y_first_name = ""
@@ -169,9 +166,7 @@ class MDAFileTableView(QtWidgets.QWidget):
             # scanDict = {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...','type':...}}
             plot_options = {
                 "x": scanDict[x_index].get("name", "") if x_index in scanDict else "",
-                "x_unit": (
-                    scanDict[x_index].get("unit", "") if x_index in scanDict else ""
-                ),
+                "x_unit": (scanDict[x_index].get("unit", "") if x_index in scanDict else ""),
                 "y": y_first_name,
                 "y_unit": y_first_unit,
                 "title": "",

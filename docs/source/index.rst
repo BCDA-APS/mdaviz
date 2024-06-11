@@ -36,8 +36,8 @@ Documentation
    :align: center
    :figclass: align-center
    :figwidth: 100%
-   
-   Screenshot of the mdaviz GUI displaying sample data. 
+
+   Screenshot of the mdaviz GUI displaying sample data.
 
 .. toctree::
    :maxdepth: 1
@@ -68,5 +68,5 @@ About
 Acknowledgements
 ================
 
-"This product includes software produced by UChicago Argonne, LLC 
+"This product includes software produced by UChicago Argonne, LLC
 under Contract No. DE-AC02-06CH11357 with the Department of Energy."
