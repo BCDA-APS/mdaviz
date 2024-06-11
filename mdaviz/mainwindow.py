@@ -127,6 +127,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def mdaInfoList(self):
         return self._mdaInfoList
 
+    def folderList(self):
+        return self._folderList
+
     def setMdaInfoList(self, infoList=None):
         self._mdaInfoList = infoList if infoList else []
 
