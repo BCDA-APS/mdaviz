@@ -8,6 +8,8 @@ Defines MainWindow class.
 
 from pathlib import Path
 from PyQt5 import QtWidgets
+import re
+from .synApps_mdalib.mda import readMDA
 
 from . import APP_TITLE
 from .mda_folder import MDA_MVC
@@ -15,6 +17,7 @@ from . import utils
 from .user_settings import settings
 from .opendialog import DIR_SETTINGS_KEY
 
+HEADERS = "Prefix", "Scan #", "Points", "Dim", "Positioner", "Date", "Size"
 UI_FILE = utils.getUiFileName(__file__)
 MAX_RECENT_DIRS = 10
 MAX_DEPTH = 4
@@ -56,13 +59,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.directory = directory
         self.mvc_folder = None
         self.setDataPath()  # the combined data path obj (folder.parent + subfolder)
-        self.setFolderList()  # the list of folder in pull down 1 (folder QCombobox)
+        self.setFolderList()  # the list of recent folders in pull down 1 (folder QCombobox)
         self.setSubFolderList()  # the list of subfolder in pull down 2 (subfolder QCombobox)
         self.setMdaFileList()  # the list of mda file NAME str (name only)
+        self.setMdaInfoList()
 
         self.connect()
-
         self.setFolderPath(self.directory)
+
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
 
@@ -144,11 +148,19 @@ class MainWindow(QtWidgets.QMainWindow):
         """List of mda file (name only) in the selected folder."""
         return self._mdaFileList
 
+    def mdaInfoList(self):
+        return self._mdaInfoList
+
+    def setMdaInfoList(self, infoList=None):
+        self._mdaInfoList = infoList if infoList else []
+
     def setDataPath(self, path=None):
         self._dataPath = path
 
     def setMdaFileList(self, path=None):
-        self._mdaFileList = sorted([file.name for file in path.glob("*.mda")]) if path else []
+        self._mdaFileList = (
+            sorted([file.name for file in path.glob("*.mda")]) if path else []
+        )
 
     def setFolderPath(self, folder_name):
         """A folder was selected (from the open dialog)."""
@@ -158,55 +170,10 @@ class MainWindow(QtWidgets.QMainWindow):
             folder_path = Path(folder_name)
             if folder_path.exists() and folder_path.is_dir():  # folder exists
                 self._folderPath = folder_path
-
-                def get_all_subfolders(
-                    folder_path,
-                    parent_path="",
-                    current_depth=0,
-                    max_depth=MAX_DEPTH,
-                    max_subfolders_per_depth=MAX_SUBFOLDERS_PER_DEPTH,
-                    depth_counter=None,
-                ):
-                    if depth_counter is None:
-                        depth_counter = {depth: 0 for depth in range(1, max_depth + 1)}
-
-                    subfolder_list = []
-                    if parent_path:  # Don't add the root parent folder
-                        subfolder_list.append(parent_path)
-
-                    if current_depth >= max_depth:
-                        print(f"{current_depth=}")
-                        return subfolder_list
-
-                    try:
-                        for item in folder_path.iterdir():
-                            # Check if we have collected enough subfolders for the current depth
-                            if depth_counter[current_depth + 1] >= max_subfolders_per_depth:
-                                break
-
-                            if item.is_dir() and not item.name.startswith("."):
-                                full_path = f"{parent_path}/{item.name}" if parent_path else item.name
-                                subfolder_list.append(full_path)
-                                # Addition of a subfolder that exists at one level deeper than the current level
-                                depth_counter[current_depth + 1] += 1
-                                # Recursively collect subfolders, passing the updated depth_counter
-                                subfolder_list.extend(
-                                    get_all_subfolders(
-                                        item,
-                                        full_path,
-                                        current_depth + 1,
-                                        max_depth,
-                                        max_subfolders_per_depth,
-                                        depth_counter,
-                                    )
-                                )
-                    except PermissionError:
-                        print(f"Permission denied for folder: {folder_path}")
-                    subfolder_list = list(dict.fromkeys(sorted(subfolder_list)))
-
-                    return subfolder_list
-
-                self.setSubFolderList(get_all_subfolders(folder_path, folder_path.name))
+                mda_list = [self._get_file_info(f) for f in folder_path.glob("*.mda")]
+                mda_list = sorted(mda_list, key=lambda x: x["Name"])
+                self.setMdaInfoList(mda_list)
+                self.setSubFolderList([str(folder_path)])
                 self._updateRecentFolders(str(folder_path))
             else:
                 self._folderPath = None
@@ -277,12 +244,20 @@ class MainWindow(QtWidgets.QMainWindow):
         unique_paths = set()
         candidate_paths = [self.directory, "Other..."]
         if not folder_list:
-            recent_dirs = settings.getKey(DIR_SETTINGS_KEY).split(",") if settings.getKey(DIR_SETTINGS_KEY) else []
+            recent_dirs = (
+                settings.getKey(DIR_SETTINGS_KEY).split(",")
+                if settings.getKey(DIR_SETTINGS_KEY)
+                else []
+            )
             if recent_dirs:
                 candidate_paths[1:1] = recent_dirs
         else:
             candidate_paths = folder_list
-        new_path_list = [p for p in candidate_paths if p not in unique_paths and (unique_paths.add(p) or True)]
+        new_path_list = [
+            p
+            for p in candidate_paths
+            if p not in unique_paths and (unique_paths.add(p) or True)
+        ]
         return new_path_list
 
     def _updateRecentFolders(self, folder_path):
@@ -291,9 +266,53 @@ class MainWindow(QtWidgets.QMainWindow):
         Args:
             folder_path (str): The path of the folder to be added.
         """
-        recent_dirs = settings.getKey(DIR_SETTINGS_KEY).split(",") if settings.getKey(DIR_SETTINGS_KEY) else []
+        recent_dirs = (
+            settings.getKey(DIR_SETTINGS_KEY).split(",")
+            if settings.getKey(DIR_SETTINGS_KEY)
+            else []
+        )
         if folder_path in recent_dirs:
             recent_dirs.remove(folder_path)
         recent_dirs.insert(0, str(folder_path))
         recent_dirs = [dir for dir in recent_dirs if dir != "."]
         settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs[:MAX_RECENT_DIRS]))
+
+    def _get_file_info(self, file_path):
+        file_name = file_path.name
+        file_data = readMDA(str(file_path))[1]
+        file_metadata = readMDA(str(file_path))[0]
+        file_num = file_metadata.get("scan_number", None)
+        file_prefix = self._extract_prefix(file_name, file_num)
+        file_size = utils.human_readable_size(file_path.stat().st_size)
+        file_date = utils.byte2str(file_data.time).split(".")[0]
+        file_pts = file_data.curr_pt
+        file_dim = file_data.dim
+        pv = utils.byte2str(file_data.p[0].name) if len(file_data.p) else "index"
+        desc = utils.byte2str(file_data.p[0].desc) if len(file_data.p) else "index"
+        file_pos = desc if desc else pv
+
+        fileInfo = {"Name": file_name}
+        # HEADERS = "Prefix", "Scan #", "Points", "Dim", "Positioner", "Date", "Size"
+        values = [
+            file_prefix,
+            file_num,
+            file_pts,
+            file_dim,
+            file_pos,
+            file_date,
+            file_size,
+        ]
+        for k, v in zip(HEADERS, values):
+            fileInfo[k] = v
+        return fileInfo
+
+    def _extract_prefix(self, file_name, scan_number):
+        """Create a pattern that matches the prefix followed by an optional separator and the scan number with possible leading zeros
+        The separators considered here are underscore (_), hyphen (-), dot (.), and space ( )
+        """
+        scan_number = str(scan_number)
+        pattern = rf"^(.*?)[_\-\. ]?0*{scan_number}\.mda$"
+        match = re.match(pattern, file_name)
+        if match:
+            return match.group(1)
+        return None
