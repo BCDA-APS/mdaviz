@@ -69,6 +69,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
         utils.reconnect(self.open.released, self.doOpen)
+        utils.reconnect(self.refresh.released, self.doRefresh)
         self.folder.currentTextChanged.connect(self.onFolderSelected)
 
     @property
@@ -198,6 +199,29 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self.reset_mainwindow()
                 self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
+
+    def doRefresh(self):
+        """
+        Refreshes the file list in the currently selected folder
+        - Re-fetch the list of MDA files in the current folder.
+        - Display the updated file list in the MDA folder table view.
+        """
+        # TODO: could be more efficient (i.e. ignore mda files already loaded)
+        self.setStatus("Refreshing folder...")
+        current_folder = self.dataPath()
+        current_mdaFileList = self.mdaFileList()
+        self.onFolderSelected(current_folder)
+        new_mdaFileList = self.mdaFileList()
+        if new_mdaFileList:
+            difference = [
+                item for item in new_mdaFileList if item not in current_mdaFileList
+            ]
+            if difference:
+                self.setStatus(f"Loading new files: {difference}")
+            else:
+                self.setStatus("No new files.")
+        else:
+            self.setStatus("Nothing to update.")
 
     def _buildFolderList(self, folder_list=None):
         """Build the list of recent folders and remove duplicates from the folder list.

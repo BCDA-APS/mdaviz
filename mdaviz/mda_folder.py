@@ -78,7 +78,9 @@ class MDA_MVC(QtWidgets.QWidget):
     """Model View Controller class for mda files."""
 
     # TODO - question: should this signal be emitted here or in MDA_FILE_TM?
-    detRemoved = QtCore.pyqtSignal(str, int)  # Emit the file path and row when a DET checkbox is unchecked
+    detRemoved = QtCore.pyqtSignal(
+        str, int
+    )  # Emit the file path and row when a DET checkbox is unchecked
 
     ui_file = utils.getUiFileName(__file__)
     motion_wait_time = 1
@@ -109,7 +111,6 @@ class MDA_MVC(QtWidgets.QWidget):
         layout = self.folder_groupbox.layout()
         layout.addWidget(self.mda_folder_tableview)
         self.mda_folder_tableview.displayTable()
-        utils.reconnect(self.mainWindow.refresh.released, self.doRefresh)
 
         # File table view:
         self.mda_file = MDAFile(self)
@@ -134,8 +135,12 @@ class MDA_MVC(QtWidgets.QWidget):
             self.setSelectionModel(selection_model)
         # Ensure focus policy and selection mode for keyboard navigation
         self.mda_folder_tableview.tableView.setFocusPolicy(QtCore.Qt.StrongFocus)
-        self.mda_folder_tableview.tableView.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.mda_folder_tableview.tableView.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.mda_folder_tableview.tableView.setSelectionMode(
+            QAbstractItemView.SingleSelection
+        )
+        self.mda_folder_tableview.tableView.setSelectionBehavior(
+            QAbstractItemView.SelectRows
+        )
 
         # Folder table view signal/slot connections:
         self.mda_folder_tableview.tableView.doubleClicked.connect(self.onFileSelected)
@@ -250,27 +255,6 @@ class MDA_MVC(QtWidgets.QWidget):
             self.setSelectionModel(selection_model)
             utils.reconnect(self.selectionModel().currentChanged, self.onFileSelected)
 
-    def doRefresh(self):
-        """
-        Refreshes the file list in the currently selected folder
-        - Re-fetch the list of MDA files in the current folder.
-        - Display the updated file list in the MDA folder table view.
-        """
-        self.setStatus("Refreshing folder...")
-        current_folder = self.dataPath()
-        current_mdaFileList = self.mdaFileList()
-        self.mainWindow.setMdaFileList(current_folder)
-        new_mdaFileList = self.mdaFileList()
-        if new_mdaFileList:
-            self.mda_folder_tableview.displayTable()
-            difference = [item for item in new_mdaFileList if item not in current_mdaFileList]
-            if difference:
-                self.setStatus(f"Loading new files: {difference}")
-            else:
-                self.setStatus("No new files.")
-        else:
-            self.setStatus("Nothing to update.")
-
     # # ------------ Fields selection methods:
 
     def selectionField(self):
@@ -299,9 +283,13 @@ class MDA_MVC(QtWidgets.QWidget):
         """
         tableview = self.currentFileTableview()
         self.setSelectionField(new_selection)
-        tableview.tableView.model().updateCheckboxes(utils.mda2ftm(new_selection), update_mda_mvc=False)
+        tableview.tableView.model().updateCheckboxes(
+            utils.mda2ftm(new_selection), update_mda_mvc=False
+        )
 
-    def updateSelectionForNewPVs(self, old_selection, oldPvList, newPvList, verbose=False):
+    def updateSelectionForNewPVs(
+        self, old_selection, oldPvList, newPvList, verbose=False
+    ):
         """
         Updates field selection based on new PV list when a new file is selected.
         - Adjusts selection indices for POS and DET to match new PVs indexes.
@@ -326,7 +314,9 @@ class MDA_MVC(QtWidgets.QWidget):
         tableview = self.currentFileTableview()
         new_selection = {"Y": [], "X": None}
         # Update Y selections: if either left operand or right operand is True, result will be True.
-        changes_made |= self.updateDetectorSelection(oldPvList, old_selection, newPvList, new_selection, verbose)
+        changes_made |= self.updateDetectorSelection(
+            oldPvList, old_selection, newPvList, new_selection, verbose
+        )
         # Update X selection and check for changes: if X was 0 or None, set to 0; if not, set to 1st POS
         old_idx = old_selection.get("X")
         if old_idx:
@@ -336,13 +326,17 @@ class MDA_MVC(QtWidgets.QWidget):
         if old_idx != new_idx:
             changes_made = True
             if verbose:
-                print(f"POS <{oldPvList[old_idx]}> changed from {old_idx} to {new_idx} <{newPvList[new_idx]}>")
+                print(
+                    f"POS <{oldPvList[old_idx]}> changed from {old_idx} to {new_idx} <{newPvList[new_idx]}>"
+                )
         if changes_made:
             self.applySelectionChanges(new_selection)
         if verbose:
             print(f"----- Selection After clean up: {self.selectionField()}\n")
 
-    def updateDetectorSelection(self, oldPvList, old_selection, newPvList, new_selection, verbose=False):
+    def updateDetectorSelection(
+        self, oldPvList, old_selection, newPvList, new_selection, verbose=False
+    ):
         """
         Helper function to update detector selections in the new selection field.
         - Iterates through old detector selections and updates based on new PVs.
@@ -359,7 +353,9 @@ class MDA_MVC(QtWidgets.QWidget):
                     if new_index != old_index:
                         changes_made = True
                         if verbose:
-                            print(f"DET <{old_pv}> changed from {old_index} to {new_index}")
+                            print(
+                                f"DET <{old_pv}> changed from {old_index} to {new_index}"
+                            )
                 else:
                     changes_made = True
                     if verbose:
@@ -429,7 +425,9 @@ class MDA_MVC(QtWidgets.QWidget):
             if old_pv_list is not None:
                 # TODO - later: find out why this sometimes fails - not that important:
                 try:
-                    self.updateSelectionForNewPVs(old_selection, old_pv_list, new_pv_list, verbose)
+                    self.updateSelectionForNewPVs(
+                        old_selection, old_pv_list, new_pv_list, verbose
+                    )
                 except:
                     pass
             self.handlePlotBasedOnMode()
@@ -580,7 +578,9 @@ class MDA_MVC(QtWidgets.QWidget):
         try:
             if self.mdaFileList() and self.selectionModel():
                 currentIndex = self.selectionModel().currentIndex()
-                nextIndex = currentIndex.sibling(currentIndex.row() + 1, currentIndex.column())
+                nextIndex = currentIndex.sibling(
+                    currentIndex.row() + 1, currentIndex.column()
+                )
                 if nextIndex.isValid():
                     self.selectAndShowIndex(nextIndex)
         except RuntimeError as e:
@@ -593,7 +593,9 @@ class MDA_MVC(QtWidgets.QWidget):
         try:
             if self.mdaFileList() and self.selectionModel():
                 currentIndex = self.selectionModel().currentIndex()
-                prevIndex = currentIndex.sibling(currentIndex.row() - 1, currentIndex.column())
+                prevIndex = currentIndex.sibling(
+                    currentIndex.row() - 1, currentIndex.column()
+                )
                 if prevIndex.isValid():
                     self.selectAndShowIndex(prevIndex)
         except RuntimeError as e:
@@ -622,7 +624,9 @@ class MDA_MVC(QtWidgets.QWidget):
         elif index.row() == rowCount - 1:
             scrollHint = QAbstractItemView.PositionAtBottom
         # Select the row and ensure it's visible:
-        self.selectionModel().setCurrentIndex(index, QItemSelectionModel.ClearAndSelect | QItemSelectionModel.Rows)
+        self.selectionModel().setCurrentIndex(
+            index, QItemSelectionModel.ClearAndSelect | QItemSelectionModel.Rows
+        )
         self.mda_folder_tableview.tableView.scrollTo(index, scrollHint)
         # Trigger actions associated with file selection
         self.onFileSelected(index)
