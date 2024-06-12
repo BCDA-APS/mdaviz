@@ -25,7 +25,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     .. autosummary::
 
-        ~setup
         ~status
         ~setStatus
         ~doAboutDialog
@@ -55,7 +54,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setMdaInfoList()  # the list of mda file Info (all the data necessary to fill the table view)
 
         self.connect()
-        self.setDataPath(self.directory)
+        # self.onFolderSelected(directory)
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
@@ -114,6 +113,14 @@ class MainWindow(QtWidgets.QMainWindow):
             folder_list.insert(0, dir_name)
             self.setFolderList(folder_list)
 
+    def reset_mainwindow(self):
+        self.setDataPath()
+        self.setMdaInfoList()
+        self.setMdaFileList()
+        if self.mvc_folder is not None:
+            # If MVC exists, clear table view:
+            self.mvc_folder.mda_folder_tableview.clearContents()
+
     def dataPath(self):
         """
         Full path object for the selected folder
@@ -146,15 +153,15 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             folder_path = Path(folder_name)
             if folder_path.exists() and folder_path.is_dir():  # folder exists
-                self.setDataPath(folder_path)
                 mda_list = [utils.get_file_info(f) for f in folder_path.glob("*.mda")]
                 if mda_list:
+                    self.setDataPath(folder_path)
                     mda_list = sorted(mda_list, key=lambda x: x["Name"])
                     mda_name_list = [entry["Name"] for entry in mda_list]
-                    self.info.setText(f"{len(mda_list)} mda files")
                     self.setMdaInfoList(mda_list)
                     self.setMdaFileList(mda_name_list)
                     self._updateRecentFolders(str(folder_path))
+                    self.info.setText(f"{len(mda_list)} mda files")
                     layout = self.groupbox.layout()
                     if self.mvc_folder is None:
                         self.mvc_folder = MDA_MVC(self)
@@ -168,14 +175,6 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self.reset_mainwindow()
                 self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
-
-    def reset_mainwindow(self):
-        self.setDataPath()
-        self.setMdaInfoList()
-        self.setMdaFileList()
-        if self.mvc_folder is not None:
-            # If MVC exists, clear table view:
-            self.mvc_folder.mda_folder_tableview.clearContents()
 
     def setFolderList(self, folder_list=None):
         """Set the folder path list & populating the folder QComboBox.
@@ -226,7 +225,7 @@ class MainWindow(QtWidgets.QMainWindow):
         return new_path_list
 
     def _updateRecentFolders(self, folder_path):
-        """Add a new folder path to the list of recent folders in the app settings.
+        """Add a new folder path to the list of recent folders in the app settings & pull down menu.
 
         Args:
             folder_path (str): The path of the folder to be added.
