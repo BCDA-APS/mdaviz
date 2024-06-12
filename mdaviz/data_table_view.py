@@ -1,11 +1,9 @@
-from PyQt5 import QtCore, QtWidgets
-from . import utils
+from PyQt5 import QtWidgets
 
 HEADERS = ["X", "Y"]
 
 
 class DataTableView(QtWidgets.QWidget):
-
     def __init__(self, data, parent):
         """
         This class is responsible for setting up a table view widget, managing the data displayed within it,

@@ -42,7 +42,10 @@ class MDAFolderTableView(QtWidgets.QWidget):
         from .mda_folder_table_model import MDAFolderTableModel
         from .empty_table_model import EmptyTableModel
 
-        data = self.mdaFileList()
+        data = self.mdaInfoList()
+        if data:
+            print(f"==== {data[0]=}")
+
         if len(data) > 0:
             data_model = MDAFolderTableModel(data, self.mda_mvc)
             self.tableView.setModel(data_model)
@@ -62,9 +65,9 @@ class MDAFolderTableView(QtWidgets.QWidget):
             empty_model = EmptyTableModel(HEADERS)
             self.tableView.setModel(empty_model)
 
-    def mdaFileList(self):
+    def mdaInfoList(self):
         """List of mda file (name only) in the selected folder."""
-        return self.mda_mvc.mdaFileList()
+        return self.mda_mvc.mdaInfoList()
 
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)

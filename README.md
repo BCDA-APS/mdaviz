@@ -3,7 +3,7 @@
 Python Qt5 application to visualize mda data.
 
 GH tag | GH release | PyPI
---- | --- | --- 
+--- | --- | ---
 [![tag](https://img.shields.io/github/tag/BCDA-APS/mdaviz.svg)](https://github.com/BCDA-APS/mdaviz/tags) | [![release](https://img.shields.io/github/release/BCDA-APS/mdaviz.svg)](https://github.com/BCDA-APS/mdaviz/releases) | [![PyPi](https://img.shields.io/pypi/v/mdaviz.svg)](https://pypi.python.org/pypi/mdaviz)
 
 Python version(s) | Unit Tests | Code Coverage | License
@@ -20,5 +20,5 @@ For complete installation guide, see [https://bcda-aps.github.io/mdaviz/](https:
 
 ## Acknowledgements
 
-"This product includes software produced by UChicago Argonne, LLC 
+"This product includes software produced by UChicago Argonne, LLC
 under Contract No. DE-AC02-06CH11357 with the Department of Energy."

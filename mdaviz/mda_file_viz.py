@@ -5,7 +5,7 @@ from . import utils
 from .chartview import ChartView
 from .data_table_view import DataTableView
 
-MD_FONT = "Monospace"
+MD_FONT = "Arial"
 MD_FONT_SIZE = 12
 
 

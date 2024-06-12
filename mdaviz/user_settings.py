@@ -198,17 +198,9 @@ class ApplicationQSettings(QtCore.QSettings):
             # find the "available" screen dimensions
             # (excludes docks, menu bars, ...)
             available_rect = qdw.availableGeometry(screen_num)
-            if (
-                available_rect.x()
-                <= int(x)
-                < available_rect.x() + available_rect.width()
-            ):
+            if available_rect.x() <= int(x) < available_rect.x() + available_rect.width():
                 x_onscreen = True
-            if (
-                available_rect.y()
-                <= int(y)
-                < available_rect.y() + available_rect.height()
-            ):
+            if available_rect.y() <= int(y) < available_rect.y() + available_rect.height():
                 y_onscreen = True
 
         # Move the window to the primary window if it would otherwise be drawn off screen

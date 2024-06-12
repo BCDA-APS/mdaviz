@@ -11,10 +11,14 @@ description = "Python Qt5 application to visualize MDA data."
 authors = [
   { name="Fanny Rodolakis", email="rodolakis@anl.gov" },
   { name="Pete Jemian", email="prjemian@gmail.com" },
+  { name="Rafael Vescovi", email="ravescovi@anl.gov" },
+  { name="Eric Codrea", email="ecodrea@anl.gov" },
 ]
 maintainers = [
   { name="Fanny Rodolakis", email="rodolakis@anl.gov" },
   { name="Pete Jemian", email="prjemian@gmail.com" },
+  { name="Rafael Vescovi", email="ravescovi@anl.gov" },
+  { name="Eric Codrea", email="ecodrea@anl.gov" },
 ]
 dynamic = ["version"]
 readme = "README.md"
@@ -157,6 +161,7 @@ exclude = [
     "node_modules",
     "site-packages",
     "venv",
+    "mdaviz/synApps_mdalib",
 ]
 
 # Same as Black.

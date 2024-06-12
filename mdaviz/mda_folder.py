@@ -6,46 +6,46 @@ MVC implementation of mda files.
 .. Summary::
 
     ~MDA_MVC
-        
+
         General initialization and setup methods:
         - __init__: Initializes the MDA_MVC instance, linking it with the main application window.
-        - setup: Sets up folder and file table views, data visualization components, and establishes 
+        - setup: Sets up folder and file table views, data visualization components, and establishes
         signal-slot connections.
-        
+
         Data Access and Management:
         - dataPath: Provides the path to the folder containing MDA files.
         - mdaFileList: Fetches names of MDA files in the selected folder.
-        
+
         User interaction handling methods:
         - doRefresh: Refreshes the view to display updated MDA files from the selected folder.
         - onFileSelected: Handles user selection of MDA files, updating UI and initiating data plotting.
         - doPlot: Initiates data plotting based on user selections and current plot mode. It checks for the
         selected positioner and detectors, retrieves the corresponding data, and plots it in the visualization panel.
-        - onCheckboxStateChanged: Responds to user changes in checkbox states within the MDA file table, 
+        - onCheckboxStateChanged: Responds to user changes in checkbox states within the MDA file table,
         triggering a re-plot of selected data.
         - handlePlotBasedOnMode: Determines plot updates based on the user-selected mode, e.g. Auto-add or Auto-replace.
-    
-        
+
+
         Navigation and UI state management:
         - goToFirst, goToLast, goToNext, goToPrevious: Methods for navigating through the list of MDA files.
         - selectAndShowIndex: Selects and highlights a file in the folder view based on index.
-        - selectionModel, setSelectionModel: Get and set methods for the current selection model, managing 
+        - selectionModel, setSelectionModel: Get and set methods for the current selection model, managing
         item selections within the view.
         - setCurrentFileTableview, currentFileTableview: Manages the table view for the currently active file.
-         
+
         Selection Configuration:
-        - updateDetectorSelection: Maps user-selected detectors across file changes to ensure consistency 
+        - updateDetectorSelection: Maps user-selected detectors across file changes to ensure consistency
         despite changes in detector ordering or availability
         - updateSelectionForNewPVs: Updates to both detector and positioner selections for a new file.
         - applySelectionChanges: Updates the UI with new selections after a file change.
         - setSelectionField, selectionField: Sets and retrieves field selections for plotting.
-            
+
         Splitter position management:
-        - setSplitterSettingsName, setSplitterMoved, setSplitterWaitChanges: Methods for managing user-adjusted 
+        - setSplitterSettingsName, setSplitterMoved, setSplitterWaitChanges: Methods for managing user-adjusted
         splitter positions and saving these settings for future sessions.
-        
+
     Flow Chart:
-        
+
         Refresh Button Press
         |___> doRefresh
             |___> mda_folder_tableview.displayTable()   (to reload folder content)
@@ -55,11 +55,11 @@ MVC implementation of mda files.
             |___> Update UI (Tabs, Metadata, Data Display)
             |___> doPlot (Based on current mode and selections)
                 |___> Retrieve and plot data based on selected positioner and detectors
-        
+
         Checkbox State Change in File View
         |___> onCheckboxStateChanged
             |___> doPlot (Replot based on new selections)
-                |___> Retrieve and plot data based on selected positioner and detectors  
+                |___> Retrieve and plot data based on selected positioner and detectors
 """
 
 import time
@@ -111,7 +111,6 @@ class MDA_MVC(QtWidgets.QWidget):
         layout = self.folder_groupbox.layout()
         layout.addWidget(self.mda_folder_tableview)
         self.mda_folder_tableview.displayTable()
-        utils.reconnect(self.mainWindow.refresh.released, self.doRefresh)
 
         # File table view:
         self.mda_file = MDAFile(self)
@@ -194,6 +193,15 @@ class MDA_MVC(QtWidgets.QWidget):
         """
         return self.mainWindow.mdaFileList()
 
+    def mdaInfoList(self):
+        """
+        Fetches a list of MDA file info from the currently selected folder.
+
+        Returns:
+            list: A list of dictionary containing the high level info for the MDA files in the selected folder.
+        """
+        return self.mainWindow.mdaInfoList()
+
     def currentFileTableview(self):
         """
         Gets the current file TableView being displayed in the active tab.
@@ -246,29 +254,6 @@ class MDA_MVC(QtWidgets.QWidget):
             selection_model = self.mda_folder_tableview.tableView.selectionModel()
             self.setSelectionModel(selection_model)
             utils.reconnect(self.selectionModel().currentChanged, self.onFileSelected)
-
-    def doRefresh(self):
-        """
-        Refreshes the file list in the currently selected folder
-        - Re-fetch the list of MDA files in the current folder.
-        - Display the updated file list in the MDA folder table view.
-        """
-        self.setStatus("Refreshing folder...")
-        current_folder = self.dataPath()
-        current_mdaFileList = self.mdaFileList()
-        self.mainWindow.setMdaFileList(current_folder)
-        new_mdaFileList = self.mdaFileList()
-        if new_mdaFileList:
-            self.mda_folder_tableview.displayTable()
-            difference = [
-                item for item in new_mdaFileList if item not in current_mdaFileList
-            ]
-            if difference:
-                self.setStatus(f"Loading new files: {difference}")
-            else:
-                self.setStatus("No new files.")
-        else:
-            self.setStatus("Nothing to update.")
 
     # # ------------ Fields selection methods:
 
@@ -350,7 +335,7 @@ class MDA_MVC(QtWidgets.QWidget):
             print(f"----- Selection After clean up: {self.selectionField()}\n")
 
     def updateDetectorSelection(
-        self, oldPvList, old_selection, newPvList, new_selection, verbose
+        self, oldPvList, old_selection, newPvList, new_selection, verbose=False
     ):
         """
         Helper function to update detector selections in the new selection field.
@@ -379,7 +364,7 @@ class MDA_MVC(QtWidgets.QWidget):
 
     # # ------------ File selection methods:
 
-    def onFileSelected(self, index, verbose=True):
+    def onFileSelected(self, index, verbose=False):
         """
         - Handles the selection of a new file in the folder table view.
         - Updates the UI to:
@@ -407,7 +392,7 @@ class MDA_MVC(QtWidgets.QWidget):
         """
 
         selected_file = self.mdaFileList()[index.row()]
-        self.setStatus(f"\n\n========= {selected_file} in {str(self.dataPath())}")
+        self.setStatus(f"\nLoading {str(self.dataPath())}/{selected_file}")
 
         # Ensures the table view scrolls to the selected item.
         if isinstance(index, QtCore.QModelIndex):

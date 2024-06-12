@@ -16,8 +16,11 @@ Support functions for this demo project.
 
 import datetime
 import pathlib
+import re
 import threading
-from .synApps_mdalib.mda import scanPositioner
+from .synApps_mdalib.mda import readMDA, scanPositioner
+
+HEADERS = "Prefix", "Scan #", "Points", "Dim", "Positioner", "Date", "Size"
 
 
 def human_readable_size(size, decimal_places=2):
@@ -63,11 +66,48 @@ def byte2str(byte_literal):
     Returns:
         - str | Any: The decoded string if the input is a byte literal, otherwise the original input.
     """
-    return (
-        byte_literal.decode("utf-8")
-        if isinstance(byte_literal, bytes)
-        else byte_literal
-    )
+    return byte_literal.decode("utf-8") if isinstance(byte_literal, bytes) else byte_literal
+
+
+def get_file_info(file_path):
+    file_name = file_path.name
+    file_data = readMDA(str(file_path))[1]
+    file_metadata = readMDA(str(file_path))[0]
+    file_num = file_metadata.get("scan_number", None)
+    file_prefix = extract_file_prefix(file_name, file_num)
+    file_size = human_readable_size(file_path.stat().st_size)
+    file_date = byte2str(file_data.time).split(".")[0]
+    file_pts = file_data.curr_pt
+    file_dim = file_data.dim
+    pv = byte2str(file_data.p[0].name) if len(file_data.p) else "index"
+    desc = byte2str(file_data.p[0].desc) if len(file_data.p) else "index"
+    file_pos = desc if desc else pv
+
+    fileInfo = {"Name": file_name}
+    values = [
+        file_prefix,
+        file_num,
+        file_pts,
+        file_dim,
+        file_pos,
+        file_date,
+        file_size,
+    ]
+    for k, v in zip(HEADERS, values):
+        fileInfo[k] = v
+    return fileInfo
+
+
+def extract_file_prefix(file_name, scan_number):
+    """Create a pattern that matches the prefix followed by an optional separator and the scan number with possible leading zeros
+    The separators considered here are underscore (_), hyphen (-), dot (.), and space ( )
+    """
+    scan_number = str(scan_number)
+    pattern = rf"^(.*?)[_\-\. ]?0*{scan_number}\.mda$"
+    match = re.match(pattern, file_name)
+    if match:
+        return match.group(1)
+    return None
 
 
 def get_det(mda_file_data):
@@ -109,7 +149,7 @@ def get_det(mda_file_data):
     # Defining a default scanPositioner Object for "Index" at for key=0:
     p0 = scanPositioner()
     p0.number = 0  # positioner number in sscan record
-    p0.fieldName = "p0"  # name of sscanRecord PV
+    p0.fieldName = "P0"  # name of sscanRecord PV
     p0.name = "Index"  # name of EPICS PV this positioner wrote to
     p0.desc = "Index"  # description of 'name' PV
     p0.step_mode = ""  # 'LINEAR', 'TABLE', or 'FLY'
@@ -337,7 +377,7 @@ def reconnect(signal, new_slot):
         - signal: The signal to disconnect and then reconnect.
         - new_slot: The new slot to connect to the signal.
 
-    Note: 
+    Note:
         - this function catches TypeError which occurs if the signal was not connected to any slots.
     """
     try:

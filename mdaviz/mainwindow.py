@@ -8,7 +8,6 @@ Defines MainWindow class.
 
 from pathlib import Path
 from PyQt5 import QtWidgets
-from PyQt5.QtGui import QIcon
 
 from . import APP_TITLE
 from .mda_folder import MDA_MVC
@@ -17,9 +16,8 @@ from .user_settings import settings
 from .opendialog import DIR_SETTINGS_KEY
 
 UI_FILE = utils.getUiFileName(__file__)
+MAX_FILES = 100
 MAX_RECENT_DIRS = 10
-MAX_DEPTH = 4
-MAX_SUBFOLDERS_PER_DEPTH = 10
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -27,61 +25,53 @@ class MainWindow(QtWidgets.QMainWindow):
 
     .. autosummary::
 
-        ~setup
+        ~connect
         ~status
         ~setStatus
         ~doAboutDialog
         ~closeEvent
         ~doClose
         ~doOpen
+        ~reset_mainwindow
         ~dataPath
-        ~subFolderPath
-        ~folderPath
-        ~folderList
-        ~subFolderList
+        ~setDataPath
         ~mdaFileList
-        ~mdaFileCount
         ~setMdaFileList
-        ~setSubFolderName
-        ~setSubfolderList
-        ~setFolderPath
-        ~setSubFolderPath
-        ~cleanFolderList
+        ~mdaInfoList
+        ~setMdaInfoList
+        ~folderList
         ~setFolderList
-        ~updateRecentFolders
+        ~onFolderSelected
+        ~onRefresh
+        ~_buildFolderList
+        ~_updateRecentFolders
     """
 
     def __init__(self, directory):
         super().__init__()
-        self.directory = directory
         utils.myLoadUi(UI_FILE, baseinstance=self)
-        self.setup()
-
-    def setup(self):
-        self._dataPath = None  # the combined data path obj (folder.parent + subfolder)
-        self._folderPath = None  # the path obj from pull down 1
-        self._folderList = []  # the list of folder in pull down 1
-        self._subFolderPath = None  # the subfolder path obj selected in pull down 2
-        self._subFolderList = []  # the list of subfolder in pull down 2
-        self._mdaFileList = []  # the list of mda file NAME str (name only)
-        self._mdaFileCount = 0  # the number of mda files in the list
-        self.mvc_folder = None
-
         self.setWindowTitle(APP_TITLE)
-        self.setFolderList(None)
 
+        self.directory = directory
+        self.mvc_folder = None
+        self.setDataPath()  # the combined data path obj
+        self.setFolderList()  # the list of recent folders in folder QCombobox
+        self.setMdaFileList()  # the list of mda file NAME str (name only)
+        self.setMdaInfoList()  # the list of mda file Info (all the data necessary to fill the table view)
+
+        self.connect()
+        self.onFolderSelected(directory)
+
+        settings.restoreWindowGeometry(self, "mainwindow_geometry")
+        print("Settings are saved in:", settings.fileName())
+
+    def connect(self):
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
         utils.reconnect(self.open.released, self.doOpen)
-        self.open.released.connect(self.doOpen)
-
-        self.folder.currentTextChanged.connect(self.setFolderPath)
-        self.subfolder.currentTextChanged.connect(self.setSubFolderPath)
-
-        settings.restoreWindowGeometry(self, "mainwindow_geometry")
-        print("Settings are saved in:", settings.fileName())
-        self.setFolderPath(self.directory)
+        utils.reconnect(self.refresh.released, self.onRefresh)
+        self.folder.currentTextChanged.connect(self.onFolderSelected)
 
     @property
     def status(self):
@@ -113,9 +103,7 @@ class MainWindow(QtWidgets.QMainWindow):
         User chose exit (or quit), or closeEvent() was called.
         """
         self.setStatus("Application quitting ...")
-
         settings.saveWindowGeometry(self, "mainwindow_geometry")
-
         self.close()
 
     def doOpen(self, *args, **kw):
@@ -129,185 +117,173 @@ class MainWindow(QtWidgets.QMainWindow):
         dir_name = open_dialog.getExistingDirectory(self, "Select a Directory")
         if dir_name:
             folder_list = self.folderList()
-            if folder_list[0] == "":
-                folder_list[0] = dir_name
-            else:
-                folder_list.insert(0, dir_name)
+            folder_list.insert(0, dir_name)
             self.setFolderList(folder_list)
+
+    def reset_mainwindow(self):
+        self.setDataPath()
+        self.setMdaInfoList()
+        self.setMdaFileList()
+        if self.mvc_folder is not None:
+            self.mvc_folder.mda_folder_tableview.clearContents()
 
     def dataPath(self):
         """
-        Full path object for the displayed data:
-            dataPath = folderPath.parent + subFolderPath
+        Full path object for the selected folder
         """
         return self._dataPath
 
-    def subFolderPath(self):
-        """Subfolder name (str) of the selected subfolder."""
-        return self._subFolderPath
-
-    def folderPath(self):
-        """Full path (obj) of the selected folder."""
-        return self._folderPath
-
-    def folderList(self):
-        """Folder path (str) list in the pull down menu."""
-        return self._folderList
-
-    def subFolderList(self):
-        """Subfolder path (str) list in the pull down menu."""
-        return self._subFolderList
+    def setDataPath(self, path=None):
+        self._dataPath = path
 
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
         return self._mdaFileList
 
-    def mdaFileCount(self):
-        """Number of mda files in the selected folder."""
-        return self._mdaFileCount
+    def setMdaFileList(self, mda_file_list=None):
+        self._mdaFileList = mda_file_list if mda_file_list else []
 
-    def setMdaFileList(self, data_path):
-        if data_path:
-            self._mdaFileList = sorted([file.name for file in data_path.glob("*.mda")])
-        else:
-            self._mdaFileList = []
+    def mdaInfoList(self):
+        return self._mdaInfoList
 
-    def setSubFolderName(self):
-        self._subFolderPath = Path(self.subfolder.currentText())
+    def setMdaInfoList(self, infoList=None):
+        self._mdaInfoList = infoList if infoList else []
 
-    def setSubfolderList(self, subfolder_list):
-        """Set the subfolders path list in the pop-up list."""
-        self._subFolderList = subfolder_list
-        self.subfolder.clear()
-        self.subfolder.addItems(subfolder_list)
+    def folderList(self):
+        return self._folderList
 
-    def setFolderPath(self, folder_name):
-        """A folder was selected (from the open dialog)."""
-        if folder_name == "Other...":
+    def setFolderList(self, folder_list=None):
+        """Set the folder path list & populating the folder QComboBox.
+
+        - If folder_list is not None, it will remove its duplicates.
+        - If folder_list is None, the call to buildFolderList will take care of building the list
+          based on the recent list of folder saved in the app settings.
+
+        Args:
+            folder_list (list, optional): the current list of recent folders. Defaults to None.
+        """
+        if folder_list != "":
+            folder_list = self._buildFolderList(folder_list)
+        self._fillFolderBox(folder_list)
+        self._folderList = folder_list
+
+    def onFolderSelected(self, folder_name):
+        """A folder was selected (from the open dialog or pull down menu)."""
+        if folder_name == "Open...":
             self.doOpen()
+        elif folder_name == "Clear Recently Open...":
+            settings.setKey(DIR_SETTINGS_KEY, "")
+            folder_list = [str(self.dataPath())] if self.dataPath() else [""]
+            self.setFolderList(folder_list)
         else:
             folder_path = Path(folder_name)
             if folder_path.exists() and folder_path.is_dir():  # folder exists
-                self._folderPath = folder_path
-
-                def get_all_subfolders(
-                    folder_path,
-                    parent_path="",
-                    current_depth=0,
-                    max_depth=MAX_DEPTH,
-                    max_subfolders_per_depth=MAX_SUBFOLDERS_PER_DEPTH,
-                    depth_counter=None,
-                ):
-                    if depth_counter is None:
-                        depth_counter = {depth: 0 for depth in range(1, max_depth + 1)}
-
-                    subfolder_list = []
-                    if parent_path:  # Don't add the root parent folder
-                        subfolder_list.append(parent_path)
-
-                    if current_depth >= max_depth:
-                        print(f"{current_depth=}")
-                        return subfolder_list
-
-                    try:
-                        for item in folder_path.iterdir():
-                            # Check if we have collected enough subfolders for the current depth
-                            if (
-                                depth_counter[current_depth + 1]
-                                >= max_subfolders_per_depth
-                            ):
-                                break
-
-                            if item.is_dir() and not item.name.startswith("."):
-                                full_path = (
-                                    f"{parent_path}/{item.name}"
-                                    if parent_path
-                                    else item.name
-                                )
-                                subfolder_list.append(full_path)
-                                # Addition of a subfolder that exists at one level deeper than the current level
-                                depth_counter[current_depth + 1] += 1
-                                # Recursively collect subfolders, passing the updated depth_counter
-                                subfolder_list.extend(
-                                    get_all_subfolders(
-                                        item,
-                                        full_path,
-                                        current_depth + 1,
-                                        max_depth,
-                                        max_subfolders_per_depth,
-                                        depth_counter,
-                                    )
-                                )
-                    except PermissionError:
-                        print(f"Permission denied for folder: {folder_path}")
-                    subfolder_list = list(dict.fromkeys(sorted(subfolder_list)))
-
-                    return subfolder_list
-
-                self.setSubfolderList(get_all_subfolders(folder_path, folder_path.name))
-                self.updateRecentFolders(str(folder_path))
+                mda_list = [utils.get_file_info(f) for f in folder_path.glob("*.mda")]
+                if mda_list:
+                    self.setDataPath(folder_path)
+                    mda_list = sorted(mda_list, key=lambda x: x["Name"])
+                    mda_name_list = [entry["Name"] for entry in mda_list]
+                    self.setMdaInfoList(mda_list)
+                    self.setMdaFileList(mda_name_list)
+                    self._addToRecentFolders(str(folder_path))
+                    self.info.setText(f"{len(mda_list)} mda files")
+                    layout = self.groupbox.layout()
+                    if self.mvc_folder is None:
+                        self.mvc_folder = MDA_MVC(self)
+                        layout.addWidget(self.mvc_folder)
+                    else:
+                        # Always update the folder view since it is a new folder
+                        self.mvc_folder.updateFolderView()
+                else:
+                    self.info.setText("No mda files")
+                    self.reset_mainwindow()
+                    self.setStatus(f"\n{str(folder_path)!r} - No MDA files found.")
             else:
-                self._folderPath = None
-                self._dataPath = None
-                self._mdaFileList = []
-                self._mdaFileCount = 0
-                self.setSubfolderList([])
-                self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
-                if self.mvc_folder is not None:
-                    # If MVC exists, display empty table views
-                    self.mvc_folder.mda_folder_tableview.clearContents()
+                self.reset_mainwindow()
+                self.setStatus(f"\n{str(folder_path)!r} - Path does not exist.")
 
-    def setSubFolderPath(self, subfolder_name):
-        if subfolder_name:
-            data_path = self.folderPath().parent / Path(subfolder_name)
-            self._dataPath = data_path
-            layout = self.groupbox.layout()
-            mda_files_path = list(data_path.glob("*.mda"))
-            self._mdaFileCount = len(mda_files_path)
-            self.setMdaFileList(data_path)
-            self.info.setText(f"{self._mdaFileCount} mda files")
-            if self.mvc_folder is None:
-                self.mvc_folder = MDA_MVC(self)
-                layout.addWidget(self.mvc_folder)
-            else:
-                # Always update the folder view since it is a new subfolder
-                self.mvc_folder.updateFolderView()
-            if mda_files_path == []:
-                # If there are no MDA files, pass None to display empty table
-                self.mvc_folder.updateFolderView()
-                self.setStatus("No MDA files found in the selected folder.")
+    def onRefresh(self):
+        """
+        Refreshes the file list in the currently selected folder
+        - Re-fetch the list of MDA files in the current folder.
+        - Display the updated file list in the MDA folder table view.
+        """
+        # TODO: could be more efficient (i.e. ignore mda files already loaded)
+        self.setStatus("Refreshing folder...")
+        current_folder = self.dataPath()
+        if current_folder:
+            current_mdaFileList = self.mdaFileList()
+            self.onFolderSelected(current_folder)
+            new_mdaFileList = self.mdaFileList()
+            if new_mdaFileList:
+                difference = [
+                    item for item in new_mdaFileList if item not in current_mdaFileList
+                ]
+                if difference:
+                    self.setStatus(f"Loading new files: {difference}")
+                else:
+                    self.setStatus("No new files.")
+        else:
+            self.setStatus("Nothing to update.")
 
-    def cleanFolderList(self, folder_list=None):
-        """Check the list of recent folder and remove duplicate"""
+    def _buildFolderList(self, folder_list=None):
+        """Build the list of recent folders and remove duplicates from the folder list.
+
+        - If folder_list arg is not None (after a doOpen call), it just removes duplicates.
+        - If folder_list arg is None, it grabs the list of recent folder from the app settings.
+          The directory loaded at start-up will be added at index 0.
+
+        Args:
+            folder_list (list, optional): a list folders. Defaults to None.
+
+        Returns:
+            list: list of folders to be populated in the QComboBox
+        """
         unique_paths = set()
-        new_path_list = []
-        candidate_paths = [self.directory, "Other..."]
+        candidate_paths = [self.directory]
         if not folder_list:
-            recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)
-            recent_dirs = recent_dirs_str.split(",") if recent_dirs_str else []
+            recent_dirs = self._getRecentFolders()
             if recent_dirs:
                 candidate_paths[1:1] = recent_dirs
         else:
             candidate_paths = folder_list
-        for p in candidate_paths:
-            if p not in unique_paths:
-                unique_paths.add(p)
-                new_path_list.append(p)
+        new_path_list = [
+            p
+            for p in candidate_paths
+            if p not in unique_paths and (unique_paths.add(p) or True)
+        ]
         return new_path_list
 
-    def setFolderList(self, folder_list):
-        """Sets the folder list, updating the internal folder list & populate the QComboBox"""
-        folder_list = self.cleanFolderList(folder_list)
+    def _getRecentFolders(self):
+        recent_dirs = (
+            settings.getKey(DIR_SETTINGS_KEY).split(",")
+            if settings.getKey(DIR_SETTINGS_KEY)
+            else []
+        )
+        return recent_dirs
+
+    def _addToRecentFolders(self, folder_path):
+        """Add a new folder path to the list of recent folders in the app settings.
+
+        Args:
+            folder_path (str): The path of the folder to be added.
+        """
+        recent_dirs = self._getRecentFolders()
+        if folder_path in recent_dirs:
+            recent_dirs.remove(folder_path)
+        recent_dirs.insert(0, str(folder_path))
+        recent_dirs = [dir for dir in recent_dirs if dir != "."]
+        settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs[:MAX_RECENT_DIRS]))
+
+    def _fillFolderBox(self, folder_list=[]):
+        """Fill the Folder ComboBox; Open... and Clear Recently Open... are added at the end by default.
+
+        Args:
+            folder_list (list, optional): The list of folders to be displayed in the ComboBox. Defaults to [].
+        """
         self.folder.clear()
         self.folder.addItems(folder_list)
-        self._folderList = folder_list
-
-    def updateRecentFolders(self, folder_name):
-        recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)
-        recent_dirs = recent_dirs_str.split(",") if recent_dirs_str else []
-        if folder_name in recent_dirs:
-            recent_dirs.remove(folder_name)
-        recent_dirs.insert(0, str(folder_name))
-        recent_dirs = recent_dirs[:MAX_RECENT_DIRS]
-        recent_dirs = [dir for dir in recent_dirs if dir != "."]
-        settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs))
+        self.folder.addItems(["Open...", "Clear Recently Open..."])
+        count = self.folder.count()
+        self.folder.insertSeparator(count - 1)
+        self.folder.insertSeparator(count - 2)

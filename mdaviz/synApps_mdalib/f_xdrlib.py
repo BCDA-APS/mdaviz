@@ -254,7 +254,7 @@ class Unpacker:
         i = self.__pos
         self.__pos = j = i+4*n
         return self.unpackFloatDict[n](self.__buf[i:j])
-        
+
     def unpack_farray_double(self, n):
         if not self.unpackDoubleDict.has_key(n):
             fmt = ">" + "d"*n
