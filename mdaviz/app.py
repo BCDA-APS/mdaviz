@@ -16,22 +16,18 @@ from PyQt5 import QtWidgets
 from .mainwindow import MainWindow
 import argparse
 
+
 def gui():
     """Display the main window"""
 
-
     app = QtWidgets.QApplication(sys.argv)
     main_window = MainWindow()
-    main_window.setStatus(
-        f"Application started ..."
-    )
+    main_window.setStatus("Application started ...")
     main_window.show()
     sys.exit(app.exec())
 
 
 def command_line_interface():
-
-
     from . import __version__
 
     doc = __doc__.strip().splitlines()[0]
@@ -61,7 +57,6 @@ def command_line_interface():
 
 
 def main():  # for future command-line options
-
     global logger
 
     options = command_line_interface()
