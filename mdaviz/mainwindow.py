@@ -42,6 +42,7 @@ class MainWindow(QtWidgets.QMainWindow):
         ~folderList
         ~setFolderList
         ~onFolderSelected
+        ~onRefresh
         ~_buildFolderList
         ~_updateRecentFolders
     """
@@ -69,7 +70,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionAbout.triggered.connect(self.doAboutDialog)
         self.actionExit.triggered.connect(self.doClose)
         utils.reconnect(self.open.released, self.doOpen)
-        utils.reconnect(self.refresh.released, self.doRefresh)
+        utils.reconnect(self.refresh.released, self.onRefresh)
         self.folder.currentTextChanged.connect(self.onFolderSelected)
 
     @property
@@ -124,7 +125,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setMdaInfoList()
         self.setMdaFileList()
         if self.mvc_folder is not None:
-            # If MVC exists, clear table view:
             self.mvc_folder.mda_folder_tableview.clearContents()
 
     def dataPath(self):
@@ -162,7 +162,8 @@ class MainWindow(QtWidgets.QMainWindow):
         Args:
             folder_list (list, optional): the current list of recent folders. Defaults to None.
         """
-        folder_list = self._buildFolderList(folder_list)
+        if folder_list != "":
+            folder_list = self._buildFolderList(folder_list)
         self._fillFolderBox(folder_list)
         self._folderList = folder_list
 
@@ -172,8 +173,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.doOpen()
         elif folder_name == "Clear Recently Open...":
             settings.setKey(DIR_SETTINGS_KEY, "")
-            folder_list = [str(self.dataPath())] if self.dataPath() else []
-            self._fillFolderBox(folder_list)
+            folder_list = [str(self.dataPath())] if self.dataPath() else [""]
+            self.setFolderList(folder_list)
         else:
             folder_path = Path(folder_name)
             if folder_path.exists() and folder_path.is_dir():  # folder exists
@@ -184,7 +185,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     mda_name_list = [entry["Name"] for entry in mda_list]
                     self.setMdaInfoList(mda_list)
                     self.setMdaFileList(mda_name_list)
-                    self._updateRecentFolders(str(folder_path))
+                    self._addToRecentFolders(str(folder_path))
                     self.info.setText(f"{len(mda_list)} mda files")
                     layout = self.groupbox.layout()
                     if self.mvc_folder is None:
@@ -200,7 +201,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.reset_mainwindow()
                 self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
 
-    def doRefresh(self):
+    def onRefresh(self):
         """
         Refreshes the file list in the currently selected folder
         - Re-fetch the list of MDA files in the current folder.
@@ -226,8 +227,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def _buildFolderList(self, folder_list=None):
         """Build the list of recent folders and remove duplicates from the folder list.
 
-        - If folder_list is not None (after a doOpen call), it just removes duplicates.
-        - If folder_list is None, it grabs the list of recent folder from the app settings.
+        - If folder_list arg is not None (after a doOpen call), it just removes duplicates.
+        - If folder_list arg is None, it grabs the list of recent folder from the app settings.
           The directory loaded at start-up will be added at index 0.
 
         Args:
@@ -239,11 +240,7 @@ class MainWindow(QtWidgets.QMainWindow):
         unique_paths = set()
         candidate_paths = [self.directory]
         if not folder_list:
-            recent_dirs = (
-                settings.getKey(DIR_SETTINGS_KEY).split(",")
-                if settings.getKey(DIR_SETTINGS_KEY)
-                else []
-            )
+            recent_dirs = self._getRecentFolders()
             if recent_dirs:
                 candidate_paths[1:1] = recent_dirs
         else:
@@ -255,17 +252,21 @@ class MainWindow(QtWidgets.QMainWindow):
         ]
         return new_path_list
 
-    def _updateRecentFolders(self, folder_path):
-        """Add a new folder path to the list of recent folders in the app settings & pull down menu.
-
-        Args:
-            folder_path (str): The path of the folder to be added.
-        """
+    def _getRecentFolders(self):
         recent_dirs = (
             settings.getKey(DIR_SETTINGS_KEY).split(",")
             if settings.getKey(DIR_SETTINGS_KEY)
             else []
         )
+        return recent_dirs
+
+    def _addToRecentFolders(self, folder_path):
+        """Add a new folder path to the list of recent folders in the app settings.
+
+        Args:
+            folder_path (str): The path of the folder to be added.
+        """
+        recent_dirs = self._getRecentFolders()
         if folder_path in recent_dirs:
             recent_dirs.remove(folder_path)
         recent_dirs.insert(0, str(folder_path))
@@ -273,6 +274,11 @@ class MainWindow(QtWidgets.QMainWindow):
         settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs[:MAX_RECENT_DIRS]))
 
     def _fillFolderBox(self, folder_list=[]):
+        """Fill the Folder ComboBox; Open... and Clear Recently Open... are added at the end by default.
+
+        Args:
+            folder_list (list, optional): The list of folders to be displayed in the ComboBox. Defaults to [].
+        """
         self.folder.clear()
         self.folder.addItems(folder_list)
         self.folder.addItems(["Open...", "Clear Recently Open..."])
