@@ -54,7 +54,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setMdaInfoList()  # the list of mda file Info (all the data necessary to fill the table view)
 
         self.connect()
-        # self.onFolderSelected(directory)
+        self.onFolderSelected(directory)
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
