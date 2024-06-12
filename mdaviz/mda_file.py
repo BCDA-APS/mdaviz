@@ -314,7 +314,6 @@ class MDAFile(QtWidgets.QWidget):
         self.displayMetadata(metadata)
         self.displayData(tabledata)
         selection_field = self.defaultSelection(first_pos, first_det, selection_field)
-
         # Update tab widget:
         if self.tabManager.getTabData(file_path):
             tab_index = self.tabPath2Index(file_path)
