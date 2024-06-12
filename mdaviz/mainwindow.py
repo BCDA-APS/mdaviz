@@ -185,19 +185,18 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def onFolderSelected(self, folder_name):
         """A folder was selected (from the open dialog or pull down menu)."""
-        if folder_name == Path("."):
-            print("FUCK")
-        elif folder_name == "Open...":
+        if folder_name in [".", "", "Select a folder..."]:
+            pass
+        elif folder_name in ["Open..."]:
             self.doOpen()
         elif folder_name == "Clear Recently Open...":
             settings.setKey(DIR_SETTINGS_KEY, "")
-            folder_list = [str(self.dataPath())] if self.dataPath() else [""]
+            folder_list = [str(self.dataPath())] if self.dataPath() else []
             self.setFolderList(folder_list)
         else:
             folder_path = Path(folder_name)
             if folder_path.exists() and folder_path.is_dir():  # folder exists
                 n_files = len([folder_path.iterdir()])
-                print(f"{folder_path=}")
                 answer = True
                 if n_files > MAX_FILES:
                     answer = self.doPopUp(
@@ -272,13 +271,13 @@ class MainWindow(QtWidgets.QMainWindow):
             list: list of folders to be populated in the QComboBox
         """
         unique_paths = set()
-        candidate_paths = [""]
+        candidate_paths = []
         if not folder_list:
             recent_dirs = self._getRecentFolders()
             if recent_dirs:
-                candidate_paths[1:1] = recent_dirs
+                candidate_paths.extend([d for d in recent_dirs if d and d != "."])
         else:
-            candidate_paths = folder_list
+            candidate_paths.extend([d for d in folder_list if d and d != "."])
         new_path_list = [
             p
             for p in candidate_paths
@@ -314,6 +313,8 @@ class MainWindow(QtWidgets.QMainWindow):
             folder_list (list, optional): The list of folders to be displayed in the ComboBox. Defaults to [].
         """
         self.folder.clear()
+        if not folder_list:
+            folder_list = ["Select a folder..."]
         self.folder.addItems(folder_list)
         self.folder.addItems(["Open...", "Clear Recently Open..."])
         count = self.folder.count()
