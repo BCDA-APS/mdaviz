@@ -20,8 +20,7 @@ def test_app_startup(qtbot):
         # FIXME: dumps core
         # app = QtWidgets.QApplication([])
         # assert app is not None
-        test_data_dir = os.path.join(os.path.dirname(__file__), "test_data")
-        main_window = MainWindow(directory=test_data_dir)
+        main_window = MainWindow()
         assert main_window is not None
         # main_window.setStatus("Application started ...")
         # main_window.show()
