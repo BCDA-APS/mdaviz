@@ -181,8 +181,11 @@ class ChartView(QtWidgets.QWidget):
         ds = curveData["ds"]
         ds_options = curveData["ds_options"]
         # Plot and store the plot object associated with curveID:
-        plot_obj = self.main_axes.plot(*ds, **ds_options)[0]
-        self.plotObjects[curveID] = plot_obj
+        try:
+            plot_obj = self.main_axes.plot(*ds, **ds_options)[0]
+            self.plotObjects[curveID] = plot_obj
+        except Exception as exc:
+            print(str(exc))
         # Update plot
         self.updatePlot(update_title=True)
         # Add to the comboBox
@@ -382,19 +385,24 @@ class ChartView(QtWidgets.QWidget):
 
     def updateBasicMathInfo(self, curveID):
         if curveID and curveID in self.curveManager.curves():
-            curve_data = self.curveManager.getCurveData(curveID)
-            x = curve_data["ds"][0]
-            y = curve_data["ds"][1]
-            stats = self.calculateBasicMath(x, y)
-            for i, txt in zip(stats, ["min_text", "max_text", "com_text", "mean_text"]):
-                if isinstance(i, tuple):
-                    result = f"({utils.num2fstr(i[0])}, {utils.num2fstr(i[1])})"
-                else:
-                    result = f"{utils.num2fstr(i)}" if i else "n/a"
-                self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText(result)
+            try:
+                curve_data = self.curveManager.getCurveData(curveID)
+                x = curve_data["ds"][0]
+                y = curve_data["ds"][1]
+                stats = self.calculateBasicMath(x, y)
+                for i, txt in zip(
+                    stats, ["min_text", "max_text", "com_text", "mean_text"]
+                ):
+                    if isinstance(i, tuple):
+                        result = f"({utils.num2fstr(i[0])}, {utils.num2fstr(i[1])})"
+                    else:
+                        result = f"{utils.num2fstr(i)}" if i else "n/a"
+                    self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText(result)
+            except Exception as exc:
+                print(str(exc))
+                self.clearBasicMath()
         else:
-            for txt in ["min_text", "max_text", "com_text", "mean_text"]:
-                self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText("n/a")
+            self.clearBasicMath()
 
     def clearBasicMath(self):
         for txt in ["min_text", "max_text", "com_text", "mean_text"]:
