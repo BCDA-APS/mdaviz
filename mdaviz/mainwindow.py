@@ -16,7 +16,7 @@ from .user_settings import settings
 from .opendialog import DIR_SETTINGS_KEY
 
 UI_FILE = utils.getUiFileName(__file__)
-MAX_FILES = 100
+MAX_FILES = 500
 MAX_RECENT_DIRS = 10
 
 
@@ -120,6 +120,23 @@ class MainWindow(QtWidgets.QMainWindow):
             folder_list.insert(0, dir_name)
             self.setFolderList(folder_list)
 
+    def doPopUp(self, message):
+        """
+        User chose to open (connect with) a tiled server.
+        """
+        from .popup import PopUp
+
+        popup = PopUp(self, message)
+        return popup.exec_() == QtWidgets.QDialog.Accepted
+        
+    def proceed(self):
+        """Handle the logic when the user clicks 'OK'."""
+        return True
+
+    def cancel(self):
+        """Handle the logic when the user clicks 'Cancel'."""
+        return False
+
     def reset_mainwindow(self):
         self.setDataPath()
         self.setMdaInfoList()
@@ -178,26 +195,36 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             folder_path = Path(folder_name)
             if folder_path.exists() and folder_path.is_dir():  # folder exists
-                mda_list = [utils.get_file_info(f) for f in folder_path.glob("*.mda")]
-                if mda_list:
-                    self.setDataPath(folder_path)
-                    mda_list = sorted(mda_list, key=lambda x: x["Name"])
-                    mda_name_list = [entry["Name"] for entry in mda_list]
-                    self.setMdaInfoList(mda_list)
-                    self.setMdaFileList(mda_name_list)
-                    self._addToRecentFolders(str(folder_path))
-                    self.info.setText(f"{len(mda_list)} mda files")
-                    layout = self.groupbox.layout()
-                    if self.mvc_folder is None:
-                        self.mvc_folder = MDA_MVC(self)
-                        layout.addWidget(self.mvc_folder)
+                n_files = len([*folder_path.iterdir()])
+                answer = True
+                if n_files > MAX_FILES:
+                    answer = self.doPopUp(f"The selected folder contains {n_files} files. \nDo you want to proceed?")
+                if answer:
+                    mda_list = [utils.get_file_info(f) for f in folder_path.glob("*.mda")]
+                    if mda_list:
+                        self.setDataPath(folder_path)
+                        mda_list = sorted(mda_list, key=lambda x: x["Name"])
+                        mda_name_list = [entry["Name"] for entry in mda_list]
+                        self.setMdaInfoList(mda_list)
+                        self.setMdaFileList(mda_name_list)
+                        self._addToRecentFolders(str(folder_path))
+                        self.info.setText(f"{len(mda_list)} mda files")
+                        layout = self.groupbox.layout()
+                        if self.mvc_folder is None:
+                            self.mvc_folder = MDA_MVC(self)
+                            layout.addWidget(self.mvc_folder)
+                        else:
+                            # Always update the folder view since it is a new folder
+                            self.mvc_folder.updateFolderView()
                     else:
-                        # Always update the folder view since it is a new folder
-                        self.mvc_folder.updateFolderView()
+                        self.info.setText("No mda files")
+                        self.doPopUp(f"No MDA files found.")
+                        self.reset_mainwindow()
+                        self.setStatus(f"\n{str(folder_path)!r} - No MDA files found.")
+                        
                 else:
-                    self.info.setText("No mda files")
                     self.reset_mainwindow()
-                    self.setStatus(f"\n{str(folder_path)!r} - No MDA files found.")
+                    self.setStatus("Operation canceled.")
             else:
                 self.reset_mainwindow()
                 self.setStatus(f"\n{str(folder_path)!r} - Path does not exist.")
