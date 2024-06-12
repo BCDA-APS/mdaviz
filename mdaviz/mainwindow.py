@@ -216,9 +216,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.onFolderSelected(current_folder)
             new_mdaFileList = self.mdaFileList()
             if new_mdaFileList:
-                difference = [
-                    item for item in new_mdaFileList if item not in current_mdaFileList
-                ]
+                difference = [item for item in new_mdaFileList if item not in current_mdaFileList]
                 if difference:
                     self.setStatus(f"Loading new files: {difference}")
                 else:
@@ -247,19 +245,11 @@ class MainWindow(QtWidgets.QMainWindow):
                 candidate_paths[1:1] = recent_dirs
         else:
             candidate_paths = folder_list
-        new_path_list = [
-            p
-            for p in candidate_paths
-            if p not in unique_paths and (unique_paths.add(p) or True)
-        ]
+        new_path_list = [p for p in candidate_paths if p not in unique_paths and (unique_paths.add(p) or True)]
         return new_path_list
 
     def _getRecentFolders(self):
-        recent_dirs = (
-            settings.getKey(DIR_SETTINGS_KEY).split(",")
-            if settings.getKey(DIR_SETTINGS_KEY)
-            else []
-        )
+        recent_dirs = settings.getKey(DIR_SETTINGS_KEY).split(",") if settings.getKey(DIR_SETTINGS_KEY) else []
         return recent_dirs
 
     def _addToRecentFolders(self, folder_path):
