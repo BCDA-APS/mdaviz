@@ -208,7 +208,6 @@ class MainWindow(QtWidgets.QMainWindow):
         - Re-fetch the list of MDA files in the current folder.
         - Display the updated file list in the MDA folder table view.
         """
-        # TODO: could be more efficient (i.e. ignore mda files already loaded)
         self.setStatus("Refreshing folder...")
         current_folder = self.dataPath()
         if current_folder:
