@@ -420,7 +420,6 @@ class MDA_MVC(QtWidgets.QWidget):
         # selectionField() may have changed when calling addFileTab
         if self.selectionField():
             if old_pv_list is not None:
-                # TODO - later: find out why this sometimes fails - not that important:
                 try:
                     self.updateSelectionForNewPVs(
                         old_selection, old_pv_list, new_pv_list, verbose=False
