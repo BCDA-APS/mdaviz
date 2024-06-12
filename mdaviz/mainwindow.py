@@ -128,7 +128,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         popup = PopUp(self, message)
         return popup.exec_() == QtWidgets.QDialog.Accepted
-        
+
     def proceed(self):
         """Handle the logic when the user clicks 'OK'."""
         return True
@@ -198,9 +198,13 @@ class MainWindow(QtWidgets.QMainWindow):
                 n_files = len([*folder_path.iterdir()])
                 answer = True
                 if n_files > MAX_FILES:
-                    answer = self.doPopUp(f"The selected folder contains {n_files} files. \nDo you want to proceed?")
+                    answer = self.doPopUp(
+                        f"The selected folder contains {n_files} files. \nDo you want to proceed?"
+                    )
                 if answer:
-                    mda_list = [utils.get_file_info(f) for f in folder_path.glob("*.mda")]
+                    mda_list = [
+                        utils.get_file_info(f) for f in folder_path.glob("*.mda")
+                    ]
                     if mda_list:
                         self.setDataPath(folder_path)
                         mda_list = sorted(mda_list, key=lambda x: x["Name"])
@@ -218,10 +222,10 @@ class MainWindow(QtWidgets.QMainWindow):
                             self.mvc_folder.updateFolderView()
                     else:
                         self.info.setText("No mda files")
-                        self.doPopUp(f"No MDA files found.")
+                        self.doPopUp("No MDA files found.")
                         self.reset_mainwindow()
                         self.setStatus(f"\n{str(folder_path)!r} - No MDA files found.")
-                        
+
                 else:
                     self.reset_mainwindow()
                     self.setStatus("Operation canceled.")

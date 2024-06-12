@@ -1,4 +1,3 @@
-
 from PyQt5 import QtWidgets
 
 from . import utils
@@ -15,11 +14,11 @@ class PopUp(QtWidgets.QDialog):
 
         super().__init__(parent)
         utils.myLoadUi(self.ui_file, baseinstance=self)
-        
+
         self.message.setText(message)
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
-        
+
     def accept(self):
         """OK button was clicked"""
         super().accept()
