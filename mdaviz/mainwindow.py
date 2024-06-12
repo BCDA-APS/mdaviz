@@ -25,18 +25,23 @@ class MainWindow(QtWidgets.QMainWindow):
 
     .. autosummary::
 
+        ~connect
         ~status
         ~setStatus
         ~doAboutDialog
         ~closeEvent
         ~doClose
         ~doOpen
+        ~reset_mainwindow
         ~dataPath
-        ~folderList
+        ~setDataPath
         ~mdaFileList
-        ~mdaFileCount
         ~setMdaFileList
+        ~mdaInfoList
+        ~setMdaInfoList
+        ~folderList
         ~setFolderList
+        ~onFolderSelected
         ~_buildFolderList
         ~_updateRecentFolders
     """
@@ -127,29 +132,47 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         return self._dataPath
 
+    def setDataPath(self, path=None):
+        self._dataPath = path
+
     def mdaFileList(self):
         """List of mda file (name only) in the selected folder."""
         return self._mdaFileList
 
+    def setMdaFileList(self, mda_file_list=None):
+        self._mdaFileList = mda_file_list if mda_file_list else []
+
     def mdaInfoList(self):
         return self._mdaInfoList
-
-    def folderList(self):
-        return self._folderList
 
     def setMdaInfoList(self, infoList=None):
         self._mdaInfoList = infoList if infoList else []
 
-    def setDataPath(self, path=None):
-        self._dataPath = path
+    def folderList(self):
+        return self._folderList
 
-    def setMdaFileList(self, mda_file_list=None):
-        self._mdaFileList = mda_file_list if mda_file_list else []
+    def setFolderList(self, folder_list=None):
+        """Set the folder path list & populating the folder QComboBox.
+
+        - If folder_list is not None, it will remove its duplicates.
+        - If folder_list is None, the call to buildFolderList will take care of building the list
+          based on the recent list of folder saved in the app settings.
+
+        Args:
+            folder_list (list, optional): the current list of recent folders. Defaults to None.
+        """
+        folder_list = self._buildFolderList(folder_list)
+        self._fillFolderBox(folder_list)
+        self._folderList = folder_list
 
     def onFolderSelected(self, folder_name):
         """A folder was selected (from the open dialog or pull down menu)."""
-        if folder_name == "Other...":
+        if folder_name == "Open...":
             self.doOpen()
+        elif folder_name == "Clear Recently Open...":
+            settings.setKey(DIR_SETTINGS_KEY, "")
+            folder_list = [str(self.dataPath())] if self.dataPath() else []
+            self._fillFolderBox(folder_list)
         else:
             folder_path = Path(folder_name)
             if folder_path.exists() and folder_path.is_dir():  # folder exists
@@ -176,28 +199,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.reset_mainwindow()
                 self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
 
-    def setFolderList(self, folder_list=None):
-        """Set the folder path list & populating the folder QComboBox.
-
-        - If folder_list is not None, it will remove its duplicates.
-        - If folder_list is None, the call to buildFolderList will take care of building the list
-          based on the recent list of folder saved in the app settings.
-
-        Args:
-            folder_list (list, optional): the current list of recent folders. Defaults to None.
-        """
-        folder_list = self._buildFolderList(folder_list)
-        self.folder.clear()
-        self.folder.addItems(folder_list)
-        self._folderList = folder_list
-
     def _buildFolderList(self, folder_list=None):
         """Build the list of recent folders and remove duplicates from the folder list.
 
         - If folder_list is not None (after a doOpen call), it just removes duplicates.
         - If folder_list is None, it grabs the list of recent folder from the app settings.
-          The directory loaded at start-up and the "Other..." option will be added at index
-          0 and -1, respectively.
+          The directory loaded at start-up will be added at index 0.
 
         Args:
             folder_list (list, optional): a list folders. Defaults to None.
@@ -206,7 +213,7 @@ class MainWindow(QtWidgets.QMainWindow):
             list: list of folders to be populated in the QComboBox
         """
         unique_paths = set()
-        candidate_paths = [self.directory, "Other..."]
+        candidate_paths = [self.directory]
         if not folder_list:
             recent_dirs = (
                 settings.getKey(DIR_SETTINGS_KEY).split(",")
@@ -240,3 +247,11 @@ class MainWindow(QtWidgets.QMainWindow):
         recent_dirs.insert(0, str(folder_path))
         recent_dirs = [dir for dir in recent_dirs if dir != "."]
         settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs[:MAX_RECENT_DIRS]))
+
+    def _fillFolderBox(self, folder_list=[]):
+        self.folder.clear()
+        self.folder.addItems(folder_list)
+        self.folder.addItems(["Open...", "Clear Recently Open..."])
+        count = self.folder.count()
+        self.folder.insertSeparator(count - 1)
+        self.folder.insertSeparator(count - 2)
