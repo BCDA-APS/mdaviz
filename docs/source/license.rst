@@ -3,5 +3,5 @@
 License
 =======
 
-.. literalinclude:: ../../mdaviz/LICENSE
+.. literalinclude:: ../../LICENSE
    :language: text

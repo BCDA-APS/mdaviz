@@ -17,7 +17,7 @@ class LicenseDialog(QtWidgets.QDialog):
         self.setup()
 
     def setup(self):
-        from . import LICENSE_FILE
+        LICENSE_FILE = "../LICENSE"
 
         self.setModal(True)
         license_text = open(LICENSE_FILE, "r").read()
