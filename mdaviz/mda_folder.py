@@ -312,7 +312,7 @@ class MDA_MVC(QtWidgets.QWidget):
             print(f"\n----- Selection before clean up: {old_selection}")
         changes_made = False
         tableview = self.currentFileTableview()
-        new_selection = {"Y": [], "X": None}
+        new_selection = {"Y": [], "X": 0}
         # Update Y selections: if either left operand or right operand is True, result will be True.
         changes_made |= self.updateDetectorSelection(
             oldPvList, old_selection, newPvList, new_selection, verbose
@@ -325,10 +325,7 @@ class MDA_MVC(QtWidgets.QWidget):
             new_idx = 0
         if old_idx != new_idx:
             changes_made = True
-            if verbose:
-                print(
-                    f"POS <{oldPvList[old_idx]}> changed from {old_idx} to {new_idx} <{newPvList[new_idx]}>"
-                )
+            new_selection["X"] = new_idx
         if changes_made:
             self.applySelectionChanges(new_selection)
         if verbose:
@@ -426,10 +423,11 @@ class MDA_MVC(QtWidgets.QWidget):
                 # TODO - later: find out why this sometimes fails - not that important:
                 try:
                     self.updateSelectionForNewPVs(
-                        old_selection, old_pv_list, new_pv_list, verbose
+                        old_selection, old_pv_list, new_pv_list, verbose=False
                     )
                 except Exception as exc:
                     print(str(exc))
+
             self.handlePlotBasedOnMode()
         else:
             self.setStatus("Could not find a (positioner,detector) pair to plot.")
@@ -531,7 +529,6 @@ class MDA_MVC(QtWidgets.QWidget):
         if index == -1:
             self.setCurrentFileTableview()  # Reset to indicate no active file table view
             self.setSelectionField()  # Reset selection field to default
-            print("No file currently selected.")
             return
 
         # Retrieve the table view for the currently selected tab:
