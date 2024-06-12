@@ -18,12 +18,12 @@ have_fast_xdr = False
 try:
     import xdrlib as xdr
 except ImportError:
-    import f_xdrlib as xdr
+    from . import f_xdrlib as xdr
 
     have_fast_xdr = True
 
 try:
-	import Tkinter
+	import tkinter
 	have_Tkinter = True
 except:
 	have_Tkinter = False
@@ -34,7 +34,7 @@ except:
 		have_wx = False
 
 if have_Tkinter:
-	import tkFileDialog
+	import tkinter.filedialog
 
 try:
 	import numpy
@@ -525,7 +525,7 @@ def readMDA(fname=None, maxdim=4, verbose=0, showHelp=0, outFile=None, useNumpy=
 	dim = []
 	if (fname == None):
 		if have_Tkinter:
-			fname = tkFileDialog.Open().show()
+			fname = tkinter.filedialog.Open().show()
 		elif have_wx:
 			app=wx.App()
 			wildcard = "MDA (*.mda)|*.mda|All files (*.*)|*.*"
@@ -543,7 +543,7 @@ def readMDA(fname=None, maxdim=4, verbose=0, showHelp=0, outFile=None, useNumpy=
 		if (not fname.endswith('.mda')):
 			fname = fname + '.mda'
 		if (not os.path.isfile(fname)):
-			print(fname, "not found")
+			print((fname, "not found"))
 			return None
 
 	if (outFile == None):
@@ -851,15 +851,15 @@ def readMDA(fname=None, maxdim=4, verbose=0, showHelp=0, outFile=None, useNumpy=
 	if showHelp:
 		print(" ")
 		print("   each scan dimension (i.e., dim[1], dim[2], ...) has the following fields: ")
-		print("      time      - date & time at which scan was started: %s" % (dim[1].time))
-		print("      name - name of scan record that acquired this dimension: '%s'" % (dim[1].name))
-		print("      curr_pt   - number of data points actually acquired: %d" % (dim[1].curr_pt))
-		print("      npts      - number of data points requested: %d" % (dim[1].npts))
-		print("      nd        - number of detectors for this scan dimension: %d" % (dim[1].nd))
+		print(("      time      - date & time at which scan was started: %s" % (dim[1].time)))
+		print(("      name - name of scan record that acquired this dimension: '%s'" % (dim[1].name)))
+		print(("      curr_pt   - number of data points actually acquired: %d" % (dim[1].curr_pt)))
+		print(("      npts      - number of data points requested: %d" % (dim[1].npts)))
+		print(("      nd        - number of detectors for this scan dimension: %d" % (dim[1].nd)))
 		print("      d[]       - list of detector-data structures")
-		print("      np        - number of positioners for this scan dimension: %d" % (dim[1].np))
+		print(("      np        - number of positioners for this scan dimension: %d" % (dim[1].np)))
 		print("      p[]       - list of positioner-data structures")
-		print("      nt        - number of detector triggers for this scan dimension: %d" % (dim[1].nt))
+		print(("      nt        - number of detector triggers for this scan dimension: %d" % (dim[1].nt)))
 		print("      t[]       - list of trigger-info structures")
 
 	if showHelp:
@@ -897,7 +897,7 @@ def skimScan(dataFile):
 	u = xdr.Unpacker(buf)
 	scan.rank = u.unpack_int()
 	if (scan.rank > 20) or (scan.rank < 0):
-		print("* * * skimScan('%s'): rank > 20.  probably a corrupt file" % dataFile.name)
+		print(("* * * skimScan('%s'): rank > 20.  probably a corrupt file" % dataFile.name))
 		return None
 	scan.npts = u.unpack_int()
 	scan.curr_pt = u.unpack_int()
@@ -929,13 +929,13 @@ def skimMDA(fname=None, verbose=False):
 		if (not fname.endswith('.mda')):
 			fname = fname + '.mda'
 		if (not os.path.isfile(fname)):
-			print(fname, "not found")
+			print((fname, "not found"))
 			return None
 
 	try:
 		dataFile = open(fname, 'rb')
 	except:
-		print("mda_f:skimMDA: failed to open file '%s'" % fname)
+		print(("mda_f:skimMDA: failed to open file '%s'" % fname))
 		return None
 
 	buf = dataFile.read(100)		# to read header for scan of up to 5 dimensions
@@ -957,7 +957,7 @@ def skimMDA(fname=None, verbose=False):
 	dataFile.seek(pmain_scan)
 	scan = skimScan(dataFile)
 	if (scan == None):
-		if verbose: print(fname, "contains no data")
+		if verbose: print((fname, "contains no data"))
 		return None
 
 	dim.append(scan)
@@ -969,7 +969,7 @@ def skimMDA(fname=None, verbose=False):
 		if (dim[1]):
 			dim[1].dim = 2
 		else:
-			if verbose: print("had a problem reading 2d from ", fname)
+			if verbose: print(("had a problem reading 2d from ", fname))
 			return None
 
 	if (rank > 2):
@@ -978,7 +978,7 @@ def skimMDA(fname=None, verbose=False):
 		if (dim[2]):
 			dim[2].dim = 3
 		else:
-			if verbose: print("had a problem reading 3d from ", fname)
+			if verbose: print(("had a problem reading 3d from ", fname))
 			return None
 
 	if (rank > 3):
@@ -987,7 +987,7 @@ def skimMDA(fname=None, verbose=False):
 		if (dim[3]):
 			dim[3].dim = 4
 		else:
-			if verbose: print("had a problem reading 4d from ", fname)
+			if verbose: print(("had a problem reading 4d from ", fname))
 			return None
 
 	dataFile.close()
@@ -1175,12 +1175,12 @@ def writeMDA(dim, fname=None):
 	p.reset()
 
 	numKeys = 0
-	for name in dim[0].keys():
+	for name in list(dim[0].keys()):
 		if not (name in dim[0]['ourKeys']):
 			numKeys = numKeys + 1
 	p.pack_int(numKeys)
 
-	for name in dim[0].keys():
+	for name in list(dim[0].keys()):
 		# Note we don't want to write the dict entries we made for our own
 		# use in the scanDim object.
 		if not (name in dim[0]['ourKeys']):
@@ -1236,7 +1236,7 @@ def writeMDA(dim, fname=None):
 						m.scan.inner[i].inner[j].pLowerScansBuf = p.get_buffer()
 
 	# Write
-	if (fname == None): fname = tkFileDialog.SaveAs().show()
+	if (fname == None): fname = tkinter.filedialog.SaveAs().show()
 	f = open(fname, 'wb')
 
 	f.write(m.header)
@@ -1320,10 +1320,10 @@ def writeAscii(d, fname=None):
 	f.write("#\n# Scan-environment PV values:\n")
 	ourKeys = d[0]['ourKeys']
 	maxKeyLen = 0
-	for i in d[0].keys():
+	for i in list(d[0].keys()):
 		if (i not in ourKeys):
 			if len(i) > maxKeyLen: maxKeyLen = len(i)
-	for i in d[0].keys():
+	for i in list(d[0].keys()):
 		if (i not in ourKeys):
 			f.write("#%s%s%s\n" % (i, (maxKeyLen-len(i))*' ', d[0][i]))
 
@@ -1395,11 +1395,11 @@ def showEnv(dict, all=0):
 	if type(dict) == type([]) and type(dict[0]) == type({}):
 		dict = dict[0]
 	fieldLen = 0
-	for k in dict.keys():
+	for k in list(dict.keys()):
 		if len(k) > fieldLen:
 			fieldLen = len(k)
 	format = "%%-%-ds %%s" % fieldLen
-	for k in dict.keys():
+	for k in list(dict.keys()):
 		if not (k in dict['ourKeys']):
 			if type(dict[k]) == type((1,2,3)):
 				value = dict[k][2]
@@ -1408,9 +1408,9 @@ def showEnv(dict, all=0):
 			if type(value) == type([]) and len(value) == 1:
 				value = value[0]
 			if all:
-				print(format % (k,dict[k]))
+				print((format % (k,dict[k])))
 			else:
-				print(format % (k,value))
+				print((format % (k,value)))
 	return
 
 def fixMDA(d):
@@ -1479,7 +1479,7 @@ def getDescFromEnv(data):
 def isScan(d):
 	if type(d) != type([]): return(0)
 	if type(d[0]) != type({}): return(0)
-	if 'rank' not in d[0].keys(): return(0)
+	if 'rank' not in list(d[0].keys()): return(0)
 	if len(d) < 2: return(0)
 	if type(d[1]) != type(scanDim()): return(0)
 	return(1)
@@ -1500,7 +1500,7 @@ def setOp(op):
 	if (op == '/') or (op == 'div'): return(div)
 	if (op == '>') or (op == 'max'): return(max)
 	if (op == '<') or (op == 'min'): return(min)
-	print("opMDA: unrecognized op = ", op)
+	print(("opMDA: unrecognized op = ", op))
 	return None
 
 def opMDA_usage():
@@ -1594,7 +1594,7 @@ def opMDA(op, d1, d2):
 		print("scans do not have same number of data points")
 		return None
 	for i in range(s[1].nd):
-		s[1].d[i].data = map(op, s[1].d[i].data, d2[1].d[i].data)
+		s[1].d[i].data = list(map(op, s[1].d[i].data, d2[1].d[i].data))
 
 	if (len(s) == 2): return s
 	# 2D op
@@ -1606,7 +1606,7 @@ def opMDA(op, d1, d2):
 		return None
 	for i in range(s[2].nd):
 		for j in range(s[1].npts):
-			s[2].d[i].data[j] = map(op, s[2].d[i].data[j], d2[2].d[i].data[j])
+			s[2].d[i].data[j] = list(map(op, s[2].d[i].data[j], d2[2].d[i].data[j]))
 
 	if (len(s) == 3): return s
 	# 3D op
@@ -1619,7 +1619,7 @@ def opMDA(op, d1, d2):
 	for i in range(s[3].nd):
 		for j in range(s[1].npts):
 			for k in range(s[2].npts):
-				s[3].d[i].data[j][k] = map(op, s[3].d[i].data[j][k], d2[3].d[i].data[j][k])
+				s[3].d[i].data[j][k] = list(map(op, s[3].d[i].data[j][k], d2[3].d[i].data[j][k]))
 
 	if (len(s) == 4): return s
 	# 3D op
@@ -1633,7 +1633,7 @@ def opMDA(op, d1, d2):
 		for j in range(s[1].npts):
 			for k in range(s[2].npts):
 				for l in range(s[3].npts):
-					s[4].d[i].data[j][k][l] = map(op, s[4].d[i].data[j][k][l], d2[4].d[i].data[j][k][l])
+					s[4].d[i].data[j][k][l] = list(map(op, s[4].d[i].data[j][k][l], d2[4].d[i].data[j][k][l]))
 
 	if (len(s) > 5):
 		print("opMDA supports up to 4D scans")
@@ -1651,7 +1651,7 @@ def main():
 #		print("   maxdim defaults to 2; verbose defaults to 1")
 #		return()
 	if len(sys.argv) < 2 or sys.argv[1] == '?' or sys.argv[1] == "help" or sys.argv[1][:2] == "-h":
-		print("usage: %s [filename [maxdim [verbose]]]" % sys.argv[0])
+		print(("usage: %s [filename [maxdim [verbose]]]" % sys.argv[0]))
 		print("   maxdim defaults to 4; verbose defaults to 0")
 		return()
 	else:

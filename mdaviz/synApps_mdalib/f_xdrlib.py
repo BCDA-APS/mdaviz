@@ -14,9 +14,9 @@ April, 2008
 from _struct import Struct, error
 import struct
 try:
-    from cStringIO import StringIO as _StringIO
+    from io import StringIO as _StringIO
 except ImportError:
-    from StringIO import StringIO as _StringIO
+    from io import StringIO as _StringIO
 
 __all__ = ["Error", "Packer", "Unpacker", "ConversionError"]
 
@@ -69,24 +69,24 @@ class Packer:
         else: self.__buf.write('\0\0\0\0')
 
     def pack_uhyper(self, x):
-        self.pack_uint(x>>32 & 0xffffffffL)
-        self.pack_uint(x & 0xffffffffL)
+        self.pack_uint(x>>32 & 0xffffffff)
+        self.pack_uint(x & 0xffffffff)
 
     pack_hyper = pack_uhyper
 
     def pack_float(self, x):
         try: self.__buf.write(struct.pack('>f', x))
-        except struct.error, msg:
-            raise ConversionError, msg
+        except struct.error as msg:
+            raise ConversionError(msg)
 
     def pack_double(self, x):
         try: self.__buf.write(struct.pack('>d', x))
-        except struct.error, msg:
-            raise ConversionError, msg
+        except struct.error as msg:
+            raise ConversionError(msg)
 
     def pack_fstring(self, n, s):
         if n < 0:
-            raise ValueError, 'fstring size must be nonnegative'
+            raise ValueError('fstring size must be nonnegative')
         data = s[:n]
         n = ((n+3)//4)*4
         data = data + (n - len(data)) * '\0'
@@ -110,7 +110,7 @@ class Packer:
 
     def pack_farray(self, n, list, pack_item):
         if len(list) != n:
-            raise ValueError, 'wrong array size'
+            raise ValueError('wrong array size')
         for item in list:
             pack_item(item)
 
@@ -175,12 +175,12 @@ class Unpacker:
     def unpack_uhyper(self):
         hi = self.unpack_uint()
         lo = self.unpack_uint()
-        return long(hi)<<32 | lo
+        return int(hi)<<32 | lo
 
     def unpack_hyper(self):
         x = self.unpack_uhyper()
-        if x >= 0x8000000000000000L:
-            x = x - 0x10000000000000000L
+        if x >= 0x8000000000000000:
+            x = x - 0x10000000000000000
         return x
 
     def unpack_float(self):
@@ -201,7 +201,7 @@ class Unpacker:
 
     def unpack_fstring(self, n):
         if n < 0:
-            raise ValueError, 'fstring size must be nonnegative'
+            raise ValueError('fstring size must be nonnegative')
         i = self.__pos
         j = i + (n+3)//4*4
         if j > len(self.__buf):
@@ -224,7 +224,7 @@ class Unpacker:
             x = self.unpack_uint()
             if x == 0: break
             if x != 1:
-                raise ConversionError, '0 or 1 expected, got %r' % (x,)
+                raise ConversionError('0 or 1 expected, got %r' % (x,))
             item = unpack_item()
             list.append(item)
         return list
@@ -248,7 +248,7 @@ class Unpacker:
             return self.standard_unpack_farray(n, unpack_item)
 
     def unpack_farray_float(self, n):
-        if not self.unpackFloatDict.has_key(n):
+        if n not in self.unpackFloatDict:
             fmt = ">" + "f"*n
             self.unpackFloatDict[n] = Struct(fmt).unpack
         i = self.__pos
@@ -256,7 +256,7 @@ class Unpacker:
         return self.unpackFloatDict[n](self.__buf[i:j])
 
     def unpack_farray_double(self, n):
-        if not self.unpackDoubleDict.has_key(n):
+        if n not in self.unpackDoubleDict:
             fmt = ">" + "d"*n
             self.unpackDoubleDict[n] = Struct(fmt).unpack
         i = self.__pos
@@ -264,7 +264,7 @@ class Unpacker:
         return self.unpackDoubleDict[n](self.__buf[i:j])
 
     def unpack_farray_int(self, n):
-        if not self.unpackIntDict.has_key(n):
+        if n not in self.unpackIntDict:
             fmt = ">" + "l"*n
             self.unpackIntDict[n] = Struct(fmt).unpack
         i = self.__pos
@@ -283,22 +283,22 @@ def _test():
         (p.pack_uint,    (9,)),
         (p.pack_bool,    (True,)),
         (p.pack_bool,    (False,)),
-        (p.pack_uhyper,  (45L,)),
+        (p.pack_uhyper,  (45,)),
         (p.pack_float,   (1.9,)),
         (p.pack_double,  (1.9,)),
         (p.pack_string,  ('hello world',)),
-        (p.pack_list,    (range(5), p.pack_uint)),
+        (p.pack_list,    (list(range(5)), p.pack_uint)),
         (p.pack_array,   (['what', 'is', 'hapnin', 'doctor'], p.pack_string)),
         ]
     succeedlist = [1] * len(packtest)
     count = 0
     for method, args in packtest:
-        print 'pack test', count,
+        print('pack test', count, end=' ')
         try:
             method(*args)
-            print 'succeeded'
-        except ConversionError, var:
-            print 'ConversionError:', var.msg
+            print('succeeded')
+        except ConversionError as var:
+            print('ConversionError:', var.msg)
             succeedlist[count] = 0
         count = count + 1
     data = p.get_buffer()
@@ -308,25 +308,25 @@ def _test():
         (up.unpack_uint,   (), lambda x: x == 9),
         (up.unpack_bool,   (), lambda x: x is True),
         (up.unpack_bool,   (), lambda x: x is False),
-        (up.unpack_uhyper, (), lambda x: x == 45L),
+        (up.unpack_uhyper, (), lambda x: x == 45),
         (up.unpack_float,  (), lambda x: 1.89 < x < 1.91),
         (up.unpack_double, (), lambda x: 1.89 < x < 1.91),
         (up.unpack_string, (), lambda x: x == 'hello world'),
-        (up.unpack_list,   (up.unpack_uint,), lambda x: x == range(5)),
+        (up.unpack_list,   (up.unpack_uint,), lambda x: x == list(range(5))),
         (up.unpack_array,  (up.unpack_string,),
          lambda x: x == ['what', 'is', 'hapnin', 'doctor']),
         ]
     count = 0
     for method, args, pred in unpacktest:
-        print 'unpack test', count,
+        print('unpack test', count, end=' ')
         try:
             if succeedlist[count]:
                 x = method(*args)
-                print pred(x) and 'succeeded' or 'failed', ':', x
+                print(pred(x) and 'succeeded' or 'failed', ':', x)
             else:
-                print 'skipping'
-        except ConversionError, var:
-            print 'ConversionError:', var.msg
+                print('skipping')
+        except ConversionError as var:
+            print('ConversionError:', var.msg)
         count = count + 1
 
 
