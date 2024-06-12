@@ -195,11 +195,12 @@ class MainWindow(QtWidgets.QMainWindow):
                         # Always update the folder view since it is a new folder
                         self.mvc_folder.updateFolderView()
                 else:
+                    self.info.setText("No mda files")
                     self.reset_mainwindow()
-                    self.setStatus("No MDA files found in the selected folder.")
+                    self.setStatus(f"\n{str(folder_path)!r} - No MDA files found.")
             else:
                 self.reset_mainwindow()
-                self.setStatus(f"\n{str(folder_path)!r} - invalid path.")
+                self.setStatus(f"\n{str(folder_path)!r} - Path does not exist.")
 
     def onRefresh(self):
         """
@@ -210,17 +211,18 @@ class MainWindow(QtWidgets.QMainWindow):
         # TODO: could be more efficient (i.e. ignore mda files already loaded)
         self.setStatus("Refreshing folder...")
         current_folder = self.dataPath()
-        current_mdaFileList = self.mdaFileList()
-        self.onFolderSelected(current_folder)
-        new_mdaFileList = self.mdaFileList()
-        if new_mdaFileList:
-            difference = [
-                item for item in new_mdaFileList if item not in current_mdaFileList
-            ]
-            if difference:
-                self.setStatus(f"Loading new files: {difference}")
-            else:
-                self.setStatus("No new files.")
+        if current_folder:
+            current_mdaFileList = self.mdaFileList()
+            self.onFolderSelected(current_folder)
+            new_mdaFileList = self.mdaFileList()
+            if new_mdaFileList:
+                difference = [
+                    item for item in new_mdaFileList if item not in current_mdaFileList
+                ]
+                if difference:
+                    self.setStatus(f"Loading new files: {difference}")
+                else:
+                    self.setStatus("No new files.")
         else:
             self.setStatus("Nothing to update.")
 
