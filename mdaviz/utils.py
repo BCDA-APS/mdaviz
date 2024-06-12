@@ -212,7 +212,7 @@ def get_scan(mda_file_data):
     p0 = scanPositioner()
     # Set predefined properties for p0
     p0.number = 0
-    p0.fieldName, p0.name, p0.desc = "p0", "Index", "Index"
+    p0.fieldName, p0.name, p0.desc = "P0", "Index", "Index"
     p0.step_mode, p0.unit = "", ""
     p0.readback_name, p0.readback_desc, p0.readback_unit = "", "", ""
     p0.data = list(range(npts))
