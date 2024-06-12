@@ -23,7 +23,9 @@ def gui(directory):
 
     app = QtWidgets.QApplication(sys.argv)
     main_window = MainWindow(directory=directory)
-    main_window.setStatus(f"Application started, loading {pathlib.Path(directory).absolute()} ...")
+    main_window.setStatus(
+        f"Application started, loading {pathlib.Path(directory).absolute()} ..."
+    )
     main_window.show()
     sys.exit(app.exec())
 
@@ -72,12 +74,16 @@ def main():  # for future command-line options
 
     # Ensure the path is absolute (starts with a "/")
     if not directory.startswith("/"):
-        print(f"\n\nERROR: The specified directory is not an absolute path:\n\t{directory}\n")
+        print(
+            f"\n\nERROR: The specified directory is not an absolute path:\n\t{directory}\n"
+        )
         sys.exit(1)
 
     # Check if the directory exists
     if not directory_path.exists() or not directory_path.is_dir():
-        print(f"\n\nERROR: The specified directory does not exist or is not a directory:\n\t{directory}\n")
+        print(
+            f"\n\nERROR: The specified directory does not exist or is not a directory:\n\t{directory}\n"
+        )
         sys.exit(1)
 
     logging.basicConfig(level=options.log.upper())

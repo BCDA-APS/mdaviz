@@ -340,9 +340,9 @@ class ChartView(QtWidgets.QWidget):
             self.curveBox.setToolTip(file_path)
             try:
                 self.mda_mvc.mda_file.highlightRowInTab(file_path, row)
-            except:
-                print("highlightRowInTab failed.")
-                pass
+            except Exception as exc:
+                print(str(exc))
+                print("highlightRowInTab failed; ignoring exception.")
         else:
             self.offset_value.setText("0")
             self.factor_value.setText("1")
@@ -413,7 +413,11 @@ class ChartView(QtWidgets.QWidget):
         x_at_y_min = x_array[y_min_index]
         x_at_y_max = x_array[y_max_index]
         # Calculate x_com and y_mean
-        x_com = numpy.sum(x_array * y_array) / numpy.sum(y_array) if numpy.sum(y_array) != 0 else None
+        x_com = (
+            numpy.sum(x_array * y_array) / numpy.sum(y_array)
+            if numpy.sum(y_array) != 0
+            else None
+        )
         y_mean = numpy.mean(y_array)
         return (x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean
 
@@ -425,7 +429,9 @@ class ChartView(QtWidgets.QWidget):
             cross.remove()
             self.cursors[cursor_num] = None
             self.cursors[f"pos{cursor_num}"] = None
-            self.cursors[f"text{cursor_num}"] = "middle click" if cursor_num == 1 else "right click"
+            self.cursors[f"text{cursor_num}"] = (
+                "middle click" if cursor_num == 1 else "right click"
+            )
         self.cursors["diff"] = "n/a"
         self.cursors["midpoint"] = "n/a"
         self.updateCursorInfo()
@@ -486,8 +492,12 @@ class ChartView(QtWidgets.QWidget):
             delta_y = y2 - y1
             midpoint_x = (x1 + x2) / 2
             midpoint_y = (y1 + y2) / 2
-            self.cursors["diff"] = f"({utils.num2fstr(delta_x)}, {utils.num2fstr(delta_y)})"
-            self.cursors["midpoint"] = f"({utils.num2fstr(midpoint_x)}, {utils.num2fstr(midpoint_y)})"
+            self.cursors["diff"] = (
+                f"({utils.num2fstr(delta_x)}, {utils.num2fstr(delta_y)})"
+            )
+            self.cursors["midpoint"] = (
+                f"({utils.num2fstr(midpoint_x)}, {utils.num2fstr(midpoint_y)})"
+            )
         self.updateCursorInfo()
 
     def updateCursorInfo(self):
@@ -514,7 +524,9 @@ class CurveManager(QtCore.QObject):
     curveUpdated = QtCore.pyqtSignal(
         str, bool, bool
     )  # Emit curveID, recompute_y (bool) & update_x (bool) when a curve is updated
-    allCurvesRemoved = QtCore.pyqtSignal(bool)  # Emit a doNotClearCheckboxes bool when all curve are removed
+    allCurvesRemoved = QtCore.pyqtSignal(
+        bool
+    )  # Emit a doNotClearCheckboxes bool when all curve are removed
 
     def __init__(self, parent=None):
         super().__init__(parent)

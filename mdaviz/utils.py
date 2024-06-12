@@ -66,7 +66,11 @@ def byte2str(byte_literal):
     Returns:
         - str | Any: The decoded string if the input is a byte literal, otherwise the original input.
     """
-    return byte_literal.decode("utf-8") if isinstance(byte_literal, bytes) else byte_literal
+    return (
+        byte_literal.decode("utf-8")
+        if isinstance(byte_literal, bytes)
+        else byte_literal
+    )
 
 
 def get_file_info(file_path):
