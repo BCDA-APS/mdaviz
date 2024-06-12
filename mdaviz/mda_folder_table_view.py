@@ -43,9 +43,6 @@ class MDAFolderTableView(QtWidgets.QWidget):
         from .empty_table_model import EmptyTableModel
 
         data = self.mdaInfoList()
-        if data:
-            print(f"==== {data[0]=}")
-
         if len(data) > 0:
             data_model = MDAFolderTableModel(data, self.mda_mvc)
             self.tableView.setModel(data_model)
