@@ -47,12 +47,12 @@ class MainWindow(QtWidgets.QMainWindow):
         ~_updateRecentFolders
     """
 
-    def __init__(self, directory):
+    def __init__(self):
         super().__init__()
         utils.myLoadUi(UI_FILE, baseinstance=self)
         self.setWindowTitle(APP_TITLE)
 
-        self.directory = directory
+        # self.directory = directory
         self.mvc_folder = None
         self.setDataPath()  # the combined data path obj
         self.setFolderList()  # the list of recent folders in folder QCombobox
@@ -60,7 +60,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setMdaInfoList()  # the list of mda file Info (all the data necessary to fill the table view)
 
         self.connect()
-        self.onFolderSelected(directory)
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
@@ -186,7 +185,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def onFolderSelected(self, folder_name):
         """A folder was selected (from the open dialog or pull down menu)."""
-        if folder_name == "Open...":
+        if folder_name == Path("."):
+            print("FUCK")
+        elif folder_name == "Open...":
             self.doOpen()
         elif folder_name == "Clear Recently Open...":
             settings.setKey(DIR_SETTINGS_KEY, "")
@@ -195,7 +196,8 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             folder_path = Path(folder_name)
             if folder_path.exists() and folder_path.is_dir():  # folder exists
-                n_files = len([*folder_path.iterdir()])
+                n_files = len([folder_path.iterdir()])
+                print(f"{folder_path=}")
                 answer = True
                 if n_files > MAX_FILES:
                     answer = self.doPopUp(
@@ -270,7 +272,7 @@ class MainWindow(QtWidgets.QMainWindow):
             list: list of folders to be populated in the QComboBox
         """
         unique_paths = set()
-        candidate_paths = [self.directory]
+        candidate_paths = [""]
         if not folder_list:
             recent_dirs = self._getRecentFolders()
             if recent_dirs:

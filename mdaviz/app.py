@@ -11,27 +11,26 @@ mdaviz: Python Qt5 application to visualize mda data.
 """
 
 import logging
-import pathlib
 import sys
+from PyQt5 import QtWidgets
+from .mainwindow import MainWindow
+import argparse
 
-
-def gui(directory):
+def gui():
     """Display the main window"""
-    from PyQt5 import QtWidgets
 
-    from .mainwindow import MainWindow
 
     app = QtWidgets.QApplication(sys.argv)
-    main_window = MainWindow(directory=directory)
+    main_window = MainWindow()
     main_window.setStatus(
-        f"Application started, loading {pathlib.Path(directory).absolute()} ..."
+        f"Application started ..."
     )
     main_window.show()
     sys.exit(app.exec())
 
 
 def command_line_interface():
-    import argparse
+
 
     from . import __version__
 
@@ -50,11 +49,11 @@ def command_line_interface():
     )
     # fmt: on
 
-    parser.add_argument(
-        "directory",
-        help=("Directory loaded at start up. This argument is required."),
-        type=str,
-    )
+    # parser.add_argument(
+    #     "directory",
+    #     help=("Directory loaded at start up. This argument is required."),
+    #     type=str,
+    # )
 
     parser.add_argument("-v", "--version", action="version", version=__version__)
 
@@ -62,29 +61,28 @@ def command_line_interface():
 
 
 def main():  # for future command-line options
-    from pathlib import Path
 
     global logger
 
     options = command_line_interface()
 
-    # Resolve the directory to an absolute path and remove trailing slash
-    directory_path = Path(options.directory).resolve()
-    directory = directory_path.as_posix().rstrip("/")
+    # # Resolve the directory to an absolute path and remove trailing slash
+    # directory_path = Path(options.directory).resolve()
+    # directory = directory_path.as_posix().rstrip("/")
 
-    # Ensure the path is absolute (starts with a "/")
-    if not directory.startswith("/"):
-        print(
-            f"\n\nERROR: The specified directory is not an absolute path:\n\t{directory}\n"
-        )
-        sys.exit(1)
+    # # Ensure the path is absolute (starts with a "/")
+    # if not directory.startswith("/"):
+    #     print(
+    #         f"\n\nERROR: The specified directory is not an absolute path:\n\t{directory}\n"
+    #     )
+    #     sys.exit(1)
 
-    # Check if the directory exists
-    if not directory_path.exists() or not directory_path.is_dir():
-        print(
-            f"\n\nERROR: The specified directory does not exist or is not a directory:\n\t{directory}\n"
-        )
-        sys.exit(1)
+    # # Check if the directory exists
+    # if not directory_path.exists() or not directory_path.is_dir():
+    #     print(
+    #         f"\n\nERROR: The specified directory does not exist or is not a directory:\n\t{directory}\n"
+    #     )
+    #     sys.exit(1)
 
     logging.basicConfig(level=options.log.upper())
     logger = logging.getLogger(__name__)
@@ -94,7 +92,7 @@ def main():  # for future command-line options
     for package in "httpcore httpx PyQt5 tiled".split():
         logging.getLogger(package).setLevel(logging.WARNING)
 
-    gui(directory)
+    gui()
 
 
 if __name__ == "__main__":
