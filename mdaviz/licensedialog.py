@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets
-
+import pathlib
 from . import utils
 
 
@@ -17,7 +17,7 @@ class LicenseDialog(QtWidgets.QDialog):
         self.setup()
 
     def setup(self):
-        LICENSE_FILE = "../LICENSE"
+        LICENSE_FILE = pathlib.Path(__file__).parent /"../LICENSE.txt"
 
         self.setModal(True)
         license_text = open(LICENSE_FILE, "r").read()
