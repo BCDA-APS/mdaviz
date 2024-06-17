@@ -11,5 +11,5 @@ jobs:
       name: Checkout code
     - uses: actions/setup-python@v3
       name: Setup Python
-    - uses: pre-commit/action@v3.0.0
+    - uses: pre-commit/action@v3.0.1
       name: Run Pre-Commit Checks
