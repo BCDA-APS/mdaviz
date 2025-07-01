@@ -31,6 +31,7 @@ import yaml
 
 from . import utils
 from .mda_file_table_view import MDAFileTableView
+from .data_cache import get_global_cache
 
 
 class MDAFile(QtWidgets.QWidget):
@@ -73,6 +74,7 @@ class MDAFile(QtWidgets.QWidget):
         self.addButton.clicked.connect(partial(self.responder, "add"))
         self.clearButton.clicked.connect(partial(self.responder, "clear"))
         self.replaceButton.clicked.connect(partial(self.responder, "replace"))
+        self.clearGraphButton.clicked.connect(self.onClearGraphRequested)
 
         # Mode handling:
         options = ["Auto-replace", "Auto-add", "Auto-off"]
@@ -163,24 +165,67 @@ class MDAFile(QtWidgets.QWidget):
         folder_path = self.dataPath()
         file_name = self.mdaFileList()[index]
         file_path = self.dataPath() / file_name
-        file_metadata, file_data_dim1, *_ = readMDA(file_path)
-        if file_metadata["rank"] > 1:
-            self.setStatus(
-                "WARNING: Multidimensional data not supported - ignoring ranks > 1."
-            )
-        scanDict, first_pos, first_det = utils.get_scan(file_data_dim1)
-        pvList = [v["name"] for v in scanDict.values()]
-        self._data = {
-            "fileName": file_path.stem,  # file_name.rsplit(".mda", 1)[0]
-            "filePath": str(file_path),
-            "folderPath": str(folder_path),
-            "metadata": file_metadata,
-            "scanDict": scanDict,
-            "firstPos": first_pos,
-            "firstDet": first_det,
-            "pvList": pvList,
-            "index": index,
-        }
+        
+        # Debug: print the paths to see what's happening
+        print(f"Debug - folder_path: {folder_path}")
+        print(f"Debug - file_name: {file_name}")
+        print(f"Debug - file_path: {file_path}")
+        print(f"Debug - file_path.exists(): {file_path.exists()}")
+        
+        # Use data cache for better performance
+        cache = get_global_cache()
+        cached_data = cache.get_or_load(str(file_path))
+        
+        if cached_data:
+            # Use cached data
+            self._data = {
+                "fileName": cached_data.file_name,
+                "filePath": cached_data.file_path,
+                "folderPath": cached_data.folder_path,
+                "metadata": cached_data.metadata,
+                "scanDict": cached_data.scan_dict,
+                "firstPos": cached_data.first_pos,
+                "firstDet": cached_data.first_det,
+                "pvList": cached_data.pv_list,
+                "index": index,
+            }
+        else:
+            # Fallback to direct loading if cache fails
+            result = readMDA(str(file_path))
+            if result is None:
+                self.setStatus(f"Could not read file: {file_path}")
+                # Still populate basic file info even if data can't be read
+                self._data = {
+                    "fileName": file_path.stem,
+                    "filePath": str(file_path),
+                    "folderPath": str(folder_path),
+                    "metadata": {},
+                    "scanDict": {},
+                    "firstPos": 0,
+                    "firstDet": 1,
+                    "pvList": [],
+                    "index": index,
+                }
+                return
+            
+            file_metadata, file_data_dim1, *_ = result
+            if file_metadata["rank"] > 1:
+                self.setStatus(
+                    "WARNING: Multidimensional data not supported - ignoring ranks > 1."
+                )
+            scanDict, first_pos, first_det = utils.get_scan(file_data_dim1)
+            pvList = [v["name"] for v in scanDict.values()]
+            self._data = {
+                "fileName": file_path.stem,  # file_name.rsplit(".mda", 1)[0]
+                "filePath": str(file_path),
+                "folderPath": str(folder_path),
+                "metadata": file_metadata,
+                "scanDict": scanDict,
+                "firstPos": first_pos,
+                "firstDet": first_det,
+                "pvList": pvList,
+                "index": index,
+            }
 
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
@@ -281,6 +326,11 @@ class MDAFile(QtWidgets.QWidget):
     def onAllTabsRemoved(self):
         """To be implemented"""
         pass
+
+    def onClearGraphRequested(self):
+        """Clear only the graph area in the visualization panel."""
+        self.mda_mvc.mda_file_viz.clearContents(plot=True, data=False, metadata=False)
+        self.setStatus("Graph cleared.")
 
     # ------ Tabs management:
 

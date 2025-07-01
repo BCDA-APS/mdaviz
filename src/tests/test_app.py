@@ -2,7 +2,7 @@ from contextlib import nullcontext as does_not_raise
 
 # TODO: (below) from PyQt5 import QtWidgets
 
-from ..mainwindow import MainWindow
+from mdaviz.mainwindow import MainWindow
 
 # FIXME: gui starts and waits for user to close it
 # def test_app(qtbot):

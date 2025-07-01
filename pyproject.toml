@@ -53,6 +53,17 @@ dependencies = [
   "tiled",
 ]
 
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.0",
+  "pytest-cov>=4.0",
+  "ruff>=0.1.0",
+  "mypy>=1.0",
+  "pre-commit>=3.0",
+  "types-PyYAML",
+  "pytest-qt>=4.2.0",
+]
+
 [project.urls]
 "Homepage" = "https://github.com/BCDA-APS/mdaviz"
 "Bug Tracker" = "https://github.com/BCDA-APS/mdaviz/issues"
@@ -98,8 +109,11 @@ omit = [
     # omit anything under the installed packages directory
     "*/site-packages/*",
     # omit these individual files
+    "tests/*",
+    "src/mdaviz/synApps_mdalib/*",
 ]
 relative_files = true
+source = ["src/mdaviz"]
 
 [tool.flake8]
 max-line-length = 88
@@ -121,7 +135,12 @@ include_trailing_comma = true
 [tool.pytest.ini_options]
 addopts = [
     "--import-mode=importlib",
+    "--cov=src/mdaviz",
+    "--cov-report=term-missing",
+    "--cov-report=html",
 ]
+testpaths = ["tests"]
+pythonpath = ["src"]
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
@@ -152,7 +171,7 @@ exclude = [
     "node_modules",
     "site-packages",
     "venv",
-    "mdaviz/synApps_mdalib",
+    "src/mdaviz/synApps_mdalib",
 ]
 
 # Same as Black.
@@ -179,6 +198,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F403"]
 "**/{tests,docs,tools}/*" = ["E402"]
+"src/mdaviz/synApps_mdalib/*" = ["E402", "F401", "F403"]
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
@@ -190,27 +210,14 @@ indent-style = "space"
 # Like Black, respect magic trailing commas.
 skip-magic-trailing-comma = false
 
-# Like Black, automatically detect the appropriate line ending.
-line-ending = "auto"
-
 # Enable auto-formatting of code examples in docstrings. Markdown,
 # reStructuredText code/literal blocks and doctests are all supported.
 #
 # This is currently disabled by default, but it is planned for this
 # to be opt-out in the future.
-docstring-code-format = false
-
-# Set the line length limit used when formatting code snippets in
-# docstrings.
-#
-# This only has an effect when the `docstring-code-format` setting is
-# enabled.
-docstring-code-line-length = "dynamic"
-
-[tool.setuptools]
-py-modules = ["mdaviz"]
 
 [tool.setuptools.packages.find]
+where = ["src"]  # list of folders that contain the packages (["."] by default)
 include = ["mdaviz*"]  # package names should match these glob patterns (["*"] by default)
 
 [tool.setuptools_scm]

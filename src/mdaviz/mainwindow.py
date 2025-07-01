@@ -14,6 +14,7 @@ from .mda_folder import MDA_MVC
 from . import utils
 from .user_settings import settings
 from .opendialog import DIR_SETTINGS_KEY
+from .lazy_folder_scanner import LazyFolderScanner, FolderScanResult
 
 UI_FILE = utils.getUiFileName(__file__)
 MAX_FILES = 500
@@ -58,6 +59,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setFolderList()  # the list of recent folders in folder QCombobox
         self.setMdaFileList()  # the list of mda file NAME str (name only)
         self.setMdaInfoList()  # the list of mda file Info (all the data necessary to fill the table view)
+
+        # Initialize lazy folder scanner
+        self.lazy_scanner = LazyFolderScanner(batch_size=50, max_files=2000, use_lightweight_scan=True)
+        self.lazy_scanner.scan_progress.connect(self._on_scan_progress)
+        self.lazy_scanner.scan_complete.connect(self._on_scan_complete)
+        self.lazy_scanner.scan_error.connect(self._on_scan_error)
 
         self.connect()
 
@@ -196,40 +203,9 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             folder_path = Path(folder_name)
             if folder_path.exists() and folder_path.is_dir():  # folder exists
-                n_files = len([folder_path.iterdir()])
-                answer = True
-                if n_files > MAX_FILES:
-                    answer = self.doPopUp(
-                        f"The selected folder contains {n_files} files. \nDo you want to proceed?"
-                    )
-                if answer:
-                    mda_list = [
-                        utils.get_file_info(f) for f in folder_path.glob("*.mda")
-                    ]
-                    if mda_list:
-                        self.setDataPath(folder_path)
-                        mda_list = sorted(mda_list, key=lambda x: x["Name"])
-                        mda_name_list = [entry["Name"] for entry in mda_list]
-                        self.setMdaInfoList(mda_list)
-                        self.setMdaFileList(mda_name_list)
-                        self._addToRecentFolders(str(folder_path))
-                        self.info.setText(f"{len(mda_list)} mda files")
-                        layout = self.groupbox.layout()
-                        if self.mvc_folder is None:
-                            self.mvc_folder = MDA_MVC(self)
-                            layout.addWidget(self.mvc_folder)
-                        else:
-                            # Always update the folder view since it is a new folder
-                            self.mvc_folder.updateFolderView()
-                    else:
-                        self.info.setText("No mda files")
-                        self.doPopUp("No MDA files found.")
-                        self.reset_mainwindow()
-                        self.setStatus(f"\n{str(folder_path)!r} - No MDA files found.")
-
-                else:
-                    self.reset_mainwindow()
-                    self.setStatus("Operation canceled.")
+                # Use lazy folder scanner for better performance
+                self.setStatus(f"Scanning folder: {folder_name}")
+                self.lazy_scanner.scan_folder_async(folder_path)
             else:
                 self.reset_mainwindow()
                 self.setStatus(f"\n{str(folder_path)!r} - Path does not exist.")
@@ -320,3 +296,52 @@ class MainWindow(QtWidgets.QMainWindow):
         count = self.folder.count()
         self.folder.insertSeparator(count - 1)
         self.folder.insertSeparator(count - 2)
+    
+    def _on_scan_progress(self, current: int, total: int) -> None:
+        """Handle scan progress updates."""
+        progress_percent = (current / total * 100) if total > 0 else 0
+        self.setStatus(f"Scanning files: {current}/{total} ({progress_percent:.1f}%)")
+    
+    def _on_scan_complete(self, result: FolderScanResult) -> None:
+        """Handle scan completion."""
+        if result.is_complete and result.file_list:
+            # Sort the file list
+            sorted_files = sorted(result.file_list)
+            sorted_info = sorted(result.file_info_list, key=lambda x: x["Name"])
+            
+            # Set the data - extract folder path from the first file
+            if sorted_info and "folderPath" in sorted_info[0]:
+                folder_path = Path(sorted_info[0]["folderPath"])
+            else:
+                # Fallback: construct folder path from file path
+                folder_path = Path(sorted_files[0]).parent if sorted_files else None
+            
+            if folder_path:
+                self.setDataPath(folder_path)
+                self.setMdaInfoList(sorted_info)
+                self.setMdaFileList(sorted_files)
+                self._addToRecentFolders(str(folder_path))
+                self.info.setText(f"{len(sorted_files)} mda files")
+                
+                # Create or update the folder view
+                layout = self.groupbox.layout()
+                if self.mvc_folder is None:
+                    self.mvc_folder = MDA_MVC(self)
+                    layout.addWidget(self.mvc_folder)
+                else:
+                    # Always update the folder view since it is a new folder
+                    self.mvc_folder.updateFolderView()
+                
+                self.setStatus(f"Loaded {len(sorted_files)} MDA files from {folder_path}")
+        else:
+            error_msg = result.error_message or "No MDA files found"
+            self.info.setText("No mda files")
+            self.doPopUp(error_msg)
+            self.reset_mainwindow()
+            self.setStatus(f"Scan failed: {error_msg}")
+    
+    def _on_scan_error(self, error_message: str) -> None:
+        """Handle scan errors."""
+        self.reset_mainwindow()
+        self.setStatus(f"Scan error: {error_message}")
+        self.doPopUp(f"Error scanning folder: {error_message}")

@@ -10,13 +10,44 @@ Python version(s) | Unit Tests | Code Coverage | License
 --- | --- | --- | ---
 [![Python version](https://img.shields.io/pypi/pyversions/mdaviz.svg)](https://pypi.python.org/pypi/mdaviz) | [![Unit Tests](https://github.com/BCDA-APS/mdaviz/workflows/Unit%20Tests%20%26%20Code%20Coverage/badge.svg)](https://github.com/BCDA-APS/mdaviz/actions/workflows/unit_tests.yml) | [![Coverage Status](https://coveralls.io/repos/github/BCDA-APS/mdaviz/badge.svg?branch=main)](https://coveralls.io/github/BCDA-APS/mdaviz?branch=main) | [![license: ANL](https://img.shields.io/badge/license-ANL-brightgreen)](LICENSE.txt)
 
-## How to run this code?
+## Quickstart
 
-First said, this software application is in first release and may contain significant unhandled
-bugs.  Please [report any you encounter](https://github.com/BCDA-APS/mdaviz/issues/new) or
-feature requests, too.
+```bash
+# Clone the repo
+$ git clone https://github.com/BCDA-APS/mdaviz.git
+$ cd mdaviz
 
-For complete installation guide, see [https://bcda-aps.github.io/mdaviz/](https://bcda-aps.github.io/mdaviz/).
+# Install with development dependencies
+$ pip install -e .[dev]
+
+# Run the application
+$ python -m mdaviz.app
+```
+
+## Testing
+
+Run all tests:
+```bash
+pytest src/tests
+```
+
+## Pre-commit hooks
+
+To ensure code quality, install and run pre-commit:
+```bash
+pre-commit install
+pre-commit run --all-files
+```
+
+## Contributing
+
+1. Fork and clone the repository.
+2. Create a new branch for your feature or bugfix.
+3. Make your changes and add tests.
+4. Run pre-commit and pytest to ensure all checks pass.
+5. Submit a pull request.
+
+For a complete installation guide, see [https://bcda-aps.github.io/mdaviz/](https://bcda-aps.github.io/mdaviz/).
 
 ## Acknowledgements
 

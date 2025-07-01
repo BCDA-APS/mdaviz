@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets
 
-from .. import aboutdialog
+from mdaviz import aboutdialog
 
 
 def test_about_starts(qtbot):

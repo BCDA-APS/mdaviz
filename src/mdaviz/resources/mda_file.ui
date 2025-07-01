@@ -130,6 +130,22 @@
             </property>
            </widget>
           </item>
+          <item row="0" column="5">
+           <widget class="QPushButton" name="clearGraphButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Clear the graph area</string>
+            </property>
+            <property name="text">
+             <string>Clear Graph</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
