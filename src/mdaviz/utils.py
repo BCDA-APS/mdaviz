@@ -76,13 +76,13 @@ def byte2str(byte_literal):
 def get_file_info_lightweight(file_path: pathlib.Path) -> dict:
     """
     Get lightweight file information without loading full MDA data.
-    
+
     This function extracts only the essential metadata needed for the folder view
     without loading the complete file data, making it much faster for large folders.
-    
+
     Parameters:
         file_path (Path): Path to the MDA file
-        
+
     Returns:
         dict: Dictionary containing lightweight file information with keys:
             - Name: File name
@@ -96,17 +96,17 @@ def get_file_info_lightweight(file_path: pathlib.Path) -> dict:
     """
     file_name = file_path.name
     file_size = human_readable_size(file_path.stat().st_size)
-    
+
     # Try to get basic info from skimMDA first (fastest)
     try:
         skim_result = skimMDA(str(file_path))
         if skim_result and len(skim_result) > 0:
             # skimMDA returns a list where the first element is a dict with metadata
             skim_data = skim_result[0] if isinstance(skim_result[0], dict) else {}
-            
+
             file_num = skim_data.get("scan_number", None)
             file_prefix = extract_file_prefix(file_name, file_num)
-            
+
             # Get basic scan info from skim data
             if skim_data.get("rank", 0) > 0:
                 file_pts = skim_data.get("acquired_dimensions", [0])[0]
@@ -114,22 +114,26 @@ def get_file_info_lightweight(file_path: pathlib.Path) -> dict:
             else:
                 file_pts = 0
                 file_dim = 1
-                
+
             # Try to get date from file modification time as fallback
-            file_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")
-            
+            file_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
+
             # Default positioner info
             file_pos = "index"
-            
+
         else:
             # Fallback to basic file info only
             file_num = None
             file_prefix = None
             file_pts = 0
             file_dim = 1
-            file_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+            file_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
             file_pos = "index"
-            
+
     except Exception as e:
         # If skimMDA fails, provide minimal info
         print(f"Error reading {file_path}: {e}")
@@ -137,7 +141,9 @@ def get_file_info_lightweight(file_path: pathlib.Path) -> dict:
         file_prefix = None
         file_pts = 0
         file_dim = 1
-        file_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+        file_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
         file_pos = "index"
 
     fileInfo = {"Name": file_name, "folderPath": str(file_path.parent)}
@@ -158,30 +164,38 @@ def get_file_info_lightweight(file_path: pathlib.Path) -> dict:
 def get_file_info_full(file_path: pathlib.Path) -> dict:
     """
     Get complete file information by loading the full MDA data.
-    
+
     This is the original get_file_info function, renamed for clarity.
     Use this only when detailed file information is needed.
-    
+
     Parameters:
         file_path (Path): Path to the MDA file
-        
+
     Returns:
         dict: Complete file information including all metadata and data
     """
     file_name = file_path.name
-    
+
     # Check if readMDA returns None
     result = readMDA(str(file_path))
     if result is None:
         # Return minimal info if file cannot be read
         fileInfo = {"Name": file_name}
-        values = [None, None, 0, 1, "index", 
-                 datetime.fromtimestamp(file_path.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S"),
-                 human_readable_size(file_path.stat().st_size)]
+        values = [
+            None,
+            None,
+            0,
+            1,
+            "index",
+            datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            ),
+            human_readable_size(file_path.stat().st_size),
+        ]
         for k, v in zip(HEADERS, values):
             fileInfo[k] = v
         return fileInfo
-    
+
     file_metadata, file_data_dim1, *_ = result
     file_num = file_metadata.get("scan_number", None)
     file_prefix = extract_file_prefix(file_name, file_num)
@@ -212,10 +226,10 @@ def get_file_info_full(file_path: pathlib.Path) -> dict:
 def get_file_info(file_path: pathlib.Path) -> dict:
     """
     Get file information. This is an alias for get_file_info_full for backward compatibility.
-    
+
     Parameters:
         file_path (Path): Path to the MDA file
-        
+
     Returns:
         dict: Complete file information
     """

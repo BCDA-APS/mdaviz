@@ -21,10 +21,10 @@ HEADERS = "Field", "X", "Y", "Mon", "Norm", "PV", "DESC", "Unit"
 
 COLUMNS = [
     TableColumn("Field", ColumnDataType.text),
-    TableColumn("X", ColumnDataType.checkbox, rule=FieldRuleType.unique),
-    TableColumn("Y", ColumnDataType.checkbox, rule=FieldRuleType.multiple),
-    TableColumn("Mon", ColumnDataType.checkbox, rule=FieldRuleType.unique),
-    TableColumn("Norm", ColumnDataType.checkbox, rule=FieldRuleType.multiple),
+    TableColumn("X", ColumnDataType.checkbox, rule=FieldRuleType.unique),  # type: ignore[arg-type]
+    TableColumn("Y", ColumnDataType.checkbox, rule=FieldRuleType.multiple),  # type: ignore[arg-type]
+    TableColumn("Mon", ColumnDataType.checkbox, rule=FieldRuleType.unique),  # type: ignore[arg-type]
+    TableColumn("Norm", ColumnDataType.checkbox, rule=FieldRuleType.multiple),  # type: ignore[arg-type]
     TableColumn("PV", ColumnDataType.text),
     TableColumn("DESC", ColumnDataType.text),
     TableColumn("Unit", ColumnDataType.text),

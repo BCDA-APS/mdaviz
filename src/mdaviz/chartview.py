@@ -64,10 +64,9 @@ class ChartView(QtWidgets.QWidget):
 
         # Set size policy to prevent unwanted expansion
         self.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding,
-            QtWidgets.QSizePolicy.Expanding
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
         )
-        
+
         # Set minimum and maximum height to constrain vertical growth
         self.setMinimumHeight(200)  # Minimum reasonable height
         self.setMaximumHeight(16777215)  # Allow reasonable expansion but not unlimited

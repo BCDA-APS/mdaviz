@@ -13,6 +13,7 @@ from contextlib import nullcontext as does_not_raise
 
 # Note: GUI tests are limited in headless environments. The commented code below is intentionally skipped.
 
+
 def test_app_startup(qtbot):
     """Repeat the steps here that start the GUI, don't wait for user."""
     with does_not_raise():

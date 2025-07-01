@@ -195,14 +195,14 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         """Return the flags for the given index."""
         if not index.isValid():
             return QtCore.Qt.NoItemFlags
-        
+
         column = index.column()
         flags = QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
-        
+
         # Make checkbox columns checkable
         if column in self.checkboxColumns:
             flags |= QtCore.Qt.ItemIsUserCheckable
-        
+
         return flags
 
     def setHighlightRow(self, row=None):
@@ -425,7 +425,16 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
 
     def columnLabels(self) -> List[str]:
         """Return the column labels."""
-        return ["Name", "Prefix", "Number", "Points", "Dimension", "Positioner", "Date", "Size"]
+        return [
+            "Name",
+            "Prefix",
+            "Number",
+            "Points",
+            "Dimension",
+            "Positioner",
+            "Date",
+            "Size",
+        ]
 
     def sort(self, column, order):
         """Sort the data by the given column and order."""
@@ -514,7 +523,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
             "Dimension": self._dimension_list,
             "Positioner": self._positioner_list,
             "Date": self._date_list,
-            "Size": self._size_list
+            "Size": self._size_list,
         }
 
     def setAllData(self, data: Dict[str, List]) -> None:
@@ -545,7 +554,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         """Return the data for a specific row."""
         if row >= len(self._file_list):
             return ("", "", 0, 0, 1, "", "", "")
-        
+
         return (
             self._file_list[row],
             self._prefix_list[row] if row < len(self._prefix_list) else "",
@@ -554,10 +563,12 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
             self._dimension_list[row] if row < len(self._dimension_list) else 1,
             self._positioner_list[row] if row < len(self._positioner_list) else "",
             self._date_list[row] if row < len(self._date_list) else "",
-            self._size_list[row] if row < len(self._size_list) else ""
+            self._size_list[row] if row < len(self._size_list) else "",
         )
 
-    def setRowData(self, row: int, data: Tuple[str, str, int, int, int, str, str, str]) -> None:
+    def setRowData(
+        self, row: int, data: Tuple[str, str, int, int, int, str, str, str]
+    ) -> None:
         """Set the data for a specific row."""
         if row >= len(self._file_list):
             # Extend lists if needed
@@ -570,7 +581,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
                 self._positioner_list.append("")
                 self._date_list.append("")
                 self._size_list.append("")
-        
+
         self._file_list[row] = data[0]
         self._prefix_list[row] = data[1]
         self._number_list[row] = data[2]
@@ -579,11 +590,10 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         self._positioner_list[row] = data[5]
         self._date_list[row] = data[6]
         self._size_list[row] = data[7]
-        
+
         # Emit data changed signal for the specific row
         self.dataChanged.emit(
-            self.index(row, 0),
-            self.index(row, len(self.columnLabels()) - 1)
+            self.index(row, 0), self.index(row, len(self.columnLabels()) - 1)
         )
 
     def setData(self, index, value, role):

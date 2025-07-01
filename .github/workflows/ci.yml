@@ -92,4 +92,4 @@ jobs:
 
     - name: Run mypy
       run: |
-        mypy src/mdaviz --ignore-missing-imports 
+        mypy src/mdaviz --ignore-missing-imports

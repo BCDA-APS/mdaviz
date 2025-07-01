@@ -62,7 +62,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setMdaInfoList()  # the list of mda file Info (all the data necessary to fill the table view)
 
         # Initialize lazy folder scanner
-        self.lazy_scanner = LazyFolderScanner(batch_size=50, max_files=2000, use_lightweight_scan=True)
+        self.lazy_scanner = LazyFolderScanner(
+            batch_size=50, max_files=2000, use_lightweight_scan=True
+        )
         self.lazy_scanner.scan_progress.connect(self._on_scan_progress)
         self.lazy_scanner.scan_complete.connect(self._on_scan_complete)
         self.lazy_scanner.scan_error.connect(self._on_scan_error)
@@ -71,7 +73,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
-        
+
         # Auto-load the first valid folder from recent folders
         self._auto_load_first_folder()
 
@@ -82,7 +84,7 @@ class MainWindow(QtWidgets.QMainWindow):
         utils.reconnect(self.open.released, self.doOpen)
         utils.reconnect(self.refresh.released, self.onRefresh)
         self.folder.currentTextChanged.connect(self.onFolderSelected)
-        
+
         # Add auto-load toggle action to File menu
         self._setup_auto_load_menu()
 
@@ -90,11 +92,13 @@ class MainWindow(QtWidgets.QMainWindow):
         """Set up the auto-load toggle menu action."""
         # Create the auto-load toggle action
         self.actionToggleAutoLoad = QtWidgets.QAction("Toggle Auto-Load", self)
-        self.actionToggleAutoLoad.setStatusTip("Toggle automatic folder loading on startup")
+        self.actionToggleAutoLoad.setStatusTip(
+            "Toggle automatic folder loading on startup"
+        )
         self.actionToggleAutoLoad.setCheckable(True)
         self.actionToggleAutoLoad.setChecked(self.get_auto_load_setting())
         self.actionToggleAutoLoad.triggered.connect(self._on_toggle_auto_load)
-        
+
         # Add to File menu
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionToggleAutoLoad)
@@ -323,33 +327,33 @@ class MainWindow(QtWidgets.QMainWindow):
         count = self.folder.count()
         self.folder.insertSeparator(count - 1)
         self.folder.insertSeparator(count - 2)
-    
+
     def _on_scan_progress(self, current: int, total: int) -> None:
         """Handle scan progress updates."""
         progress_percent = (current / total * 100) if total > 0 else 0
         self.setStatus(f"Scanning files: {current}/{total} ({progress_percent:.1f}%)")
-    
+
     def _on_scan_complete(self, result: FolderScanResult) -> None:
         """Handle scan completion."""
         if result.is_complete and result.file_list:
             # Sort the file list
             sorted_files = sorted(result.file_list)
             sorted_info = sorted(result.file_info_list, key=lambda x: x["Name"])
-            
+
             # Set the data - extract folder path from the first file
             if sorted_info and "folderPath" in sorted_info[0]:
                 folder_path = Path(sorted_info[0]["folderPath"])
             else:
                 # Fallback: construct folder path from file path
-                folder_path = Path(sorted_files[0]).parent if sorted_files else None
-            
+                folder_path = Path(sorted_files[0]).parent if sorted_files else None  # type: ignore[assignment]
+
             if folder_path is not None:
                 self.setDataPath(folder_path)
                 self.setMdaInfoList(sorted_info)
                 self.setMdaFileList(sorted_files)
                 self._addToRecentFolders(str(folder_path))
                 self.info.setText(f"{len(sorted_files)} mda files")
-                
+
                 # Create or update the folder view
                 layout = self.groupbox.layout()
                 if self.mvc_folder is None:
@@ -358,8 +362,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 else:
                     # Always update the folder view since it is a new folder
                     self.mvc_folder.updateFolderView()
-                
-                self.setStatus(f"Loaded {len(sorted_files)} MDA files from {folder_path}")
+
+                self.setStatus(
+                    f"Loaded {len(sorted_files)} MDA files from {folder_path}"
+                )
             else:
                 error_msg = "Could not determine folder path from scan results"
                 self.info.setText("No mda files")
@@ -372,7 +378,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.doPopUp(error_msg)
             self.reset_mainwindow()
             self.setStatus(f"Scan failed: {error_msg}")
-    
+
     def _on_scan_error(self, error_message: str) -> None:
         """Handle scan errors."""
         self.reset_mainwindow()
@@ -382,11 +388,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def _auto_load_first_folder(self) -> None:
         """
         Auto-load the first valid folder from recent folders.
-        
+
         This method attempts to automatically load the first folder from the recent
         folders list if it exists and is valid. This provides a better user experience
         by not requiring manual folder selection on startup.
-        
+
         The auto-loading can be disabled by setting the 'auto_load_folder' setting to False.
         """
         # Check if auto-loading is enabled (default to True)
@@ -395,11 +401,11 @@ class MainWindow(QtWidgets.QMainWindow):
             # Default to True if not set
             auto_load_enabled = True
             settings.setKey("auto_load_folder", True)
-        
+
         if not auto_load_enabled:
             self.setStatus("Auto-loading disabled by user preference")
             return
-            
+
         recent_dirs = self._getRecentFolders()
         if recent_dirs:
             first_folder = recent_dirs[0]
@@ -410,7 +416,9 @@ class MainWindow(QtWidgets.QMainWindow):
                     # Use lazy folder scanner for better performance
                     self.lazy_scanner.scan_folder_async(folder_path)
                 else:
-                    self.setStatus(f"Auto-load failed: {first_folder} does not exist or is not a directory")
+                    self.setStatus(
+                        f"Auto-load failed: {first_folder} does not exist or is not a directory"
+                    )
             else:
                 self.setStatus("No valid recent folders to auto-load")
         else:
@@ -419,26 +427,26 @@ class MainWindow(QtWidgets.QMainWindow):
     def toggle_auto_load(self) -> bool:
         """
         Toggle the auto-load folder setting.
-        
+
         Returns:
             bool: The new state of the auto-load setting (True if enabled, False if disabled)
         """
         current_setting = settings.getKey("auto_load_folder")
         if current_setting is None:
             current_setting = True
-        
+
         new_setting = not current_setting
         settings.setKey("auto_load_folder", new_setting)
-        
+
         status_text = "Auto-loading enabled" if new_setting else "Auto-loading disabled"
         self.setStatus(status_text)
-        
+
         return new_setting
 
     def get_auto_load_setting(self) -> bool:
         """
         Get the current auto-load folder setting.
-        
+
         Returns:
             bool: True if auto-loading is enabled, False if disabled
         """
@@ -449,5 +457,5 @@ class MainWindow(QtWidgets.QMainWindow):
             settings.setKey("auto_load_folder", True)
         elif isinstance(setting, str):
             # Convert string to boolean
-            setting = setting.lower() in ('true', '1', 'yes', 'on')
+            setting = setting.lower() in ("true", "1", "yes", "on")
         return bool(setting)

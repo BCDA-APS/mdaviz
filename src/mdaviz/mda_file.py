@@ -166,17 +166,17 @@ class MDAFile(QtWidgets.QWidget):
         folder_path = self.dataPath()
         file_name = self.mdaFileList()[index]
         file_path = self.dataPath() / file_name
-        
+
         # Debug: print the paths to see what's happening
         print(f"Debug - folder_path: {folder_path}")
         print(f"Debug - file_name: {file_name}")
         print(f"Debug - file_path: {file_path}")
         print(f"Debug - file_path.exists(): {file_path.exists()}")
-        
+
         # Use data cache for better performance
         cache = get_global_cache()
         cached_data = cache.get_or_load(str(file_path))
-        
+
         if cached_data:
             # Use cached data
             self._data = {
@@ -208,7 +208,7 @@ class MDAFile(QtWidgets.QWidget):
                     "index": index,
                 }
                 return
-            
+
             file_metadata, file_data_dim1, *_ = result
             if file_metadata["rank"] > 1:
                 self.setStatus(
@@ -334,7 +334,7 @@ class MDAFile(QtWidgets.QWidget):
         layout = self.mda_mvc.mda_file_viz.plotPageMpl.layout()
         if layout.count() > 0:
             plot_widget = layout.itemAt(0).widget()
-            if hasattr(plot_widget, 'curveManager'):
+            if hasattr(plot_widget, "curveManager"):
                 plot_widget.curveManager.removeAllCurves(doNotClearCheckboxes=False)
         self.setStatus("Graph cleared.")
 
