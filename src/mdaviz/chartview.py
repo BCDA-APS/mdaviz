@@ -57,6 +57,11 @@ def auto_symbol():
 class ChartView(QtWidgets.QWidget):
     """TODO: docstrings"""
 
+    # Fit signals for main window connection
+    fitAdded = QtCore.pyqtSignal(str, str)  # curveID, fitID
+    fitUpdated = QtCore.pyqtSignal(str, str)  # curveID, fitID
+    fitRemoved = QtCore.pyqtSignal(str, str)  # curveID, fitID
+
     def __init__(self, parent, **kwargs):
         # parent=<mdaviz.mda_folder.MDA_MVC object at 0x10e7ff520>
         self.mda_mvc = parent
@@ -586,6 +591,9 @@ class ChartView(QtWidgets.QWidget):
             # Update fit list in UI
             self.updateFitList(curveID)
 
+            # Emit signal for main window
+            self.fitAdded.emit(curveID, fitID)
+
     def onFitRemoved(self, curveID: str, fitID: str) -> None:
         """
         Handle when a fit is removed.
@@ -605,6 +613,9 @@ class ChartView(QtWidgets.QWidget):
 
             # Update fit list in UI
             self.updateFitList(curveID)
+
+            # Emit signal for main window
+            self.fitRemoved.emit(curveID, fitID)
 
     def onFitVisibilityChanged(self, curveID: str, fitID: str, visible: bool) -> None:
         """

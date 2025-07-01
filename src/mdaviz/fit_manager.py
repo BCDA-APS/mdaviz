@@ -101,6 +101,10 @@ class FitManager(QtCore.QObject):
             if not isinstance(y_data, np.ndarray):
                 y_data = np.array(y_data, dtype=float)
             
+            # Ensure arrays are contiguous
+            x_data = np.ascontiguousarray(x_data, dtype=float)
+            y_data = np.ascontiguousarray(y_data, dtype=float)
+            
             # Check for valid range
             if x_range[0] >= x_range[1]:
                 raise ValueError("Invalid range: start must be less than end")
@@ -120,6 +124,10 @@ class FitManager(QtCore.QObject):
                 x_data = np.array(x_data, dtype=float)
             if not isinstance(y_data, np.ndarray):
                 y_data = np.array(y_data, dtype=float)
+            
+            # Ensure arrays are contiguous
+            x_data = np.ascontiguousarray(x_data, dtype=float)
+            y_data = np.ascontiguousarray(y_data, dtype=float)
             
             x_fit = x_data
             y_fit = y_data

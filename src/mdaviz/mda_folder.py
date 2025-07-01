@@ -491,6 +491,9 @@ class MDA_MVC(QtWidgets.QWidget):
             y_index = selection.get("Y", [])
             if not isinstance(widgetMpl, ChartView):  # Make a blank chart.
                 widgetMpl = ChartView(self, **plot_options)
+                # Connect fit signals to main window
+                if hasattr(self.mainWindow, 'connectToFitSignals'):
+                    self.mainWindow.connectToFitSignals(widgetMpl)
             if action in ("replace"):
                 widgetMpl.curveManager.removeAllCurves()
             for i, (ds, ds_options) in zip(y_index, datasets):
@@ -685,6 +688,9 @@ class MDA_MVC(QtWidgets.QWidget):
 
         if not isinstance(widgetMpl, ChartView):
             widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
+            # Connect fit signals to main window
+            if hasattr(self.mainWindow, 'connectToFitSignals'):
+                self.mainWindow.connectToFitSignals(widgetMpl)
         if mode in ("Auto-replace"):
             widgetMpl.curveManager.removeAllCurves()
         for row, (ds, ds_options) in zip(new_y_selection, datasets):
