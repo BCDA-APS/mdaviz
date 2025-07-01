@@ -13,7 +13,19 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>400</width>
+    <height>300</height>
+   </size>
+  </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>1</horstretch>
+     <verstretch>1</verstretch>
+    </sizepolicy>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
     <property name="spacing">
      <number>0</number>
@@ -51,7 +63,7 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>10</width>
+          <width>5</width>
           <height>20</height>
          </size>
         </property>
@@ -81,7 +93,7 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>15</width>
+          <width>8</width>
           <height>20</height>
          </size>
         </property>
@@ -111,7 +123,7 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>15</width>
+          <width>8</width>
           <height>20</height>
          </size>
         </property>
@@ -141,7 +153,7 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>40</width>
+          <width>20</width>
           <height>20</height>
          </size>
         </property>
@@ -161,7 +173,7 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>10</width>
+          <width>5</width>
           <height>20</height>
          </size>
         </property>
@@ -173,6 +185,12 @@
      <widget class="QGroupBox" name="groupbox">
       <property name="title">
        <string/>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>1</horstretch>
+        <verstretch>1</verstretch>
+       </sizepolicy>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <property name="leftMargin">
@@ -191,6 +209,12 @@
         <widget class="QWidget" name="widget" native="true">
          <property name="toolTip">
           <string extracomment="Select"/>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>1</horstretch>
+           <verstretch>1</verstretch>
+          </sizepolicy>
          </property>
         </widget>
        </item>

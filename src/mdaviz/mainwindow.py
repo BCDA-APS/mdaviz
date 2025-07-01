@@ -54,6 +54,14 @@ class MainWindow(QtWidgets.QMainWindow):
         utils.myLoadUi(UI_FILE, baseinstance=self)
         self.setWindowTitle(APP_TITLE)
 
+        # Ensure the window is resizable
+        self.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+        )
+
+        # Ensure central widget and main content area are resizable
+        self._setup_resizable_layout()
+
         # self.directory = directory
         self.mvc_folder = None
         self.setDataPath()  # the combined data path obj
@@ -73,6 +81,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
+
+        # Set a reasonable default size if no geometry was restored
+        if self.width() < 400 or self.height() < 300:
+            self.resize(800, 600)
 
         # Auto-load the first valid folder from recent folders
         self._auto_load_first_folder()
@@ -384,6 +396,26 @@ class MainWindow(QtWidgets.QMainWindow):
         self.reset_mainwindow()
         self.setStatus(f"Scan error: {error_message}")
         self.doPopUp(f"Error scanning folder: {error_message}")
+
+    def _setup_resizable_layout(self) -> None:
+        """Set up proper size policies for resizable layout."""
+        # Ensure central widget is resizable
+        if hasattr(self, "centralwidget"):
+            self.centralwidget.setSizePolicy(
+                QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+            )
+
+        # Ensure the main content area (groupbox) is resizable
+        if hasattr(self, "groupbox"):
+            self.groupbox.setSizePolicy(
+                QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+            )
+
+        # Ensure the widget inside groupbox is resizable
+        if hasattr(self, "widget"):
+            self.widget.setSizePolicy(
+                QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+            )
 
     def _auto_load_first_folder(self) -> None:
         """

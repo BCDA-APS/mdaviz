@@ -5,9 +5,11 @@ Charting widget
 import datetime
 from functools import partial
 from itertools import cycle
+from typing import Optional
 import numpy
 from PyQt5 import QtCore, QtWidgets
 from . import utils
+from .fit_manager import FitManager
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -99,6 +101,7 @@ class ChartView(QtWidgets.QWidget):
 
         # Track curves and display in QComboBox:
         self.plotObjects = {}  # all the Line2D on the graph, key = curveID
+        self.fitObjects = {}  # all the fit Line2D on the graph, key = (curveID, fitID)
         self.curveBox = self.mda_mvc.mda_file_viz.curveBox
         self.curveBox.currentTextChanged.connect(self.onCurveSelected)
 
@@ -108,6 +111,12 @@ class ChartView(QtWidgets.QWidget):
         self.curveManager.curveUpdated.connect(self.onCurveUpdated)
         self.curveManager.curveRemoved.connect(self.onCurveRemoved)
         self.curveManager.allCurvesRemoved.connect(self.onAllCurvesRemoved)
+
+        # Initialize FitManager
+        self.fitManager = FitManager(self)
+        self.fitManager.fitAdded.connect(self.onFitAdded)
+        self.fitManager.fitRemoved.connect(self.onFitRemoved)
+        self.fitManager.fitVisibilityChanged.connect(self.onFitVisibilityChanged)
         # # Debug signals:
         # self.curveManager.curveAdded.connect(utils.debug_signal)
         # self.curveManager.curveRemoved.connect(utils.debug_signal)
@@ -359,8 +368,30 @@ class ChartView(QtWidgets.QWidget):
             self.offset_value.setText("0")
             self.factor_value.setText("1")
             self.curveBox.setToolTip("Selected curve")
+
         # Update basic math info:
         self.updateBasicMathInfo(curveID)
+
+        # Update fit UI
+        self.updateFitUI(curveID)
+
+    def updateFitUI(self, curveID: str) -> None:
+        """
+        Update fit UI based on curve selection.
+
+        Parameters:
+        - curveID: ID of the selected curve
+        """
+        # Update fit controls state
+        has_curve = curveID in self.curveManager.curves()
+        self.mda_mvc.mda_file_viz.updateFitControls(has_curve)
+
+        # Update fit list
+        self.updateFitList(curveID)
+
+        # Clear fit details if no curve selected
+        if not has_curve:
+            self.mda_mvc.mda_file_viz.fitDetails.clear()
 
     def removeItemCurveBox(self, curveID):
         # Returns the index of the item containing the given text ; otherwise returns -1.
@@ -528,6 +559,182 @@ class ChartView(QtWidgets.QWidget):
         self.mda_mvc.mda_file_viz.pos2_text.setText("right click")
         self.mda_mvc.mda_file_viz.diff_text.setText("n/a")
         self.mda_mvc.mda_file_viz.midpoint_text.setText("n/a")
+
+    ########################################## Fit methods:
+
+    def onFitAdded(self, curveID: str, fitID: str) -> None:
+        """
+        Handle when a new fit is added.
+
+        Parameters:
+        - curveID: ID of the curve that was fitted
+        - fitID: ID of the new fit
+        """
+        # Get fit data and plot the fit curve
+        fit_data = self.fitManager.getFitCurveData(curveID, fitID)
+        if fit_data:
+            x_fit, y_fit = fit_data
+            # Plot fit curve with dashed line style
+            fit_line = self.main_axes.plot(x_fit, y_fit, "--", alpha=0.8, linewidth=2)[
+                0
+            ]
+            self.fitObjects[(curveID, fitID)] = fit_line
+
+            # Update plot
+            self.updatePlot(update_title=False)
+
+            # Update fit list in UI
+            self.updateFitList(curveID)
+
+    def onFitRemoved(self, curveID: str, fitID: str) -> None:
+        """
+        Handle when a fit is removed.
+
+        Parameters:
+        - curveID: ID of the curve
+        - fitID: ID of the removed fit
+        """
+        # Remove fit line from plot
+        fit_key = (curveID, fitID)
+        if fit_key in self.fitObjects:
+            self.fitObjects[fit_key].remove()
+            del self.fitObjects[fit_key]
+
+            # Update plot
+            self.updatePlot(update_title=False)
+
+            # Update fit list in UI
+            self.updateFitList(curveID)
+
+    def onFitVisibilityChanged(self, curveID: str, fitID: str, visible: bool) -> None:
+        """
+        Handle when fit visibility changes.
+
+        Parameters:
+        - curveID: ID of the curve
+        - fitID: ID of the fit
+        - visible: Whether the fit should be visible
+        """
+        fit_key = (curveID, fitID)
+        if fit_key in self.fitObjects:
+            self.fitObjects[fit_key].set_visible(visible)
+            self.canvas.draw()
+
+    def updateFitList(self, curveID: str) -> None:
+        """
+        Update the fit list in the UI for a given curve.
+
+        Parameters:
+        - curveID: ID of the curve
+        """
+        fit_list = self.mda_mvc.mda_file_viz.fitList
+        fit_list.clear()
+
+        if self.fitManager.hasFits(curveID):
+            fits = self.fitManager.getCurveFits(curveID)
+            for fit_id, fit_data in fits.items():
+                item_text = f"{fit_data.model_name} ({fit_id})"
+                item = QtWidgets.QListWidgetItem(item_text)
+                item.setData(0, fit_id)  # Use role 0 for custom data
+                fit_list.addItem(item)
+
+    def getCursorRange(self) -> Optional[tuple[float, float]]:
+        """
+        Get the range defined by cursors.
+
+        Returns:
+        - Tuple of (x_min, x_max) if both cursors are set, None otherwise
+        """
+        if self.cursors[1] is not None and self.cursors[2] is not None:
+            x1 = self.cursors["pos1"]
+            x2 = self.cursors["pos2"]
+            return (min(x1, x2), max(x1, x2))
+        return None
+
+    def performFit(self, model_name: str, use_range: bool = False) -> None:
+        """
+        Perform a fit on the currently selected curve.
+
+        Parameters:
+        - model_name: Name of the fit model to use
+        - use_range: Whether to use cursor range for fitting
+        """
+        curveID = self.getSelectedCurveID()
+        if not curveID or curveID not in self.curveManager.curves():
+            return
+
+        # Get curve data
+        curve_data = self.curveManager.getCurveData(curveID)
+        if not curve_data:
+            return
+
+        x_data = curve_data["ds"][0]
+        y_data = curve_data["ds"][1]
+
+        # Apply offset and factor
+        factor = curve_data.get("factor", 1)
+        offset = curve_data.get("offset", 0)
+        y_data = numpy.multiply(y_data, factor) + offset
+
+        # Determine fit range
+        x_range = None
+        if use_range:
+            x_range = self.getCursorRange()
+
+        try:
+            # Perform the fit
+            fit_id = self.fitManager.addFit(
+                curveID, model_name, x_data, y_data, x_range
+            )
+
+            # Update fit details display
+            self.updateFitDetails(curveID, fit_id)
+
+        except ValueError as e:
+            # Show error message
+            QtWidgets.QMessageBox.warning(self, "Fit Error", str(e))
+
+    def updateFitDetails(self, curveID: str, fitID: str) -> None:
+        """
+        Update the fit details display.
+
+        Parameters:
+        - curveID: ID of the curve
+        - fitID: ID of the fit
+        """
+        fit_details = self.mda_mvc.mda_file_viz.fitDetails
+
+        # Get fit data
+        fit_data = self.fitManager.getFitData(curveID, fitID)
+        if not fit_data:
+            return
+
+        # Format fit results
+        result = fit_data.fit_result
+        details_text = f"Fit: {fit_data.model_name}\n"
+        details_text += f"Fit ID: {fitID}\n\n"
+
+        # Parameters
+        details_text += "Parameters:\n"
+        for param_name, param_value in result.parameters.items():
+            uncertainty = result.uncertainties.get(param_name, 0)
+            details_text += f"  {param_name}: {utils.num2fstr(param_value)} ± {utils.num2fstr(uncertainty)}\n"
+
+        # Quality metrics
+        details_text += "\nQuality Metrics:\n"
+        details_text += f"  R²: {utils.num2fstr(result.r_squared)}\n"
+        details_text += f"  χ²: {utils.num2fstr(result.chi_squared)}\n"
+        details_text += f"  Reduced χ²: {utils.num2fstr(result.reduced_chi_squared)}\n"
+
+        fit_details.setText(details_text)
+
+    def clearAllFits(self) -> None:
+        """Clear all fits from the currently selected curve."""
+        curveID = self.getSelectedCurveID()
+        if curveID:
+            self.fitManager.removeAllFits(curveID)
+            self.mda_mvc.mda_file_viz.fitList.clear()
+            self.mda_mvc.mda_file_viz.fitDetails.clear()
 
 
 # ------ Curves management (data):

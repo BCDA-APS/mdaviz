@@ -4,6 +4,7 @@ from PyQt5.QtGui import QFont
 from . import utils
 from .chartview import ChartView
 from .data_table_view import DataTableView
+from .fit_models import get_available_models
 
 MD_FONT = "Arial"
 MD_FONT_SIZE = 12
@@ -49,6 +50,59 @@ class MDAFileVisualization(QtWidgets.QWidget):
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
         )
 
+        # Setup fit functionality
+        self.setupFitUI()
+
+    def setupFitUI(self):
+        """Setup the fit UI components and connections."""
+        # Populate fit model combo box
+        models = get_available_models()
+        for model_name in models.keys():
+            self.fitModelCombo.addItem(model_name)
+
+        # Connect fit buttons
+        self.fitButton.clicked.connect(self.onFitButtonClicked)
+        self.clearFitsButton.clicked.connect(self.onClearFitsButtonClicked)
+
+        # Connect fit list selection
+        self.fitList.itemSelectionChanged.connect(self.onFitListSelectionChanged)
+
+        # Initially disable fit controls until a curve is selected
+        self.fitButton.setEnabled(False)
+        self.clearFitsButton.setEnabled(False)
+
+    def onFitButtonClicked(self):
+        """Handle fit button click."""
+        if hasattr(self, "chart_view") and self.chart_view:
+            model_name = self.fitModelCombo.currentText()
+            use_range = self.useFitRangeCheck.isChecked()
+            self.chart_view.performFit(model_name, use_range)
+
+    def onClearFitsButtonClicked(self):
+        """Handle clear fits button click."""
+        if hasattr(self, "chart_view") and self.chart_view:
+            self.chart_view.clearAllFits()
+
+    def onFitListSelectionChanged(self):
+        """Handle fit list selection change."""
+        if hasattr(self, "chart_view") and self.chart_view:
+            current_item = self.fitList.currentItem()
+            if current_item:
+                fit_id = current_item.data(QtWidgets.Qt.UserRole)
+                curve_id = self.chart_view.getSelectedCurveID()
+                if curve_id and fit_id:
+                    self.chart_view.updateFitDetails(curve_id, fit_id)
+
+    def updateFitControls(self, curve_selected: bool):
+        """
+        Update fit control states based on curve selection.
+
+        Parameters:
+        - curve_selected: Whether a curve is currently selected
+        """
+        self.fitButton.setEnabled(curve_selected)
+        self.clearFitsButton.setEnabled(curve_selected)
+
     def setTableData(self, data):
         self.data_table_view = DataTableView(data, self)
         layout = self.dataPage.layout()
@@ -75,6 +129,9 @@ class MDAFileVisualization(QtWidgets.QWidget):
         )  # Allow reasonable expansion but not unlimited
 
         layout.addWidget(plot_widget)
+
+        # Store reference to chart view for fit functionality
+        self.chart_view = plot_widget
 
     def isPlotBlank(self):
         layout = self.plotPageMpl.layout()

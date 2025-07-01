@@ -975,84 +975,166 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="QWidget" name="fitsOps" native="true">
-                <layout class="QGridLayout" name="gridlayout_2">
-                 <property name="leftMargin">
-                  <number>0</number>
+               <widget class="QScrollArea" name="fitScrollArea">
+                <property name="widgetResizable">
+                 <bool>true</bool>
+                </property>
+                <property name="horizontalScrollBarPolicy">
+                 <enum>Qt::ScrollBarAsNeeded</enum>
+                </property>
+                <property name="verticalScrollBarPolicy">
+                 <enum>Qt::ScrollBarAsNeeded</enum>
+                </property>
+                <widget class="QWidget" name="fitScrollAreaWidgetContents">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>400</width>
+                   <height>300</height>
+                  </rect>
                  </property>
-                 <property name="topMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="bottomMargin">
-                  <number>0</number>
-                 </property>
-                 <item row="1" column="0">
-                  <widget class="QWidget" name="advanced1" native="true">
-                   <layout class="QGridLayout" name="gridLayout_3">
-                    <property name="topMargin">
-                     <number>0</number>
+                 <layout class="QVBoxLayout" name="fitContentLayout">
+                  <property name="spacing">
+                   <number>6</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>6</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>6</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>6</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>6</number>
+                  </property>
+                  <item>
+                   <widget class="QGroupBox" name="fitControls">
+                    <property name="title">
+                     <string>Fit Controls</string>
                     </property>
-                    <property name="bottomMargin">
-                     <number>0</number>
+                    <layout class="QGridLayout" name="fitControlsLayout">
+                     <property name="horizontalSpacing">
+                      <number>7</number>
+                     </property>
+                     <property name="verticalSpacing">
+                      <number>5</number>
+                     </property>
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="fitModelLabel">
+                       <property name="text">
+                        <string>Fit Model:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QComboBox" name="fitModelCombo">
+                       <property name="toolTip">
+                        <string>Select fit model to apply</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="fitRangeLabel">
+                       <property name="text">
+                        <string>Fit Range:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QCheckBox" name="useFitRangeCheck">
+                       <property name="text">
+                        <string>Use cursor range</string>
+                       </property>
+                       <property name="toolTip">
+                        <string>Use cursor positions to define fit range</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="0" colspan="2">
+                      <widget class="QWidget" name="fitButtonsContainer" native="true">
+                       <layout class="QHBoxLayout" name="fitButtonsLayout">
+                        <property name="spacing">
+                         <number>5</number>
+                        </property>
+                        <item>
+                         <widget class="QPushButton" name="fitButton">
+                          <property name="text">
+                           <string>Fit</string>
+                          </property>
+                          <property name="toolTip">
+                           <string>Perform fit on selected curve</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QPushButton" name="clearFitsButton">
+                          <property name="text">
+                           <string>Clear All</string>
+                          </property>
+                          <property name="toolTip">
+                           <string>Remove all fits from current curve</string>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QGroupBox" name="fitResults">
+                    <property name="title">
+                     <string>Fit Results</string>
                     </property>
-                    <property name="horizontalSpacing">
-                     <number>7</number>
+                    <layout class="QVBoxLayout" name="fitResultsLayout">
+                     <property name="spacing">
+                      <number>5</number>
+                     </property>
+                     <item>
+                      <widget class="QListWidget" name="fitList">
+                       <property name="toolTip">
+                        <string>List of fits for current curve</string>
+                       </property>
+                       <property name="maximumHeight">
+                        <number>100</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QTextEdit" name="fitDetails">
+                       <property name="toolTip">
+                        <string>Detailed fit results and parameters</string>
+                       </property>
+                       <property name="maximumHeight">
+                        <number>150</number>
+                       </property>
+                       <property name="readOnly">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="fitVerticalSpacer">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
                     </property>
-                    <property name="verticalSpacing">
-                     <number>0</number>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>40</height>
+                     </size>
                     </property>
-                    <item row="0" column="0">
-                     <widget class="QLabel" name="label0">
-                      <property name="toolTip">
-                       <string>TBD</string>
-                      </property>
-                      <property name="text">
-                       <string>Basic fits</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QWidget" name="advanced2" native="true">
-                   <layout class="QGridLayout" name="gridLayout_4">
-                    <property name="topMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="bottomMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="horizontalSpacing">
-                     <number>7</number>
-                    </property>
-                    <property name="verticalSpacing">
-                     <number>0</number>
-                    </property>
-                    <item row="0" column="0">
-                     <widget class="QLabel" name="label2">
-                      <property name="toolTip">
-                       <string>TBD</string>
-                      </property>
-                      <property name="text">
-                       <string>dy/dy</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="0">
-                     <widget class="QLabel" name="label1">
-                      <property name="text">
-                       <string>Binning</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                </layout>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
                </widget>
               </item>
              </layout>
