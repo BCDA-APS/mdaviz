@@ -5,7 +5,6 @@
 
 """
 
-from PyQt5 import QtCore
 from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt
 
 
@@ -45,13 +44,6 @@ class DataTableModel(QAbstractTableModel):
     def columnCount(self, parent=None):
         # Number of columns is determined by the number of pos(s) & det(s)
         return len(self.columnLabels())
-
-    def data(self, index, role):
-        # display data
-        if role == QtCore.Qt.DisplayRole and self.setAllData is not {}:
-            label = self.columnLabels()[index.column()]
-            value = self.allData()[label][index.row()]
-            return value
 
     def headerData(self, section, orientation, role):
         """

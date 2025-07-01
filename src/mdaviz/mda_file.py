@@ -84,8 +84,7 @@ class MDAFile(QtWidgets.QWidget):
         self.autoBox.currentTextChanged.connect(self.updateButtonVisibility)
 
         # Connect TabManager signals:
-        # TODO: implement proper signal/slot tab managment via tabManager for tabAdded and allTabsRemoved
-        #       - tabAdded: should doFileSelected emit a signal monitored by the tabManager?
+        # DESIGN NOTE: Implement proper signal/slot tab management via tabManager for tabAdded and allTabsRemoved if needed.
         self.tabManager.tabAdded.connect(self.onTabAdded)
         self.tabManager.tabRemoved.connect(self.onTabRemoved)
         self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
@@ -93,6 +92,8 @@ class MDAFile(QtWidgets.QWidget):
         # Tab handling:
         self.tabWidget.currentChanged.connect(self.updateCurrentTabInfo)
         self.tabWidget.tabCloseRequested.connect(self.onTabCloseRequested)
+
+        # NOTE: Consider setting tab tool tip for Data & Metadata tabs and updating dynamically when switching file.
 
         # # Debug signals:
         # self.addButton.clicked.connect(utils.debug_signal)
@@ -329,7 +330,12 @@ class MDAFile(QtWidgets.QWidget):
 
     def onClearGraphRequested(self):
         """Clear only the graph area in the visualization panel."""
-        self.mda_mvc.mda_file_viz.clearContents(plot=True, data=False, metadata=False)
+        # Get the chart view and clear all curves with checkboxes
+        layout = self.mda_mvc.mda_file_viz.plotPageMpl.layout()
+        if layout.count() > 0:
+            plot_widget = layout.itemAt(0).widget()
+            if hasattr(plot_widget, 'curveManager'):
+                plot_widget.curveManager.removeAllCurves(doNotClearCheckboxes=False)
         self.setStatus("Graph cleared.")
 
     # ------ Tabs management:
@@ -403,7 +409,7 @@ class MDAFile(QtWidgets.QWidget):
         tableview.displayTable(selection_field)
         tableview.filePath.setText(file_path)
         self.tabWidget.setTabToolTip(tab_index, file_path)
-        # TODO: set tab tool tip for Data & Metadata tabs too and update dynamically when switching file?
+        # NOTE: Consider setting tab tool tip for Data & Metadata tabs and updating dynamically when switching file.
 
     def removeAllFileTabs(self):
         """

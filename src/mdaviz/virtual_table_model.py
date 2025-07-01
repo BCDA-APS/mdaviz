@@ -1,17 +1,17 @@
 """
-Virtual table model for handling large datasets efficiently.
+Virtual table model for efficient data display.
 
-This module provides a virtual table model that loads data on-demand and
-implements pagination to handle large datasets without loading everything into memory.
+This module provides a virtual table model that can handle large datasets
+efficiently by loading data on-demand and caching frequently accessed items.
 
 .. autosummary::
 
     ~VirtualTableModel
     ~VirtualDataProvider
+    ~MDAVirtualDataProvider
 """
 
-from typing import List, Dict, Any, Optional, Callable
-from PyQt5 import QtCore
+from typing import List, Dict, Any, Optional
 from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt
 
 
@@ -87,6 +87,15 @@ class VirtualDataProvider:
             bool: True if data is loaded, False otherwise
         """
         raise NotImplementedError
+    
+    def clear_cache(self) -> None:
+        """
+        Clear any cached data.
+        
+        This method should clear any internal caches maintained by the
+        data provider to free up memory.
+        """
+        raise NotImplementedError
 
 
 class VirtualTableModel(QAbstractTableModel):
@@ -117,8 +126,6 @@ class VirtualTableModel(QAbstractTableModel):
         self.data_provider = data_provider
         self.page_size = page_size
         self.preload_pages = preload_pages
-        self._loaded_pages: Dict[int, bool] = {}
-        self._current_visible_range = (0, 0)
         
     def rowCount(self, parent=None):
         """Get the total number of rows."""
@@ -174,7 +181,6 @@ class VirtualTableModel(QAbstractTableModel):
         
         # Load the page
         self.data_provider.load_data_range(start_row, end_row)
-        self._loaded_pages[page] = True
     
     def set_visible_range(self, start_row: int, end_row: int) -> None:
         """
@@ -187,11 +193,6 @@ class VirtualTableModel(QAbstractTableModel):
             start_row (int): Starting row index (inclusive)
             end_row (int): Ending row index (exclusive)
         """
-        if (start_row, end_row) == self._current_visible_range:
-            return
-        
-        self._current_visible_range = (start_row, end_row)
-        
         # Calculate pages to load
         start_page = start_row // self.page_size
         end_page = (end_row - 1) // self.page_size
@@ -203,20 +204,13 @@ class VirtualTableModel(QAbstractTableModel):
         
         # Load all required pages
         for page in range(preload_start, preload_end):
-            if page not in self._loaded_pages:
-                page_start = page * self.page_size
-                page_end = min(page_start + self.page_size, self.data_provider.get_row_count())
-                self.data_provider.load_data_range(page_start, page_end)
-                self._loaded_pages[page] = True
+            page_start = page * self.page_size
+            page_end = min(page_start + self.page_size, self.data_provider.get_row_count())
+            self.data_provider.load_data_range(page_start, page_end)
     
     def clear_cache(self) -> None:
         """Clear the loaded data cache."""
-        self._loaded_pages.clear()
         self.data_provider.clear_cache()
-    
-    def get_loaded_pages_count(self) -> int:
-        """Get the number of currently loaded pages."""
-        return len(self._loaded_pages)
 
 
 class MDAVirtualDataProvider(VirtualDataProvider):

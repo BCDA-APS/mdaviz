@@ -14,7 +14,6 @@ Support functions for this demo project.
     ~ts2iso
 """
 
-import datetime
 import pathlib
 import re
 import threading
@@ -34,7 +33,7 @@ def human_readable_size(size, decimal_places=2):
 
 def iso2dt(iso_date_time):
     """Convert ISO8601 time string to datetime object."""
-    return datetime.datetime.fromisoformat(iso_date_time)
+    return datetime.fromisoformat(iso_date_time)
 
 
 def iso2ts(iso_date_time):
@@ -44,7 +43,7 @@ def iso2ts(iso_date_time):
 
 def ts2dt(timestamp):
     """Convert timestamp to datetime object."""
-    return datetime.datetime.fromtimestamp(timestamp)
+    return datetime.fromtimestamp(timestamp)
 
 
 def ts2iso(timestamp):

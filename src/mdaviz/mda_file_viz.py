@@ -33,6 +33,24 @@ class MDAFileVisualization(QtWidgets.QWidget):
         font = QFont(MD_FONT)
         font.setPointSize(MD_FONT_SIZE)
         self.metadata.setFont(font)
+        
+        # Set size policy for the main visualization widget to prevent unwanted expansion
+        self.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding,
+            QtWidgets.QSizePolicy.Expanding
+        )
+        
+        # Set size policy for the plot page to prevent vertical expansion
+        self.plotPageMpl.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding,
+            QtWidgets.QSizePolicy.Expanding
+        )
+        
+        # Set size policy for the tab widget to prevent expansion
+        self.tabWidget.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding,
+            QtWidgets.QSizePolicy.Expanding
+        )
 
     def setTableData(self, data):
         self.data_table_view = DataTableView(data, self)
@@ -47,6 +65,17 @@ class MDAFileVisualization(QtWidgets.QWidget):
     def setPlot(self, plot_widget):
         layout = self.plotPageMpl.layout()
         utils.removeAllLayoutWidgets(layout)
+        
+        # Set size policy to prevent vertical expansion
+        plot_widget.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding,
+            QtWidgets.QSizePolicy.Expanding
+        )
+        
+        # Set minimum and maximum height to constrain vertical growth
+        plot_widget.setMinimumHeight(200)  # Minimum reasonable height
+        plot_widget.setMaximumHeight(16777215)  # Allow reasonable expansion but not unlimited
+        
         layout.addWidget(plot_widget)
 
     def isPlotBlank(self):

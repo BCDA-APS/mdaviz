@@ -77,7 +77,7 @@ from . import utils
 class MDA_MVC(QtWidgets.QWidget):
     """Model View Controller class for mda files."""
 
-    # TODO - question: should this signal be emitted here or in MDA_FILE_TM?
+    # DESIGN NOTE: Should this signal be emitted here or in MDA_FILE_TM? Review if refactoring signal emission logic.
     detRemoved = QtCore.pyqtSignal(
         str, int
     )  # Emit the file path and row when a DET checkbox is unchecked
@@ -541,11 +541,7 @@ class MDA_MVC(QtWidgets.QWidget):
             self.mda_file.displayMetadata(file_data.get("metadata", None))
             self.mda_file.displayData(file_data.get("tabledata", None))
 
-        # TODO - check:  disable UI elements or actions that require an active file to be meaningful: Add, replace...
-        # This is already done by self.removeAllFileTabs() that gets triggered when the last tab is removed.
-        # but did I forgot anything?
-        # TODO - check:  disable UI elements or actions that require an active Folder to be meaningful:
-        # "GoTo" buttons ect... but, did I forgot anything?
+        # NOTE: Consider disabling UI elements or actions that require an active file/folder to be meaningful.
 
     # # ------------ Folder Table View navigation & selection highlight:
 

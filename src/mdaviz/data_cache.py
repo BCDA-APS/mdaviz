@@ -1,19 +1,19 @@
 """
-Data cache module for lazy loading of MDA file data.
+Data caching functionality for MDA files.
 
-This module provides a caching mechanism for MDA file data to improve performance
-and reduce memory usage when working with large datasets.
+This module provides caching capabilities to improve performance when
+loading and processing MDA files.
 
 .. autosummary::
 
     ~DataCache
     ~CachedFileData
+    ~get_global_cache
 """
 
-import os
 import time
 from pathlib import Path
-from typing import Dict, Optional, Any, Tuple
+from typing import Dict, Any, Optional
 from dataclasses import dataclass, field
 from collections import OrderedDict
 from PyQt5 import QtCore

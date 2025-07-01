@@ -7,6 +7,7 @@ Defines MainWindow class.
 """
 
 from pathlib import Path
+from typing import List, Optional
 from PyQt5 import QtWidgets
 
 from . import APP_TITLE
@@ -70,6 +71,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
+        
+        # Auto-load the first valid folder from recent folders
+        self._auto_load_first_folder()
 
     def connect(self):
         self.actionOpen.triggered.connect(self.doOpen)
@@ -78,6 +82,27 @@ class MainWindow(QtWidgets.QMainWindow):
         utils.reconnect(self.open.released, self.doOpen)
         utils.reconnect(self.refresh.released, self.onRefresh)
         self.folder.currentTextChanged.connect(self.onFolderSelected)
+        
+        # Add auto-load toggle action to File menu
+        self._setup_auto_load_menu()
+
+    def _setup_auto_load_menu(self):
+        """Set up the auto-load toggle menu action."""
+        # Create the auto-load toggle action
+        self.actionToggleAutoLoad = QtWidgets.QAction("Toggle Auto-Load", self)
+        self.actionToggleAutoLoad.setStatusTip("Toggle automatic folder loading on startup")
+        self.actionToggleAutoLoad.setCheckable(True)
+        self.actionToggleAutoLoad.setChecked(self.get_auto_load_setting())
+        self.actionToggleAutoLoad.triggered.connect(self._on_toggle_auto_load)
+        
+        # Add to File menu
+        self.menuFile.addSeparator()
+        self.menuFile.addAction(self.actionToggleAutoLoad)
+
+    def _on_toggle_auto_load(self):
+        """Handle auto-load toggle menu action."""
+        new_setting = self.toggle_auto_load()
+        self.actionToggleAutoLoad.setChecked(new_setting)
 
     @property
     def status(self):
@@ -261,7 +286,7 @@ class MainWindow(QtWidgets.QMainWindow):
         ]
         return new_path_list
 
-    def _getRecentFolders(self):
+    def _getRecentFolders(self) -> List[str]:
         recent_dirs = (
             settings.getKey(DIR_SETTINGS_KEY).split(",")
             if settings.getKey(DIR_SETTINGS_KEY)
@@ -269,7 +294,7 @@ class MainWindow(QtWidgets.QMainWindow):
         )
         return recent_dirs
 
-    def _addToRecentFolders(self, folder_path):
+    def _addToRecentFolders(self, folder_path: str) -> None:
         """Add a new folder path to the list of recent folders in the app settings.
 
         Args:
@@ -282,12 +307,14 @@ class MainWindow(QtWidgets.QMainWindow):
         recent_dirs = [dir for dir in recent_dirs if dir != "."]
         settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs[:MAX_RECENT_DIRS]))
 
-    def _fillFolderBox(self, folder_list=[]):
+    def _fillFolderBox(self, folder_list: Optional[List[str]] = None) -> None:
         """Fill the Folder ComboBox; Open... and Clear Recently Open... are added at the end by default.
 
         Args:
             folder_list (list, optional): The list of folders to be displayed in the ComboBox. Defaults to [].
         """
+        if folder_list is None:
+            folder_list = []
         self.folder.clear()
         if not folder_list:
             folder_list = ["Select a folder..."]
@@ -316,7 +343,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 # Fallback: construct folder path from file path
                 folder_path = Path(sorted_files[0]).parent if sorted_files else None
             
-            if folder_path:
+            if folder_path is not None:
                 self.setDataPath(folder_path)
                 self.setMdaInfoList(sorted_info)
                 self.setMdaFileList(sorted_files)
@@ -333,6 +360,12 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.mvc_folder.updateFolderView()
                 
                 self.setStatus(f"Loaded {len(sorted_files)} MDA files from {folder_path}")
+            else:
+                error_msg = "Could not determine folder path from scan results"
+                self.info.setText("No mda files")
+                self.doPopUp(error_msg)
+                self.reset_mainwindow()
+                self.setStatus(f"Scan failed: {error_msg}")
         else:
             error_msg = result.error_message or "No MDA files found"
             self.info.setText("No mda files")
@@ -345,3 +378,76 @@ class MainWindow(QtWidgets.QMainWindow):
         self.reset_mainwindow()
         self.setStatus(f"Scan error: {error_message}")
         self.doPopUp(f"Error scanning folder: {error_message}")
+
+    def _auto_load_first_folder(self) -> None:
+        """
+        Auto-load the first valid folder from recent folders.
+        
+        This method attempts to automatically load the first folder from the recent
+        folders list if it exists and is valid. This provides a better user experience
+        by not requiring manual folder selection on startup.
+        
+        The auto-loading can be disabled by setting the 'auto_load_folder' setting to False.
+        """
+        # Check if auto-loading is enabled (default to True)
+        auto_load_enabled = settings.getKey("auto_load_folder")
+        if auto_load_enabled is None:
+            # Default to True if not set
+            auto_load_enabled = True
+            settings.setKey("auto_load_folder", True)
+        
+        if not auto_load_enabled:
+            self.setStatus("Auto-loading disabled by user preference")
+            return
+            
+        recent_dirs = self._getRecentFolders()
+        if recent_dirs:
+            first_folder = recent_dirs[0]
+            if first_folder and first_folder.strip():
+                folder_path = Path(first_folder.strip())
+                if folder_path.exists() and folder_path.is_dir():
+                    self.setStatus(f"Auto-loading folder: {first_folder}")
+                    # Use lazy folder scanner for better performance
+                    self.lazy_scanner.scan_folder_async(folder_path)
+                else:
+                    self.setStatus(f"Auto-load failed: {first_folder} does not exist or is not a directory")
+            else:
+                self.setStatus("No valid recent folders to auto-load")
+        else:
+            self.setStatus("No recent folders available for auto-loading")
+
+    def toggle_auto_load(self) -> bool:
+        """
+        Toggle the auto-load folder setting.
+        
+        Returns:
+            bool: The new state of the auto-load setting (True if enabled, False if disabled)
+        """
+        current_setting = settings.getKey("auto_load_folder")
+        if current_setting is None:
+            current_setting = True
+        
+        new_setting = not current_setting
+        settings.setKey("auto_load_folder", new_setting)
+        
+        status_text = "Auto-loading enabled" if new_setting else "Auto-loading disabled"
+        self.setStatus(status_text)
+        
+        return new_setting
+
+    def get_auto_load_setting(self) -> bool:
+        """
+        Get the current auto-load folder setting.
+        
+        Returns:
+            bool: True if auto-loading is enabled, False if disabled
+        """
+        setting = settings.getKey("auto_load_folder")
+        if setting is None:
+            # Default to True if not set
+            setting = True
+            settings.setKey("auto_load_folder", True)
+        elif isinstance(setting, str):
+            # Convert string to boolean
+            setting = setting.lower() in ('true', '1', 'yes', 'on')
+        return bool(setting)

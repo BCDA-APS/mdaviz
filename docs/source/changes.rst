@@ -3,4 +3,4 @@
 Changes
 =======
 
-TODO
+# Add change log entries here as the project evolves.

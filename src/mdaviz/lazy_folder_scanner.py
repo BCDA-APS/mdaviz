@@ -1,21 +1,21 @@
 """
-Lazy folder scanning module for handling large folders efficiently.
+Lazy folder scanning functionality.
 
-This module provides functionality to scan MDA folders in a lazy manner,
-loading file information in batches to prevent memory issues and UI freezing.
+This module provides efficient folder scanning capabilities for MDA files
+with support for batch processing and progress tracking.
 
 .. autosummary::
 
     ~LazyFolderScanner
     ~FolderScanResult
+    ~FolderScanWorker
 """
 
-import os
 from pathlib import Path
-from typing import List, Dict, Optional, Callable, Any
-from dataclasses import dataclass
+from typing import List, Dict, Any, Optional, Callable
 from PyQt5 import QtCore
 from .utils import get_file_info_lightweight, get_file_info_full
+from dataclasses import dataclass
 
 
 @dataclass

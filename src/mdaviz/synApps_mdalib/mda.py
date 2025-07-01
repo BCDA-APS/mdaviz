@@ -14,6 +14,12 @@ import sys
 import os
 import string
 
+# Note: xdrlib is deprecated in Python 3.13+ and will be removed in Python 3.15.
+# This code includes a fallback to a local implementation (f_xdrlib) when xdrlib is not available.
+# For future compatibility, consider migrating to a maintained XDR library or implementing a custom solution.
+
+import string
+
 have_fast_xdr = False
 try:
     import xdrlib as xdr

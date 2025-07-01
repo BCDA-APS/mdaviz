@@ -1,18 +1,21 @@
 """
-Configuration module for lazy loading settings.
+Configuration management for lazy loading functionality.
 
-This module provides configuration options for the lazy loading system,
-allowing users to customize the behavior for their specific needs.
+This module provides configuration management for the lazy loading system,
+allowing users to customize behavior and persist settings.
 
 .. autosummary::
 
     ~LazyLoadingConfig
+    ~ConfigManager
+    ~get_config
+    ~update_config
 """
 
 import json
 from pathlib import Path
-from typing import Dict, Any, Optional
-from dataclasses import dataclass, field, asdict
+from typing import Any, Dict, Optional
+from dataclasses import dataclass, asdict
 from PyQt5 import QtCore
 
 

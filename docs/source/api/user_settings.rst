@@ -2,10 +2,9 @@
 user_settings
 ====================================
 
-.. FIXME: problems with this module
-    .. automodule: : mdaviz.user_settings
-        :members:
-        :private-members:
+.. automodule:: mdaviz.user_settings
+    :members:
+    :private-members:
 
     WARNING: Failed to import mdaviz.user_settings.
     Possible hints:

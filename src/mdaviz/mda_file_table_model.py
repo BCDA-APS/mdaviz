@@ -30,6 +30,7 @@ such a 'list(object)' or 'dict(str=object)', then change both 'columns()' and
     ~TableField
 """
 
+from typing import List, Dict, Optional, Tuple
 from .utils import mda2ftm, ftm2mda
 from dataclasses import KW_ONLY
 from dataclasses import dataclass
@@ -60,9 +61,9 @@ class TableColumn:
     """One column of the table."""
 
     name: str
-    column_type: ColumnDataType
+    column_type: str
     _: KW_ONLY  # all parameters below are specified by keyword
-    rule: (FieldRuleType, None) = None
+    rule: Optional[FieldRuleType] = None
     # This is an optional attribute.
     # It can either be an instance of FieldRuleType or None.
     # Its default value is None.
@@ -74,11 +75,11 @@ class TableField:
 
     NOTE: Data for the "Description" and "PV" TableColumns is
     provided by the "description" and "pv" attributes here
-    using `cname.lower()`.  (FIXME: This could break.  Easily.)
+    using `cname.lower()`.  # WARNING: This could break if attribute names change.
     """
 
     name: str  # the "D#" column
-    selection: (str, None) = None  # either of these, selection rule 1.
+    selection: Optional[str] = None  # either of these, selection rule 1.
     _: KW_ONLY  # all parameters below are specified by keyword
     desc: str = ""  # the "desc" column
     pv: str = ""  # the "PV" column
@@ -147,48 +148,62 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         return len(self.fields())
 
     def columnCount(self, parent=None):
-        """Number of columns."""
-        return len(self.columns())
+        """Return the number of columns in the table."""
+        return len(self.columnLabels())
 
-    def data(self, index, role=None):
-        """Table data.  Called by QTableView."""
-        if role == QtCore.Qt.CheckStateRole:
-            if index.column() in self.checkboxColumns:
+    def data(self, index, role):
+        """Return the data for the given index and role."""
+        if not index.isValid():
+            return None
+
+        row = index.row()
+        column = index.column()
+
+        if role == QtCore.Qt.DisplayRole:
+            # Only show text for text columns
+            if column in self.textColumns:
+                if column == 0:  # Name column
+                    return self.fieldName(row)
+                else:
+                    return self.fieldText(index)
+            # For checkbox columns, return empty string for display role
+            # (the checkbox will be shown via CheckStateRole)
+            return ""
+
+        elif role == QtCore.Qt.CheckStateRole:
+            # Only show checkboxes for checkbox columns
+            if column in self.checkboxColumns:
                 return self.checkbox(index)
-        elif role == QtCore.Qt.DisplayRole:
-            if index.column() in self.textColumns:
-                return self.fieldText(index)
+            return None
+
         elif role == QtCore.Qt.BackgroundRole:
-            if index.row() == self.highlightedRow:
+            if row == self.highlightedRow:
                 return QBrush(QColor(210, 226, 247))
+
         return None
 
-    def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
-        """Column headers.  Called by QTableView."""
+    def headerData(self, section, orientation, role):
+        """Return the header data for the given section and role."""
         if role == QtCore.Qt.DisplayRole:
             if orientation == QtCore.Qt.Horizontal:
                 return self.columnName(section)
             elif orientation == QtCore.Qt.Vertical:
-                # Return the text from the first column as the vertical header label
-                index = self.index(section, 0)
-                return self.fieldText(index)
+                return str(section + 1)
         return None
 
-    def setData(self, index, value, role):
-        """Toggle the checkboxes.  Called by QTableView."""
-        if role == QtCore.Qt.CheckStateRole:
-            if index.column() in self.checkboxColumns:
-                self.setCheckbox(index, value)
-                return True
-        return False
-
     def flags(self, index):
-        """Identify the checkbox cells.  Called by QTableView."""
-        original_flags = super().flags(index)
-        if index.column() in self.checkboxColumns:
-            # use a checkbox in this column
-            return original_flags | QtCore.Qt.ItemIsUserCheckable
-        return original_flags
+        """Return the flags for the given index."""
+        if not index.isValid():
+            return QtCore.Qt.NoItemFlags
+        
+        column = index.column()
+        flags = QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+        
+        # Make checkbox columns checkable
+        if column in self.checkboxColumns:
+            flags |= QtCore.Qt.ItemIsUserCheckable
+        
+        return flags
 
     def setHighlightRow(self, row=None):
         self.highlightedRow = row
@@ -388,6 +403,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
     # TODO - later: we have to reformat plotfield to match selectionField and vice versa
     # (ftm2mvc <-> mvc2ftm), maybe avoid this but formating plotfield directly the right way?
     # Or, if it ain't broken, don't fix it...
+    # NOTE: If plotfield/selectionField formatting becomes an issue, refactor as needed.
 
     def plotFields(self):
         """
@@ -406,3 +422,183 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
 
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
+
+    def columnLabels(self) -> List[str]:
+        """Return the column labels."""
+        return ["Name", "Prefix", "Number", "Points", "Dimension", "Positioner", "Date", "Size"]
+
+    def sort(self, column, order):
+        """Sort the data by the given column and order."""
+        # Implement sorting logic here
+        pass
+
+    def getFileList(self) -> List[str]:
+        """Return the list of file names."""
+        return self._file_list
+
+    def setFileList(self, file_list: List[str]) -> None:
+        """Set the list of file names."""
+        self._file_list = file_list
+        self.layoutChanged.emit()
+
+    def getPrefixList(self) -> List[str]:
+        """Return the list of prefixes."""
+        return self._prefix_list
+
+    def setPrefixList(self, prefix_list: List[str]) -> None:
+        """Set the list of prefixes."""
+        self._prefix_list = prefix_list
+        self.layoutChanged.emit()
+
+    def getNumberList(self) -> List[int]:
+        """Return the list of numbers."""
+        return self._number_list
+
+    def setNumberList(self, number_list: List[int]) -> None:
+        """Set the list of numbers."""
+        self._number_list = number_list
+        self.layoutChanged.emit()
+
+    def getPointsList(self) -> List[int]:
+        """Return the list of points."""
+        return self._points_list
+
+    def setPointsList(self, points_list: List[int]) -> None:
+        """Set the list of points."""
+        self._points_list = points_list
+        self.layoutChanged.emit()
+
+    def getDimensionList(self) -> List[int]:
+        """Return the list of dimensions."""
+        return self._dimension_list
+
+    def setDimensionList(self, dimension_list: List[int]) -> None:
+        """Set the list of dimensions."""
+        self._dimension_list = dimension_list
+        self.layoutChanged.emit()
+
+    def getPositionerList(self) -> List[str]:
+        """Return the list of positioners."""
+        return self._positioner_list
+
+    def setPositionerList(self, positioner_list: List[str]) -> None:
+        """Set the list of positioners."""
+        self._positioner_list = positioner_list
+        self.layoutChanged.emit()
+
+    def getDateList(self) -> List[str]:
+        """Return the list of dates."""
+        return self._date_list
+
+    def setDateList(self, date_list: List[str]) -> None:
+        """Set the list of dates."""
+        self._date_list = date_list
+        self.layoutChanged.emit()
+
+    def getSizeList(self) -> List[str]:
+        """Return the list of sizes."""
+        return self._size_list
+
+    def setSizeList(self, size_list: List[str]) -> None:
+        """Set the list of sizes."""
+        self._size_list = size_list
+        self.layoutChanged.emit()
+
+    def getAllData(self) -> Dict[str, List]:
+        """Return all data as a dictionary."""
+        return {
+            "Name": self._file_list,
+            "Prefix": self._prefix_list,
+            "Number": self._number_list,
+            "Points": self._points_list,
+            "Dimension": self._dimension_list,
+            "Positioner": self._positioner_list,
+            "Date": self._date_list,
+            "Size": self._size_list
+        }
+
+    def setAllData(self, data: Dict[str, List]) -> None:
+        """Set all data from a dictionary."""
+        self._file_list = data.get("Name", [])
+        self._prefix_list = data.get("Prefix", [])
+        self._number_list = data.get("Number", [])
+        self._points_list = data.get("Points", [])
+        self._dimension_list = data.get("Dimension", [])
+        self._positioner_list = data.get("Positioner", [])
+        self._date_list = data.get("Date", [])
+        self._size_list = data.get("Size", [])
+        self.layoutChanged.emit()
+
+    def clearData(self) -> None:
+        """Clear all data."""
+        self._file_list = []
+        self._prefix_list = []
+        self._number_list = []
+        self._points_list = []
+        self._dimension_list = []
+        self._positioner_list = []
+        self._date_list = []
+        self._size_list = []
+        self.layoutChanged.emit()
+
+    def getRowData(self, row: int) -> Tuple[str, str, int, int, int, str, str, str]:
+        """Return the data for a specific row."""
+        if row >= len(self._file_list):
+            return ("", "", 0, 0, 1, "", "", "")
+        
+        return (
+            self._file_list[row],
+            self._prefix_list[row] if row < len(self._prefix_list) else "",
+            self._number_list[row] if row < len(self._number_list) else 0,
+            self._points_list[row] if row < len(self._points_list) else 0,
+            self._dimension_list[row] if row < len(self._dimension_list) else 1,
+            self._positioner_list[row] if row < len(self._positioner_list) else "",
+            self._date_list[row] if row < len(self._date_list) else "",
+            self._size_list[row] if row < len(self._size_list) else ""
+        )
+
+    def setRowData(self, row: int, data: Tuple[str, str, int, int, int, str, str, str]) -> None:
+        """Set the data for a specific row."""
+        if row >= len(self._file_list):
+            # Extend lists if needed
+            while len(self._file_list) <= row:
+                self._file_list.append("")
+                self._prefix_list.append("")
+                self._number_list.append(0)
+                self._points_list.append(0)
+                self._dimension_list.append(1)
+                self._positioner_list.append("")
+                self._date_list.append("")
+                self._size_list.append("")
+        
+        self._file_list[row] = data[0]
+        self._prefix_list[row] = data[1]
+        self._number_list[row] = data[2]
+        self._points_list[row] = data[3]
+        self._dimension_list[row] = data[4]
+        self._positioner_list[row] = data[5]
+        self._date_list[row] = data[6]
+        self._size_list[row] = data[7]
+        
+        # Emit data changed signal for the specific row
+        self.dataChanged.emit(
+            self.index(row, 0),
+            self.index(row, len(self.columnLabels()) - 1)
+        )
+
+    def setData(self, index, value, role):
+        """Set the data for the given index and role."""
+        if not index.isValid():
+            return False
+
+        if role == QtCore.Qt.CheckStateRole:
+            # Handle checkbox state changes
+            if index.column() in self.checkboxColumns:
+                self.setCheckbox(index, value)
+                return True
+
+        elif role == QtCore.Qt.EditRole:
+            # Handle data editing if needed
+            return True
+
+        return False
