@@ -38,12 +38,61 @@ class DataTableModel(QAbstractTableModel):
         self.setColumnLabels()
 
     def rowCount(self, parent=None):
-        value = len(self.allData()["Index"]) if len(self.allData()) > 0 else 0
-        return value
+        """
+        Returns the number of rows in the table model.
+        
+        Returns:
+            int: The number of rows, or 0 if no data
+        """
+        data = self.allData()
+        if not data or len(data) == 0:
+            return 0
+            
+        # Find the maximum length of any column's data
+        max_length = 0
+        for column_data in data.values():
+            if isinstance(column_data, list):
+                max_length = max(max_length, len(column_data))
+                
+        return max_length
 
     def columnCount(self, parent=None):
         # Number of columns is determined by the number of pos(s) & det(s)
         return len(self.columnLabels())
+
+    def data(self, index, role=Qt.DisplayRole):
+        """
+        Returns the data to be displayed for a given index and role.
+        
+        Args:
+            index (QModelIndex): The index of the item to retrieve data for
+            role (int): The role of the data (DisplayRole, EditRole, etc.)
+            
+        Returns:
+            QVariant: The data for the given index and role, or QVariant() if not found
+        """
+        if not index.isValid():
+            return QVariant()
+            
+        if role == Qt.DisplayRole:
+            row = index.row()
+            col = index.column()
+            
+            # Get the column label for this column
+            if col < len(self.columnLabels()):
+                column_label = self.columnLabels()[col]
+                
+                # Get the data for this column
+                if column_label in self.allData():
+                    column_data = self.allData()[column_label]
+                    
+                    # Return the data for this row if it exists
+                    if row < len(column_data):
+                        return str(column_data[row])
+                    else:
+                        return QVariant()
+                        
+        return QVariant()
 
     def headerData(self, section, orientation, role):
         """

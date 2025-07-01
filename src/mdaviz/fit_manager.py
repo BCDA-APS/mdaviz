@@ -95,10 +95,32 @@ class FitManager(QtCore.QObject):
         
         # Apply x_range if specified
         if x_range is not None:
+            # Ensure x_data and y_data are numpy arrays
+            if not isinstance(x_data, np.ndarray):
+                x_data = np.array(x_data, dtype=float)
+            if not isinstance(y_data, np.ndarray):
+                y_data = np.array(y_data, dtype=float)
+            
+            # Check for valid range
+            if x_range[0] >= x_range[1]:
+                raise ValueError("Invalid range: start must be less than end")
+            
+            # Create mask for the range
             mask = (x_data >= x_range[0]) & (x_data <= x_range[1])
+            
+            # Check if any data points fall within the range
+            if not np.any(mask):
+                raise ValueError(f"No data points found in range [{x_range[0]}, {x_range[1]}]")
+            
             x_fit = x_data[mask]
             y_fit = y_data[mask]
         else:
+            # Ensure x_data and y_data are numpy arrays
+            if not isinstance(x_data, np.ndarray):
+                x_data = np.array(x_data, dtype=float)
+            if not isinstance(y_data, np.ndarray):
+                y_data = np.array(y_data, dtype=float)
+            
             x_fit = x_data
             y_fit = y_data
         

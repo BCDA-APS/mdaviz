@@ -449,8 +449,8 @@ class ChartView(QtWidgets.QWidget):
             self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText("n/a")
 
     def calculateBasicMath(self, x_data, y_data):
-        x_array = numpy.array(x_data)
-        y_array = numpy.array(y_data)
+        x_array = numpy.array(x_data, dtype=float)
+        y_array = numpy.array(y_data, dtype=float)
         # Find y_min and y_max
         y_min = numpy.min(y_array)
         y_max = numpy.max(y_array)
@@ -574,8 +574,8 @@ class ChartView(QtWidgets.QWidget):
         fit_data = self.fitManager.getFitCurveData(curveID, fitID)
         if fit_data:
             x_fit, y_fit = fit_data
-            # Plot fit curve with dashed line style
-            fit_line = self.main_axes.plot(x_fit, y_fit, "--", alpha=0.8, linewidth=2)[
+            # Plot fit curve with dashed line style and higher z-order to ensure it's on top
+            fit_line = self.main_axes.plot(x_fit, y_fit, "--", alpha=0.8, linewidth=2, zorder=10)[
                 0
             ]
             self.fitObjects[(curveID, fitID)] = fit_line
@@ -645,10 +645,11 @@ class ChartView(QtWidgets.QWidget):
         Returns:
         - Tuple of (x_min, x_max) if both cursors are set, None otherwise
         """
-        if self.cursors[1] is not None and self.cursors[2] is not None:
-            x1 = self.cursors["pos1"]
-            x2 = self.cursors["pos2"]
-            return (min(x1, x2), max(x1, x2))
+        if "pos1" in self.cursors and "pos2" in self.cursors:
+            if self.cursors["pos1"] is not None and self.cursors["pos2"] is not None:
+                x1 = self.cursors["pos1"]
+                x2 = self.cursors["pos2"]
+                return (min(x1, x2), max(x1, x2))
         return None
 
     def performFit(self, model_name: str, use_range: bool = False) -> None:
@@ -670,6 +671,21 @@ class ChartView(QtWidgets.QWidget):
 
         x_data = curve_data["ds"][0]
         y_data = curve_data["ds"][1]
+
+        # Ensure data are numpy arrays with proper types
+        if not isinstance(x_data, numpy.ndarray):
+            x_data = numpy.array(x_data, dtype=float)
+        if not isinstance(y_data, numpy.ndarray):
+            y_data = numpy.array(y_data, dtype=float)
+        
+        # Check for valid data
+        if len(x_data) == 0 or len(y_data) == 0:
+            QtWidgets.QMessageBox.warning(self, "Fit Error", "No data available for fitting")
+            return
+        
+        if len(x_data) != len(y_data):
+            QtWidgets.QMessageBox.warning(self, "Fit Error", "X and Y data have different lengths")
+            return
 
         # Apply offset and factor
         factor = curve_data.get("factor", 1)

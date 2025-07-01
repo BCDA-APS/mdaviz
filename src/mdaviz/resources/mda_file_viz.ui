@@ -980,7 +980,7 @@
                  <bool>true</bool>
                 </property>
                 <property name="horizontalScrollBarPolicy">
-                 <enum>Qt::ScrollBarAsNeeded</enum>
+                 <enum>Qt::ScrollBarAlwaysOff</enum>
                 </property>
                 <property name="verticalScrollBarPolicy">
                  <enum>Qt::ScrollBarAsNeeded</enum>
@@ -1015,6 +1015,12 @@
                     <property name="title">
                      <string>Fit Controls</string>
                     </property>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <layout class="QGridLayout" name="fitControlsLayout">
                      <property name="horizontalSpacing">
                       <number>7</number>
@@ -1033,6 +1039,12 @@
                       <widget class="QComboBox" name="fitModelCombo">
                        <property name="toolTip">
                         <string>Select fit model to apply</string>
+                       </property>
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>1</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
                        </property>
                       </widget>
                      </item>
@@ -1067,6 +1079,12 @@
                           <property name="toolTip">
                            <string>Perform fit on selected curve</string>
                           </property>
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                            <horstretch>1</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
                          </widget>
                         </item>
                         <item>
@@ -1076,6 +1094,12 @@
                           </property>
                           <property name="toolTip">
                            <string>Remove all fits from current curve</string>
+                          </property>
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                            <horstretch>1</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
                           </property>
                          </widget>
                         </item>
@@ -1089,6 +1113,12 @@
                    <widget class="QGroupBox" name="fitResults">
                     <property name="title">
                      <string>Fit Results</string>
+                    </property>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>1</verstretch>
+                     </sizepolicy>
                     </property>
                     <layout class="QVBoxLayout" name="fitResultsLayout">
                      <property name="spacing">

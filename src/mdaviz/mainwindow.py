@@ -8,7 +8,7 @@ Defines MainWindow class.
 
 from pathlib import Path
 from typing import List, Optional
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 
 from . import APP_TITLE
 from .mda_folder import MDA_MVC
@@ -54,6 +54,22 @@ class MainWindow(QtWidgets.QMainWindow):
         utils.myLoadUi(UI_FILE, baseinstance=self)
         self.setWindowTitle(APP_TITLE)
 
+        # Set proper window flags for macOS resizing
+        self.setWindowFlags(
+            QtCore.Qt.Window | 
+            QtCore.Qt.WindowMinimizeButtonHint | 
+            QtCore.Qt.WindowMaximizeButtonHint | 
+            QtCore.Qt.WindowCloseButtonHint
+        )
+
+        # Additional macOS-specific properties for proper resizing
+        self.setAttribute(QtCore.Qt.WA_MacShowFocusRect, False)
+        self.setAttribute(QtCore.Qt.WA_MacNormalSize, True)
+        
+        # Ensure the window can be resized
+        self.setMinimumSize(400, 300)
+        self.resize(800, 600)
+        
         # Ensure the window is resizable
         self.setSizePolicy(
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
@@ -85,6 +101,9 @@ class MainWindow(QtWidgets.QMainWindow):
         # Set a reasonable default size if no geometry was restored
         if self.width() < 400 or self.height() < 300:
             self.resize(800, 600)
+
+        # Center the window on the screen
+        self._center_window()
 
         # Auto-load the first valid folder from recent folders
         self._auto_load_first_folder()
@@ -491,3 +510,11 @@ class MainWindow(QtWidgets.QMainWindow):
             # Convert string to boolean
             setting = setting.lower() in ("true", "1", "yes", "on")
         return bool(setting)
+
+    def _center_window(self):
+        """Center the window on the screen."""
+        screen = QtWidgets.QDesktopWidget().screenGeometry()
+        size = self.geometry()
+        x = (screen.width() - size.width()) / 2
+        y = (screen.height() - size.height()) / 2
+        self.move(int(x), int(y))
