@@ -68,7 +68,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
         # Ensure the window can be resized
         self.setMinimumSize(400, 300)
-        self.resize(800, 600)
+        self.resize(720, 400)  # More reasonable initial size
         
         # Ensure the window is resizable
         self.setSizePolicy(
@@ -81,7 +81,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.directory = directory
         self.mvc_folder = None
         self.setDataPath()  # the combined data path obj
-        self.setFolderList()  # the list of recent folders in folder QCombobox
+        self.setFolderList()  # the list of recent folders in folder QComboBox
         self.setMdaFileList()  # the list of mda file NAME str (name only)
         self.setMdaInfoList()  # the list of mda file Info (all the data necessary to fill the table view)
 
@@ -98,9 +98,15 @@ class MainWindow(QtWidgets.QMainWindow):
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
 
-        # Set a reasonable default size if no geometry was restored
-        if self.width() < 400 or self.height() < 300:
-            self.resize(800, 600)
+        # Ensure the window size is reasonable (not too large)
+        screen = QtWidgets.QDesktopWidget().screenGeometry()
+        max_width = min(screen.width() * 0.8, 1200)  # Max 80% of screen width or 1200px
+        max_height = min(screen.height() * 0.8, 800)  # Max 80% of screen height or 800px
+        
+        if self.width() > max_width or self.height() > max_height:
+            self.resize(min(self.width(), max_width), min(self.height(), max_height))
+        elif self.width() < 400 or self.height() < 300:
+            self.resize(720, 400)  # Reasonable default size
 
         # Center the window on the screen
         self._center_window()
