@@ -580,9 +580,9 @@ class ChartView(QtWidgets.QWidget):
         if fit_data:
             x_fit, y_fit = fit_data
             # Plot fit curve with dashed line style and higher z-order to ensure it's on top
-            fit_line = self.main_axes.plot(x_fit, y_fit, "--", alpha=0.8, linewidth=2, zorder=10)[
-                0
-            ]
+            fit_line = self.main_axes.plot(
+                x_fit, y_fit, "--", alpha=0.8, linewidth=2, zorder=10
+            )[0]
             self.fitObjects[(curveID, fitID)] = fit_line
 
             # Update plot
@@ -688,14 +688,18 @@ class ChartView(QtWidgets.QWidget):
             x_data = numpy.array(x_data, dtype=float)
         if not isinstance(y_data, numpy.ndarray):
             y_data = numpy.array(y_data, dtype=float)
-        
+
         # Check for valid data
         if len(x_data) == 0 or len(y_data) == 0:
-            QtWidgets.QMessageBox.warning(self, "Fit Error", "No data available for fitting")
+            QtWidgets.QMessageBox.warning(
+                self, "Fit Error", "No data available for fitting"
+            )
             return
-        
+
         if len(x_data) != len(y_data):
-            QtWidgets.QMessageBox.warning(self, "Fit Error", "X and Y data have different lengths")
+            QtWidgets.QMessageBox.warning(
+                self, "Fit Error", "X and Y data have different lengths"
+            )
             return
 
         # Apply offset and factor
