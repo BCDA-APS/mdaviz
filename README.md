@@ -51,6 +51,17 @@ $ pip install -e .[dev]
 $ python -m mdaviz.app
 ```
 
+## Conda Environment
+
+It is strongly recommended to use the provided conda environment for development and running the application. This ensures all dependencies (including PyQt5) are available and compatible.
+
+```bash
+conda env create -f env.yml
+conda activate mdaviz
+```
+
+Always activate the environment before running, testing, or using pre-commit hooks.
+
 ## Testing
 
 Run all tests:

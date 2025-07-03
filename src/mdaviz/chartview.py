@@ -178,7 +178,7 @@ class ChartView(QtWidgets.QWidget):
             # Get the global keyboard state
             modifiers = QtWidgets.QApplication.keyboardModifiers()
             self.alt_pressed = modifiers & QtCore.Qt.AltModifier
-        except:
+        except Exception:
             # Fallback if Qt method fails
             pass
 

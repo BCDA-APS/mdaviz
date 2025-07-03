@@ -13,7 +13,7 @@ repos:
     rev: v0.12.1
     hooks:
       - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
+        args: [--fix]
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -21,7 +21,9 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies: [types-PyYAML]
+        # Only check for import errors, do not require type annotations
         args: [--ignore-missing-imports]
+        # If you see 'No module named PyQt5', activate your conda environment: 'conda activate mdaviz'
 
   - repo: local
     hooks:

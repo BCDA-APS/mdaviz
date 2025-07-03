@@ -5,7 +5,7 @@ This module manages fit operations for curves, handles fit parameter storage
 and retrieval, and coordinates between UI and fit calculations.
 """
 
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, Optional, Tuple
 import numpy as np
 from PyQt5 import QtCore
 from .fit_models import FitModel, FitResult, get_available_models

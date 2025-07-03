@@ -5,27 +5,27 @@ This module provides common fit functions and parameter management
 for curve fitting in the mdaviz application.
 """
 
-from typing import Dict, List, Tuple, Optional, Any, Union, Callable
+from typing import Dict, List, Tuple, Optional, Any, Callable
 import numpy as np
 from scipy.optimize import curve_fit
-from lmfit import Model, Parameters
-import lmfit.models
 
 
 class FitResult:
     """Container for fit results."""
-    
-    def __init__(self, 
-                 parameters: Dict[str, float],
-                 uncertainties: Dict[str, float],
-                 r_squared: float,
-                 chi_squared: float,
-                 reduced_chi_squared: float,
-                 fit_curve: np.ndarray,
-                 x_fit: np.ndarray):
+
+    def __init__(
+        self,
+        parameters: Dict[str, float],
+        uncertainties: Dict[str, float],
+        r_squared: float,
+        chi_squared: float,
+        reduced_chi_squared: float,
+        fit_curve: np.ndarray,
+        x_fit: np.ndarray,
+    ):
         """
         Initialize fit result.
-        
+
         Parameters:
         - parameters: Dictionary of fit parameter names and values
         - uncertainties: Dictionary of parameter uncertainties
@@ -46,11 +46,11 @@ class FitResult:
 
 class FitModel:
     """Base class for fit models."""
-    
+
     def __init__(self, name: str, function: Callable, parameters: List[str]):
         """
         Initialize fit model.
-        
+
         Parameters:
         - name: Display name for the model
         - function: The fitting function
@@ -59,19 +59,23 @@ class FitModel:
         self.name = name
         self.function = function
         self.parameters = parameters
-        
-    def fit(self, x_data: np.ndarray, y_data: np.ndarray, 
-            initial_guess: Optional[Dict[str, float]] = None,
-            bounds: Optional[Dict[str, Tuple[float, float]]] = None) -> FitResult:
+
+    def fit(
+        self,
+        x_data: np.ndarray,
+        y_data: np.ndarray,
+        initial_guess: Optional[Dict[str, float]] = None,
+        bounds: Optional[Dict[str, Tuple[float, float]]] = None,
+    ) -> FitResult:
         """
         Perform fit and return results.
-        
+
         Parameters:
         - x_data: X values for fitting
         - y_data: Y values for fitting
         - initial_guess: Initial parameter guesses
         - bounds: Parameter bounds (min, max) for each parameter
-        
+
         Returns:
         - FitResult object with fit parameters and quality metrics
         """
@@ -79,49 +83,65 @@ class FitModel:
         mask = np.isfinite(x_data) & np.isfinite(y_data)
         x_clean = x_data[mask]
         y_clean = y_data[mask]
-        
+
         if len(x_clean) < len(self.parameters):
-            raise ValueError(f"Not enough data points for {len(self.parameters)} parameters")
-        
+            raise ValueError(
+                f"Not enough data points for {len(self.parameters)} parameters"
+            )
+
         # Set default initial guesses if not provided
         if initial_guess is None:
             initial_guess = self._get_default_initial_guess(x_clean, y_clean)
-        
+
         # Prepare bounds for scipy.curve_fit
         if bounds is not None:
             p0 = [initial_guess.get(param, 1.0) for param in self.parameters]
-            bounds_lower = [bounds.get(param, (-np.inf, np.inf))[0] for param in self.parameters]
-            bounds_upper = [bounds.get(param, (-np.inf, np.inf))[1] for param in self.parameters]
+            bounds_lower = [
+                bounds.get(param, (-np.inf, np.inf))[0] for param in self.parameters
+            ]
+            bounds_upper = [
+                bounds.get(param, (-np.inf, np.inf))[1] for param in self.parameters
+            ]
             bounds_tuple: Tuple[Any, Any] = (bounds_lower, bounds_upper)
         else:
             p0 = [initial_guess.get(param, 1.0) for param in self.parameters]
             bounds_tuple_unbounded: Tuple[Any, Any] = (-np.inf, np.inf)
             bounds_tuple = bounds_tuple_unbounded
-        
+
         try:
             # Perform the fit
-            popt, pcov = curve_fit(self.function, x_clean, y_clean, 
-                                  p0=p0, bounds=bounds_tuple, maxfev=10000)
-            
+            popt, pcov = curve_fit(
+                self.function,
+                x_clean,
+                y_clean,
+                p0=p0,
+                bounds=bounds_tuple,
+                maxfev=10000,
+            )
+
             # Calculate uncertainties
             perr = np.sqrt(np.diag(pcov)) if pcov is not None else np.zeros(len(popt))
-            
+
             # Calculate fit curve
             y_fit = self.function(x_clean, *popt)
-            
+
             # Calculate quality metrics
             residuals = y_clean - y_fit
             ss_res = np.sum(residuals**2)
-            ss_tot = np.sum((y_clean - np.mean(y_clean))**2)
+            ss_tot = np.sum((y_clean - np.mean(y_clean)) ** 2)
             r_squared = 1 - (ss_res / ss_tot) if ss_tot != 0 else 0
-            
+
             chi_squared = np.sum(residuals**2)
-            reduced_chi_squared = chi_squared / (len(x_clean) - len(popt)) if len(x_clean) > len(popt) else np.inf
-            
+            reduced_chi_squared = (
+                chi_squared / (len(x_clean) - len(popt))
+                if len(x_clean) > len(popt)
+                else np.inf
+            )
+
             # Create parameter dictionaries
             parameters = dict(zip(self.parameters, popt))
             uncertainties = dict(zip(self.parameters, perr))
-            
+
             return FitResult(
                 parameters=parameters,
                 uncertainties=uncertainties,
@@ -129,20 +149,22 @@ class FitModel:
                 chi_squared=chi_squared,
                 reduced_chi_squared=reduced_chi_squared,
                 fit_curve=y_fit,
-                x_fit=x_clean
+                x_fit=x_clean,
             )
-            
+
         except (RuntimeError, ValueError) as e:
             raise ValueError(f"Fit failed: {str(e)}")
-    
-    def _get_default_initial_guess(self, x_data: np.ndarray, y_data: np.ndarray) -> Dict[str, float]:
+
+    def _get_default_initial_guess(
+        self, x_data: np.ndarray, y_data: np.ndarray
+    ) -> Dict[str, float]:
         """
         Get default initial parameter guesses.
-        
+
         Parameters:
         - x_data: X values
         - y_data: Y values
-        
+
         Returns:
         - Dictionary of parameter names and default values
         """
@@ -151,36 +173,47 @@ class FitModel:
 
 class GaussianFit(FitModel):
     """Gaussian fit model."""
-    
+
     def __init__(self):
         """Initialize Gaussian fit model."""
-        super().__init__("Gaussian", self._gaussian_function, 
-                        ["amplitude", "center", "sigma", "offset"])
-    
-    def _gaussian_function(self, x: np.ndarray, amplitude: float, 
-                          center: float, sigma: float, offset: float) -> np.ndarray:
+        super().__init__(
+            "Gaussian",
+            self._gaussian_function,
+            ["amplitude", "center", "sigma", "offset"],
+        )
+
+    def _gaussian_function(
+        self,
+        x: np.ndarray,
+        amplitude: float,
+        center: float,
+        sigma: float,
+        offset: float,
+    ) -> np.ndarray:
         """
         Gaussian function.
-        
+
         Parameters:
         - x: X values
         - amplitude: Peak amplitude
         - center: Center position
         - sigma: Standard deviation
         - offset: Vertical offset
-        
+
         Returns:
         - Y values of Gaussian function
         """
-        return amplitude * np.exp(-(x - center)**2 / (2 * sigma**2)) + offset
-    
-    def _get_default_initial_guess(self, x_data: np.ndarray, y_data: np.ndarray) -> Dict[str, float]:
+        return amplitude * np.exp(-((x - center) ** 2) / (2 * sigma**2)) + offset
+
+    def _get_default_initial_guess(
+        self, x_data: np.ndarray, y_data: np.ndarray
+    ) -> Dict[str, float]:
         """Get default initial guesses for Gaussian fit."""
         y_max = np.max(y_data)
         y_min = np.min(y_data)
         x_max_idx = np.argmax(y_data)
         x_max = x_data[x_max_idx]
-        
+
         # Estimate sigma from FWHM
         half_max = (y_max + y_min) / 2
         left_idx = np.where(y_data <= half_max)[0]
@@ -200,47 +233,58 @@ class GaussianFit(FitModel):
                 sigma_est = (x_data[-1] - x_data[0]) / 10
         else:
             sigma_est = (x_data[-1] - x_data[0]) / 10
-        
+
         return {
             "amplitude": y_max - y_min,
             "center": x_max,
             "sigma": sigma_est,
-            "offset": y_min
+            "offset": y_min,
         }
 
 
 class LorentzianFit(FitModel):
     """Lorentzian fit model."""
-    
+
     def __init__(self):
         """Initialize Lorentzian fit model."""
-        super().__init__("Lorentzian", self._lorentzian_function,
-                        ["amplitude", "center", "gamma", "offset"])
-    
-    def _lorentzian_function(self, x: np.ndarray, amplitude: float,
-                            center: float, gamma: float, offset: float) -> np.ndarray:
+        super().__init__(
+            "Lorentzian",
+            self._lorentzian_function,
+            ["amplitude", "center", "gamma", "offset"],
+        )
+
+    def _lorentzian_function(
+        self,
+        x: np.ndarray,
+        amplitude: float,
+        center: float,
+        gamma: float,
+        offset: float,
+    ) -> np.ndarray:
         """
         Lorentzian function.
-        
+
         Parameters:
         - x: X values
         - amplitude: Peak amplitude
         - center: Center position
         - gamma: Half-width at half-maximum
         - offset: Vertical offset
-        
+
         Returns:
         - Y values of Lorentzian function
         """
-        return amplitude * gamma**2 / ((x - center)**2 + gamma**2) + offset
-    
-    def _get_default_initial_guess(self, x_data: np.ndarray, y_data: np.ndarray) -> Dict[str, float]:
+        return amplitude * gamma**2 / ((x - center) ** 2 + gamma**2) + offset
+
+    def _get_default_initial_guess(
+        self, x_data: np.ndarray, y_data: np.ndarray
+    ) -> Dict[str, float]:
         """Get default initial guesses for Lorentzian fit."""
         y_max = np.max(y_data)
         y_min = np.min(y_data)
         x_max_idx = np.argmax(y_data)
         x_max = x_data[x_max_idx]
-        
+
         # Estimate gamma from FWHM
         half_max = (y_max + y_min) / 2
         left_idx = np.where(y_data <= half_max)[0]
@@ -260,111 +304,120 @@ class LorentzianFit(FitModel):
                 gamma_est = (x_data[-1] - x_data[0]) / 10
         else:
             gamma_est = (x_data[-1] - x_data[0]) / 10
-        
+
         return {
             "amplitude": y_max - y_min,
             "center": x_max,
             "gamma": gamma_est,
-            "offset": y_min
+            "offset": y_min,
         }
 
 
 class LinearFit(FitModel):
     """Linear fit model."""
-    
+
     def __init__(self):
         """Initialize linear fit model."""
         super().__init__("Linear", self._linear_function, ["slope", "intercept"])
-    
-    def _linear_function(self, x: np.ndarray, slope: float, intercept: float) -> np.ndarray:
+
+    def _linear_function(
+        self, x: np.ndarray, slope: float, intercept: float
+    ) -> np.ndarray:
         """
         Linear function.
-        
+
         Parameters:
         - x: X values
         - slope: Slope of the line
         - intercept: Y-intercept
-        
+
         Returns:
         - Y values of linear function
         """
         return slope * x + intercept
-    
-    def _get_default_initial_guess(self, x_data: np.ndarray, y_data: np.ndarray) -> Dict[str, float]:
+
+    def _get_default_initial_guess(
+        self, x_data: np.ndarray, y_data: np.ndarray
+    ) -> Dict[str, float]:
         """Get default initial guesses for linear fit."""
         # Use numpy's polyfit for initial estimates
         coeffs = np.polyfit(x_data, y_data, 1)
-        return {
-            "slope": coeffs[0],
-            "intercept": coeffs[1]
-        }
+        return {"slope": coeffs[0], "intercept": coeffs[1]}
 
 
 class ExponentialFit(FitModel):
     """Exponential fit model."""
-    
+
     def __init__(self):
         """Initialize exponential fit model."""
-        super().__init__("Exponential", self._exponential_function, 
-                        ["amplitude", "decay", "offset"])
-    
-    def _exponential_function(self, x: np.ndarray, amplitude: float, 
-                             decay: float, offset: float) -> np.ndarray:
+        super().__init__(
+            "Exponential", self._exponential_function, ["amplitude", "decay", "offset"]
+        )
+
+    def _exponential_function(
+        self, x: np.ndarray, amplitude: float, decay: float, offset: float
+    ) -> np.ndarray:
         """
         Exponential function.
-        
+
         Parameters:
         - x: X values
         - amplitude: Initial amplitude
         - decay: Decay constant
         - offset: Vertical offset
-        
+
         Returns:
         - Y values of exponential function
         """
         return amplitude * np.exp(-decay * x) + offset
-    
-    def _get_default_initial_guess(self, x_data: np.ndarray, y_data: np.ndarray) -> Dict[str, float]:
+
+    def _get_default_initial_guess(
+        self, x_data: np.ndarray, y_data: np.ndarray
+    ) -> Dict[str, float]:
         """Get default initial guesses for exponential fit."""
         y_max = np.max(y_data)
         y_min = np.min(y_data)
         x_range = x_data[-1] - x_data[0]
-        
+
         return {
             "amplitude": y_max - y_min,
             "decay": 1.0 / x_range if x_range > 0 else 1.0,
-            "offset": y_min
+            "offset": y_min,
         }
 
 
 class PolynomialFit(FitModel):
     """Polynomial fit model."""
-    
+
     def __init__(self, degree: int = 2):
         """
         Initialize polynomial fit model.
-        
+
         Parameters:
         - degree: Degree of the polynomial (default: 2 for quadratic)
         """
         self.degree = degree
         param_names = [f"coeff_{i}" for i in range(degree + 1)]
-        super().__init__(f"Polynomial (deg={degree})", self._polynomial_function, param_names)
-    
+        super().__init__(
+            f"Polynomial (deg={degree})", self._polynomial_function, param_names
+        )
+
     def _polynomial_function(self, x: np.ndarray, *coefficients: float) -> np.ndarray:
         """
         Polynomial function.
-        
+
         Parameters:
         - x: X values
         - coefficients: Polynomial coefficients (highest degree first)
-        
+
         Returns:
         - Y values of polynomial function
         """
         return np.polyval(coefficients[::-1], x)  # Reverse coefficients for polyval
-    
-    def _get_default_initial_guess(self, x_data: np.ndarray, y_data: np.ndarray) -> Dict[str, float]:
+
+    def _get_default_initial_guess(
+        self, x_data: np.ndarray, y_data: np.ndarray
+    ) -> Dict[str, float]:
         """Get default initial guesses for polynomial fit."""
         # Use numpy's polyfit for initial estimates
         coeffs = np.polyfit(x_data, y_data, self.degree)
@@ -375,7 +428,7 @@ class PolynomialFit(FitModel):
 def get_available_models() -> Dict[str, FitModel]:
     """
     Get dictionary of available fit models.
-    
+
     Returns:
     - Dictionary mapping model names to FitModel instances
     """
@@ -386,4 +439,4 @@ def get_available_models() -> Dict[str, FitModel]:
         "Exponential": ExponentialFit(),
         "Quadratic": PolynomialFit(degree=2),
         "Cubic": PolynomialFit(degree=3),
-    } 
+    }

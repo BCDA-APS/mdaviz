@@ -137,7 +137,7 @@ Planned improvements include:
 
 ### Common Issues
 
-1. **Fit Fails**: 
+1. **Fit Fails**:
    - Check that you have enough data points
    - Try a different fit model
    - Ensure data doesn't contain too many invalid values
@@ -171,4 +171,4 @@ Key classes:
 - `FitModel`: Base class for fit models
 - `FitResult`: Container for fit results
 - `FitManager`: Manages fit operations and state
-- `FitData`: Stores fit information and metadata 
+- `FitData`: Stores fit information and metadata

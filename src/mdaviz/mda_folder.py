@@ -492,7 +492,7 @@ class MDA_MVC(QtWidgets.QWidget):
             if not isinstance(widgetMpl, ChartView):  # Make a blank chart.
                 widgetMpl = ChartView(self, **plot_options)
                 # Connect fit signals to main window
-                if hasattr(self.mainWindow, 'connectToFitSignals'):
+                if hasattr(self.mainWindow, "connectToFitSignals"):
                     self.mainWindow.connectToFitSignals(widgetMpl)
             if action in ("replace"):
                 widgetMpl.curveManager.removeAllCurves()
@@ -689,7 +689,7 @@ class MDA_MVC(QtWidgets.QWidget):
         if not isinstance(widgetMpl, ChartView):
             widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
             # Connect fit signals to main window
-            if hasattr(self.mainWindow, 'connectToFitSignals'):
+            if hasattr(self.mainWindow, "connectToFitSignals"):
                 self.mainWindow.connectToFitSignals(widgetMpl)
         if mode in ("Auto-replace"):
             widgetMpl.curveManager.removeAllCurves()

@@ -10,7 +10,7 @@ import sys
 from PyQt5 import QtWidgets
 
 # Add the src directory to the path so we can import mdaviz
-sys.path.insert(0, 'src')
+sys.path.insert(0, "src")
 
 from mdaviz.mainwindow import MainWindow
 
@@ -18,23 +18,23 @@ from mdaviz.mainwindow import MainWindow
 def main():
     """Run the manual resize test."""
     app = QtWidgets.QApplication(sys.argv)
-    
+
     # Create the main window
     window = MainWindow()
-    
+
     # Set a reasonable initial size
     window.resize(800, 600)
-    
+
     # Show the window
     window.show()
-    
+
     print("Main window created and shown.")
     print("Try resizing the window to verify it works correctly.")
     print("Press Ctrl+C to exit.")
-    
+
     # Run the application
     sys.exit(app.exec_())
 
 
 if __name__ == "__main__":
-    main() 
+    main()

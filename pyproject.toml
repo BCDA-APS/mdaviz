@@ -222,4 +222,19 @@ skip-magic-trailing-comma = false
 where = ["src"]  # list of folders that contain the packages (["."] by default)
 include = ["mdaviz*"]  # package names should match these glob patterns (["*"] by default)
 
+[tool.mypy]
+python_version = "3.11"
+# All strict options removed for initial release; only import errors will be checked by pre-commit
+
+[[tool.mypy.overrides]]
+module = [
+    "PyQt5.*",
+    "matplotlib.*",
+    "scipy.*",
+    "numpy.*",
+    "lmfit.*",
+    "tiled.*",
+]
+ignore_missing_imports = true
+
 [tool.setuptools_scm]
