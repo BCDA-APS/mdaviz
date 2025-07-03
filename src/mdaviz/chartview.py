@@ -521,9 +521,65 @@ class ChartView(QtWidgets.QWidget):
         self.onRemoveCursor(1)
         self.onRemoveCursor(2)
 
+    def findNearestPoint(
+        self, x_click: float, y_click: float
+    ) -> Optional[tuple[float, float]]:
+        """
+        Find the nearest data point in the selected curve to the given click position.
+
+        Parameters:
+        - x_click: X coordinate of the click
+        - y_click: Y coordinate of the click
+
+        Returns:
+        - Tuple of (x_nearest, y_nearest) if a curve is selected and has data, None otherwise
+        """
+        curveID = self.getSelectedCurveID()
+        if not curveID or curveID not in self.curveManager.curves():
+            return None
+
+        curve_data = self.curveManager.getCurveData(curveID)
+        if not curve_data:
+            return None
+
+        ds = curve_data.get("ds")
+        if not ds or len(ds) < 2:
+            return None
+
+        x_data = ds[0]
+        y_data = ds[1]
+
+        # Ensure data are numpy arrays
+        if not isinstance(x_data, numpy.ndarray):
+            x_data = numpy.array(x_data, dtype=float)
+        if not isinstance(y_data, numpy.ndarray):
+            y_data = numpy.array(y_data, dtype=float)
+
+        # Apply offset and factor to y_data to match what's displayed
+        factor = curve_data.get("factor", 1)
+        offset = curve_data.get("offset", 0)
+        y_data = numpy.multiply(y_data, factor) + offset
+
+        # Calculate distances to all points
+        distances = numpy.sqrt((x_data - x_click) ** 2 + (y_data - y_click) ** 2)
+
+        # Find the index of the nearest point
+        nearest_index = numpy.argmin(distances)
+
+        return (float(x_data[nearest_index]), float(y_data[nearest_index]))
+
     def onclick(self, event):
         # Check if the click was in the main_axes
         if event.inaxes is self.main_axes:
+            # Find the nearest point in the selected curve
+            nearest_point = self.findNearestPoint(event.xdata, event.ydata)
+
+            if nearest_point is None:
+                # No curve selected or no data available
+                return
+
+            x_nearest, y_nearest = nearest_point
+
             # Middle click or Alt+right click for red cursor (cursor 1)
             if event.button == MIDDLE_BUTTON or (
                 event.button == RIGHT_BUTTON and self.alt_pressed
@@ -531,21 +587,21 @@ class ChartView(QtWidgets.QWidget):
                 if self.cursors[1]:
                     self.cursors[1].remove()  # Remove existing red cursor
                 (self.cursors[1],) = self.main_axes.plot(
-                    event.xdata, event.ydata, "r+", markersize=15, linewidth=2
+                    x_nearest, y_nearest, "r+", markersize=15, linewidth=2
                 )
-                # Update cursor position
-                self.cursors["pos1"] = (event.xdata, event.ydata)
+                # Update cursor position to nearest point
+                self.cursors["pos1"] = (x_nearest, y_nearest)
 
             # Right click (without Alt) for blue cursor (cursor 2)
             elif event.button == RIGHT_BUTTON and not self.alt_pressed:
                 if self.cursors[2]:
                     self.cursors[2].remove()  # Remove existing blue cursor
                 (self.cursors[2],) = self.main_axes.plot(
-                    event.xdata, event.ydata, "b+", markersize=15, linewidth=2
+                    x_nearest, y_nearest, "b+", markersize=15, linewidth=2
                 )
 
-                # Update cursor position
-                self.cursors["pos2"] = (event.xdata, event.ydata)
+                # Update cursor position to nearest point
+                self.cursors["pos2"] = (x_nearest, y_nearest)
 
             # Update the info panel with cursor positions
             self.calculateCursors()
@@ -704,8 +760,8 @@ class ChartView(QtWidgets.QWidget):
         """
         if "pos1" in self.cursors and "pos2" in self.cursors:
             if self.cursors["pos1"] is not None and self.cursors["pos2"] is not None:
-                x1 = self.cursors["pos1"]
-                x2 = self.cursors["pos2"]
+                x1, y1 = self.cursors["pos1"]
+                x2, y2 = self.cursors["pos2"]
                 return (min(x1, x2), max(x1, x2))
         return None
 
