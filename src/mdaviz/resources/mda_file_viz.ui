@@ -478,26 +478,10 @@
                    <property name="verticalSpacing">
                     <number>0</number>
                    </property>
-                   <item row="0" column="0">
-                    <widget class="QLabel" name="diff_label">
-                     <property name="maximumSize">
-                      <size>
-                       <width>70</width>
-                       <height>20</height>
-                      </size>
-                     </property>
+                   <item row="1" column="1">
+                    <widget class="QLabel" name="midpoint_text">
                      <property name="toolTip">
-                      <string>(x1-x2,y1-y2)</string>
-                     </property>
-                     <property name="text">
-                      <string>Difference</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="1">
-                    <widget class="QLabel" name="diff_text">
-                     <property name="toolTip">
-                      <string>(x1-x2,y1-y2)</string>
+                      <string>(0.5*(x1 + x2), 0.5*(y1 + y2))</string>
                      </property>
                      <property name="styleSheet">
                       <string notr="true">QLabel {
@@ -527,10 +511,10 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="1">
-                    <widget class="QLabel" name="midpoint_text">
+                   <item row="0" column="1">
+                    <widget class="QLabel" name="diff_text">
                      <property name="toolTip">
-                      <string>(0.5*(x1 + x2), 0.5*(y1 + y2))</string>
+                      <string>(x1-x2,y1-y2)</string>
                      </property>
                      <property name="styleSheet">
                       <string notr="true">QLabel {
@@ -541,6 +525,22 @@
                      </property>
                      <property name="text">
                       <string>n/a</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="diff_label">
+                     <property name="maximumSize">
+                      <size>
+                       <width>70</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>(x1-x2,y1-y2)</string>
+                     </property>
+                     <property name="text">
+                      <string>Difference</string>
                      </property>
                     </widget>
                    </item>
@@ -574,7 +574,7 @@
              <enum>QTabWidget::Rounded</enum>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <property name="tabsClosable">
              <bool>false</bool>
@@ -991,7 +991,7 @@
                    <x>0</x>
                    <y>0</y>
                    <width>858</width>
-                   <height>361</height>
+                   <height>316</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="fitContentLayout">
@@ -1028,10 +1028,19 @@
                      <property name="verticalSpacing">
                       <number>5</number>
                      </property>
-                     <item row="0" column="0">
-                      <widget class="QLabel" name="fitModelLabel">
+                     <item row="1" column="2">
+                      <widget class="QPushButton" name="clearFitsButton">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>1</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="toolTip">
+                        <string>Remove all fits from current curve</string>
+                       </property>
                        <property name="text">
-                        <string>Fit Model:</string>
+                        <string>Clear All</string>
                        </property>
                       </widget>
                      </item>
@@ -1048,13 +1057,6 @@
                        </property>
                       </widget>
                      </item>
-                     <item row="1" column="0">
-                      <widget class="QLabel" name="fitRangeLabel">
-                       <property name="text">
-                        <string>Fit Range:</string>
-                       </property>
-                      </widget>
-                     </item>
                      <item row="1" column="1">
                       <widget class="QCheckBox" name="useFitRangeCheck">
                        <property name="toolTip">
@@ -1065,45 +1067,34 @@
                        </property>
                       </widget>
                      </item>
-                     <item row="2" column="0" colspan="2">
-                      <widget class="QWidget" name="fitButtonsContainer" native="true">
-                       <layout class="QHBoxLayout" name="fitButtonsLayout">
-                        <property name="spacing">
-                         <number>5</number>
-                        </property>
-                        <item>
-                         <widget class="QPushButton" name="fitButton">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                            <horstretch>1</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="toolTip">
-                           <string>Perform fit on selected curve</string>
-                          </property>
-                          <property name="text">
-                           <string>Fit</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="clearFitsButton">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                            <horstretch>1</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="toolTip">
-                           <string>Remove all fits from current curve</string>
-                          </property>
-                          <property name="text">
-                           <string>Clear All</string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="fitRangeLabel">
+                       <property name="text">
+                        <string>Fit Range:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="fitModelLabel">
+                       <property name="text">
+                        <string>Fit Model:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="2">
+                      <widget class="QPushButton" name="fitButton">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>1</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="toolTip">
+                        <string>Perform fit on selected curve</string>
+                       </property>
+                       <property name="text">
+                        <string>Fit</string>
+                       </property>
                       </widget>
                      </item>
                     </layout>
