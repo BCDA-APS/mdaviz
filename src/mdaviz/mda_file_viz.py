@@ -64,9 +64,6 @@ class MDAFileVisualization(QtWidgets.QWidget):
         self.fitButton.clicked.connect(self.onFitButtonClicked)
         self.clearFitsButton.clicked.connect(self.onClearFitsButtonClicked)
 
-        # Connect fit list selection
-        self.fitList.itemSelectionChanged.connect(self.onFitListSelectionChanged)
-
         # Initially disable fit controls until a curve is selected
         self.fitButton.setEnabled(False)
         self.clearFitsButton.setEnabled(False)
@@ -82,16 +79,6 @@ class MDAFileVisualization(QtWidgets.QWidget):
         """Handle clear fits button click."""
         if hasattr(self, "chart_view") and self.chart_view:
             self.chart_view.clearAllFits()
-
-    def onFitListSelectionChanged(self):
-        """Handle fit list selection change."""
-        if hasattr(self, "chart_view") and self.chart_view:
-            current_item = self.fitList.currentItem()
-            if current_item:
-                fit_id = current_item.data(QtWidgets.Qt.UserRole)
-                curve_id = self.chart_view.getSelectedCurveID()
-                if curve_id and fit_id:
-                    self.chart_view.updateFitDetails(curve_id, fit_id)
 
     def updateFitControls(self, curve_selected: bool):
         """

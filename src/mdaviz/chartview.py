@@ -106,7 +106,7 @@ class ChartView(QtWidgets.QWidget):
 
         # Track curves and display in QComboBox:
         self.plotObjects = {}  # all the Line2D on the graph, key = curveID
-        self.fitObjects = {}  # all the fit Line2D on the graph, key = (curveID, fitID)
+        self.fitObjects = {}  # all the fit Line2D on the graph, key = curveID
         self.curveBox = self.mda_mvc.mda_file_viz.curveBox
         self.curveBox.currentTextChanged.connect(self.onCurveSelected)
 
@@ -120,6 +120,7 @@ class ChartView(QtWidgets.QWidget):
         # Initialize FitManager
         self.fitManager = FitManager(self)
         self.fitManager.fitAdded.connect(self.onFitAdded)
+        self.fitManager.fitUpdated.connect(self.onFitUpdated)
         self.fitManager.fitRemoved.connect(self.onFitRemoved)
         self.fitManager.fitVisibilityChanged.connect(self.onFitVisibilityChanged)
         # # Debug signals:
@@ -567,87 +568,107 @@ class ChartView(QtWidgets.QWidget):
 
     ########################################## Fit methods:
 
-    def onFitAdded(self, curveID: str, fitID: str) -> None:
+    def onFitAdded(self, curveID: str) -> None:
         """
         Handle when a new fit is added.
 
         Parameters:
         - curveID: ID of the curve that was fitted
-        - fitID: ID of the new fit
         """
         # Get fit data and plot the fit curve
-        fit_data = self.fitManager.getFitCurveData(curveID, fitID)
+        fit_data = self.fitManager.getFitCurveData(curveID)
         if fit_data:
             x_fit, y_fit = fit_data
             # Plot fit curve with dashed line style and higher z-order to ensure it's on top
             fit_line = self.main_axes.plot(
                 x_fit, y_fit, "--", alpha=0.8, linewidth=2, zorder=10
             )[0]
-            self.fitObjects[(curveID, fitID)] = fit_line
+            self.fitObjects[curveID] = fit_line
 
             # Update plot
             self.updatePlot(update_title=False)
 
-            # Update fit list in UI
-            self.updateFitList(curveID)
+            # Update fit details display
+            self.updateFitDetails(curveID)
 
             # Emit signal for main window
-            self.fitAdded.emit(curveID, fitID)
+            self.fitAdded.emit(curveID, "single_fit")
 
-    def onFitRemoved(self, curveID: str, fitID: str) -> None:
+    def onFitUpdated(self, curveID: str) -> None:
+        """
+        Handle when a fit is updated.
+
+        Parameters:
+        - curveID: ID of the curve
+        """
+        # Remove existing fit line if any
+        if curveID in self.fitObjects:
+            self.fitObjects[curveID].remove()
+            del self.fitObjects[curveID]
+
+        # Add new fit line
+        fit_data = self.fitManager.getFitCurveData(curveID)
+        if fit_data:
+            x_fit, y_fit = fit_data
+            # Plot fit curve with dashed line style and higher z-order to ensure it's on top
+            fit_line = self.main_axes.plot(
+                x_fit, y_fit, "--", alpha=0.8, linewidth=2, zorder=10
+            )[0]
+            self.fitObjects[curveID] = fit_line
+
+            # Update plot
+            self.updatePlot(update_title=False)
+
+            # Update fit details display
+            self.updateFitDetails(curveID)
+
+            # Emit signal for main window
+            self.fitUpdated.emit(curveID, "single_fit")
+
+    def onFitRemoved(self, curveID: str) -> None:
         """
         Handle when a fit is removed.
 
         Parameters:
         - curveID: ID of the curve
-        - fitID: ID of the removed fit
         """
         # Remove fit line from plot
-        fit_key = (curveID, fitID)
-        if fit_key in self.fitObjects:
-            self.fitObjects[fit_key].remove()
-            del self.fitObjects[fit_key]
+        if curveID in self.fitObjects:
+            self.fitObjects[curveID].remove()
+            del self.fitObjects[curveID]
 
             # Update plot
             self.updatePlot(update_title=False)
 
-            # Update fit list in UI
-            self.updateFitList(curveID)
+            # Clear fit details display
+            self.mda_mvc.mda_file_viz.fitDetails.clear()
 
             # Emit signal for main window
-            self.fitRemoved.emit(curveID, fitID)
+            self.fitRemoved.emit(curveID, "single_fit")
 
-    def onFitVisibilityChanged(self, curveID: str, fitID: str, visible: bool) -> None:
+    def onFitVisibilityChanged(self, curveID: str, visible: bool) -> None:
         """
         Handle when fit visibility changes.
 
         Parameters:
         - curveID: ID of the curve
-        - fitID: ID of the fit
         - visible: Whether the fit should be visible
         """
-        fit_key = (curveID, fitID)
-        if fit_key in self.fitObjects:
-            self.fitObjects[fit_key].set_visible(visible)
+        if curveID in self.fitObjects:
+            self.fitObjects[curveID].set_visible(visible)
             self.canvas.draw()
 
     def updateFitList(self, curveID: str) -> None:
         """
         Update the fit list in the UI for a given curve.
+        Note: This method is kept for compatibility but no longer needed with single-fit system.
 
         Parameters:
         - curveID: ID of the curve
         """
-        fit_list = self.mda_mvc.mda_file_viz.fitList
-        fit_list.clear()
-
-        if self.fitManager.hasFits(curveID):
-            fits = self.fitManager.getCurveFits(curveID)
-            for fit_id, fit_data in fits.items():
-                item_text = f"{fit_data.model_name} ({fit_id})"
-                item = QtWidgets.QListWidgetItem(item_text)
-                item.setData(0, fit_id)  # Use role 0 for custom data
-                fit_list.addItem(item)
+        # With single-fit system, we don't need a fit list
+        # The fit details are shown directly when a fit exists
+        pass
 
     def getCursorRange(self) -> Optional[tuple[float, float]]:
         """
@@ -713,37 +734,31 @@ class ChartView(QtWidgets.QWidget):
             x_range = self.getCursorRange()
 
         try:
-            # Perform the fit
-            fit_id = self.fitManager.addFit(
-                curveID, model_name, x_data, y_data, x_range
-            )
-
-            # Update fit details display
-            self.updateFitDetails(curveID, fit_id)
+            # Perform the fit (this will replace any existing fit)
+            self.fitManager.addFit(curveID, model_name, x_data, y_data, x_range)
 
         except ValueError as e:
             # Show error message
             QtWidgets.QMessageBox.warning(self, "Fit Error", str(e))
 
-    def updateFitDetails(self, curveID: str, fitID: str) -> None:
+    def updateFitDetails(self, curveID: str) -> None:
         """
         Update the fit details display.
 
         Parameters:
         - curveID: ID of the curve
-        - fitID: ID of the fit
         """
         fit_details = self.mda_mvc.mda_file_viz.fitDetails
 
         # Get fit data
-        fit_data = self.fitManager.getFitData(curveID, fitID)
+        fit_data = self.fitManager.getFitData(curveID)
         if not fit_data:
+            fit_details.clear()
             return
 
         # Format fit results
         result = fit_data.fit_result
-        details_text = f"Fit: {fit_data.model_name}\n"
-        details_text += f"Fit ID: {fitID}\n\n"
+        details_text = f"Fit: {fit_data.model_name}\n\n"
 
         # Parameters
         details_text += "Parameters:\n"
@@ -760,11 +775,10 @@ class ChartView(QtWidgets.QWidget):
         fit_details.setText(details_text)
 
     def clearAllFits(self) -> None:
-        """Clear all fits from the currently selected curve."""
+        """Clear the fit from the currently selected curve."""
         curveID = self.getSelectedCurveID()
         if curveID:
-            self.fitManager.removeAllFits(curveID)
-            self.mda_mvc.mda_file_viz.fitList.clear()
+            self.fitManager.removeFit(curveID)
             self.mda_mvc.mda_file_viz.fitDetails.clear()
 
 

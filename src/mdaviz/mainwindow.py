@@ -578,20 +578,19 @@ class MainWindow(QtWidgets.QMainWindow):
             # Get fit data from the fit manager
             fit_manager = getattr(self.mvc_folder, "fit_manager", None)
             if fit_manager:
-                fit_data = fit_manager.getFitData(curve_id, fit_id)
+                fit_data = fit_manager.getFitData(curve_id)
                 if fit_data:
-                    self._display_fit_data(fit_data, curve_id, fit_id)
+                    self._display_fit_data(fit_data, curve_id)
 
     def _on_fit_updated(self, curve_id: str, fit_id: str):
         """Handle when a fit is updated."""
         self._on_fit_added(curve_id, fit_id)
 
-    def _display_fit_data(self, fit_data, curve_id: str, fit_id: str):
+    def _display_fit_data(self, fit_data, curve_id: str):
         """Display fit data in the fit data tab."""
         try:
             # Format the fit data for display
-            formatted_data = f"Fit ID: {fit_id}\n"
-            formatted_data += f"Curve ID: {curve_id}\n"
+            formatted_data = f"Curve ID: {curve_id}\n"
             formatted_data += f"Model: {fit_data.model_name}\n"
             formatted_data += f"Fit Range: {fit_data.x_range}\n\n"
 

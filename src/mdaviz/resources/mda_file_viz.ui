@@ -1037,10 +1037,10 @@
                         </sizepolicy>
                        </property>
                        <property name="toolTip">
-                        <string>Remove all fits from current curve</string>
+                        <string>Remove fit from current curve</string>
                        </property>
                        <property name="text">
-                        <string>Clear All</string>
+                        <string>Clear Fit</string>
                        </property>
                       </widget>
                      </item>
@@ -1109,19 +1109,12 @@
                      </sizepolicy>
                     </property>
                     <property name="title">
-                     <string>Fit Results</string>
+                     <string>Fit Result</string>
                     </property>
                     <layout class="QVBoxLayout" name="fitResultsLayout">
                      <property name="spacing">
                       <number>5</number>
                      </property>
-                     <item>
-                      <widget class="QListWidget" name="fitList">
-                       <property name="toolTip">
-                        <string>List of fits for current curve</string>
-                       </property>
-                      </widget>
-                     </item>
                      <item>
                       <widget class="QTextEdit" name="fitDetails">
                        <property name="toolTip">
