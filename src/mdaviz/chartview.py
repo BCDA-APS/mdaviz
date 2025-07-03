@@ -154,16 +154,39 @@ class ChartView(QtWidgets.QWidget):
 
         # Connect the click event to a handler
         self.cid = self.figure.canvas.mpl_connect("button_press_event", self.onclick)
+        self.alt_pressed = False
+
+        # Set up a timer to check modifier key state
+        self.key_check_timer = QtCore.QTimer()
+        self.key_check_timer.timeout.connect(self.check_modifier_keys)
+        self.key_check_timer.start(50)  # Check every 50ms
+
         self.cursors = {
             1: None,
             "pos1": None,
-            "text1": "middle click",
+            "text1": "middle click or alt+right click",
             2: None,
             "pos2": None,
             "text2": "right click",
             "diff": "n/a",
             "midpoint": "n/a",
         }
+
+    def check_modifier_keys(self):
+        """Check for modifier keys using Qt's global state."""
+        try:
+            # Get the global keyboard state
+            modifiers = QtWidgets.QApplication.keyboardModifiers()
+            self.alt_pressed = modifiers & QtCore.Qt.AltModifier
+        except:
+            # Fallback if Qt method fails
+            pass
+
+    def closeEvent(self, event):
+        """Clean up resources when the widget is closed."""
+        if hasattr(self, "key_check_timer"):
+            self.key_check_timer.stop()
+        super().closeEvent(event)
 
     ########################################## Set & get methods:
 
@@ -484,7 +507,7 @@ class ChartView(QtWidgets.QWidget):
             self.cursors[cursor_num] = None
             self.cursors[f"pos{cursor_num}"] = None
             self.cursors[f"text{cursor_num}"] = (
-                "middle click" if cursor_num == 1 else "right click"
+                "middle click or alt+right click" if cursor_num == 1 else "right click"
             )
         self.cursors["diff"] = "n/a"
         self.cursors["midpoint"] = "n/a"
@@ -501,8 +524,10 @@ class ChartView(QtWidgets.QWidget):
     def onclick(self, event):
         # Check if the click was in the main_axes
         if event.inaxes is self.main_axes:
-            # Middle click for red cursor
-            if event.button == MIDDLE_BUTTON:
+            # Middle click or Alt+right click for red cursor (cursor 1)
+            if event.button == MIDDLE_BUTTON or (
+                event.button == RIGHT_BUTTON and self.alt_pressed
+            ):
                 if self.cursors[1]:
                     self.cursors[1].remove()  # Remove existing red cursor
                 (self.cursors[1],) = self.main_axes.plot(
@@ -511,8 +536,8 @@ class ChartView(QtWidgets.QWidget):
                 # Update cursor position
                 self.cursors["pos1"] = (event.xdata, event.ydata)
 
-            # Right click for blue cursor
-            elif event.button == RIGHT_BUTTON:
+            # Right click (without Alt) for blue cursor (cursor 2)
+            elif event.button == RIGHT_BUTTON and not self.alt_pressed:
                 if self.cursors[2]:
                     self.cursors[2].remove()  # Remove existing blue cursor
                 (self.cursors[2],) = self.main_axes.plot(
@@ -561,7 +586,7 @@ class ChartView(QtWidgets.QWidget):
         self.mda_mvc.mda_file_viz.midpoint_text.setText(self.cursors["midpoint"])
 
     def clearCursorInfo(self):
-        self.mda_mvc.mda_file_viz.pos1_text.setText("middle click")
+        self.mda_mvc.mda_file_viz.pos1_text.setText("middle click or alt+right click")
         self.mda_mvc.mda_file_viz.pos2_text.setText("right click")
         self.mda_mvc.mda_file_viz.diff_text.setText("n/a")
         self.mda_mvc.mda_file_viz.midpoint_text.setText("n/a")
