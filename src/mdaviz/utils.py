@@ -53,7 +53,7 @@ def ts2iso(timestamp):
 
 def num2fstr(x):
     """Return a string with the adequate precision and format"""
-    return f"{x:.3e}" if abs(x) < 1e-3 else f"{x:.3f}"
+    return f"{x:.2e}" if abs(x) < 1e-3 else f"{x:.2f}"
 
 
 def byte2str(byte_literal):
