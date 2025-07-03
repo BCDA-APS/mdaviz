@@ -471,7 +471,7 @@ class TestLazyLoadingConfig:
     def test_config_initialization(self, config: LazyLoadingConfig) -> None:
         """Test that the config initializes with default values."""
         assert config.folder_scan_batch_size == 50
-        assert config.folder_scan_max_files == 2000
+        assert config.folder_scan_max_files == 10000
         assert config.folder_scan_use_lightweight is True
         assert config.data_cache_max_size_mb == 500.0
         assert config.data_cache_max_entries == 100
@@ -482,7 +482,7 @@ class TestLazyLoadingConfig:
 
         assert isinstance(config_dict, dict)
         assert config_dict["folder_scan_batch_size"] == 50
-        assert config_dict["folder_scan_max_files"] == 2000
+        assert config_dict["folder_scan_max_files"] == 10000
         assert config_dict["folder_scan_use_lightweight"] is True
 
     def test_config_from_dict(self) -> None:

@@ -87,7 +87,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Initialize lazy folder scanner
         self.lazy_scanner = LazyFolderScanner(
-            batch_size=50, max_files=2000, use_lightweight_scan=True
+            batch_size=50, max_files=10000, use_lightweight_scan=True
         )
         self.lazy_scanner.scan_progress.connect(self._on_scan_progress)
         self.lazy_scanner.scan_complete.connect(self._on_scan_complete)

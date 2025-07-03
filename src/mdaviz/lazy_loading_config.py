@@ -30,7 +30,7 @@ class LazyLoadingConfig:
 
     # Folder scanning settings
     folder_scan_batch_size: int = 50
-    folder_scan_max_files: int = 2000
+    folder_scan_max_files: int = 10000
     folder_scan_use_lightweight: bool = True
 
     # Data cache settings
