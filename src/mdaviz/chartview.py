@@ -10,6 +10,7 @@ import numpy
 from PyQt5 import QtCore, QtWidgets
 from . import utils
 from .fit_manager import FitManager
+from .user_settings import settings
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -74,9 +75,17 @@ class ChartView(QtWidgets.QWidget):
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
         )
 
+        # Get maximum height from user settings with default fallback
+        max_height = settings.getKey("plot_max_height")
+        try:
+            max_height = int(max_height)
+        except (TypeError, ValueError):
+            max_height = 800  # Default value
+            settings.setKey("plot_max_height", max_height)
+
         # Set minimum and maximum height to constrain vertical growth
         self.setMinimumHeight(200)  # Minimum reasonable height
-        self.setMaximumHeight(16777215)  # Allow reasonable expansion but not unlimited
+        self.setMaximumHeight(max_height)  # Configurable maximum height
 
         # Create a Matplotlib figure and canvas
         self.figure = Figure()
@@ -84,6 +93,13 @@ class ChartView(QtWidgets.QWidget):
         self.main_axes = self.figure.add_subplot(111)
         # Adjust margins
         self.figure.subplots_adjust(bottom=0.1, top=0.9, right=0.92)
+
+        # Set size constraints on the canvas to prevent vertical expansion
+        canvas_max_height = max_height - 50  # Leave room for toolbar
+        self.canvas.setMaximumHeight(canvas_max_height)
+        self.canvas.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
+        )
 
         # Create the navigation toolbar
         self.toolbar = NavigationToolbar(self.canvas, self)
@@ -190,8 +206,8 @@ class ChartView(QtWidgets.QWidget):
 
     ########################################## Set & get methods:
 
-    def setPlotTitle(self, text):
-        self.main_axes.set_title(text, fontsize=FONTSIZE, y=1.03)
+    def setPlotTitle(self, txt=""):
+        self.main_axes.set_title(txt, fontsize=FONTSIZE)
 
     def setBottomAxisText(self, text):
         self.main_axes.set_xlabel(text, fontsize=FONTSIZE, labelpad=10)
@@ -219,6 +235,29 @@ class ChartView(QtWidgets.QWidget):
 
     def getSelectedCurveID(self):
         return self.curveBox.currentText()
+
+    def setMaximumPlotHeight(self, height: int):
+        """
+        Set the maximum height for the plot widget and save to user settings.
+
+        Parameters:
+        - height (int): Maximum height in pixels
+        """
+        if height < 200:
+            height = 200  # Minimum reasonable height
+
+        # Update the widget maximum height
+        self.setMaximumHeight(height)
+
+        # Update the canvas maximum height (leave room for toolbar)
+        canvas_max_height = height - 50
+        self.canvas.setMaximumHeight(canvas_max_height)
+
+        # Save to user settings
+        settings.setKey("plot_max_height", height)
+
+        # Redraw the canvas
+        self.canvas.draw()
 
     ########################################## Slot methods:
 

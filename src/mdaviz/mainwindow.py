@@ -121,6 +121,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def connect(self):
         self.actionOpen.triggered.connect(self.doOpen)
         self.actionAbout.triggered.connect(self.doAboutDialog)
+        self.actionPreferences.triggered.connect(self.doPreferences)
         self.actionExit.triggered.connect(self.doClose)
         utils.reconnect(self.open.released, self.doOpen)
         utils.reconnect(self.refresh.released, self.onRefresh)
@@ -169,6 +170,74 @@ class MainWindow(QtWidgets.QMainWindow):
 
         about = AboutDialog(self)
         about.open()
+
+    def doPreferences(self, *args, **kw):
+        """
+        Show the Preferences dialog
+        """
+        from PyQt5.QtWidgets import (
+            QDialog,
+            QVBoxLayout,
+            QHBoxLayout,
+            QLabel,
+            QSpinBox,
+            QDialogButtonBox,
+        )
+
+        # Create preferences dialog
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Preferences")
+        dialog.setModal(True)
+        dialog.resize(400, 200)
+
+        layout = QVBoxLayout(dialog)
+
+        # Plot height setting
+        plot_layout = QHBoxLayout()
+        plot_label = QLabel("Maximum Plot Height (pixels):")
+        plot_spinbox = QSpinBox()
+        plot_spinbox.setRange(200, 2000)
+        plot_height_val = settings.getKey("plot_max_height")
+        try:
+            plot_height_val = int(plot_height_val)
+        except (TypeError, ValueError):
+            plot_height_val = 800
+        plot_spinbox.setValue(plot_height_val)
+        plot_spinbox.setSuffix(" px")
+        plot_layout.addWidget(plot_label)
+        plot_layout.addWidget(plot_spinbox)
+        layout.addLayout(plot_layout)
+
+        # Add some spacing
+        layout.addStretch()
+
+        # Buttons
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        button_box.accepted.connect(dialog.accept)
+        button_box.rejected.connect(dialog.reject)
+        layout.addWidget(button_box)
+
+        # Show dialog
+        if dialog.exec_() == QDialog.Accepted:
+            # Save the new plot height setting
+            new_height = plot_spinbox.value()
+            settings.setKey("plot_max_height", new_height)
+
+            # Update any existing ChartView widgets
+            if hasattr(self, "mvc_folder") and self.mvc_folder:
+                if (
+                    hasattr(self.mvc_folder, "mda_file_viz")
+                    and self.mvc_folder.mda_file_viz
+                ):
+                    if (
+                        hasattr(self.mvc_folder.mda_file_viz, "chart_view")
+                        and self.mvc_folder.mda_file_viz.chart_view
+                    ):
+                        self.mvc_folder.mda_file_viz.chart_view.setMaximumPlotHeight(
+                            new_height
+                        )
+
+            self.setStatus(f"Plot height setting updated to {new_height} pixels")
 
     def closeEvent(self, event):
         """
