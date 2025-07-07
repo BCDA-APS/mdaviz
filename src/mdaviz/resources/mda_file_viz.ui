@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1358</width>
-    <height>664</height>
+    <height>636</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,7 +43,7 @@
         <x>0</x>
         <y>0</y>
         <width>1356</width>
-        <height>662</height>
+        <height>634</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -163,18 +163,18 @@
            <height>40</height>
           </size>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_1">
+         <layout class="QHBoxLayout" name="horizontalLayout_1" stretch="2,0,4,0">
           <property name="spacing">
            <number>7</number>
           </property>
           <property name="leftMargin">
-           <number>6</number>
+           <number>20</number>
           </property>
           <property name="topMargin">
            <number>0</number>
           </property>
           <property name="rightMargin">
-           <number>12</number>
+           <number>20</number>
           </property>
           <property name="bottomMargin">
            <number>0</number>
@@ -203,6 +203,19 @@
              <string>Clear Graph</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
           <item>
            <widget class="QComboBox" name="curveBox">
@@ -990,8 +1003,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>858</width>
-                   <height>316</height>
+                   <width>843</width>
+                   <height>231</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="fitContentLayout">
