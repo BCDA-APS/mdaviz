@@ -68,6 +68,8 @@ class LazyFolderScanner(QtCore.QObject):
         self.use_lightweight_scan = use_lightweight_scan
         self._scanning = False
         self._current_scan_path: Optional[Path] = None
+        self.scanner_thread: Optional[QtCore.QThread] = None
+        self.scanner_worker: Optional[FolderScanWorker] = None
 
     def scan_folder(
         self,
@@ -151,8 +153,12 @@ class LazyFolderScanner(QtCore.QObject):
         Parameters:
             folder_path (Path): Path to the folder to scan
         """
+        # Cancel any existing scan and wait for it to finish
         if self._scanning:
-            return
+            self.cancel_scan()
+            # Wait a bit for the thread to finish
+            if self.scanner_thread is not None and self.scanner_thread.isRunning():
+                self.scanner_thread.wait(1000)  # Wait up to 1 second
 
         self._scanning = True
         self._current_scan_path = folder_path
@@ -196,9 +202,20 @@ class LazyFolderScanner(QtCore.QObject):
 
     def cancel_scan(self) -> None:
         """Cancel the current scan operation."""
-        if self._scanning and hasattr(self, "scanner_thread"):
+        if self._scanning and self.scanner_thread is not None:
+            # Cancel the worker first
+            if self.scanner_worker is not None:
+                self.scanner_worker.cancel()
+
+            # Quit the thread
             self.scanner_thread.quit()
-            self.scanner_thread.wait()
+
+            # Wait for the thread to finish (with timeout)
+            if not self.scanner_thread.wait(2000):  # Wait up to 2 seconds
+                # Force terminate if it doesn't finish gracefully
+                self.scanner_thread.terminate()
+                self.scanner_thread.wait(1000)  # Wait a bit more for termination
+
             self._scanning = False
             self._current_scan_path = None
 

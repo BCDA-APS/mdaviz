@@ -258,6 +258,11 @@ class MainWindow(QtWidgets.QMainWindow):
         User chose exit (or quit), or closeEvent() was called.
         """
         self.setStatus("Application quitting ...")
+
+        # Cancel any ongoing scan operations
+        if hasattr(self, "lazy_scanner"):
+            self.lazy_scanner.cancel_scan()
+
         settings.saveWindowGeometry(self, "mainwindow_geometry")
         self.close()
 
