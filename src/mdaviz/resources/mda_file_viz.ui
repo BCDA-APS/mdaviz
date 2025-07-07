@@ -279,7 +279,7 @@
            <height>230</height>
           </size>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout">
+         <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2">
           <property name="spacing">
            <number>-1</number>
           </property>
