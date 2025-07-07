@@ -71,10 +71,6 @@ class LazyFolderScanner(QtCore.QObject):
         self.scanner_thread: Optional[QtCore.QThread] = None
         self.scanner_worker: Optional[FolderScanWorker] = None
 
-    def __del__(self):
-        """Destructor to ensure thread cleanup."""
-        self.cancel_scan()
-
     def scan_folder(
         self,
         folder_path: Path,
@@ -215,14 +211,11 @@ class LazyFolderScanner(QtCore.QObject):
             self.scanner_thread.quit()
 
             # Wait for the thread to finish (with timeout)
-            if not self.scanner_thread.wait(3000):  # Wait up to 3 seconds
+            if not self.scanner_thread.wait(2000):  # Wait up to 2 seconds
                 # Force terminate if it doesn't finish gracefully
                 self.scanner_thread.terminate()
-                self.scanner_thread.wait(2000)  # Wait a bit more for termination
+                self.scanner_thread.wait(1000)  # Wait a bit more for termination
 
-            # Clean up references
-            self.scanner_worker = None
-            self.scanner_thread = None
             self._scanning = False
             self._current_scan_path = None
 
