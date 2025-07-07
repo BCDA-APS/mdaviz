@@ -81,7 +81,14 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.directory = directory
         self.mvc_folder = None
         self.setDataPath()  # the combined data path obj
-        self.setFolderList()  # the list of recent folders in folder QComboBox
+
+        # Set up folder list based on auto-load setting
+        if self.get_auto_load_setting():
+            self.setFolderList()  # the list of recent folders in folder QComboBox
+        else:
+            # Auto-load disabled: show empty combo box with "Select a folder..."
+            self._fillFolderBox([])
+
         self.setMdaFileList()  # the list of mda file NAME str (name only)
         self.setMdaInfoList()  # the list of mda file Info (all the data necessary to fill the table view)
 
@@ -253,17 +260,31 @@ class MainWindow(QtWidgets.QMainWindow):
         self.doClose()
         event.accept()  # let the window close
 
+    def event(self, event):
+        """Override event to handle application quit events."""
+        if event.type() == QtCore.QEvent.ApplicationStateChange:
+            # Application is about to quit, ensure cleanup
+            if hasattr(self, "lazy_scanner"):
+                self.lazy_scanner.cancel_scan()
+        return super().event(event)
+
     def doClose(self, *args, **kw):
         """
         User chose exit (or quit), or closeEvent() was called.
         """
         self.setStatus("Application quitting ...")
 
-        # Cancel any ongoing scan operations
+        # Cancel any ongoing scan operations and wait for cleanup
         if hasattr(self, "lazy_scanner"):
             self.lazy_scanner.cancel_scan()
+            # Give a bit more time for thread cleanup
+            QtCore.QThread.msleep(100)
 
         settings.saveWindowGeometry(self, "mainwindow_geometry")
+
+        # Ensure all settings are synchronized to disk
+        settings.sync()
+
         self.close()
 
     def doOpen(self, *args, **kw):
@@ -330,18 +351,14 @@ class MainWindow(QtWidgets.QMainWindow):
         return self._folderList
 
     def setFolderList(self, folder_list=None):
-        """Set the folder path list & populating the folder QComboBox.
-
-        - If folder_list is not None, it will remove its duplicates.
-        - If folder_list is None, the call to buildFolderList will take care of building the list
-          based on the recent list of folder saved in the app settings.
-
-        Args:
-            folder_list (list, optional): the current list of recent folders. Defaults to None.
-        """
+        """Set the folder path list & populating the folder QComboBox."""
         if folder_list != "":
             folder_list = self._buildFolderList(folder_list)
-        self._fillFolderBox(folder_list)
+        else:
+            folder_list = self._buildFolderList()
+        # Use auto-load setting to determine which item to select
+        select_first = not self.get_auto_load_setting()
+        self._fillFolderBox(folder_list, select_first=select_first)
         self._folderList = folder_list
 
     def onFolderSelected(self, folder_name):
@@ -436,22 +453,47 @@ class MainWindow(QtWidgets.QMainWindow):
         recent_dirs = [dir for dir in recent_dirs if dir != "."]
         settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs[:MAX_RECENT_DIRS]))
 
-    def _fillFolderBox(self, folder_list: Optional[List[str]] = None) -> None:
-        """Fill the Folder ComboBox; Open... and Clear Recently Open... are added at the end by default.
-
-        Args:
-            folder_list (list, optional): The list of folders to be displayed in the ComboBox. Defaults to [].
-        """
+    def _fillFolderBox(
+        self, folder_list: Optional[List[str]] = None, select_first: bool = True
+    ) -> None:
+        """Fill the Folder ComboBox; 'Select a folder...' is always first, then recent folders, then Open... and Clear Recently Open..."""
         if folder_list is None:
             folder_list = []
         self.folder.clear()
-        if not folder_list:
-            folder_list = ["Select a folder..."]
+        items = ["Select a folder..."] + folder_list
+        self.folder.addItems(items)
+        self.folder.addItems(["Open...", "Clear Recently Open..."])
+        count = self.folder.count()
+        self.folder.insertSeparator(count - 1)
+        self.folder.insertSeparator(count - 2)
+        # Set the current index
+        if select_first:
+            self.folder.setCurrentIndex(0)  # 'Select a folder...'
+        else:
+            # If there are recent folders, select the first one
+            self.folder.setCurrentIndex(1 if len(items) > 1 else 0)
+
+    def _updateFolderComboBoxAfterLoad(self, loaded_folder_path: str) -> None:
+        """Update the folder combo box after a folder is loaded, removing 'Select a folder...' and selecting the loaded folder."""
+        # Get the current folder list without "Select a folder..."
+        folder_list = self._buildFolderList()
+
+        # Clear and repopulate the combo box without "Select a folder..."
+        self.folder.clear()
         self.folder.addItems(folder_list)
         self.folder.addItems(["Open...", "Clear Recently Open..."])
         count = self.folder.count()
         self.folder.insertSeparator(count - 1)
         self.folder.insertSeparator(count - 2)
+
+        # Find and select the loaded folder
+        try:
+            folder_index = folder_list.index(loaded_folder_path)
+            self.folder.setCurrentIndex(folder_index)
+        except ValueError:
+            # If the folder is not in the list (shouldn't happen), select the first one
+            if folder_list:
+                self.folder.setCurrentIndex(0)
 
     def _on_scan_progress(self, current: int, total: int) -> None:
         """Handle scan progress updates."""
@@ -487,6 +529,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 else:
                     # Always update the folder view since it is a new folder
                     self.mvc_folder.updateFolderView()
+
+                # Update the folder combo box to show the loaded folder and remove "Select a folder..."
+                self._updateFolderComboBoxAfterLoad(str(folder_path))
 
                 self.setStatus(
                     f"Loaded {len(sorted_files)} MDA files from {folder_path}"
@@ -545,24 +590,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def _auto_load_first_folder(self) -> None:
         """
         Auto-load the first valid folder from recent folders.
-
-        This method attempts to automatically load the first folder from the recent
-        folders list if it exists and is valid. This provides a better user experience
-        by not requiring manual folder selection on startup.
-
-        The auto-loading can be disabled by setting the 'auto_load_folder' setting to False.
         """
-        # Check if auto-loading is enabled (default to True)
-        auto_load_enabled = settings.getKey("auto_load_folder")
-        if auto_load_enabled is None:
-            # Default to True if not set
-            auto_load_enabled = True
-            settings.setKey("auto_load_folder", True)
-
+        auto_load_enabled = self.get_auto_load_setting()
+        self.setFolderList()  # Always update the combo box with correct selection
         if not auto_load_enabled:
             self.setStatus("Auto-loading disabled by user preference")
             return
-
         recent_dirs = self._getRecentFolders()
         if recent_dirs:
             first_folder = recent_dirs[0]
@@ -570,7 +603,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 folder_path = Path(first_folder.strip())
                 if folder_path.exists() and folder_path.is_dir():
                     self.setStatus(f"Auto-loading folder: {first_folder}")
-                    # Use lazy folder scanner for better performance
                     self.lazy_scanner.scan_folder_async(folder_path)
                 else:
                     self.setStatus(
@@ -584,20 +616,16 @@ class MainWindow(QtWidgets.QMainWindow):
     def toggle_auto_load(self) -> bool:
         """
         Toggle the auto-load folder setting.
-
-        Returns:
-            bool: The new state of the auto-load setting (True if enabled, False if disabled)
         """
         current_setting = settings.getKey("auto_load_folder")
         if current_setting is None:
             current_setting = True
-
         new_setting = not current_setting
         settings.setKey("auto_load_folder", new_setting)
-
+        settings.sync()
+        self.setFolderList()  # Update combo box selection
         status_text = "Auto-loading enabled" if new_setting else "Auto-loading disabled"
         self.setStatus(status_text)
-
         return new_setting
 
     def get_auto_load_setting(self) -> bool:
