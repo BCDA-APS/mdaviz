@@ -55,10 +55,20 @@ class MDAFileVisualization(QtWidgets.QWidget):
 
     def setupFitUI(self):
         """Setup the fit UI components and connections."""
-        # Populate fit model combo box
+        # Populate fit model combo box in the desired order
         models = get_available_models()
-        for model_name in models.keys():
-            self.fitModelCombo.addItem(model_name)
+        ordered_model_names = [
+            "Gaussian",
+            "Lorentzian",
+            "Error Function",
+            "Linear",
+            "Quadratic",
+            "Cubic",
+            "Exponential",
+        ]
+        for model_name in ordered_model_names:
+            if model_name in models:
+                self.fitModelCombo.addItem(model_name)
 
         # Connect fit buttons
         self.fitButton.clicked.connect(self.onFitButtonClicked)

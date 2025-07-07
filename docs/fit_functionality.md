@@ -36,6 +36,10 @@ The following fit models are available:
    - Parameters: coeff_0, coeff_1, coeff_2, coeff_3
    - Useful for: Complex curved trends
 
+7. **Error Function** - Fits an error function (erf) with scaling and offset
+   - Parameters: amplitude, center, sigma, offset
+   - Useful for: Step functions, cumulative distributions, edge detection
+
 ### Fit Range Selection
 
 - **Full Range**: Fit to all data points in the curve

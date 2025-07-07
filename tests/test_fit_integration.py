@@ -30,6 +30,7 @@ class TestFitIntegration:
             "Exponential",
             "Quadratic",
             "Cubic",
+            "Error Function",
         ]
         for model_name in expected_models:
             assert model_name in models

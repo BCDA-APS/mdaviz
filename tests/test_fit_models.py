@@ -16,6 +16,7 @@ from mdaviz.fit_models import (
     LinearFit,
     ExponentialFit,
     PolynomialFit,
+    ErrorFunctionFit,
     get_available_models,
 )
 
@@ -285,6 +286,61 @@ class TestPolynomialFit:
         assert result.reduced_chi_squared > 0
 
 
+class TestErrorFunctionFit:
+    """Test ErrorFunctionFit class."""
+
+    def test_error_function_fit_initialization(self) -> None:
+        """Test ErrorFunctionFit initialization."""
+        fit = ErrorFunctionFit()
+
+        assert fit.name == "Error Function"
+        assert fit.parameters == ["amplitude", "center", "sigma", "offset"]
+
+    def test_error_function_calculation(self) -> None:
+        """Test error function calculation."""
+        fit = ErrorFunctionFit()
+        x = np.array([-2, -1, 0, 1, 2])
+
+        # Test with standard parameters
+        result = fit._error_function(
+            x, amplitude=1.0, center=0.0, sigma=1.0, offset=0.0
+        )
+
+        # Error function should be symmetric around center=0
+        assert abs(result[2]) < 0.1  # erf(0) ≈ 0
+        assert abs(result[1] + result[3]) < 0.1  # erf(-1) ≈ -erf(1)
+        assert abs(result[0] + result[4]) < 0.1  # erf(-2) ≈ -erf(2)
+
+    def test_error_function_fit(self) -> None:
+        """Test error function fitting."""
+        fit = ErrorFunctionFit()
+
+        # Create synthetic error function data
+        x = np.linspace(-5, 5, 100)
+        from scipy.special import erf
+
+        y = (
+            2.0 * erf((x - 1.0) / (0.5 * np.sqrt(2)))
+            + 0.5
+            + 0.1 * np.random.normal(size=len(x))
+        )
+
+        result = fit.fit(x, y)
+
+        # Check that fit is reasonable
+        assert result.r_squared > 0.8
+        assert "amplitude" in result.parameters
+        assert "center" in result.parameters
+        assert "sigma" in result.parameters
+        assert "offset" in result.parameters
+
+        # Check that parameters are close to expected values
+        assert abs(result.parameters["amplitude"] - 2.0) < 1.0
+        assert abs(result.parameters["center"] - 1.0) < 1.0
+        assert abs(result.parameters["sigma"] - 0.5) < 0.5
+        assert abs(result.parameters["offset"] - 0.5) < 1.0
+
+
 class TestFitModelsIntegration:
     """Test integration of fit models."""
 
@@ -300,6 +356,7 @@ class TestFitModelsIntegration:
             "Exponential",
             "Quadratic",
             "Cubic",
+            "Error Function",
         ]
         for model_name in expected_models:
             assert model_name in models

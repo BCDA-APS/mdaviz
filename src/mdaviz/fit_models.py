@@ -424,6 +424,64 @@ class PolynomialFit(FitModel):
         return {f"coeff_{i}": coeff for i, coeff in enumerate(coeffs[::-1])}
 
 
+class ErrorFunctionFit(FitModel):
+    """Error function fit model."""
+
+    def __init__(self):
+        """Initialize error function fit model."""
+        super().__init__(
+            "Error Function",
+            self._error_function,
+            ["amplitude", "center", "sigma", "offset"],
+        )
+
+    def _error_function(
+        self,
+        x: np.ndarray,
+        amplitude: float,
+        center: float,
+        sigma: float,
+        offset: float,
+    ) -> np.ndarray:
+        """
+        Error function (erf) with scaling and offset.
+
+        Parameters:
+        - x: X values
+        - amplitude: Amplitude scaling factor
+        - center: Center position (shift)
+        - sigma: Width parameter
+        - offset: Vertical offset
+
+        Returns:
+        - Y values of error function
+        """
+        from scipy.special import erf
+
+        return amplitude * erf((x - center) / (sigma * np.sqrt(2))) + offset
+
+    def _get_default_initial_guess(
+        self, x_data: np.ndarray, y_data: np.ndarray
+    ) -> Dict[str, float]:
+        """Get default initial guesses for error function fit."""
+        y_max = np.max(y_data)
+        y_min = np.min(y_data)
+        x_range = x_data[-1] - x_data[0]
+
+        # Estimate center as midpoint of data range
+        center_est = (x_data[0] + x_data[-1]) / 2
+
+        # Estimate sigma as 1/4 of the data range
+        sigma_est = x_range / 4 if x_range > 0 else 1.0
+
+        return {
+            "amplitude": (y_max - y_min) / 2,  # erf goes from -1 to 1, so scale by 2
+            "center": center_est,
+            "sigma": sigma_est,
+            "offset": (y_max + y_min) / 2,  # Center the function
+        }
+
+
 # Factory function to get available fit models
 def get_available_models() -> Dict[str, FitModel]:
     """
@@ -439,4 +497,5 @@ def get_available_models() -> Dict[str, FitModel]:
         "Exponential": ExponentialFit(),
         "Quadratic": PolynomialFit(degree=2),
         "Cubic": PolynomialFit(degree=3),
+        "Error Function": ErrorFunctionFit(),
     }
