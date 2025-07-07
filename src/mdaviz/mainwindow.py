@@ -237,6 +237,12 @@ class MainWindow(QtWidgets.QMainWindow):
                             new_height
                         )
 
+                    # Update tab widget max height to match
+                    if hasattr(
+                        self.mvc_folder.mda_file_viz, "_updateTabWidgetMaxHeight"
+                    ):
+                        self.mvc_folder.mda_file_viz._updateTabWidgetMaxHeight()
+
             self.setStatus(f"Plot height setting updated to {new_height} pixels")
 
     def closeEvent(self, event):

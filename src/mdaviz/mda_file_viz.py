@@ -45,10 +45,24 @@ class MDAFileVisualization(QtWidgets.QWidget):
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
         )
 
-        # Set size policy for the tab widget to prevent expansion
+        # Set size policy for the tab widget to prevent vertical expansion
         self.tabWidget.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
         )
+
+        # Get maximum height from user settings with default fallback
+        from .user_settings import settings
+
+        max_height = settings.getKey("plot_max_height")
+        try:
+            max_height = int(max_height)
+        except (TypeError, ValueError):
+            max_height = 800  # Default value
+
+        # Set maximum height for the tab widget to prevent vertical growth
+        self.tabWidget.setMaximumHeight(
+            max_height + 100
+        )  # Add some padding for tab headers
 
         # Setup fit functionality
         self.setupFitUI()
@@ -116,19 +130,39 @@ class MDAFileVisualization(QtWidgets.QWidget):
 
         # Set size policy to prevent vertical expansion
         plot_widget.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
         )
 
-        # Set minimum and maximum height to constrain vertical growth
-        plot_widget.setMinimumHeight(200)  # Minimum reasonable height
-        plot_widget.setMaximumHeight(
-            16777215
-        )  # Allow reasonable expansion but not unlimited
+        # Don't override the ChartView's own height constraints
+        # The ChartView already has proper max height constraints set
 
         layout.addWidget(plot_widget)
 
         # Store reference to chart view for fit functionality
         self.chart_view = plot_widget
+
+        # Update tab widget max height to match the chart view
+        self._updateTabWidgetMaxHeight()
+
+    def _updateTabWidgetMaxHeight(self):
+        """Update the tab widget's maximum height to match the plot height setting."""
+        from .user_settings import settings
+
+        max_height = settings.getKey("plot_max_height")
+        try:
+            max_height = int(max_height)
+        except (TypeError, ValueError):
+            max_height = 800  # Default value
+
+        # Set maximum height for the tab widget to prevent vertical growth
+        self.tabWidget.setMaximumHeight(
+            max_height + 100
+        )  # Add some padding for tab headers
+
+        # Also update the plot page max height
+        self.plotPageMpl.setMaximumHeight(
+            max_height + 50
+        )  # Add padding for tab content
 
     def isPlotBlank(self):
         layout = self.plotPageMpl.layout()
