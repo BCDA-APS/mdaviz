@@ -56,7 +56,6 @@ class MDAFolderTableView(QtWidgets.QWidget):
 
             centerColumn("Scan #")
             centerColumn("Points")
-            centerColumn("Positioner")
             centerColumn("Dim")
         else:
             empty_model = EmptyTableModel(HEADERS)

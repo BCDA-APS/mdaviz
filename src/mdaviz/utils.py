@@ -20,7 +20,7 @@ import threading
 from datetime import datetime
 from .synApps_mdalib.mda import readMDA, scanPositioner, skimMDA
 
-HEADERS = "Prefix", "Scan #", "Points", "Dim", "Positioner", "Date", "Size"
+HEADERS = "Prefix", "Scan #", "Points", "Dim", "Date", "Size"
 
 
 def human_readable_size(size, decimal_places=2):
@@ -120,9 +120,6 @@ def get_file_info_lightweight(file_path: pathlib.Path) -> dict:
                 "%Y-%m-%d %H:%M:%S"
             )
 
-            # Default positioner info
-            file_pos = "index"
-
         else:
             # Fallback to basic file info only
             file_num = None
@@ -132,7 +129,6 @@ def get_file_info_lightweight(file_path: pathlib.Path) -> dict:
             file_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
                 "%Y-%m-%d %H:%M:%S"
             )
-            file_pos = "index"
 
     except Exception as e:
         # If skimMDA fails, provide minimal info
@@ -144,7 +140,6 @@ def get_file_info_lightweight(file_path: pathlib.Path) -> dict:
         file_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
             "%Y-%m-%d %H:%M:%S"
         )
-        file_pos = "index"
 
     fileInfo = {"Name": file_name, "folderPath": str(file_path.parent)}
     values = [
@@ -152,7 +147,6 @@ def get_file_info_lightweight(file_path: pathlib.Path) -> dict:
         file_num,
         file_pts,
         file_dim,
-        file_pos,
         file_date,
         file_size,
     ]
@@ -186,7 +180,6 @@ def get_file_info_full(file_path: pathlib.Path) -> dict:
             None,
             0,
             1,
-            "index",
             datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
                 "%Y-%m-%d %H:%M:%S"
             ),
@@ -203,9 +196,6 @@ def get_file_info_full(file_path: pathlib.Path) -> dict:
     file_date = byte2str(file_data_dim1.time).split(".")[0]
     file_pts = file_data_dim1.curr_pt
     file_dim = file_data_dim1.dim
-    pv = byte2str(file_data_dim1.p[0].name) if len(file_data_dim1.p) else "index"
-    desc = byte2str(file_data_dim1.p[0].desc) if len(file_data_dim1.p) else "index"
-    file_pos = desc if desc else pv
 
     fileInfo = {"Name": file_name}
     values = [
@@ -213,7 +203,6 @@ def get_file_info_full(file_path: pathlib.Path) -> dict:
         file_num,
         file_pts,
         file_dim,
-        file_pos,
         file_date,
         file_size,
     ]
