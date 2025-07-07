@@ -197,6 +197,7 @@ class MainWindow(QtWidgets.QMainWindow):
         plot_label = QLabel("Maximum Plot Height (pixels):")
         plot_spinbox = QSpinBox()
         plot_spinbox.setRange(200, 2000)
+        plot_spinbox.setSingleStep(100)  # Change step size to 100 pixels
         plot_height_val = settings.getKey("plot_max_height")
         try:
             plot_height_val = int(plot_height_val)
