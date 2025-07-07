@@ -878,13 +878,12 @@ class ChartView(QtWidgets.QWidget):
 
         # Format fit results
         result = fit_data.fit_result
-        details_text = f"Fit: {fit_data.model_name}\n\n"
+        details_text = ""
 
         # Parameters
         details_text += "Parameters:\n"
         for param_name, param_value in result.parameters.items():
-            uncertainty = result.uncertainties.get(param_name, 0)
-            details_text += f"  {param_name}: {utils.num2fstr(param_value)} ± {utils.num2fstr(uncertainty)}\n"
+            details_text += f"  {param_name}: {utils.num2fstr(param_value)}\n"
 
         # Quality metrics
         details_text += "\nQuality Metrics:\n"

@@ -675,12 +675,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 for param, value in fit_data.fit_result.parameters.items():
                     formatted_data += f"  {param}: {value:.6f}\n"
 
-            # Add fit uncertainties if available
-            if fit_data.fit_result and hasattr(fit_data.fit_result, "uncertainties"):
-                formatted_data += "\nUncertainties:\n"
-                for param, uncertainty in fit_data.fit_result.uncertainties.items():
-                    formatted_data += f"  {param}: ±{uncertainty:.6f}\n"
-
             # Add fit quality metrics if available
             if fit_data.fit_result and hasattr(fit_data.fit_result, "quality_metrics"):
                 formatted_data += "\nQuality Metrics:\n"
