@@ -457,9 +457,21 @@ class ChartView(QtWidgets.QWidget):
         # Update fit list
         self.updateFitList(curveID)
 
-        # Clear fit details if no curve selected
+        # Clear fit details if no curve selected or if switching to a different curve
         if not has_curve:
             self.mda_mvc.mda_file_viz.fitDetails.clear()
+        else:
+            # Clear fit when switching to a different curve
+            current_fitted_curve = None
+            for curve_id in self.curveManager.curves():
+                if self.fitManager.hasFits(curve_id):
+                    current_fitted_curve = curve_id
+                    break
+
+            # If we're switching to a different curve than the one with the fit, clear the fit
+            if current_fitted_curve and current_fitted_curve != curveID:
+                self.fitManager.removeFit(current_fitted_curve)
+                self.mda_mvc.mda_file_viz.fitDetails.clear()
 
     def removeItemCurveBox(self, curveID):
         # Returns the index of the item containing the given text ; otherwise returns -1.
@@ -854,7 +866,15 @@ class ChartView(QtWidgets.QWidget):
             x_range = self.getCursorRange()
 
         try:
-            # Perform the fit (this will replace any existing fit)
+            # Clear all existing fits from other curves before performing new fit
+            all_curves = list(self.curveManager.curves().keys())
+            for other_curve_id in all_curves:
+                if other_curve_id != curveID and self.fitManager.hasFits(
+                    other_curve_id
+                ):
+                    self.fitManager.removeFit(other_curve_id)
+
+            # Perform the fit (this will replace any existing fit for the current curve)
             self.fitManager.addFit(curveID, model_name, x_data, y_data, x_range)
 
         except ValueError as e:

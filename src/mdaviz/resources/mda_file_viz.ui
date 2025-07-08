@@ -377,32 +377,6 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="2">
-                    <widget class="QPushButton" name="cursor2_remove">
-                     <property name="maximumSize">
-                      <size>
-                       <width>40</width>
-                       <height>16777215</height>
-                      </size>
-                     </property>
-                     <property name="toolTip">
-                      <string>Remove cursor 2</string>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                     <property name="icon">
-                      <iconset>
-                       <normaloff>delete.png</normaloff>delete.png</iconset>
-                     </property>
-                     <property name="iconSize">
-                      <size>
-                       <width>14</width>
-                       <height>14</height>
-                      </size>
-                     </property>
-                    </widget>
-                   </item>
                    <item row="0" column="1">
                     <widget class="QLabel" name="pos1_text">
                      <property name="toolTip">
@@ -417,6 +391,23 @@
                      </property>
                      <property name="text">
                       <string>middle click</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QLabel" name="pos2_text">
+                     <property name="toolTip">
+                      <string>Cursor 2 position</string>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true">QLabel {
+    background-color: rgb(248, 248, 248);
+    border: none;
+    padding: 2px;
+}</string>
+                     </property>
+                     <property name="text">
+                      <string>right click</string>
                      </property>
                     </widget>
                    </item>
@@ -462,20 +453,29 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="1">
-                    <widget class="QLabel" name="pos2_text">
-                     <property name="toolTip">
-                      <string>Cursor 2 position</string>
+                   <item row="1" column="2">
+                    <widget class="QPushButton" name="cursor2_remove">
+                     <property name="maximumSize">
+                      <size>
+                       <width>40</width>
+                       <height>16777215</height>
+                      </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true">QLabel {
-    background-color: rgb(248, 248, 248);
-    border: none;
-    padding: 2px;
-}</string>
+                     <property name="toolTip">
+                      <string>Remove cursor 2</string>
                      </property>
                      <property name="text">
-                      <string>right click</string>
+                      <string/>
+                     </property>
+                     <property name="icon">
+                      <iconset>
+                       <normaloff>delete.png</normaloff>delete.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>14</width>
+                       <height>14</height>
+                      </size>
                      </property>
                     </widget>
                    </item>
@@ -1009,8 +1009,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>843</width>
-                   <height>231</height>
+                   <width>858</width>
+                   <height>221</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="fitContentLayout">
@@ -1038,9 +1038,21 @@
                      </sizepolicy>
                     </property>
                     <property name="title">
-                     <string>Fit Controls</string>
+                     <string/>
                     </property>
                     <layout class="QGridLayout" name="fitControlsLayout">
+                     <property name="leftMargin">
+                      <number>12</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>5</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>12</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>5</number>
+                     </property>
                      <property name="horizontalSpacing">
                       <number>7</number>
                      </property>
@@ -1134,6 +1146,18 @@
                      <property name="spacing">
                       <number>5</number>
                      </property>
+                     <property name="leftMargin">
+                      <number>5</number>
+                     </property>
+                     <property name="topMargin">
+                      <number>5</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>5</number>
+                     </property>
+                     <property name="bottomMargin">
+                      <number>5</number>
+                     </property>
                      <item>
                       <widget class="QTextEdit" name="fitDetails">
                        <property name="toolTip">
@@ -1146,19 +1170,6 @@
                      </item>
                     </layout>
                    </widget>
-                  </item>
-                  <item>
-                   <spacer name="fitVerticalSpacer">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                   </spacer>
                   </item>
                  </layout>
                 </widget>

@@ -1,5 +1,6 @@
-from PyQt5 import QtWidgets
-from PyQt5.QtGui import QFont
+from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtGui import QFont, QKeySequence
+from PyQt5.QtWidgets import QShortcut
 
 from . import utils
 from .chartview import ChartView
@@ -66,6 +67,9 @@ class MDAFileVisualization(QtWidgets.QWidget):
 
         # Setup fit functionality
         self.setupFitUI()
+
+        # Setup search functionality for metadata
+        self.setupSearchFunctionality()
 
     def setupFitUI(self):
         """Setup the fit UI components and connections."""
@@ -206,3 +210,145 @@ class MDAFileVisualization(QtWidgets.QWidget):
 
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
+
+    def setupSearchFunctionality(self):
+        """Setup search functionality for the metadata widget."""
+        # Create a shortcut for Ctrl+F
+        self.search_shortcut = QShortcut(QKeySequence("Ctrl+F"), self)
+        self.search_shortcut.activated.connect(self.showSearchDialog)
+
+        # Initially disable the shortcut (only enable when metadata tab is active)
+        self.search_shortcut.setEnabled(False)
+
+        # Create search dialog (but don't show it yet)
+        self.search_dialog = None
+
+        # Connect tab widget signals to enable/disable search
+        self.tabWidget.currentChanged.connect(self.onTabChanged)
+
+    def showSearchDialog(self):
+        """Show the search dialog for the metadata widget."""
+        if not self.search_dialog:
+            self.search_dialog = MetadataSearchDialog(self.metadata, self)
+
+        # Show the dialog
+        self.search_dialog.show()
+        self.search_dialog.raise_()
+        self.search_dialog.activateWindow()
+
+    def onTabChanged(self, index):
+        """Handle tab changes to enable/disable search functionality."""
+        # Enable search only when metadata tab is active
+        # The metadata tab is at index 2 (0=Plot, 1=Data, 2=Metadata)
+        is_metadata_tab = index == 2
+        self.search_shortcut.setEnabled(is_metadata_tab)
+
+        # Close search dialog if switching away from metadata tab
+        if (
+            not is_metadata_tab
+            and self.search_dialog
+            and self.search_dialog.isVisible()
+        ):
+            self.search_dialog.close()
+
+
+class MetadataSearchDialog(QtWidgets.QDialog):
+    """A simple search dialog for the metadata widget."""
+
+    def __init__(self, text_widget, parent=None):
+        super().__init__(parent)
+        self.text_widget = text_widget
+        self.current_find_index = 0
+        self.setupUI()
+
+    def setupUI(self):
+        """Setup the search dialog UI."""
+        self.setWindowTitle("Search Metadata")
+        self.setModal(False)
+        self.resize(300, 100)
+
+        layout = QtWidgets.QVBoxLayout(self)
+
+        # Search input
+        search_layout = QtWidgets.QHBoxLayout()
+        search_layout.addWidget(QtWidgets.QLabel("Find:"))
+        self.search_input = QtWidgets.QLineEdit()
+        self.search_input.textChanged.connect(self.findText)
+        search_layout.addWidget(self.search_input)
+        layout.addLayout(search_layout)
+
+        # Buttons
+        button_layout = QtWidgets.QHBoxLayout()
+
+        self.find_next_btn = QtWidgets.QPushButton("Find Next")
+        self.find_next_btn.clicked.connect(self.findNext)
+        button_layout.addWidget(self.find_next_btn)
+
+        self.find_prev_btn = QtWidgets.QPushButton("Find Previous")
+        self.find_prev_btn.clicked.connect(self.findPrevious)
+        button_layout.addWidget(self.find_prev_btn)
+
+        self.close_btn = QtWidgets.QPushButton("Close")
+        self.close_btn.clicked.connect(self.close)
+        button_layout.addWidget(self.close_btn)
+
+        layout.addLayout(button_layout)
+
+        # Set focus to search input
+        self.search_input.setFocus()
+
+    def findText(self):
+        """Find text as user types."""
+        search_text = self.search_input.text()
+        if search_text:
+            self.current_find_index = 0
+            self.findNext()
+
+    def findNext(self):
+        """Find next occurrence of the search text."""
+        search_text = self.search_input.text()
+        if not search_text:
+            return
+
+        # Use QTextBrowser's find method
+        found = self.text_widget.find(search_text)
+        if not found:
+            # If not found, start from beginning
+            cursor = self.text_widget.textCursor()
+            cursor.movePosition(cursor.Start)
+            self.text_widget.setTextCursor(cursor)
+            found = self.text_widget.find(search_text)
+
+        if found:
+            self.text_widget.setFocus()
+
+    def findPrevious(self):
+        """Find previous occurrence of the search text."""
+        search_text = self.search_input.text()
+        if not search_text:
+            return
+
+        # Use QTextBrowser's find method with backward search
+        found = self.text_widget.find(search_text, QtWidgets.QTextDocument.FindBackward)
+        if not found:
+            # If not found, start from end
+            cursor = self.text_widget.textCursor()
+            cursor.movePosition(cursor.End)
+            self.text_widget.setTextCursor(cursor)
+            found = self.text_widget.find(
+                search_text, QtWidgets.QTextDocument.FindBackward
+            )
+
+        if found:
+            self.text_widget.setFocus()
+
+    def keyPressEvent(self, event):
+        """Handle key press events."""
+        if event.key() == QtCore.Qt.Key_Return or event.key() == QtCore.Qt.Key_Enter:
+            # Enter key finds next
+            self.findNext()
+        elif event.key() == QtCore.Qt.Key_Escape:
+            # Escape key closes dialog
+            self.close()
+        else:
+            super().keyPressEvent(event)
