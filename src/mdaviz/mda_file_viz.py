@@ -68,6 +68,9 @@ class MDAFileVisualization(QtWidgets.QWidget):
         # Setup fit functionality
         self.setupFitUI()
 
+        # Setup curve style functionality
+        self.setupCurveStyleUI()
+
         # Setup search functionality for metadata
         self.setupSearchFunctionality()
 
@@ -117,6 +120,49 @@ class MDAFileVisualization(QtWidgets.QWidget):
         """
         self.fitButton.setEnabled(curve_selected)
         self.clearFitsButton.setEnabled(curve_selected)
+        self.updateCurveStyleControls(curve_selected)
+
+    def setupCurveStyleUI(self):
+        """Setup the curve style UI components and connections."""
+        # Define available curve styles with their matplotlib format strings
+        self.curve_styles = {
+            "Line": "-",
+            "Points": ".",
+            "Circle Markers": "o-",
+            "Square Markers": "s-",
+            "Triangle Markers": "^-",
+            "Diamond Markers": "D-",
+            "Dashed": "--",
+            "Dots": ":",
+            "Dash-Dot": "-.",
+        }
+
+        # Populate the combo box
+        for style_name in self.curve_styles.keys():
+            self.curveStyle.addItem(style_name)
+
+        # Set default style
+        self.curveStyle.setCurrentText("Line")
+
+        # Connect the combo box signal
+        self.curveStyle.currentTextChanged.connect(self.onCurveStyleChanged)
+
+        # Initially disable until a curve is selected
+        self.curveStyle.setEnabled(False)
+
+    def onCurveStyleChanged(self, style_name: str):
+        """Handle curve style change."""
+        if hasattr(self, "chart_view") and self.chart_view:
+            self.chart_view.updateCurveStyle(style_name)
+
+    def updateCurveStyleControls(self, curve_selected: bool):
+        """
+        Update curve style control states based on curve selection.
+
+        Parameters:
+        - curve_selected: Whether a curve is currently selected
+        """
+        self.curveStyle.setEnabled(curve_selected)
 
     def setTableData(self, data):
         self.data_table_view = DataTableView(data, self)

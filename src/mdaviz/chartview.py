@@ -265,7 +265,31 @@ class ChartView(QtWidgets.QWidget):
         # Add to graph
         curveData = self.curveManager.getCurveData(curveID)
         ds = curveData["ds"]
-        ds_options = curveData["ds_options"]
+        ds_options = curveData["ds_options"].copy()  # Copy to avoid modifying original
+
+        # Apply the curve style
+        style = curveData.get("style", "-")
+        ds_options["linestyle"] = style
+
+        # Handle marker styles
+        if style.startswith("o"):
+            ds_options["marker"] = "o"
+            ds_options["linestyle"] = "-" if len(style) > 1 else ""
+        elif style.startswith("s"):
+            ds_options["marker"] = "s"
+            ds_options["linestyle"] = "-" if len(style) > 1 else ""
+        elif style.startswith("^"):
+            ds_options["marker"] = "^"
+            ds_options["linestyle"] = "-" if len(style) > 1 else ""
+        elif style.startswith("D"):
+            ds_options["marker"] = "D"
+            ds_options["linestyle"] = "-" if len(style) > 1 else ""
+        elif style == ".":
+            ds_options["marker"] = "."
+            ds_options["linestyle"] = ""
+        else:
+            ds_options["marker"] = ""
+
         # Plot and store the plot object associated with curveID:
         try:
             plot_obj = self.main_axes.plot(*ds, **ds_options)[0]
@@ -456,6 +480,10 @@ class ChartView(QtWidgets.QWidget):
 
         # Update fit list
         self.updateFitList(curveID)
+
+        # Update curve style combo box to show current curve's style
+        if has_curve:
+            self.updateCurveStyleComboBox(curveID)
 
         # Clear fit details if no curve selected or if switching to a different curve
         if not has_curve:
@@ -920,6 +948,95 @@ class ChartView(QtWidgets.QWidget):
             self.fitManager.removeFit(curveID)
             self.mda_mvc.mda_file_viz.fitDetails.clear()
 
+    def updateCurveStyle(self, style_name: str) -> None:
+        """
+        Update the style of the currently selected curve.
+
+        Parameters:
+        - style_name: Name of the style to apply
+        """
+        curveID = self.getSelectedCurveID()
+        if not curveID or curveID not in self.curveManager.curves():
+            return
+
+        # Get the matplotlib format string for the style
+        style_map = self.mda_mvc.mda_file_viz.curve_styles
+        if style_name not in style_map:
+            return
+
+        format_string = style_map[style_name]
+
+        # Update the curve data with the new style
+        curve_data = self.curveManager.getCurveData(curveID)
+        if curve_data:
+            curve_data["style"] = format_string
+            self.curveManager.updateCurve(curveID, curve_data)
+
+            # Update the plot object with the new style
+            if curveID in self.plotObjects:
+                plot_obj = self.plotObjects[curveID]
+
+                # Handle different style types properly
+                if format_string == ".":
+                    # Points only - no line
+                    plot_obj.set_linestyle("")
+                    plot_obj.set_marker(".")
+                elif format_string == "o":
+                    # Markers only - no line
+                    plot_obj.set_linestyle("")
+                    plot_obj.set_marker("o")
+                elif format_string.startswith("o"):
+                    # Line with circle markers
+                    plot_obj.set_linestyle("-")
+                    plot_obj.set_marker("o")
+                elif format_string.startswith("s"):
+                    # Line with square markers
+                    plot_obj.set_linestyle("-")
+                    plot_obj.set_marker("s")
+                elif format_string.startswith("^"):
+                    # Line with triangle markers
+                    plot_obj.set_linestyle("-")
+                    plot_obj.set_marker("^")
+                elif format_string.startswith("D"):
+                    # Line with diamond markers
+                    plot_obj.set_linestyle("-")
+                    plot_obj.set_marker("D")
+                else:
+                    # Regular line styles
+                    plot_obj.set_linestyle(format_string)
+                    plot_obj.set_marker("")
+
+                # Update the plot
+                self.updatePlot(update_title=False)
+
+    def updateCurveStyleComboBox(self, curveID: str) -> None:
+        """
+        Update the curve style combo box to show the current curve's style.
+
+        Parameters:
+        - curveID: ID of the curve
+        """
+        curve_data = self.curveManager.getCurveData(curveID)
+        if not curve_data:
+            return
+
+        # Get the current style (default to "Line" if not set)
+        current_style = curve_data.get("style", "-")
+
+        # Find the style name that matches the format string
+        style_map = self.mda_mvc.mda_file_viz.curve_styles
+        style_name = "Line"  # Default
+
+        for name, fmt in style_map.items():
+            if fmt == current_style:
+                style_name = name
+                break
+
+        # Update the combo box (block signals to avoid triggering style change)
+        self.mda_mvc.mda_file_viz.curveStyle.blockSignals(True)
+        self.mda_mvc.mda_file_viz.curveStyle.setCurrentText(style_name)
+        self.mda_mvc.mda_file_viz.curveStyle.blockSignals(False)
+
 
 # ------ Curves management (data):
 
@@ -970,6 +1087,7 @@ class CurveManager(QtCore.QObject):
             "ds": ds,  # ds = [x_data, y_data]
             "offset": 0,  # default offset
             "factor": 1,  # default factor
+            "style": "-",  # default style (solid line)
             "row": row,  # DET checkbox row in the file tableview
             "file_path": file_path,
             "file_name": plot_options.get("fileName", ""),  # without ext
