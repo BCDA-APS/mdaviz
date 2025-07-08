@@ -290,6 +290,17 @@ class ChartView(QtWidgets.QWidget):
         else:
             ds_options["marker"] = ""
 
+        # Apply offset and factor to the data
+        factor = curveData.get("factor", 1)
+        offset = curveData.get("offset", 0)
+        style = curveData.get("style", "-")
+        print(
+            f"DEBUG: onCurveAdded - curve {curveID}: style={style}, offset={offset}, factor={factor}"
+        )
+        if factor != 1 or offset != 0:
+            new_y = numpy.multiply(ds[1], factor) + offset
+            ds = [ds[0], new_y]
+
         # Plot and store the plot object associated with curveID:
         try:
             plot_obj = self.main_axes.plot(*ds, **ds_options)[0]
@@ -303,8 +314,14 @@ class ChartView(QtWidgets.QWidget):
         self.curveBox.addItem(curveID)
         file_path = curveData.get("file_path", "No file path available")
         self.curveBox.setItemData(index, file_path, QtCore.Qt.ToolTipRole)
+        # Only select the new curve if it's the first one
+        if self.curveBox.count() == 1:
+            self.curveBox.setCurrentIndex(0)
 
     def onCurveUpdated(self, curveID, recompute_y=False, update_x=False):
+        print(
+            f"DEBUG: onCurveUpdated called for {curveID}, recompute_y={recompute_y}, update_x={update_x}"
+        )
         curve_data = self.curveManager.getCurveData(curveID)
         if curve_data and recompute_y:
             factor = curve_data.get("factor", 1)
@@ -314,10 +331,54 @@ class ChartView(QtWidgets.QWidget):
             if curveID in self.plotObjects:
                 self.plotObjects[curveID].set_ydata(new_y)
         if curve_data and update_x:
-            ds = curve_data["ds"]
-            new_x = curve_data["ds"][0]
+            # For x-data updates, we need to recreate the plot object to maintain style
             if curveID in self.plotObjects:
-                self.plotObjects[curveID].set_xdata(new_x)
+                # Remove the old plot object
+                old_plot_obj = self.plotObjects[curveID]
+                old_plot_obj.remove()
+                del self.plotObjects[curveID]
+
+            # Recreate the plot object with proper style
+            ds = curve_data["ds"]
+            ds_options = curve_data["ds_options"].copy()
+
+            # Apply the curve style
+            style = curve_data.get("style", "-")
+            ds_options["linestyle"] = style
+
+            # Handle marker styles
+            if style.startswith("o"):
+                ds_options["marker"] = "o"
+                ds_options["linestyle"] = "-" if len(style) > 1 else ""
+            elif style.startswith("s"):
+                ds_options["marker"] = "s"
+                ds_options["linestyle"] = "-" if len(style) > 1 else ""
+            elif style.startswith("^"):
+                ds_options["marker"] = "^"
+                ds_options["linestyle"] = "-" if len(style) > 1 else ""
+            elif style.startswith("D"):
+                ds_options["marker"] = "D"
+                ds_options["linestyle"] = "-" if len(style) > 1 else ""
+            elif style == ".":
+                ds_options["marker"] = "."
+                ds_options["linestyle"] = ""
+            else:
+                ds_options["marker"] = ""
+
+            # Apply offset and factor
+            factor = curve_data.get("factor", 1)
+            offset = curve_data.get("offset", 0)
+            if factor != 1 or offset != 0:
+                new_y = numpy.multiply(ds[1], factor) + offset
+                ds = [ds[0], new_y]
+
+            # Create new plot object
+            try:
+                plot_obj = self.main_axes.plot(*ds, **ds_options)[0]
+                self.plotObjects[curveID] = plot_obj
+            except Exception as exc:
+                print(str(exc))
+
         self.updatePlot(update_title=False)
 
     def onRemoveButtonClicked(self):
@@ -969,7 +1030,21 @@ class ChartView(QtWidgets.QWidget):
         # Update the curve data with the new style
         curve_data = self.curveManager.getCurveData(curveID)
         if curve_data:
+            old_style = curve_data.get("style", "-")
+            print(
+                f"DEBUG: Updating style for curve {curveID}: {old_style} -> {format_string}"
+            )
             curve_data["style"] = format_string
+            # Save to persistent storage
+            persistent_key = (curve_data["file_path"], curve_data["row"])
+            if persistent_key not in self.curveManager._persistent_properties:
+                self.curveManager._persistent_properties[persistent_key] = {}
+            self.curveManager._persistent_properties[persistent_key]["style"] = (
+                format_string
+            )
+            print(
+                f"DEBUG: Saved style to persistent storage: {persistent_key} -> {format_string}"
+            )
             self.curveManager.updateCurve(curveID, curve_data)
 
             # Update the plot object with the new style
@@ -1056,6 +1131,8 @@ class CurveManager(QtCore.QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
         self._curves = {}  # Store curves with a unique identifier as the key
+        # Persistent storage for curve properties across manager clears
+        self._persistent_properties = {}  # key: (file_path, row), value: {style, offset, factor}
 
     def addCurve(self, row, *ds, **options):
         """Add a new curve to the manager if not already present on the graph."""
@@ -1066,8 +1143,13 @@ class CurveManager(QtCore.QObject):
         file_path = plot_options.get("filePath", "unknown path")
         # Generate unique label & update options:
         ds_options["label"] = curveID = self.generateCurveID(label, file_path)
+        print(
+            f"DEBUG: Adding curve with ID: {curveID}, label: {label}, file_path: {file_path}"
+        )
+        print(f"DEBUG: Current curves in manager: {list(self._curves.keys())}")
         x_data = ds[0]
         if curveID in self._curves:
+            print(f"DEBUG: Curve {curveID} already exists")
             # Check if x_data is the same
             existing_x_data = self._curves[curveID]["ds"][0]
             if numpy.array_equal(x_data, existing_x_data):
@@ -1077,23 +1159,67 @@ class CurveManager(QtCore.QObject):
             else:
                 print(" x_data is different, update the curve")
                 # x_data is different, update the curve:
-                curveData = self._curves[curveID]
-                curveData["ds"] = ds
-                curveData["plot_options"] = plot_options
-                self.updateCurve(curveID, curveData, update_x=True)
+                # Get existing curve data and preserve all properties
+                existing_curve_data = self._curves[curveID]
+                print(
+                    f"DEBUG: Existing style: {existing_curve_data.get('style')}, offset: {existing_curve_data.get('offset')}, factor: {existing_curve_data.get('factor')}"
+                )
+                existing_curve_data["ds"] = ds
+                existing_curve_data["plot_options"] = plot_options
+                # Preserve existing style, offset, factor, and other properties
+                self.updateCurve(curveID, existing_curve_data, update_x=True)
                 return
+        else:
+            print(f"DEBUG: Curve {curveID} does NOT exist, creating new curve")
+            # Check if this might be a re-creation after removeAllCurves was called
+            # Look for any existing curve with the same file_path and row
+            for existing_curve_id, existing_data in self._curves.items():
+                if (
+                    existing_data["file_path"] == file_path
+                    and existing_data["row"] == row
+                ):
+                    print(
+                        f"DEBUG: Found existing curve with same file_path and row: {existing_curve_id}"
+                    )
+                    print(
+                        f"DEBUG: Transferring properties: style={existing_data.get('style')}, offset={existing_data.get('offset')}, factor={existing_data.get('factor')}"
+                    )
+                    # Transfer properties from existing curve
+                    self._curves[curveID] = {
+                        "ds": ds,  # ds = [x_data, y_data]
+                        "offset": existing_data.get("offset", 0),  # preserve offset
+                        "factor": existing_data.get("factor", 1),  # preserve factor
+                        "style": existing_data.get("style", "-"),  # preserve style
+                        "row": row,  # DET checkbox row in the file tableview
+                        "file_path": file_path,
+                        "file_name": plot_options.get("fileName", ""),  # without ext
+                        "plot_options": plot_options,
+                        "ds_options": ds_options,
+                    }
+                    # Remove the old curve entry
+                    del self._curves[existing_curve_id]
+                    print(f"DEBUG: Transferred properties to new curve ID: {curveID}")
+                    self.curveAdded.emit(curveID)
+                    return
         # Add new curve if not already present on the graph:
+        # Check for persistent properties first
+        persistent_key = (file_path, row)
+        persistent_props = self._persistent_properties.get(persistent_key, {})
+
         self._curves[curveID] = {
             "ds": ds,  # ds = [x_data, y_data]
-            "offset": 0,  # default offset
-            "factor": 1,  # default factor
-            "style": "-",  # default style (solid line)
+            "offset": persistent_props.get("offset", 0),  # restore offset
+            "factor": persistent_props.get("factor", 1),  # restore factor
+            "style": persistent_props.get("style", "-"),  # restore style
             "row": row,  # DET checkbox row in the file tableview
             "file_path": file_path,
             "file_name": plot_options.get("fileName", ""),  # without ext
             "plot_options": plot_options,
             "ds_options": ds_options,
         }
+        print(
+            f"DEBUG: Created curve {curveID} with persistent properties: {persistent_props}"
+        )
         self.curveAdded.emit(curveID)
 
     def updateCurve(self, curveID, curveData, recompute_y=False, update_x=False):
@@ -1136,7 +1262,18 @@ class CurveManager(QtCore.QObject):
         if curve_data:
             offset = curve_data["offset"]
             if offset != new_offset:
+                print(
+                    f"DEBUG: Updating offset for curve {curveID}: {offset} -> {new_offset}"
+                )
                 curve_data["offset"] = new_offset
+                # Save to persistent storage
+                persistent_key = (curve_data["file_path"], curve_data["row"])
+                if persistent_key not in self._persistent_properties:
+                    self._persistent_properties[persistent_key] = {}
+                self._persistent_properties[persistent_key]["offset"] = new_offset
+                print(
+                    f"DEBUG: Saved offset to persistent storage: {persistent_key} -> {new_offset}"
+                )
                 self.updateCurve(curveID, curve_data, recompute_y=True)
 
     def updateCurveFactor(self, curveID, new_factor):
@@ -1144,7 +1281,18 @@ class CurveManager(QtCore.QObject):
         if curve_data:
             factor = curve_data["factor"]
             if factor != new_factor:
+                print(
+                    f"DEBUG: Updating factor for curve {curveID}: {factor} -> {new_factor}"
+                )
                 curve_data["factor"] = new_factor
+                # Save to persistent storage
+                persistent_key = (curve_data["file_path"], curve_data["row"])
+                if persistent_key not in self._persistent_properties:
+                    self._persistent_properties[persistent_key] = {}
+                self._persistent_properties[persistent_key]["factor"] = new_factor
+                print(
+                    f"DEBUG: Saved factor to persistent storage: {persistent_key} -> {new_factor}"
+                )
                 self.updateCurve(curveID, curve_data, recompute_y=True)
 
     def generateCurveID(self, label, file_path):
