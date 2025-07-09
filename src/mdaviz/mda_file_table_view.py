@@ -170,7 +170,7 @@ class MDAFileTableView(QtWidgets.QWidget):
                         1  # Replace zeros with 1 to avoid division by zero
                     )
                     y_data = np.array(y_data) / i0_data_safe
-                    y_label = f"{fileName}: {y_name} vs {i0_name}"
+                    y_label = f"{fileName}: {y_name}/{i0_name}"
                     y_unit = ""  # Normalized data typically has no units
                 else:
                     y_unit = f"({y_unit})" if y_unit else ""
@@ -179,7 +179,7 @@ class MDAFileTableView(QtWidgets.QWidget):
                 if i == 0:
                     y_first_unit = y_unit
                     y_first_name = (
-                        f"{y_name} vs {i0_name}"
+                        f"{y_name}/{i0_name}"
                         if i0_data is not None
                         else f"{y_name} {y_unit}"
                     )
