@@ -149,7 +149,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
 
     def columnCount(self, parent=None):
         """Return the number of columns in the table."""
-        return len(self.columnLabels())
+        return len(self.columns())
 
     def data(self, index, role):
         """Return the data for the given index and role."""
@@ -376,8 +376,6 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         row, column = index.row(), index.column()
         assert column in self.textColumns, f"{column=} is not text"
         fname = self.fieldName(row)
-        if column == 0:
-            return fname  # special case
         cname = self.columnName(column)
         text = str(getattr(self._fields[fname], cname.lower(), ""))
         return text

@@ -260,8 +260,8 @@ class MDA_MVC(QtWidgets.QWidget):
     def selectionField(self):
         """
         Retrieves the current field selection for plotting.
-        - Returns a dictionary with selected positioner and detectors indices.
-        - Format: {'X': positioner_index, 'Y': [detector_indices]}.
+        - Returns a dictionary with selected positioner, detectors, and I0 indices.
+        - Format: {'X': positioner_index, 'Y': [detector_indices], 'I0': i0_index}.
         - Returns None if no selection is made.
         """
         return self._selection_field
@@ -269,9 +269,9 @@ class MDA_MVC(QtWidgets.QWidget):
     def setSelectionField(self, new_selection=None):
         """
         Updates the current field selection for plotting.
-        - Accepts a dictionary specifying new selection of positioner and detectors.
+        - Accepts a dictionary specifying new selection of positioner, detectors, and I0.
         - Resets to None if given an empty dictionary.
-        - Format for new_selection: {'X': positioner_index, 'Y': [detector_indices]}.
+        - Format for new_selection: {'X': positioner_index, 'Y': [detector_indices], 'I0': i0_index}.
         """
         self._selection_field = new_selection if new_selection != {} else None
 
@@ -292,7 +292,7 @@ class MDA_MVC(QtWidgets.QWidget):
     ):
         """
         Updates field selection based on new PV list when a new file is selected.
-        - Adjusts selection indices for POS and DET to match new PVs indexes.
+        - Adjusts selection indices for POS, DET, and I0 to match new PVs indexes.
         - Directly updates the selection field if changes are made.
 
         Args:
@@ -326,6 +326,34 @@ class MDA_MVC(QtWidgets.QWidget):
         if old_idx != new_idx:
             changes_made = True
             new_selection["X"] = new_idx
+
+        # Update I0 selection and check for changes
+        old_i0_idx = old_selection.get("I0")
+        if old_i0_idx is not None:
+            if old_i0_idx < len(oldPvList):
+                old_i0_pv = oldPvList[old_i0_idx]
+                if old_i0_pv in newPvList:
+                    new_i0_idx = newPvList.index(old_i0_pv)
+                    new_selection["I0"] = new_i0_idx
+                    if new_i0_idx != old_i0_idx:
+                        changes_made = True
+                        if verbose:
+                            print(
+                                f"I0 <{old_i0_pv}> changed from {old_i0_idx} to {new_i0_idx}"
+                            )
+                else:
+                    changes_made = True
+                    if verbose:
+                        print(f"I0 <{old_i0_pv}> was removed - auto-unchecking I0")
+                    # I0 PV doesn't exist in new file, so uncheck the I0 checkbox
+                    tableview.tableView.model().uncheckCheckBox(old_i0_idx)
+            else:
+                changes_made = True
+                if verbose:
+                    print(f"I0 index {old_i0_idx} out of range - auto-unchecking I0")
+                # I0 index was invalid, so uncheck the I0 checkbox
+                tableview.tableView.model().uncheckCheckBox(old_i0_idx)
+
         if changes_made:
             self.applySelectionChanges(new_selection)
         if verbose:
@@ -631,20 +659,21 @@ class MDA_MVC(QtWidgets.QWidget):
     def onCheckboxStateChanged(self, selection, det_removed):
         """
         Responds to changes in checkbox states within the file's data view.
-         - adjusts the plot based on the selection of detectors.
+         - adjusts the plot based on the selection of detectors and I0.
          - updates the selection field with the new selection and initiates plotting based
          on the current mode (Auto-add, Auto-replace, or Auto-off).
 
         Parameters:
-        - selection (dict): The current selection of detectors (Y) and positioner (X) for plotting.
+        - selection (dict): The current selection of detectors (Y), positioner (X), and I0 for plotting.
         - det_removed (bool): Indicates if a detector has been removed (unchecked).
 
         Notes:
-        - The selection dict format: {'X': int, 'Y': list[int]}.
+        - The selection dict format: {'X': int, 'Y': list[int], 'I0': int}.
         - If 'Auto-off' mode is active, the method returns without updating the plot.
         - If no positioner is selected, default to Index.
         - If no detectors are selected or if all curves are removed, the plot is cleared.
         - If a detector is unchecked, the corresponding curve is removed from the plot.
+        - If I0 is selected, Y data will be normalized as Y/I0.
         """
 
         from .chartview import ChartView

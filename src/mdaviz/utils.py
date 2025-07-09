@@ -389,7 +389,7 @@ def mda2ftm(selection):
     """
     Converts a field selection from MDA_MVC (MVC) format to SelectFieldsTableModel (TM) format.
 
-    The MVC format {'Y': [2, 3], 'X': 1} is transformed into TM format {1: 'X', 2: 'Y', 4: 'Y'}.
+    The MVC format {'Y': [2, 3], 'X': 1, 'I0': 4} is transformed into TM format {1: 'X', 2: 'Y', 4: 'Y', 4: 'I0'}.
     This is used to sync selection states between SelectFieldsTableModel and MDA_MVC.
 
     Parameters:
@@ -399,11 +399,15 @@ def mda2ftm(selection):
         - dict: The selection converted to TM format.
     """
     if selection is not None:
-        ftm_selection = {
-            v: "X" if k == "X" else "Y"
-            for k, vals in selection.items()
-            for v in ([vals] if isinstance(vals, int) else vals)
-        }
+        ftm_selection = {}
+        for k, vals in selection.items():
+            if k in ["X", "I0"]:
+                # Handle unique selections (X and I0)
+                ftm_selection[vals] = k
+            else:
+                # Handle multiple selections (Y)
+                for v in vals:
+                    ftm_selection[v] = k
     else:
         ftm_selection = {}
     return ftm_selection
@@ -413,7 +417,7 @@ def ftm2mda(selection):
     """
     Converts a field selection from SelectFieldsTableModel (TM) format to MDA_MVC (MVC) format.
 
-    The TM format {1: 'X', 2: 'Y', 4: 'Y'} is transformed into MVC format {'Y': [2, 3], 'X': 1}.
+    The TM format {1: 'X', 2: 'Y', 4: 'Y', 4: 'I0'} is transformed into MVC format {'Y': [2, 3], 'X': 1, 'I0': 4}.
     Used to update MDA_MVC selection state (self.selectionField()) based on changes in SelectFieldsTableModel.
 
     Parameters:
@@ -425,8 +429,8 @@ def ftm2mda(selection):
     mda_selection = {}
     if selection is not None:
         for key, value in selection.items():
-            if value == "X":
-                # Directly assign the value for 'X' since it's always unique
+            if value in ["X", "I0"]:
+                # Directly assign the value for 'X' and 'I0' since they are always unique
                 mda_selection[value] = key
             else:
                 # Append to the list for 'Y'

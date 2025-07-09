@@ -9,7 +9,7 @@ Uses :class:`mda_file_table_model.MDAFileTableModel`.
 """
 
 from PyQt5 import QtWidgets
-
+import numpy as np
 
 from . import utils
 from .mda_file_table_model import ColumnDataType
@@ -17,14 +17,13 @@ from .mda_file_table_model import FieldRuleType
 from .mda_file_table_model import TableColumn
 from .mda_file_table_model import TableField
 
-HEADERS = "Field", "X", "Y", "Mon", "Norm", "PV", "DESC", "Unit"
+HEADERS = "Field", "X", "Y", "I0", "PV", "DESC", "Unit"
 
 COLUMNS = [
     TableColumn("Field", ColumnDataType.text),
     TableColumn("X", ColumnDataType.checkbox, rule=FieldRuleType.unique),  # type: ignore[arg-type]
     TableColumn("Y", ColumnDataType.checkbox, rule=FieldRuleType.multiple),  # type: ignore[arg-type]
-    TableColumn("Mon", ColumnDataType.checkbox, rule=FieldRuleType.unique),  # type: ignore[arg-type]
-    TableColumn("Norm", ColumnDataType.checkbox, rule=FieldRuleType.multiple),  # type: ignore[arg-type]
+    TableColumn("I0", ColumnDataType.checkbox, rule=FieldRuleType.unique),  # type: ignore[arg-type]
     TableColumn("PV", ColumnDataType.text),
     TableColumn("DESC", ColumnDataType.text),
     TableColumn("Unit", ColumnDataType.text),
@@ -107,8 +106,9 @@ class MDAFileTableView(QtWidgets.QWidget):
                 COLUMNS, fields, selection_field, self.mda_file.mda_mvc
             )
             self.tableView.setModel(data_model)
-            # Hide Field/Mon/Norm columns (Field = vertical header, Mon & Norm not yet implemented)
-            for i in [0, 3, 4]:
+            # Hide Field column (Field = vertical header)
+            # Note: I0 column (index 3) is now visible
+            for i in [0]:
                 self.tableView.hideColumn(i)
         else:
             # No MDA files to display, show an empty table with headers
@@ -127,8 +127,8 @@ class MDAFileTableView(QtWidgets.QWidget):
         Extracts selected datasets for plotting from scanDict based on user selections.
 
         Parameters:
-            - selections: A dictionary with keys "X" and "Y", where "X" is the index for the x-axis data
-              and "Y" is a list of indices for the y-axis data.
+            - selections: A dictionary with keys "X", "Y", and optionally "I0", where "X" is the index for the x-axis data,
+              "Y" is a list of indices for the y-axis data, and "I0" is the index for normalization data.
 
         Returns:
             - A tuple of (datasets, plot_options), where datasets is a list of tuples containing the
@@ -146,6 +146,12 @@ class MDAFileTableView(QtWidgets.QWidget):
             # ------ extract x data:
             x_index = selections.get("X")
             x_data = scanDict[x_index].get("data") if x_index in scanDict else None
+            # ------ extract I0 data for normalization:
+            i0_index = selections.get("I0")
+            i0_data = scanDict[i0_index].get("data") if i0_index in scanDict else None
+            i0_name = (
+                scanDict[i0_index].get("name", "n/a") if i0_index in scanDict else ""
+            )
             # ------ extract y(s) data:
             y_index = selections.get("Y", [])
             y_first_unit = y_first_name = ""
@@ -155,16 +161,35 @@ class MDAFileTableView(QtWidgets.QWidget):
                 y_data = scanDict[y].get("data")
                 y_name = scanDict[y].get("name", "n/a")
                 y_unit = scanDict[y].get("unit", "")
-                y_unit = f"({y_unit})" if y_unit else ""
-                y_label = f"{fileName}: {y_name} {y_unit}"
+
+                # Apply I0 normalization if I0 is selected
+                if i0_data is not None:
+                    # Avoid division by zero
+                    i0_data_safe = np.array(i0_data)
+                    i0_data_safe[i0_data_safe == 0] = (
+                        1  # Replace zeros with 1 to avoid division by zero
+                    )
+                    y_data = np.array(y_data) / i0_data_safe
+                    y_label = f"{fileName}: {y_name} vs {i0_name}"
+                    y_unit = ""  # Normalized data typically has no units
+                else:
+                    y_unit = f"({y_unit})" if y_unit else ""
+                    y_label = f"{fileName}: {y_name} {y_unit}"
+
                 if i == 0:
                     y_first_unit = y_unit
-                    y_first_name = f"{y_name} {y_unit}"
+                    y_first_name = (
+                        f"{y_name} vs {i0_name}"
+                        if i0_data is not None
+                        else f"{y_name} {y_unit}"
+                    )
+
                 # append to dataset:
                 ds, ds_options = [], {}
                 ds_options["label"] = y_label
                 ds = [x_data, y_data] if x_data is not None else [y_data]
                 datasets.append((ds, ds_options))
+
             # scanDict = {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...','type':...}}
             plot_options = {
                 "x": scanDict[x_index].get("name", "") if x_index in scanDict else "",
