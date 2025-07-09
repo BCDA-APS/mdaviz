@@ -124,7 +124,7 @@ class ChartView(QtWidgets.QWidget):
         self.plotObjects = {}  # all the Line2D on the graph, key = curveID
         self.fitObjects = {}  # all the fit Line2D on the graph, key = curveID
         self.curveBox = self.mda_mvc.mda_file_viz.curveBox
-        self.curveBox.currentTextChanged.connect(self.onCurveSelected)
+        self.curveBox.currentIndexChanged.connect(self.onCurveSelected)
 
         # Initialize CurveManager
         self.curveManager = CurveManager(self)
@@ -237,7 +237,14 @@ class ChartView(QtWidgets.QWidget):
         # Get the curve ID from the item data instead of display text
         current_index = self.curveBox.currentIndex()
         if current_index >= 0:
-            return self.curveBox.itemData(current_index, QtCore.Qt.UserRole)
+            curve_id = self.curveBox.itemData(current_index, QtCore.Qt.UserRole)
+
+            # Check if the curve ID exists in the curve manager
+            if curve_id in self.curveManager.curves():
+                return curve_id
+            else:
+                # If curve_id is None or not found, return None
+                return None
         return None
 
     def setMaximumPlotHeight(self, height: int):
@@ -325,6 +332,11 @@ class ChartView(QtWidgets.QWidget):
         # Only select the new curve if it's the first one
         if self.curveBox.count() == 1:
             self.curveBox.setCurrentIndex(0)
+            # Manually trigger curve selection for the first curve
+            self.onCurveSelected(0)
+
+        # Update any existing combo box items to use new curve ID format
+        self.updateComboBoxCurveIDs()
 
     def onCurveUpdated(self, curveID, recompute_y=False, update_x=False):
         print(
@@ -543,9 +555,18 @@ class ChartView(QtWidgets.QWidget):
 
     ########################################## Interaction with UI elements:
 
-    def onCurveSelected(self, curveID):
+    def onCurveSelected(self, index):
+        # Get the curve ID from the combo box item data
+        curveID = None
+        if index >= 0:
+            curveID = self.curveBox.itemData(index, QtCore.Qt.UserRole)
+
         # Update QLineEdit & QLabel widgets with the values for the selected curve
-        if curveID in self.plotObjects and curveID in self.curveManager.curves():
+        if (
+            curveID
+            and curveID in self.plotObjects
+            and curveID in self.curveManager.curves()
+        ):
             curve_data = self.curveManager.getCurveData(curveID)
             file_path = curve_data["file_path"]
             row = curve_data["row"]
@@ -611,6 +632,24 @@ class ChartView(QtWidgets.QWidget):
             if self.curveBox.itemData(i, QtCore.Qt.UserRole) == curveID:
                 self.curveBox.removeItem(i)
                 break
+
+    def updateComboBoxCurveIDs(self):
+        """Update combo box items to use new curve ID format."""
+        for i in range(self.curveBox.count()):
+            old_curve_id = self.curveBox.itemData(i, QtCore.Qt.UserRole)
+            display_text = self.curveBox.itemText(i)
+            file_path = self.curveBox.itemData(i, QtCore.Qt.ToolTipRole)
+
+            # Try to find the corresponding curve in the manager
+            for curve_id, curve_data in self.curveManager.curves().items():
+                if (
+                    curve_data.get("file_path") == file_path
+                    and curve_data.get("ds_options", {}).get("label") == display_text
+                ):
+                    # Found matching curve, update the combo box item
+                    if old_curve_id != curve_id:
+                        self.curveBox.setItemData(i, curve_id, QtCore.Qt.UserRole)
+                    break
 
     def onOffsetUpdated(self):
         curveID = self.getSelectedCurveID()
