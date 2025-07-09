@@ -234,7 +234,11 @@ class ChartView(QtWidgets.QWidget):
         self._ylabel = txt
 
     def getSelectedCurveID(self):
-        return self.curveBox.currentText()
+        # Get the curve ID from the item data instead of display text
+        current_index = self.curveBox.currentIndex()
+        if current_index >= 0:
+            return self.curveBox.itemData(current_index, QtCore.Qt.UserRole)
+        return None
 
     def setMaximumPlotHeight(self, height: int):
         """
@@ -311,7 +315,11 @@ class ChartView(QtWidgets.QWidget):
         self.updatePlot(update_title=True)
         # Add to the comboBox
         index = self.curveBox.count()  # Get the next index
-        self.curveBox.addItem(curveID)
+        # Use the user-friendly label for display, but store curveID as data
+        display_label = curveData.get("ds_options", {}).get("label", curveID)
+        self.curveBox.addItem(display_label)
+        # Store the curveID as item data for later retrieval
+        self.curveBox.setItemData(index, curveID, QtCore.Qt.UserRole)
         file_path = curveData.get("file_path", "No file path available")
         self.curveBox.setItemData(index, file_path, QtCore.Qt.ToolTipRole)
         # Only select the new curve if it's the first one
@@ -462,13 +470,42 @@ class ChartView(QtWidgets.QWidget):
             if x_label:
                 x_label_set.add(x_label)
         self.setXlabel(", ".join(list(x_label_set)))
-        # Update the y-axis label and basic math based on the selected curve
+
+        # Simple y-axis label logic: match combo box text and add /I0 if I0 is toggled
         curveID = self.getSelectedCurveID()
         if curveID in self.curveManager.curves():
             self.updateBasicMathInfo(curveID)
-            plot_options = self.curveManager.getCurveData(curveID).get("plot_options")
-            if plot_options:
-                self.setYlabel(plot_options.get("y", ""))
+
+            # Get the combo box text for the selected curve
+            current_index = self.curveBox.currentIndex()
+            if current_index >= 0:
+                combo_text = self.curveBox.currentText()
+
+                # Extract detector name from combo box text (remove file name)
+                if ": " in combo_text:
+                    detector_name = combo_text.split(": ", 1)[1]
+                else:
+                    detector_name = combo_text
+
+                # Check if I0 is toggled on by looking at the plot_options y-label
+                curve_data = self.curveManager.getCurveData(curveID)
+                plot_options = curve_data.get("plot_options", {})
+                y_label = plot_options.get("y", "")
+
+                # Check if I0 normalization is active by looking for "/" in the y_label
+                # But we need to check if this y_label corresponds to the current curve's detector
+                if "/" in y_label and detector_name in y_label:
+                    # This curve has I0 normalization, use the y_label
+                    self.setYlabel(y_label)
+                else:
+                    # No I0 normalization or wrong y_label, use just the detector name
+                    self.setYlabel(detector_name)
+            else:
+                self.setYlabel("")
+        else:
+            # No selected curve or curve not in manager, clear y-axis label
+            self.setYlabel("")
+
         # Update title:
         if update_title:
             now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -490,6 +527,9 @@ class ChartView(QtWidgets.QWidget):
         self.main_axes.clear()
         self.main_axes.axis("off")
         self.main_axes.set_title("")
+        # Clear axis labels
+        self.setXlabel("")
+        self.setYlabel("")
         self.clearCursors()
         self.clearCursorInfo()
         self.clearBasicMath()
@@ -528,6 +568,9 @@ class ChartView(QtWidgets.QWidget):
         # Update fit UI
         self.updateFitUI(curveID)
 
+        # Update plot labels (including y-axis label)
+        self.updatePlot(update_title=False)
+
     def updateFitUI(self, curveID: str) -> None:
         """
         Update fit UI based on curve selection.
@@ -563,10 +606,11 @@ class ChartView(QtWidgets.QWidget):
                 self.mda_mvc.mda_file_viz.fitDetails.clear()
 
     def removeItemCurveBox(self, curveID):
-        # Returns the index of the item containing the given text ; otherwise returns -1.
-        i = self.curveBox.findText(curveID)
-        if i >= 0:
-            self.curveBox.removeItem(i)
+        # Find the item by curve ID stored in item data
+        for i in range(self.curveBox.count()):
+            if self.curveBox.itemData(i, QtCore.Qt.UserRole) == curveID:
+                self.curveBox.removeItem(i)
+                break
 
     def onOffsetUpdated(self):
         curveID = self.getSelectedCurveID()
@@ -1141,8 +1185,9 @@ class CurveManager(QtCore.QObject):
         ds_options = options.get("ds_options", {})
         label = ds_options.get("label", "unknown label")
         file_path = plot_options.get("filePath", "unknown path")
-        # Generate unique label & update options:
-        ds_options["label"] = curveID = self.generateCurveID(label, file_path)
+        # Generate unique curve ID & update options:
+        curveID = self.generateCurveID(label, file_path, row)
+        ds_options["label"] = label  # Keep the original label for display purposes
         print(
             f"DEBUG: Adding curve with ID: {curveID}, label: {label}, file_path: {file_path}"
         )
@@ -1152,13 +1197,18 @@ class CurveManager(QtCore.QObject):
             print(f"DEBUG: Curve {curveID} already exists")
             # Check if x_data is the same
             existing_x_data = self._curves[curveID]["ds"][0]
-            if numpy.array_equal(x_data, existing_x_data):
-                print(" x_data is the same, do not add or update the curve")
-                # x_data is the same, do not add or update the curve
+            existing_label = (
+                self._curves[curveID].get("ds_options", {}).get("label", "")
+            )
+
+            # Update the curve if x_data is different OR if the label has changed (I0 normalization)
+            if numpy.array_equal(x_data, existing_x_data) and label == existing_label:
+                print(" x_data and label are the same, do not add or update the curve")
+                # x_data and label are the same, do not add or update the curve
                 return
             else:
-                print(" x_data is different, update the curve")
-                # x_data is different, update the curve:
+                print(" x_data is different OR label has changed, update the curve")
+                # x_data is different or label has changed, update the curve:
                 # Get existing curve data and preserve all properties
                 existing_curve_data = self._curves[curveID]
                 print(
@@ -1166,8 +1216,9 @@ class CurveManager(QtCore.QObject):
                 )
                 existing_curve_data["ds"] = ds
                 existing_curve_data["plot_options"] = plot_options
+                existing_curve_data["ds_options"] = ds_options  # Update the label
                 # Preserve existing style, offset, factor, and other properties
-                self.updateCurve(curveID, existing_curve_data, update_x=True)
+                self.updateCurve(curveID, existing_curve_data, recompute_y=True)
                 return
         else:
             print(f"DEBUG: Curve {curveID} does NOT exist, creating new curve")
@@ -1295,39 +1346,28 @@ class CurveManager(QtCore.QObject):
                 )
                 self.updateCurve(curveID, curve_data, recompute_y=True)
 
-    def generateCurveID(self, label, file_path):
+    def generateCurveID(self, label, file_path, row):
         """
-        Generates a unique curve label for a given label, considering the file path.
+        Generates a unique curve ID based on file_path and row, ensuring the same detector
+        always gets the same curve ID regardless of I0 normalization.
 
         Parameters:
-
-        - label (str): The original label for the curve: "file_name: PV_name (PV_unit)" or "file_name: PV_name" (if no PV_unit)
-
-        - file_path (str): The file path associated with the curve.
+        - label (str): The original label for the curve (used for display purposes)
+        - file_path (str): The file path associated with the curve
+        - row (int): The row number in the file tableview associated with the curve
 
         Returns:
-
-        - str: A unique curve label. If the exact label already exists for different file path,
-          a numeric suffix is appended: "file_name: PV_name (PV_unit) (1)" or "file_name: PV_name (1)"
-
-        .. note:: This method allows each curve to be uniquely identified and selected, even if their base
-           labels are identical, by considering their file paths.
+        - str: A unique curve ID based on file_path and row
         """
-        counter = 1
-        original_label = label
-        # Loop through existing labels:
-        while True:
-            # Check if the current label exists:
-            if label in self._curves:
-                existing_path = self._curves[label].get("file_path")
-                if existing_path != file_path:
-                    label = f"{original_label} ({counter})"
-                    counter += 1
-                else:
-                    break  # If file_path is equal, then the curve is already on the graph.
-            else:
-                break  # If the label doesn't exist already, it's automatically unique.
-        return label
+        # Generate curve ID based on file_path and row
+        curve_id = f"{file_path}_{row}"
+
+        # Check if this curve ID already exists
+        if curve_id in self._curves:
+            # If it exists, return the existing curve ID (this should not happen in normal usage)
+            return curve_id
+        else:
+            return curve_id
 
     def findCurveID(self, file_path, row):
         """
