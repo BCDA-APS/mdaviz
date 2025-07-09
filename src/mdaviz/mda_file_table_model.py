@@ -276,9 +276,16 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         """Apply selection rules 2-4."""
         row = index.row()
         column_name = self.columnName(index.column())
+        current_column_number = self.columnNumber(column_name)
+
         for r, v in sorted(self.selections.items()):
             if v is not None:
-                if self.columnNumber(v) in self.uniqueSelectionColumns:
+                v_column_number = self.columnNumber(v)
+                # Only apply rules between unique selection columns
+                if (
+                    v_column_number in self.uniqueSelectionColumns
+                    and current_column_number in self.uniqueSelectionColumns
+                ):
                     if r != row and column_name == v:
                         self.selections[r] = None
                         changes = True
