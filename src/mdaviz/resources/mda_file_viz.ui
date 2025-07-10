@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1358</width>
-    <height>636</height>
+    <width>799</width>
+    <height>744</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -42,8 +42,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1356</width>
-        <height>634</height>
+        <width>797</width>
+        <height>742</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -169,7 +169,7 @@
            <height>35</height>
           </size>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_1" stretch="4,0,0,2">
+         <layout class="QHBoxLayout" name="horizontalLayout_1" stretch="3,0,0,0,1,0,1">
           <property name="spacing">
            <number>7</number>
           </property>
@@ -200,6 +200,24 @@
           </item>
           <item>
            <widget class="QPushButton" name="curveRemove">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>40</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>40</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="toolTip">
              <string>Remove selected curve from graph</string>
             </property>
@@ -225,7 +243,30 @@
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>40</width>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Style</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="curveStyle"/>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
               <height>20</height>
              </size>
             </property>
@@ -241,7 +282,7 @@
             </property>
             <property name="minimumSize">
              <size>
-              <width>200</width>
+              <width>100</width>
               <height>30</height>
              </size>
             </property>
@@ -732,7 +773,7 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>858</width>
+                   <width>486</width>
                    <height>221</height>
                   </rect>
                  </property>
@@ -1007,7 +1048,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="3" column="1">
+                   <item row="4" column="1">
                     <widget class="QLabel" name="pos2_text">
                      <property name="toolTip">
                       <string>Cursor 2 position</string>
@@ -1050,7 +1091,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="3" column="0">
+                   <item row="4" column="0">
                     <widget class="QLabel" name="cursor2_label">
                      <property name="minimumSize">
                       <size>
@@ -1072,7 +1113,7 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="3" column="2">
+                   <item row="4" column="2">
                     <widget class="QPushButton" name="cursor2_remove">
                      <property name="maximumSize">
                       <size>
@@ -1097,6 +1138,22 @@
                       </size>
                      </property>
                     </widget>
+                   </item>
+                   <item row="3" column="1">
+                    <spacer name="verticalSpacer_13">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeType">
+                      <enum>QSizePolicy::Fixed</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>5</height>
+                      </size>
+                     </property>
+                    </spacer>
                    </item>
                   </layout>
                  </widget>
@@ -1132,9 +1189,6 @@
                      </property>
                     </spacer>
                    </item>
-                   <item row="4" column="1">
-                    <widget class="QComboBox" name="curveStyle"/>
-                   </item>
                    <item row="0" column="1">
                     <widget class="QLabel" name="diff_text">
                      <property name="toolTip">
@@ -1149,13 +1203,6 @@
                      </property>
                      <property name="text">
                       <string>n/a</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="4" column="0">
-                    <widget class="QLabel" name="label">
-                     <property name="text">
-                      <string>Style</string>
                      </property>
                     </widget>
                    </item>
