@@ -274,11 +274,20 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.setStatus("Please select a folder...")
         open_dialog = OpenDialog(self)
-        dir_name = open_dialog.getExistingDirectory(self, "Select a Directory")
-        if dir_name:
-            folder_list = self.folderList()
-            folder_list.insert(0, dir_name)
-            self.setFolderList(folder_list)
+        open_dialog.setWindowTitle("Select a Directory")
+
+        # Use exec_() to show the dialog and get the result
+        if open_dialog.exec_() == OpenDialog.Accepted:
+            # Get the selected directory
+            selected_files = open_dialog.selectedFiles()
+            if selected_files:
+                # Since we configured the dialog for directory selection,
+                # the selected file should be a directory
+                dir_name = selected_files[0]
+                if dir_name:
+                    folder_list = self.folderList()
+                    folder_list.insert(0, dir_name)
+                    self.setFolderList(folder_list)
 
     def doPopUp(self, message):
         """
