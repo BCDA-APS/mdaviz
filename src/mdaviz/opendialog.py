@@ -18,8 +18,8 @@ class OpenDialog(QFileDialog):
     def setup(self):
         self.setModal(True)
 
-        # Configure dialog to show files but only allow directory selection
-        self.setFileMode(QFileDialog.Directory)
+        # Configure dialog to allow both file and directory selection
+        self.setFileMode(QFileDialog.ExistingFile)
         self.setOption(QFileDialog.ShowDirsOnly, False)
         self.setOption(QFileDialog.DontUseNativeDialog, False)
 

@@ -272,21 +272,39 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         from .opendialog import OpenDialog
 
-        self.setStatus("Please select a folder...")
+        self.setStatus("Please select a file...")
         open_dialog = OpenDialog(self)
-        open_dialog.setWindowTitle("Select a Directory")
+        open_dialog.setWindowTitle("Select a File")
 
         # Use exec_() to show the dialog and get the result
         if open_dialog.exec_() == OpenDialog.Accepted:
-            # Get the selected directory
+            # Get the selected files
             selected_files = open_dialog.selectedFiles()
             if selected_files:
-                # Since we configured the dialog for directory selection,
-                # the selected file should be a directory
-                dir_name = selected_files[0]
-                if dir_name:
+                selected_path = selected_files[0]
+                if selected_path:
+                    # Convert file selection to folder selection
+                    path_obj = Path(selected_path)
+
+                    if path_obj.is_file():
+                        # If a file was selected, get its parent directory
+                        folder_path = path_obj.parent
+                        selected_file_name = path_obj.name
+                        self.setStatus(
+                            f"Selected file: {selected_file_name}, loading folder: {folder_path}"
+                        )
+                    else:
+                        # If a directory was selected, use it directly
+                        folder_path = path_obj
+                        selected_file_name = None
+                        self.setStatus(f"Selected folder: {folder_path}")
+
+                    # Store the selected file name for highlighting
+                    self._selected_file_name = selected_file_name
+
+                    # Add to folder list and load
                     folder_list = self.folderList()
-                    folder_list.insert(0, dir_name)
+                    folder_list.insert(0, str(folder_path))
                     self.setFolderList(folder_list)
 
     def doPopUp(self, message):
@@ -493,6 +511,31 @@ class MainWindow(QtWidgets.QMainWindow):
                 else:
                     # Always update the folder view since it is a new folder
                     self.mvc_folder.updateFolderView()
+
+                # Highlight the selected file if one was specified
+                if hasattr(self, "_selected_file_name") and self._selected_file_name:
+                    try:
+                        # Find the index of the selected file
+                        selected_index = sorted_files.index(self._selected_file_name)
+                        # Select and highlight the file in the folder view
+                        if self.mvc_folder and hasattr(
+                            self.mvc_folder, "mda_folder_tableview"
+                        ):
+                            model = (
+                                self.mvc_folder.mda_folder_tableview.tableView.model()
+                            )
+                            if model and selected_index < model.rowCount():
+                                index = model.index(selected_index, 0)
+                                self.mvc_folder.selectAndShowIndex(index)
+                                self.setStatus(
+                                    f"Highlighted selected file: {self._selected_file_name}"
+                                )
+                    except ValueError:
+                        # File not found in the list, ignore
+                        pass
+                    finally:
+                        # Clear the selected file name
+                        self._selected_file_name = None
 
                 self.setStatus(
                     f"Loaded {len(sorted_files)} MDA files from {folder_path}"
