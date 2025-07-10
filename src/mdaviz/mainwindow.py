@@ -348,8 +348,6 @@ class MainWindow(QtWidgets.QMainWindow):
         """A folder was selected (from the open dialog or pull down menu)."""
         if folder_name in [".", "", "Select a folder..."]:
             pass
-        elif folder_name in ["Open..."]:
-            self.doOpen()
         elif folder_name == "Clear Recently Open...":
             settings.setKey(DIR_SETTINGS_KEY, "")
             folder_list = [str(self.dataPath())] if self.dataPath() else []
@@ -437,7 +435,7 @@ class MainWindow(QtWidgets.QMainWindow):
         settings.setKey(DIR_SETTINGS_KEY, ",".join(recent_dirs[:MAX_RECENT_DIRS]))
 
     def _fillFolderBox(self, folder_list: Optional[List[str]] = None) -> None:
-        """Fill the Folder ComboBox; Open... and Clear Recently Open... are added at the end by default.
+        """Fill the Folder ComboBox; Clear Recently Open... is added at the end by default.
 
         Args:
             folder_list (list, optional): The list of folders to be displayed in the ComboBox. Defaults to [].
@@ -448,10 +446,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if not folder_list:
             folder_list = ["Select a folder..."]
         self.folder.addItems(folder_list)
-        self.folder.addItems(["Open...", "Clear Recently Open..."])
+        self.folder.addItems(["Clear Recently Open..."])
         count = self.folder.count()
         self.folder.insertSeparator(count - 1)
-        self.folder.insertSeparator(count - 2)
 
     def _on_scan_progress(self, current: int, total: int) -> None:
         """Handle scan progress updates."""
