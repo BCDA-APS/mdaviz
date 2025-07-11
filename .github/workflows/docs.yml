@@ -48,15 +48,12 @@ jobs:
       with:
         python-version: "3.11"
 
-    - name: Install Sphinx build requirements
-      run: pip install -r ./docs/requirements.txt
-
-    - name: Install our package
-      run: pip install --no-deps -e . -vv
+    - name: Install all runtime and doc dependencies
+      run: pip install -e .[dev] -r ./docs/requirements.txt
 
     - name: Sphinx
       id: deployment
-      run: make -C docs html
+      run: make -C docs SPHINXOPTS="-W" html
 
     - name: Diagnostic
       run: ls -lAFgh docs/build/html

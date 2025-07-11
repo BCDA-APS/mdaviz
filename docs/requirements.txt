@@ -7,3 +7,4 @@ sphinx
 sphinx-design
 sphinx-tabs
 tzdata
+tomli

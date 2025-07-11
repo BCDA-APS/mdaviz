@@ -7,8 +7,13 @@
 
 import pathlib
 import sys
-import tomllib
-from importlib.metadata import version
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib  # type: ignore[no-redef]
+
+from importlib.metadata import version as get_version
 from typing import List
 
 sys.path.insert(0, str(pathlib.Path().absolute().parent.parent))
@@ -34,7 +39,7 @@ github_url = f"https://github.com/{gh_org}/{project}"
 # -- Special handling for version numbers ------------------------------------
 # https://github.com/pypa/setuptools_scm#usage-from-sphinx
 
-release: str = version(project)
+release: str = get_version(project)
 doc_version: str = ".".join(release.split(".")[:2])
 
 # -- General configuration ---------------------------------------------------
@@ -71,4 +76,27 @@ autodoc_mock_imports = """
     numpy
     PyQt5
     yaml
+    mdaviz.aboutdialog
+    mdaviz.app
+    mdaviz.chartview
+    mdaviz.data_table_model
+    mdaviz.data_table_view
+    mdaviz.empty_table_model
+    mdaviz.fit_manager
+    mdaviz.fit_models
+    mdaviz.licensedialog
+    mdaviz.mainwindow
+    mdaviz.mda_file
+    mdaviz.mda_file_table_model
+    mdaviz.mda_file_table_view
+    mdaviz.mda_file_viz
+    mdaviz.mda_folder
+    mdaviz.mda_folder_table_model
+    mdaviz.mda_folder_table_view
+    mdaviz.opendialog
+    mdaviz.popup
+    mdaviz.progress_dialog
+    mdaviz.user_settings
+    mdaviz.utils
+    mdaviz.virtual_table_model
 """.split()
