@@ -7,7 +7,7 @@ import pytest
 from unittest.mock import Mock, patch
 from PyQt5 import QtWidgets
 
-from src.mdaviz.chartview import ChartView
+from mdaviz.chartview import ChartView
 
 
 class TestNearestPointFinding:
@@ -268,7 +268,7 @@ class TestCursorRange:
 class TestCursorIntegration:
     """Test integration of cursor functionality with fitting."""
 
-    @patch("src.mdaviz.chartview.ChartView.findNearestPoint")
+    @patch("mdaviz.chartview.ChartView.findNearestPoint")
     def test_onclick_uses_nearest_point(self, mock_find_nearest):
         """Test that onclick uses nearest point finding."""
         # Initialize Qt application
@@ -309,7 +309,7 @@ class TestCursorIntegration:
             if app:
                 app.quit()
 
-    @patch("src.mdaviz.chartview.ChartView.findNearestPoint")
+    @patch("mdaviz.chartview.ChartView.findNearestPoint")
     def test_onclick_no_nearest_point(self, mock_find_nearest):
         """Test onclick behavior when no nearest point is found."""
         # Initialize Qt application

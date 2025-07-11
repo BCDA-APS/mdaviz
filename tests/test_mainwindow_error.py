@@ -10,8 +10,8 @@ from typing import TYPE_CHECKING
 
 from PyQt5 import QtWidgets
 
-from src.mdaviz.mainwindow import MainWindow
-from src.mdaviz.user_settings import settings
+from mdaviz.mainwindow import MainWindow
+from mdaviz.user_settings import settings
 
 if TYPE_CHECKING:
     pass
