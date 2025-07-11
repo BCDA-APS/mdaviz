@@ -97,11 +97,11 @@ jobs:
 
       - name: Install additional test dependencies
         run: |
-          conda install -y coveralls pytest pytest-cov pytest-qt pytest-xvfb setuptools-scm
+          conda install -y coveralls pytest pytest-cov pytest-qt pytest-xvfb setuptools-scm scipy lmfit pyyaml
 
       - name: Install this package
         shell: bash -l {0}
-        run: pip install --no-deps -e .
+        run: pip install -e .
 
       - name: Run tests with pytest
         shell: bash -l {0}
