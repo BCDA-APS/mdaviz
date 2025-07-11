@@ -23,15 +23,20 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
 
-      # TODO:
-      # - uses: actions/setup-python@v5
-      #   with:
-      #     python-version: "3.12"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-      # - name: Run ruff
-      #   uses: davidslusser/actions_python_ruff@v1.0.1
-      #   with:
-      #     python_version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run ruff
+        run: |
+          ruff check src/ tests/
+          ruff format --check src/ tests/
 
   tests:
     name: Python ${{ matrix.python-version }}
@@ -73,31 +78,26 @@ jobs:
             xvfb
 
       - name: Create Python ${{ matrix.python-version }} environment
-        uses: mamba-org/setup-micromamba@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
-          cache-environment: true
-          cache-environment-key: env-key-${{ matrix.python-version }}
-          condarc: |
-            channel-priority: flexible
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
           environment-file: env.yml
-          environment-name: anaconda-test-env-py-${{ matrix.python-version }}
-          create-args: >-
-            coveralls
-            pytest
-            pytest-cov
-            pytest-qt
-            pytest-xvfb
-            python=${{ matrix.python-version }}
-            setuptools-scm
+          activate-environment: mdaviz
+          auto-activate-base: false
 
       - name: Initial diagnostics
         run: |
-          micromamba info
-          micromamba list
+          conda info
+          conda list
           conda config --show-sources
           conda config --show
-          micromamba env list
+          conda env list
           printenv | sort
+
+      - name: Install additional test dependencies
+        run: |
+          conda install -y coveralls pytest pytest-cov pytest-qt pytest-xvfb setuptools-scm
 
       - name: Install this package
         shell: bash -l {0}
