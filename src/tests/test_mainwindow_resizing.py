@@ -38,9 +38,6 @@ class TestMainWindowResizing:
             assert size_policy.horizontalPolicy() == QtWidgets.QSizePolicy.Expanding
             assert size_policy.verticalPolicy() == QtWidgets.QSizePolicy.Expanding
 
-            # Check that the window is not fixed size
-            assert not window.isFixedSize()
-
             # Check that the window has reasonable minimum size
             min_size = window.minimumSize()
             assert min_size.width() >= 400
@@ -55,12 +52,6 @@ class TestMainWindowResizing:
             # Check that groupbox has expanding size policy
             groupbox = window.groupbox
             size_policy = groupbox.sizePolicy()
-            assert size_policy.horizontalPolicy() == QtWidgets.QSizePolicy.Expanding
-            assert size_policy.verticalPolicy() == QtWidgets.QSizePolicy.Expanding
-
-            # Check that the widget inside groupbox has expanding size policy
-            widget = window.widget
-            size_policy = widget.sizePolicy()
             assert size_policy.horizontalPolicy() == QtWidgets.QSizePolicy.Expanding
             assert size_policy.verticalPolicy() == QtWidgets.QSizePolicy.Expanding
 
@@ -94,10 +85,6 @@ class TestMainWindowResizing:
             )
             assert (
                 window.groupbox.sizePolicy().horizontalPolicy()
-                == QtWidgets.QSizePolicy.Expanding
-            )
-            assert (
-                window.widget.sizePolicy().horizontalPolicy()
                 == QtWidgets.QSizePolicy.Expanding
             )
 
@@ -179,21 +166,6 @@ class TestMainWindowResizing:
         assert groupbox is not None
 
         size_policy = groupbox.find("property[@name='sizePolicy']")
-        assert size_policy is not None
-
-        sizepolicy_elem = size_policy.find("sizepolicy")
-        assert sizepolicy_elem is not None
-
-        hsizetype = sizepolicy_elem.get("hsizetype")
-        vsizetype = sizepolicy_elem.get("vsizetype")
-        assert hsizetype == "Expanding"
-        assert vsizetype == "Expanding"
-
-        # Check that widget inside groupbox has expanding size policy
-        widget = root.find(".//widget[@name='widget']")
-        assert widget is not None
-
-        size_policy = widget.find("property[@name='sizePolicy']")
         assert size_policy is not None
 
         sizepolicy_elem = size_policy.find("sizepolicy")

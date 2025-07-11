@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtGui import QFont, QKeySequence
-from PyQt5.QtWidgets import QShortcut
+from PyQt5.QtWidgets import QShortcut, QWidget, QDialog, QSizePolicy
 
 from . import utils
 from .chartview import ChartView
@@ -11,7 +11,7 @@ MD_FONT = "Arial"
 MD_FONT_SIZE = 12
 
 
-class MDAFileVisualization(QtWidgets.QWidget):
+class MDAFileVisualization(QWidget):
     """The panel to show the contents of a file."""
 
     # UI file name matches this module, different extension
@@ -37,19 +37,13 @@ class MDAFileVisualization(QtWidgets.QWidget):
         self.metadata.setFont(font)
 
         # Set size policy for the main visualization widget to prevent unwanted expansion
-        self.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
-        )
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # Set size policy for the plot page to prevent vertical expansion
-        self.plotPageMpl.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
-        )
+        self.plotPageMpl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # Set size policy for the tab widget to prevent vertical expansion
-        self.tabWidget.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
-        )
+        self.tabWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
         # Get maximum height from user settings with default fallback
         from .user_settings import settings
@@ -179,9 +173,7 @@ class MDAFileVisualization(QtWidgets.QWidget):
         utils.removeAllLayoutWidgets(layout)
 
         # Set size policy to prevent vertical expansion
-        plot_widget.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
-        )
+        plot_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
         # Don't override the ChartView's own height constraints
         # The ChartView already has proper max height constraints set
@@ -298,7 +290,7 @@ class MDAFileVisualization(QtWidgets.QWidget):
             self.search_dialog.close()
 
 
-class MetadataSearchDialog(QtWidgets.QDialog):
+class MetadataSearchDialog(QDialog):
     """A simple search dialog for the metadata widget."""
 
     def __init__(self, text_widget, parent=None):

@@ -8,7 +8,7 @@ Uses :class:`mda_file_table_model.MDAFileTableModel`.
     ~MDAFileTableView
 """
 
-from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QWidget, QHeaderView
 import numpy as np
 
 from . import utils
@@ -30,7 +30,7 @@ COLUMNS = [
 ]
 
 
-class MDAFileTableView(QtWidgets.QWidget):
+class MDAFileTableView(QWidget):
     ui_file = utils.getUiFileName(__file__)
 
     def __init__(self, parent):
@@ -52,7 +52,7 @@ class MDAFileTableView(QtWidgets.QWidget):
         self.setData()
         # Configure the horizontal header to resize based on content.
         header = self.tableView.horizontalHeader()
-        header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
     def data(self):
         """Return the data from the table view:

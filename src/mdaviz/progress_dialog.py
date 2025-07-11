@@ -10,10 +10,12 @@ for long-running operations like folder scanning.
 """
 
 from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QWidget, QProgressDialog, QApplication
 from typing import Optional, Callable
 
 
-class ProgressDialog(QtWidgets.QProgressDialog):
+class ProgressDialog(QProgressDialog):
     """
     Progress dialog for showing operation progress.
 
@@ -28,7 +30,7 @@ class ProgressDialog(QtWidgets.QProgressDialog):
     def __init__(
         self,
         title: str = "Progress",
-        parent: Optional[QtWidgets.QWidget] = None,
+        parent: Optional[QWidget] = None,
         auto_close: bool = True,
         auto_reset: bool = True,
     ):
@@ -95,7 +97,7 @@ class ProgressDialog(QtWidgets.QProgressDialog):
             self.setLabelText(f"Processing: {current}/{total} ({percentage}%)")
 
         # Process events to keep UI responsive
-        QtWidgets.QApplication.processEvents()
+        QApplication.processEvents()
 
     def set_message(self, message: str) -> None:
         """
@@ -105,7 +107,7 @@ class ProgressDialog(QtWidgets.QProgressDialog):
             message (str): Progress message
         """
         self.setLabelText(message)
-        QtWidgets.QApplication.processEvents()
+        QApplication.processEvents()
 
     def _on_canceled(self) -> None:
         """Handle cancel button click."""
@@ -131,10 +133,10 @@ class AsyncProgressDialog(ProgressDialog):
     """
 
     # Signals for thread-safe updates
-    progress_updated = QtCore.pyqtSignal(int, int, str)  # current, total, message
-    message_updated = QtCore.pyqtSignal(str)  # message
-    operation_completed = QtCore.pyqtSignal()
-    operation_failed = QtCore.pyqtSignal(str)  # error message
+    progress_updated = pyqtSignal(int, int, str)  # current, total, message
+    message_updated = pyqtSignal(str)  # message
+    operation_completed = pyqtSignal()
+    operation_failed = pyqtSignal(str)  # error message
 
     def __init__(
         self, title: str = "Progress", parent: Optional[QtWidgets.QWidget] = None

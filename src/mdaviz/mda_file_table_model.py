@@ -30,13 +30,14 @@ such a 'list(object)' or 'dict(str=object)', then change both 'columns()' and
     ~TableField
 """
 
-from typing import List, Dict, Optional, Tuple
+from typing import Optional, List, Dict, Tuple
 from .utils import mda2ftm, ftm2mda
 from dataclasses import KW_ONLY
 from dataclasses import dataclass
 
-from PyQt5 import QtCore
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QBrush, QColor
+from PyQt5.QtCore import QAbstractTableModel
 
 
 class ColumnDataType:
@@ -86,7 +87,7 @@ class TableField:
     unit: str = ""  # the "unit" column
 
 
-class MDAFileTableModel(QtCore.QAbstractTableModel):
+class MDAFileTableModel(QAbstractTableModel):
     """
     Select fields for plots.
 
@@ -118,7 +119,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
     # Signals in PyQt5 should be class attributes, not instance attributes, to work properly.
     # They need to be defined at the class level so that PyQt can set them up correctly when instances of the class are created.
 
-    checkboxStateChanged = QtCore.pyqtSignal(
+    checkboxStateChanged = pyqtSignal(
         dict, list
     )  # emit field selection and the list containing the DET (Y field) that have been removed
 
@@ -159,7 +160,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         row = index.row()
         column = index.column()
 
-        if role == QtCore.Qt.DisplayRole:
+        if role == 0:  # QtCore.Qt.DisplayRole
             # Only show text for text columns
             if column in self.textColumns:
                 if column == 0:  # Name column
@@ -170,13 +171,13 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
             # (the checkbox will be shown via CheckStateRole)
             return ""
 
-        elif role == QtCore.Qt.CheckStateRole:
+        elif role == 2:  # QtCore.Qt.CheckStateRole
             # Only show checkboxes for checkbox columns
             if column in self.checkboxColumns:
                 return self.checkbox(index)
             return None
 
-        elif role == QtCore.Qt.BackgroundRole:
+        elif role == 8:  # QtCore.Qt.BackgroundRole
             if row == self.highlightedRow:
                 return QBrush(QColor(210, 226, 247))
 
@@ -184,24 +185,24 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
 
     def headerData(self, section, orientation, role):
         """Return the header data for the given section and role."""
-        if role == QtCore.Qt.DisplayRole:
-            if orientation == QtCore.Qt.Horizontal:
+        if role == 0:  # QtCore.Qt.DisplayRole
+            if orientation == 1:  # QtCore.Qt.Horizontal
                 return self.columnName(section)
-            elif orientation == QtCore.Qt.Vertical:
+            elif orientation == 2:  # QtCore.Qt.Vertical
                 return str(section + 1)
         return None
 
     def flags(self, index):
         """Return the flags for the given index."""
         if not index.isValid():
-            return QtCore.Qt.NoItemFlags
+            return 0  # QtCore.Qt.NoItemFlags
 
         column = index.column()
-        flags = QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+        flags = 1 | 2  # QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
 
         # Make checkbox columns checkable
         if column in self.checkboxColumns:
-            flags |= QtCore.Qt.ItemIsUserCheckable
+            flags |= 4  # QtCore.Qt.ItemIsUserCheckable
 
         return flags
 
@@ -220,14 +221,16 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         """Return the checkbox state for a given cell: (row, column) = (index.row(), index.column())."""
         nm = self.columnName(index.column())  # selection name of THIS column
         selection = self.selections.get(index.row())  # user selection
-        return QtCore.Qt.Checked if selection == nm else QtCore.Qt.Unchecked
+        return (
+            2 if selection == nm else 0
+        )  # QtCore.Qt.Checked if selection == nm else QtCore.Qt.Unchecked
 
     def setCheckbox(self, index, state):
         """Set the checkbox state."""
         old_selection = ftm2mda(self.selections)
         row, column = index.row(), index.column()
         column_name = self.columnName(column)
-        checked = state == QtCore.Qt.Checked
+        checked = state == 2  # QtCore.Qt.Checked
         prior = self.selections.get(row)  # value if row exist as a key, None otherwise
         self.selections[row] = column_name if checked else None  # Rule 1
         changes = self.selections[row] != prior
@@ -242,7 +245,9 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         )
         col = self.columnNumber(column_name)  # Translate column name to its index
         index = self.index(row, col)
-        self.dataChanged.emit(index, index, [QtCore.Qt.CheckStateRole])  # Update view
+        self.dataChanged.emit(
+            index, index, [2]
+        )  # Update view with QtCore.Qt.CheckStateRole
 
     def uncheckCheckBox(self, row):
         if row in self.selections:
@@ -252,7 +257,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
             del self.selections[row]
             # Update view
             index = self.index(row, col)
-            self.dataChanged.emit(index, index, [QtCore.Qt.CheckStateRole])
+            self.dataChanged.emit(index, index, [2])  # QtCore.Qt.CheckStateRole
             # Update the mda_mvc selection
             self.updateMdaMvcSelection(self.selections)
 
@@ -267,7 +272,9 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         topLeftIndex = self.index(0, 0)
         bottomRightIndex = self.index(self.rowCount() - 1, self.columnCount() - 1)
         self.dataChanged.emit(
-            topLeftIndex, bottomRightIndex, [QtCore.Qt.CheckStateRole]
+            topLeftIndex,
+            bottomRightIndex,
+            [2],  # QtCore.Qt.CheckStateRole
         )
         # Update the mda_mvc selection
         self.mda_mvc.setSelectionField()
@@ -306,7 +313,7 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         # Re-evaluate the checkboxes bounded by the two corners (inclusive).
         corner1 = self.index(top, left)
         corner2 = self.index(bottom, right)
-        self.dataChanged.emit(corner1, corner2, [QtCore.Qt.CheckStateRole])
+        self.dataChanged.emit(corner1, corner2, [2])  # QtCore.Qt.CheckStateRole
         # prune empty data from new_selection
         new_selection = {k: v for k, v in new_selection.items() if v is not None}
         self.selections = new_selection
@@ -330,7 +337,10 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
             text = ""
             for c in self.checkboxColumns:
                 state = self.checkbox(self.index(r, c))
-                choices = {QtCore.Qt.Checked: "*", QtCore.Qt.Unchecked: "-"}
+                choices = {
+                    2: "*",
+                    0: "-",
+                }  # {QtCore.Qt.Checked: "*", QtCore.Qt.Unchecked: "-"}
                 text += choices[state]
             text += f" {self.fieldName(r)}"
             print(text)
@@ -606,13 +616,13 @@ class MDAFileTableModel(QtCore.QAbstractTableModel):
         if not index.isValid():
             return False
 
-        if role == QtCore.Qt.CheckStateRole:
+        if role == 2:  # QtCore.Qt.CheckStateRole
             # Handle checkbox state changes
             if index.column() in self.checkboxColumns:
                 self.setCheckbox(index, value)
                 return True
 
-        elif role == QtCore.Qt.EditRole:
+        elif role == 1:  # QtCore.Qt.EditRole
             # Handle data editing if needed
             return True
 

@@ -24,9 +24,9 @@ User: clearButton.clicked (emit: no data)
 """
 
 from .synApps_mdalib.mda import readMDA
-from PyQt5 import QtCore
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QAbstractItemView
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QAbstractItemView, QWidget
+from PyQt5.QtCore import QObject
 import yaml
 
 from . import utils
@@ -34,12 +34,12 @@ from .mda_file_table_view import MDAFileTableView
 from .data_cache import get_global_cache
 
 
-class MDAFile(QtWidgets.QWidget):
+class MDAFile(QWidget):
     ui_file = utils.getUiFileName(__file__)
     # Emit the action when button is pushed:
-    buttonPushed = QtCore.pyqtSignal(str)
+    buttonPushed = pyqtSignal(str)
     # Emit the new tab index (int), file path (str), data (dict) and selection field (dict):
-    tabChanged = QtCore.pyqtSignal(int, str, dict, dict)
+    tabChanged = pyqtSignal(int, str, dict, dict)
 
     def __init__(self, parent):
         """
@@ -513,7 +513,7 @@ class MDAFile(QtWidgets.QWidget):
 # ------ Tabs management (data):
 
 
-class TabManager(QtCore.QObject):
+class TabManager(QObject):
     """
     Manages the content of the currently opened tabs (data aspect only).
 
@@ -531,9 +531,9 @@ class TabManager(QtCore.QObject):
     - allTabRemoved: Emitted when all tabs are removed. No parameters.
     """
 
-    tabAdded = QtCore.pyqtSignal(str)  # Signal emitting file path of removed tab
-    tabRemoved = QtCore.pyqtSignal(str)  # Signal emitting file path of removed tab
-    allTabsRemoved = QtCore.pyqtSignal()  # Signal indicating all tabs have been removed
+    tabAdded = pyqtSignal(str)  # Signal emitting file path of removed tab
+    tabRemoved = pyqtSignal(str)  # Signal emitting file path of removed tab
+    allTabsRemoved = pyqtSignal()  # Signal indicating all tabs have been removed
 
     def __init__(self):
         super().__init__()

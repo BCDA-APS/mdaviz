@@ -5,7 +5,10 @@
 
 """
 
-from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt
+from typing import Any, Optional
+from PyQt5.QtCore import QModelIndex, QObject
+from PyQt5.QtCore import QAbstractTableModel
+from PyQt5.QtCore import QVariant
 
 
 class DataTableModel(QAbstractTableModel):
@@ -30,16 +33,27 @@ class DataTableModel(QAbstractTableModel):
     The model dynamically adjusts to changes in the input data, updating both the data displayed and the column headers as necessary.
     """
 
-    def __init__(self, scanDict, parent=None):
-        """ """
+    def __init__(
+        self, scanDict: dict[str, dict[str, Any]], parent: Optional[QObject] = None
+    ) -> None:
+        """Initialize the data table model.
+
+        Parameters:
+            scanDict (dict[str, dict[str, Any]]): A dictionary where keys are pos/det indexes and values are dictionaries:
+              {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...','type':...}}.
+            parent (Optional[QObject]): The parent object for this table model, default is None.
+        """
         super().__init__(parent)
 
         self.setAllData(scanDict)
         self.setColumnLabels()
 
-    def rowCount(self, parent=None):
+    def rowCount(self, parent: Optional[QModelIndex] = None) -> int:
         """
         Returns the number of rows in the table model.
+
+        Parameters:
+            parent (Optional[QModelIndex]): Parent index, not used in this implementation
 
         Returns:
             int: The number of rows, or 0 if no data
@@ -56,25 +70,32 @@ class DataTableModel(QAbstractTableModel):
 
         return max_length
 
-    def columnCount(self, parent=None):
-        # Number of columns is determined by the number of pos(s) & det(s)
+    def columnCount(self, parent: Optional[QModelIndex] = None) -> int:
+        """Returns the number of columns in the table model.
+
+        Parameters:
+            parent (Optional[QModelIndex]): Parent index, not used in this implementation
+
+        Returns:
+            int: Number of columns is determined by the number of pos(s) & det(s)
+        """
         return len(self.columnLabels())
 
-    def data(self, index, role=Qt.DisplayRole):
+    def data(self, index: QModelIndex, role: int = 0) -> Any:  # 0 = Qt.DisplayRole
         """
         Returns the data to be displayed for a given index and role.
 
-        Args:
+        Parameters:
             index (QModelIndex): The index of the item to retrieve data for
             role (int): The role of the data (DisplayRole, EditRole, etc.)
 
         Returns:
-            QVariant: The data for the given index and role, or QVariant() if not found
+            Any: The data for the given index and role, or QVariant() if not found
         """
         if not index.isValid():
             return QVariant()
 
-        if role == Qt.DisplayRole:
+        if role == 0:  # Qt.DisplayRole
             row = index.row()
             col = index.column()
 
@@ -94,27 +115,60 @@ class DataTableModel(QAbstractTableModel):
 
         return QVariant()
 
-    def headerData(self, section, orientation, role):
+    def headerData(
+        self, section: int, orientation: int, role: int = 0
+    ) -> Any:  # 0 = Qt.DisplayRole
         """
         Provide horizontal header labels only, nothing for vertical headers (Index is always the first column).
+
+        Parameters:
+            section (int): Section index
+            orientation (int): Header orientation (Horizontal/Vertical)
+            role (int): Data role
+
+        Returns:
+            Any: Header data or QVariant() if not found
         """
-        if role == Qt.DisplayRole and orientation == Qt.Horizontal:
+        if role == 0 and orientation == 1:  # Qt.DisplayRole and Qt.Horizontal
             return self.columnLabels()[section]
         return QVariant()
 
     # # # ------------ get & set methods
 
-    def columnLabels(self):
+    def columnLabels(self) -> list[str]:
+        """Get the column labels.
+
+        Returns:
+            list[str]: List of column labels
+        """
         return self._columnLabels
 
-    def setColumnLabels(self):
+    def setColumnLabels(self) -> list[str]:
+        """Set the column labels based on the data keys.
+
+        Returns:
+            list[str]: List of column labels
+        """
         self._columnLabels = list(self.allData().keys())
         return self._columnLabels
 
-    def allData(self):
+    def allData(self) -> dict[str, list]:
+        """Get all data stored in the model.
+
+        Returns:
+            dict[str, list]: Dictionary mapping column names to data lists
+        """
         return self._allData
 
-    def setAllData(self, scanDict):
+    def setAllData(self, scanDict: dict[str, dict[str, Any]]) -> dict[str, list]:
+        """Set the model's data using the input dictionary.
+
+        Parameters:
+            scanDict (dict[str, dict[str, Any]]): Input data dictionary
+
+        Returns:
+            dict[str, list]: Processed data dictionary
+        """
         self._allData = {}
         if scanDict:
             for v in list(scanDict.values()):

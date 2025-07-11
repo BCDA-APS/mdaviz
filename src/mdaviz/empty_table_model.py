@@ -1,4 +1,5 @@
-from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt
+from PyQt5.QtCore import QVariant
+from PyQt5.QtCore import QAbstractTableModel
 
 
 class EmptyTableModel(QAbstractTableModel):
@@ -20,7 +21,7 @@ class EmptyTableModel(QAbstractTableModel):
 
     def headerData(self, section, orientation, role):
         # Provide header labels
-        if role == Qt.DisplayRole and orientation == Qt.Horizontal:
+        if role == 0 and orientation == 1:  # Qt.DisplayRole and Qt.Horizontal
             return self.headers[section]
         return QVariant()
 

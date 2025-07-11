@@ -36,8 +36,8 @@ This module uses QtCore.QSettings.
 
 import datetime
 
-from PyQt5 import QtCore
-from PyQt5 import QtWidgets
+from PyQt5.QtCore import QSettings, QSize, QRect
+from PyQt5.QtWidgets import QDesktopWidget
 
 from . import __package_name__
 from . import __settings_orgName__
@@ -45,7 +45,7 @@ from . import __settings_orgName__
 GLOBAL_GROUP = "___global___"
 
 
-class ApplicationQSettings(QtCore.QSettings):
+class ApplicationQSettings(QSettings):
     """
     Manage and preserve settings for this application using QSettings.
 
@@ -68,10 +68,10 @@ class ApplicationQSettings(QtCore.QSettings):
     """
 
     def __init__(self, orgName, appName):
-        QtCore.QSettings.__init__(
+        QSettings.__init__(
             self,
-            QtCore.QSettings.IniFormat,
-            QtCore.QSettings.UserScope,
+            QSettings.IniFormat,
+            QSettings.UserScope,
             orgName,
             appName,
         )
@@ -183,7 +183,7 @@ class ApplicationQSettings(QtCore.QSettings):
         height = self.getKey(f"{label}/height")
         if width is None or height is None:
             return
-        window.resize(QtCore.QSize(int(width), int(height)))
+        window.resize(QSize(int(width), int(height)))
 
         x = self.getKey(f"{label}/x")
         y = self.getKey(f"{label}/y")
@@ -191,7 +191,7 @@ class ApplicationQSettings(QtCore.QSettings):
             return
 
         # is this window on any available screen?
-        qdw = QtWidgets.QDesktopWidget()
+        qdw = QDesktopWidget()
         x_onscreen = False
         y_onscreen = False
         for screen_num in range(qdw.screenCount()):
@@ -222,7 +222,7 @@ class ApplicationQSettings(QtCore.QSettings):
             y = available_rect.y() + offset
             height = min(int(height), available_rect.height())
 
-        window.setGeometry(QtCore.QRect(int(x), int(y), int(width), int(height)))
+        window.setGeometry(QRect(int(x), int(y), int(width), int(height)))
 
     def saveSplitter(self, splitter, label):
         """

@@ -8,6 +8,8 @@ from itertools import cycle
 from typing import Optional
 import numpy
 from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import QObject, QTimer, Qt, pyqtSignal
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QApplication
 from . import utils
 from .fit_manager import FitManager
 from .user_settings import settings
@@ -55,13 +57,13 @@ def auto_symbol():
     return next(_AUTO_SYMBOL_CYCLE)
 
 
-class ChartView(QtWidgets.QWidget):
+class ChartView(QWidget):
     """TODO: docstrings"""
 
     # Fit signals for main window connection
-    fitAdded = QtCore.pyqtSignal(str, str)  # curveID, fitID
-    fitUpdated = QtCore.pyqtSignal(str, str)  # curveID, fitID
-    fitRemoved = QtCore.pyqtSignal(str, str)  # curveID, fitID
+    fitAdded = pyqtSignal(str, str)  # curveID, fitID
+    fitUpdated = pyqtSignal(str, str)  # curveID, fitID
+    fitRemoved = pyqtSignal(str, str)  # curveID, fitID
 
     def __init__(self, parent, **kwargs):
         # parent=<mdaviz.mda_folder.MDA_MVC object at 0x10e7ff520>
@@ -71,9 +73,7 @@ class ChartView(QtWidgets.QWidget):
         ############# UI initialization:
 
         # Set size policy to prevent unwanted expansion
-        self.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
-        )
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # Get maximum height from user settings with default fallback
         max_height = settings.getKey("plot_max_height")
@@ -97,15 +97,13 @@ class ChartView(QtWidgets.QWidget):
         # Set size constraints on the canvas to prevent vertical expansion
         canvas_max_height = max_height - 50  # Leave room for toolbar
         self.canvas.setMaximumHeight(canvas_max_height)
-        self.canvas.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
-        )
+        self.canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
         # Create the navigation toolbar
         self.toolbar = NavigationToolbar(self.canvas, self)
 
         # Use a QVBoxLayout for stacking the toolbar and canvas vertically
-        layout = QtWidgets.QVBoxLayout(self)
+        layout = QVBoxLayout(self)
         layout.addWidget(self.toolbar)
         layout.addWidget(self.canvas)
         # Apply the QVBoxLayout to the ChartView widget
@@ -173,7 +171,7 @@ class ChartView(QtWidgets.QWidget):
         self.alt_pressed = False
 
         # Set up a timer to check modifier key state
-        self.key_check_timer = QtCore.QTimer()
+        self.key_check_timer = QTimer()
         self.key_check_timer.timeout.connect(self.check_modifier_keys)
         self.key_check_timer.start(50)  # Check every 50ms
 
@@ -192,8 +190,8 @@ class ChartView(QtWidgets.QWidget):
         """Check for modifier keys using Qt's global state."""
         try:
             # Get the global keyboard state
-            modifiers = QtWidgets.QApplication.keyboardModifiers()
-            self.alt_pressed = modifiers & QtCore.Qt.AltModifier
+            modifiers = QApplication.keyboardModifiers()
+            self.alt_pressed = modifiers & Qt.AltModifier
         except Exception:
             # Fallback if Qt method fails
             pass
@@ -1199,15 +1197,15 @@ class ChartView(QtWidgets.QWidget):
 # ------ Curves management (data):
 
 
-class CurveManager(QtCore.QObject):
-    curveAdded = QtCore.pyqtSignal(str)  # Emit curveID when a curve is added
-    curveRemoved = QtCore.pyqtSignal(str, dict, int)
+class CurveManager(QObject):
+    curveAdded = pyqtSignal(str)  # Emit curveID when a curve is added
+    curveRemoved = pyqtSignal(str, dict, int)
     # Emit curveID & its corresponding data when a curve is removed, plus the
     # number of curves left on the graph for this file
-    curveUpdated = QtCore.pyqtSignal(
+    curveUpdated = pyqtSignal(
         str, bool, bool
     )  # Emit curveID, recompute_y (bool) & update_x (bool) when a curve is updated
-    allCurvesRemoved = QtCore.pyqtSignal(
+    allCurvesRemoved = pyqtSignal(
         bool
     )  # Emit a doNotClearCheckboxes bool when all curve are removed
 

@@ -14,9 +14,9 @@ allowing users to customize behavior and persist settings.
 
 import json
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 from dataclasses import dataclass, asdict
-from PyQt5 import QtCore
+from PyQt5.QtCore import QObject, pyqtSignal
 
 
 @dataclass
@@ -51,12 +51,12 @@ class LazyLoadingConfig:
     show_cache_stats: bool = False
     auto_clear_cache_on_low_memory: bool = True
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert configuration to dictionary."""
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "LazyLoadingConfig":
+    def from_dict(cls, data: dict[str, Any]) -> "LazyLoadingConfig":
         """Create configuration from dictionary."""
         return cls(**data)
 
@@ -98,7 +98,7 @@ class LazyLoadingConfig:
             return None
 
 
-class ConfigManager(QtCore.QObject):
+class ConfigManager(QObject):
     """
     Manager for lazy loading configuration.
 
@@ -107,7 +107,7 @@ class ConfigManager(QtCore.QObject):
     """
 
     # Signal emitted when configuration changes
-    config_changed = QtCore.pyqtSignal(object)  # LazyLoadingConfig
+    config_changed = pyqtSignal(object)  # LazyLoadingConfig
 
     def __init__(self, config_file: Optional[Path] = None):
         """

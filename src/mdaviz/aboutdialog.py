@@ -1,6 +1,6 @@
-from PyQt5 import QtCore
-from PyQt5 import QtGui
-from PyQt5 import QtWidgets
+from PyQt5.QtCore import QUrl
+from PyQt5.QtGui import QDesktopServices
+from PyQt5.QtWidgets import QDialog
 
 from . import APP_DESC
 from . import APP_TITLE
@@ -12,7 +12,7 @@ from . import __version__
 from . import utils
 
 
-class AboutDialog(QtWidgets.QDialog):
+class AboutDialog(QDialog):
     """Load a generic About... Dialog as a .ui file."""
 
     # UI file name matches this module, different extension
@@ -60,8 +60,8 @@ class AboutDialog(QtWidgets.QDialog):
 
     def doUrl(self, url):
         """opening URL in default browser"""
-        url = QtCore.QUrl(url)
-        service = QtGui.QDesktopServices()
+        url = QUrl(url)
+        service = QDesktopServices()
         service.openUrl(url)
 
     def doDocsUrl(self):

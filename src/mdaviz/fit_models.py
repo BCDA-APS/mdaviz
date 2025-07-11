@@ -5,7 +5,7 @@ This module provides common fit functions and parameter management
 for curve fitting in the mdaviz application.
 """
 
-from typing import Dict, List, Tuple, Optional, Any, Callable
+from typing import Optional, Any, Callable
 import numpy as np
 from scipy.optimize import curve_fit
 
@@ -15,8 +15,8 @@ class FitResult:
 
     def __init__(
         self,
-        parameters: Dict[str, float],
-        uncertainties: Dict[str, float],
+        parameters: dict[str, float],
+        uncertainties: dict[str, float],
         r_squared: float,
         chi_squared: float,
         reduced_chi_squared: float,
@@ -47,7 +47,7 @@ class FitResult:
 class FitModel:
     """Base class for fit models."""
 
-    def __init__(self, name: str, function: Callable, parameters: List[str]):
+    def __init__(self, name: str, function: Callable, parameters: list[str]):
         """
         Initialize fit model.
 
@@ -64,8 +64,8 @@ class FitModel:
         self,
         x_data: np.ndarray,
         y_data: np.ndarray,
-        initial_guess: Optional[Dict[str, float]] = None,
-        bounds: Optional[Dict[str, Tuple[float, float]]] = None,
+        initial_guess: Optional[dict[str, float]] = None,
+        bounds: Optional[dict[str, tuple[float, float]]] = None,
     ) -> FitResult:
         """
         Perform fit and return results.
@@ -102,10 +102,10 @@ class FitModel:
             bounds_upper = [
                 bounds.get(param, (-np.inf, np.inf))[1] for param in self.parameters
             ]
-            bounds_tuple: Tuple[Any, Any] = (bounds_lower, bounds_upper)
+            bounds_tuple: tuple[Any, Any] = (bounds_lower, bounds_upper)
         else:
             p0 = [initial_guess.get(param, 1.0) for param in self.parameters]
-            bounds_tuple_unbounded: Tuple[Any, Any] = (-np.inf, np.inf)
+            bounds_tuple_unbounded: tuple[Any, Any] = (-np.inf, np.inf)
             bounds_tuple = bounds_tuple_unbounded
 
         try:
@@ -157,7 +157,7 @@ class FitModel:
 
     def _get_default_initial_guess(
         self, x_data: np.ndarray, y_data: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Get default initial parameter guesses.
 
@@ -207,7 +207,7 @@ class GaussianFit(FitModel):
 
     def _get_default_initial_guess(
         self, x_data: np.ndarray, y_data: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Get default initial guesses for Gaussian fit."""
         y_max = np.max(y_data)
         y_min = np.min(y_data)
@@ -278,7 +278,7 @@ class LorentzianFit(FitModel):
 
     def _get_default_initial_guess(
         self, x_data: np.ndarray, y_data: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Get default initial guesses for Lorentzian fit."""
         y_max = np.max(y_data)
         y_min = np.min(y_data)
@@ -338,7 +338,7 @@ class LinearFit(FitModel):
 
     def _get_default_initial_guess(
         self, x_data: np.ndarray, y_data: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Get default initial guesses for linear fit."""
         # Use numpy's polyfit for initial estimates
         coeffs = np.polyfit(x_data, y_data, 1)
@@ -373,7 +373,7 @@ class ExponentialFit(FitModel):
 
     def _get_default_initial_guess(
         self, x_data: np.ndarray, y_data: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Get default initial guesses for exponential fit."""
         y_max = np.max(y_data)
         y_min = np.min(y_data)
@@ -417,7 +417,7 @@ class PolynomialFit(FitModel):
 
     def _get_default_initial_guess(
         self, x_data: np.ndarray, y_data: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Get default initial guesses for polynomial fit."""
         # Use numpy's polyfit for initial estimates
         coeffs = np.polyfit(x_data, y_data, self.degree)
@@ -462,7 +462,7 @@ class ErrorFunctionFit(FitModel):
 
     def _get_default_initial_guess(
         self, x_data: np.ndarray, y_data: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Get default initial guesses for error function fit."""
         y_max = np.max(y_data)
         y_min = np.min(y_data)
@@ -483,7 +483,7 @@ class ErrorFunctionFit(FitModel):
 
 
 # Factory function to get available fit models
-def get_available_models() -> Dict[str, FitModel]:
+def get_available_models() -> dict[str, FitModel]:
     """
     Get dictionary of available fit models.
 

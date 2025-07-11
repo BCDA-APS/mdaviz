@@ -18,12 +18,22 @@ import pathlib
 import re
 import threading
 from datetime import datetime
+from typing import Any
 from .synApps_mdalib.mda import readMDA, scanPositioner, skimMDA
 
 HEADERS = "Prefix", "Scan #", "Points", "Dim", "Date", "Size"
 
 
-def human_readable_size(size, decimal_places=2):
+def human_readable_size(size: float, decimal_places: int = 2) -> str:
+    """Convert size in bytes to human readable format.
+
+    Parameters:
+        size (float): Size in bytes
+        decimal_places (int): Number of decimal places to show
+
+    Returns:
+        str: Human readable size string
+    """
     for unit in ["B", "kB", "MB", "GB", "TB"]:
         if size < 1024.0:
             break
@@ -31,28 +41,63 @@ def human_readable_size(size, decimal_places=2):
     return f"{size:.{decimal_places}f} {unit}"
 
 
-def iso2dt(iso_date_time):
-    """Convert ISO8601 time string to datetime object."""
+def iso2dt(iso_date_time: str) -> datetime:
+    """Convert ISO8601 time string to datetime object.
+
+    Parameters:
+        iso_date_time (str): ISO8601 formatted time string
+
+    Returns:
+        datetime: Datetime object
+    """
     return datetime.fromisoformat(iso_date_time)
 
 
-def iso2ts(iso_date_time):
-    """Convert ISO8601 time string to timestamp."""
+def iso2ts(iso_date_time: str) -> float:
+    """Convert ISO8601 time string to timestamp.
+
+    Parameters:
+        iso_date_time (str): ISO8601 formatted time string
+
+    Returns:
+        float: Unix timestamp
+    """
     return iso2dt(iso_date_time).timestamp()
 
 
-def ts2dt(timestamp):
-    """Convert timestamp to datetime object."""
+def ts2dt(timestamp: float) -> datetime:
+    """Convert timestamp to datetime object.
+
+    Parameters:
+        timestamp (float): Unix timestamp
+
+    Returns:
+        datetime: Datetime object
+    """
     return datetime.fromtimestamp(timestamp)
 
 
-def ts2iso(timestamp):
-    """Convert timestamp to ISO8601 time string."""
+def ts2iso(timestamp: float) -> str:
+    """Convert timestamp to ISO8601 time string.
+
+    Parameters:
+        timestamp (float): Unix timestamp
+
+    Returns:
+        str: ISO8601 formatted time string
+    """
     return ts2dt(timestamp).isoformat(sep=" ")
 
 
-def num2fstr(x):
-    """Return a string with the adequate precision and format"""
+def num2fstr(x: float) -> str:
+    """Return a string with the adequate precision and format.
+
+    Parameters:
+        x (float): Number to format
+
+    Returns:
+        str: Formatted string
+    """
     return f"{x:.2e}" if abs(x) < 1e-3 else f"{x:.2f}"
 
 
@@ -105,7 +150,11 @@ def get_file_info_lightweight(file_path: pathlib.Path) -> dict:
             skim_data = skim_result[0] if isinstance(skim_result[0], dict) else {}
 
             file_num = skim_data.get("scan_number", None)
-            file_prefix = extract_file_prefix(file_name, file_num)
+            file_prefix = (
+                extract_file_prefix(file_name, file_num)
+                if file_num is not None
+                else None
+            )
 
             # Get basic scan info from skim data
             if skim_data.get("rank", 0) > 0:
@@ -141,14 +190,17 @@ def get_file_info_lightweight(file_path: pathlib.Path) -> dict:
             "%Y-%m-%d %H:%M:%S"
         )
 
-    fileInfo = {"Name": file_name, "folderPath": str(file_path.parent)}
+    fileInfo: dict[str, Any] = {
+        "Name": file_name,
+        "folderPath": str(file_path.parent),
+    }
     values = [
-        file_prefix,
-        file_num,
-        file_pts,
-        file_dim,
-        file_date,
-        file_size,
+        str(file_prefix) if file_prefix is not None else "",
+        str(file_num) if file_num is not None else "",
+        str(file_pts) if file_pts is not None else "",
+        str(file_dim) if file_dim is not None else "",
+        str(file_date) if file_date is not None else "",
+        str(file_size) if file_size is not None else "",
     ]
     for k, v in zip(HEADERS, values):
         fileInfo[k] = v
@@ -174,37 +226,37 @@ def get_file_info_full(file_path: pathlib.Path) -> dict:
     result = readMDA(str(file_path))
     if result is None:
         # Return minimal info if file cannot be read
-        fileInfo = {"Name": file_name}
+        minimal_file_info = {"Name": file_name}
         values = [
-            None,
-            None,
-            0,
-            1,
+            "",
+            "",
+            "0",
+            "1",
             datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
                 "%Y-%m-%d %H:%M:%S"
             ),
             human_readable_size(file_path.stat().st_size),
         ]
         for k, v in zip(HEADERS, values):
-            fileInfo[k] = v
-        return fileInfo
+            minimal_file_info[k] = v
+        return minimal_file_info
 
     file_metadata, file_data_dim1, *_ = result
     file_num = file_metadata.get("scan_number", None)
     file_prefix = extract_file_prefix(file_name, file_num)
     file_size = human_readable_size(file_path.stat().st_size)
-    file_date = byte2str(file_data_dim1.time).split(".")[0]
+    file_date = str(byte2str(file_data_dim1.time)).split(".")[0]
     file_pts = file_data_dim1.curr_pt
     file_dim = file_data_dim1.dim
 
-    fileInfo = {"Name": file_name}
+    fileInfo: dict[str, Any] = {"Name": file_name}
     values = [
-        file_prefix,
-        file_num,
-        file_pts,
-        file_dim,
-        file_date,
-        file_size,
+        str(file_prefix) if file_prefix is not None else "",
+        str(file_num) if file_num is not None else "",
+        str(file_pts) if file_pts is not None else "",
+        str(file_dim) if file_dim is not None else "",
+        str(file_date) if file_date is not None else "",
+        str(file_size) if file_size is not None else "",
     ]
     for k, v in zip(HEADERS, values):
         fileInfo[k] = v
@@ -225,12 +277,20 @@ def get_file_info(file_path: pathlib.Path) -> dict:
     return get_file_info_full(file_path)
 
 
-def extract_file_prefix(file_name, scan_number):
-    """Create a pattern that matches the prefix followed by an optional separator and the scan number with possible leading zeros
+def extract_file_prefix(file_name: str, scan_number: int | None) -> str | None:
+    """Create a pattern that matches the prefix followed by an optional separator and the scan number with possible leading zeros.
+
     The separators considered here are underscore (_), hyphen (-), dot (.), and space ( )
+
+    Parameters:
+        file_name (str): Name of the file
+        scan_number (int | None): Scan number to extract prefix for
+
+    Returns:
+        str | None: Extracted prefix or None if no match
     """
-    scan_number = str(scan_number)
-    pattern = rf"^(.*?)[_\-\. ]?0*{scan_number}\.mda$"
+    scan_number_str = str(scan_number) if scan_number is not None else "0"
+    pattern = rf"^(.*?)[_\-\. ]?0*{scan_number_str}\.mda$"
     match = re.match(pattern, file_name)
     if match:
         return match.group(1)
@@ -268,7 +328,7 @@ def get_det(mda_file_data):
     p_list = mda_file_data.p  # list of scanDetector instances
     d_list = mda_file_data.d  # list of scanPositioner instances
     np = mda_file_data.np  # number of pos
-    npts = mda_file_data.curr_pt = 0  # number of data points actually acquired
+    npts = mda_file_data.curr_pt  # number of data points actually acquired
 
     first_pos = 1 if np else 0
     first_det = np + 1
@@ -290,8 +350,8 @@ def get_det(mda_file_data):
     d[0] = p0
     for e, p in enumerate(p_list):
         d[e + 1] = p
-    for e, d in enumerate(d_list):
-        d[e + 1 + np] = d
+    for e, det in enumerate(d_list):
+        d[e + 1 + np] = det
     return d, first_pos, first_det
 
 
@@ -362,7 +422,15 @@ def get_scan(mda_file_data):
     return datasets, first_pos_index, first_det_index
 
 
-def get_md(mda_file_metadata):
+def get_md(mda_file_metadata: dict) -> dict:
+    """Process MDA file metadata to convert bytes to strings and clean up structure.
+
+    Parameters:
+        mda_file_metadata (dict): Raw metadata from MDA file
+
+    Returns:
+        dict: Processed metadata with string keys and cleaned values
+    """
     from collections import OrderedDict
 
     new_metadata = OrderedDict()
@@ -385,7 +453,7 @@ def get_md(mda_file_metadata):
     return new_metadata
 
 
-def mda2ftm(selection):
+def mda2ftm(selection: dict | None) -> dict:
     """
     Converts a field selection from MDA_MVC (MVC) format to SelectFieldsTableModel (TM) format.
 
@@ -393,10 +461,10 @@ def mda2ftm(selection):
     This is used to sync selection states between SelectFieldsTableModel and MDA_MVC.
 
     Parameters:
-        - selection (dict): The selection in MVC format to be converted.
+        selection (dict | None): The selection in MVC format to be converted.
 
     Returns:
-        - dict: The selection converted to TM format.
+        dict: The selection converted to TM format.
     """
     if selection is not None:
         ftm_selection = {}
@@ -413,7 +481,7 @@ def mda2ftm(selection):
     return ftm_selection
 
 
-def ftm2mda(selection):
+def ftm2mda(selection: dict | None) -> dict:
     """
     Converts a field selection from SelectFieldsTableModel (TM) format to MDA_MVC (MVC) format.
 
@@ -421,10 +489,10 @@ def ftm2mda(selection):
     Used to update MDA_MVC selection state (self.selectionField()) based on changes in SelectFieldsTableModel.
 
     Parameters:
-        - selection (dict): The selection in TM format to be converted.
+        selection (dict | None): The selection in TM format to be converted.
 
     Returns:
-        - dict: The selection converted to MVC format.
+        dict: The selection converted to MVC format.
     """
     mda_selection = {}
     if selection is not None:
@@ -465,8 +533,12 @@ def run_in_thread(func):
     return wrapper
 
 
-def removeAllLayoutWidgets(layout):
-    """Remove all existing widgets from QLayout."""
+def removeAllLayoutWidgets(layout) -> None:
+    """Remove all existing widgets from QLayout.
+
+    Parameters:
+        layout: QLayout object to clear
+    """
     for i in reversed(range(layout.count())):
         layout.itemAt(i).widget().setParent(None)
 
@@ -495,8 +567,15 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
     return uic.loadUi(ui_file, baseinstance=baseinstance, **kw)
 
 
-def getUiFileName(py_file_name):
-    """UI file name matches the Python file, different extension."""
+def getUiFileName(py_file_name: str) -> str:
+    """UI file name matches the Python file, different extension.
+
+    Parameters:
+        py_file_name (str): Python file name
+
+    Returns:
+        str: Corresponding UI file name
+    """
     return f"{pathlib.Path(py_file_name).stem}.ui"
 
 

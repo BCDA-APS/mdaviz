@@ -5,9 +5,9 @@ This module manages fit operations for curves, handles fit parameter storage
 and retrieval, and coordinates between UI and fit calculations.
 """
 
-from typing import Dict, Optional, Tuple
+from typing import Optional, Tuple, Dict
 import numpy as np
-from PyQt5 import QtCore
+from PyQt5.QtCore import QObject, pyqtSignal
 from .fit_models import FitModel, FitResult, get_available_models
 
 
@@ -36,13 +36,13 @@ class FitData:
         self.visible = visible
 
 
-class FitManager(QtCore.QObject):
+class FitManager(QObject):
     """Manages fit operations for curves."""
 
-    fitAdded = QtCore.pyqtSignal(str)  # curveID
-    fitUpdated = QtCore.pyqtSignal(str)  # curveID
-    fitRemoved = QtCore.pyqtSignal(str)  # curveID
-    fitVisibilityChanged = QtCore.pyqtSignal(str, bool)  # curveID, visible
+    fitAdded = pyqtSignal(str)  # curveID
+    fitUpdated = pyqtSignal(str)  # curveID
+    fitRemoved = pyqtSignal(str)  # curveID
+    fitVisibilityChanged = pyqtSignal(str, bool)  # curveID, visible
 
     def __init__(self, parent=None):
         """
@@ -52,10 +52,10 @@ class FitManager(QtCore.QObject):
         - parent: Parent QObject
         """
         super().__init__(parent)
-        self._fits: Dict[str, FitData] = {}  # {curveID: FitData}
+        self._fits: dict[str, FitData] = {}  # {curveID: FitData}
         self._models = get_available_models()
 
-    def get_available_models(self) -> Dict[str, FitModel]:
+    def get_available_models(self) -> dict[str, FitModel]:
         """
         Get available fit models.
 
@@ -70,9 +70,9 @@ class FitManager(QtCore.QObject):
         model_name: str,
         x_data: np.ndarray,
         y_data: np.ndarray,
-        x_range: Optional[Tuple[float, float]] = None,
-        initial_params: Optional[Dict[str, float]] = None,
-        bounds: Optional[Dict[str, Tuple[float, float]]] = None,
+        x_range: Optional[tuple[float, float]] = None,
+        initial_params: Optional[dict[str, float]] = None,
+        bounds: Optional[dict[str, tuple[float, float]]] = None,
     ) -> None:
         """
         Add or replace a fit for a curve.

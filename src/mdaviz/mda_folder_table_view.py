@@ -2,20 +2,21 @@
 Search for mda files.
 """
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QStyledItemDelegate, QWidget, QHeaderView
 from . import utils
 from .mda_folder_table_model import HEADERS
 
 
-class _AlignCenterDelegate(QtWidgets.QStyledItemDelegate):
+class _AlignCenterDelegate(QStyledItemDelegate):
     """https://stackoverflow.com/a/61722299"""
 
     def initStyleOption(self, option, index):
         super().initStyleOption(option, index)
-        option.displayAlignment = QtCore.Qt.AlignCenter
+        option.displayAlignment = Qt.AlignCenter
 
 
-class MDAFolderTableView(QtWidgets.QWidget):
+class MDAFolderTableView(QWidget):
     ui_file = utils.getUiFileName(__file__)
 
     def __init__(self, parent):
@@ -36,7 +37,7 @@ class MDAFolderTableView(QtWidgets.QWidget):
     def setup(self):
         # Configure the horizontal header to resize based on content.
         header = self.tableView.horizontalHeader()
-        header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(QHeaderView.ResizeToContents)
 
     def displayTable(self):
         from .mda_folder_table_model import MDAFolderTableModel

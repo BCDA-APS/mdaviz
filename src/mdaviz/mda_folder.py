@@ -66,19 +66,18 @@ import time
 from functools import partial
 from pathlib import Path
 
-from PyQt5 import QtWidgets
 from PyQt5 import QtCore
-from PyQt5.QtCore import QItemSelectionModel
-from PyQt5.QtWidgets import QAbstractItemView
+from PyQt5.QtCore import QItemSelectionModel, Qt, pyqtSignal
+from PyQt5.QtWidgets import QAbstractItemView, QWidget
 
 from . import utils
 
 
-class MDA_MVC(QtWidgets.QWidget):
+class MDA_MVC(QWidget):
     """Model View Controller class for mda files."""
 
     # DESIGN NOTE: Should this signal be emitted here or in MDA_FILE_TM? Review if refactoring signal emission logic.
-    detRemoved = QtCore.pyqtSignal(
+    detRemoved = pyqtSignal(
         str, int
     )  # Emit the file path and row when a DET checkbox is unchecked
 
@@ -134,7 +133,7 @@ class MDA_MVC(QtWidgets.QWidget):
             selection_model = self.mda_folder_tableview.tableView.selectionModel()
             self.setSelectionModel(selection_model)
         # Ensure focus policy and selection mode for keyboard navigation
-        self.mda_folder_tableview.tableView.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.mda_folder_tableview.tableView.setFocusPolicy(Qt.StrongFocus)
         self.mda_folder_tableview.tableView.setSelectionMode(
             QAbstractItemView.SingleSelection
         )

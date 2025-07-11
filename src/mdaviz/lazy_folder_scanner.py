@@ -12,8 +12,8 @@ with support for batch processing and progress tracking.
 """
 
 from pathlib import Path
-from typing import List, Dict, Any, Optional, Callable
-from PyQt5 import QtCore
+from typing import Any, Optional, Callable
+from PyQt5.QtCore import QObject, QThread, pyqtSignal
 from .utils import get_file_info_lightweight, get_file_info_full
 from dataclasses import dataclass
 
@@ -22,15 +22,15 @@ from dataclasses import dataclass
 class FolderScanResult:
     """Result of a folder scan operation."""
 
-    file_list: List[str]
-    file_info_list: List[Dict[str, Any]]
+    file_list: list[str]
+    file_info_list: list[dict[str, Any]]
     total_files: int
     scanned_files: int
     is_complete: bool
     error_message: Optional[str] = None
 
 
-class LazyFolderScanner(QtCore.QObject):
+class LazyFolderScanner(QObject):
     """
     Lazy folder scanner for handling large MDA folders efficiently.
 
@@ -44,9 +44,9 @@ class LazyFolderScanner(QtCore.QObject):
     """
 
     # Signals
-    scan_progress = QtCore.pyqtSignal(int, int)  # current, total
-    scan_complete = QtCore.pyqtSignal(object)  # FolderScanResult
-    scan_error = QtCore.pyqtSignal(str)  # error message
+    scan_progress = pyqtSignal(int, int)  # current, total
+    scan_complete = pyqtSignal(object)  # FolderScanResult
+    scan_error = pyqtSignal(str)  # error message
 
     def __init__(
         self,
@@ -68,7 +68,7 @@ class LazyFolderScanner(QtCore.QObject):
         self.use_lightweight_scan = use_lightweight_scan
         self._scanning = False
         self._current_scan_path: Optional[Path] = None
-        self.scanner_thread: Optional[QtCore.QThread] = None
+        self.scanner_thread: Optional[QThread] = None
         self.scanner_worker: Optional[FolderScanWorker] = None
 
     def scan_folder(
@@ -164,7 +164,7 @@ class LazyFolderScanner(QtCore.QObject):
         self._current_scan_path = folder_path
 
         # Create a worker thread for scanning
-        self.scanner_thread = QtCore.QThread()
+        self.scanner_thread = QThread()
         self.scanner_worker = FolderScanWorker(
             folder_path, self.batch_size, self.max_files, self.use_lightweight_scan
         )
@@ -220,16 +220,16 @@ class LazyFolderScanner(QtCore.QObject):
             self._current_scan_path = None
 
 
-class FolderScanWorker(QtCore.QObject):
+class FolderScanWorker(QObject):
     """
     Worker class for performing folder scans in background threads.
     """
 
     # Signals
-    progress = QtCore.pyqtSignal(int, int)  # current, total
-    complete = QtCore.pyqtSignal(object)  # FolderScanResult
-    error = QtCore.pyqtSignal(str)  # error message
-    finished = QtCore.pyqtSignal()
+    progress = pyqtSignal(int, int)  # current, total
+    complete = pyqtSignal(object)  # FolderScanResult
+    error = pyqtSignal(str)  # error message
+    finished = pyqtSignal()
 
     def __init__(
         self,

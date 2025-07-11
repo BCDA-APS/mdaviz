@@ -17,9 +17,8 @@ from .mainwindow import MainWindow
 import argparse
 
 
-def gui():
-    """Display the main window"""
-
+def gui() -> None:
+    """Display the main window."""
     app = QtWidgets.QApplication(sys.argv)
     main_window = MainWindow()
     main_window.setStatus("Application started ...")
@@ -27,7 +26,12 @@ def gui():
     sys.exit(app.exec())
 
 
-def command_line_interface():
+def command_line_interface() -> argparse.Namespace:
+    """Parse command line arguments.
+
+    Returns:
+        argparse.Namespace: Parsed command line arguments
+    """
     from . import __version__
 
     doc = __doc__.strip().splitlines()[0]
@@ -56,10 +60,12 @@ def command_line_interface():
     return parser.parse_args()
 
 
-def main():  # for future command-line options
-    global logger
-
+def main() -> None:  # for future command-line options
+    """Main entry point for the application."""
     options = command_line_interface()
+
+    logging.basicConfig(level=options.log.upper())
+    logger = logging.getLogger(__name__)
 
     # # Resolve the directory to an absolute path and remove trailing slash
     # directory_path = Path(options.directory).resolve()
@@ -79,8 +85,6 @@ def main():  # for future command-line options
     #     )
     #     sys.exit(1)
 
-    logging.basicConfig(level=options.log.upper())
-    logger = logging.getLogger(__name__)
     logger.info("Logging level: %s", options.log)
 
     # set warning log level for (noisy) support packages

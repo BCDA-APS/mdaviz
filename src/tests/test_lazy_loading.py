@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Dict, Any, Generator
 from unittest.mock import Mock
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore
 
 from mdaviz.lazy_folder_scanner import LazyFolderScanner
 from mdaviz.data_cache import DataCache, CachedFileData, get_global_cache
@@ -324,7 +324,7 @@ class TestVirtualTableModel:
     ) -> None:
         """Test retrieving data from the model."""
         index = virtual_model.index(0, 0)
-        data = virtual_model.data(index, QtWidgets.QAbstractItemView.DisplayRole)
+        data = virtual_model.data(index, QtCore.Qt.DisplayRole)
 
         assert data == "test_data"
         mock_data_provider.get_data.assert_called_with(0, 0)
@@ -333,15 +333,15 @@ class TestVirtualTableModel:
         """Test getting header data."""
         header = virtual_model.headerData(
             0,
-            QtWidgets.QAbstractItemView.Horizontal,
-            QtWidgets.QAbstractItemView.DisplayRole,
+            QtCore.Qt.Horizontal,
+            QtCore.Qt.DisplayRole,
         )
         assert header == "Col1"
 
         row_header = virtual_model.headerData(
             0,
-            QtWidgets.QAbstractItemView.Vertical,
-            QtWidgets.QAbstractItemView.DisplayRole,
+            QtCore.Qt.Vertical,
+            QtCore.Qt.DisplayRole,
         )
         assert row_header == "1"
 

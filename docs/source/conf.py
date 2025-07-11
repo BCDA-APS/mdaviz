@@ -100,3 +100,6 @@ autodoc_mock_imports = """
     mdaviz.utils
     mdaviz.virtual_table_model
 """.split()
+
+# Suppress warnings about mocked objects
+suppress_warnings = ["autodoc.mocked_object"]

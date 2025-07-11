@@ -11,8 +11,9 @@ efficiently by loading data on-demand and caching frequently accessed items.
     ~MDAVirtualDataProvider
 """
 
-from typing import List, Dict, Any, Optional
-from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt
+from typing import Any, Optional
+from PyQt5.QtCore import QVariant
+from PyQt5.QtCore import QAbstractTableModel
 
 
 class VirtualDataProvider:
@@ -41,12 +42,12 @@ class VirtualDataProvider:
         """
         raise NotImplementedError
 
-    def get_column_headers(self) -> List[str]:
+    def get_column_headers(self) -> list[str]:
         """
         Get the column headers.
 
         Returns:
-            List[str]: List of column header strings
+            list[str]: List of column header strings
         """
         raise NotImplementedError
 
@@ -140,12 +141,12 @@ class VirtualTableModel(QAbstractTableModel):
         """Get the total number of columns."""
         return self.data_provider.get_column_count()
 
-    def data(self, index, role=Qt.DisplayRole):
+    def data(self, index, role=0):  # 0 = Qt.DisplayRole
         """Get data for a specific index and role."""
         if not index.isValid():
             return QVariant()
 
-        if role == Qt.DisplayRole:
+        if role == 0:  # Qt.DisplayRole
             row = index.row()
             column = index.column()
 
@@ -157,10 +158,10 @@ class VirtualTableModel(QAbstractTableModel):
 
         return QVariant()
 
-    def headerData(self, section, orientation, role=Qt.DisplayRole):
+    def headerData(self, section, orientation, role=0):  # 0 = Qt.DisplayRole
         """Get header data for the table."""
-        if role == Qt.DisplayRole:
-            if orientation == Qt.Horizontal:
+        if role == 0:  # Qt.DisplayRole
+            if orientation == 1:  # Qt.Horizontal
                 headers = self.data_provider.get_column_headers()
                 if 0 <= section < len(headers):
                     return headers[section]
@@ -230,7 +231,7 @@ class MDAVirtualDataProvider(VirtualDataProvider):
     display in virtual table models.
     """
 
-    def __init__(self, scan_dict: Dict[str, Any], cache_size: int = 1000):
+    def __init__(self, scan_dict: dict[str, Any], cache_size: int = 1000):
         """
         Initialize the MDA data provider.
 
@@ -240,8 +241,8 @@ class MDAVirtualDataProvider(VirtualDataProvider):
         """
         self.scan_dict = scan_dict
         self.cache_size = cache_size
-        self._data_cache: Dict[int, List[Any]] = {}
-        self._column_headers: Optional[List[str]] = None
+        self._data_cache: dict[int, list[Any]] = {}
+        self._column_headers: Optional[list[str]] = None
         self._row_count: Optional[int] = None
 
     def get_row_count(self) -> int:
@@ -259,7 +260,7 @@ class MDAVirtualDataProvider(VirtualDataProvider):
         """Get the total number of columns."""
         return len(self.scan_dict) if self.scan_dict else 0
 
-    def get_column_headers(self) -> List[str]:
+    def get_column_headers(self) -> list[str]:
         """Get the column headers."""
         if self._column_headers is None:
             self._column_headers = [v["name"] for v in self.scan_dict.values()]

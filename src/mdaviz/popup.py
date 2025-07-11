@@ -1,9 +1,9 @@
-from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QDialog
 
 from . import utils
 
 
-class PopUp(QtWidgets.QDialog):
+class PopUp(QDialog):
     """Load a generic About... Dialog as a .ui file."""
 
     # UI file name matches this module, different extension

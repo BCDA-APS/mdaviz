@@ -22,7 +22,7 @@ maintainers = [
 ]
 dynamic = ["version"]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 keywords = ["bluesky", "databroker", "tiled", "catalog"]
 # https://packaging.python.org/en/latest/specifications/declaring-project-metadata/?highlight=license
 license = {file = "LICENSE"}
@@ -141,7 +141,7 @@ addopts = [
     "--cov-report=term-missing",
     "--cov-report=html",
 ]
-testpaths = ["tests"]
+testpaths = ["src/tests"]
 pythonpath = ["src"]
 
 [tool.ruff]

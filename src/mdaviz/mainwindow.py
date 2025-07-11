@@ -7,8 +7,10 @@ Defines MainWindow class.
 """
 
 from pathlib import Path
-from typing import List, Optional
-from PyQt5 import QtWidgets, QtCore
+from typing import Optional, List
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QMainWindow, QSizePolicy, QDesktopWidget, QAction
 
 from . import APP_TITLE
 from .mda_folder import MDA_MVC
@@ -22,7 +24,7 @@ MAX_FILES = 500
 MAX_RECENT_DIRS = 10
 
 
-class MainWindow(QtWidgets.QMainWindow):
+class MainWindow(QMainWindow):
     """The main window of the app, built in Qt designer.
 
     .. autosummary::
@@ -56,24 +58,22 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Set proper window flags for macOS resizing
         self.setWindowFlags(
-            QtCore.Qt.Window
-            | QtCore.Qt.WindowMinimizeButtonHint
-            | QtCore.Qt.WindowMaximizeButtonHint
-            | QtCore.Qt.WindowCloseButtonHint
+            Qt.Window
+            | Qt.WindowMinimizeButtonHint
+            | Qt.WindowMaximizeButtonHint
+            | Qt.WindowCloseButtonHint
         )
 
         # Additional macOS-specific properties for proper resizing
-        self.setAttribute(QtCore.Qt.WA_MacShowFocusRect, False)
-        self.setAttribute(QtCore.Qt.WA_MacNormalSize, True)
+        self.setAttribute(Qt.WA_MacShowFocusRect, False)
+        self.setAttribute(Qt.WA_MacNormalSize, True)
 
         # Ensure the window can be resized
         self.setMinimumSize(400, 300)
         self.resize(720, 400)  # More reasonable initial size
 
         # Ensure the window is resizable
-        self.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
-        )
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # Ensure central widget and main content area are resizable
         self._setup_resizable_layout()
@@ -99,7 +99,7 @@ class MainWindow(QtWidgets.QMainWindow):
         print("Settings are saved in:", settings.fileName())
 
         # Ensure the window size is reasonable (not too large)
-        screen = QtWidgets.QDesktopWidget().screenGeometry()
+        screen = QDesktopWidget().screenGeometry()
         max_width = min(screen.width() * 0.8, 1200)  # Max 80% of screen width or 1200px
         max_height = min(
             screen.height() * 0.8, 800
@@ -136,7 +136,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def _setup_auto_load_menu(self):
         """Set up the auto-load toggle menu action."""
         # Create the auto-load toggle action
-        self.actionToggleAutoLoad = QtWidgets.QAction("Toggle Auto-Load", self)
+        self.actionToggleAutoLoad = QAction("Toggle Auto-Load", self)
         self.actionToggleAutoLoad.setStatusTip(
             "Toggle automatic folder loading on startup"
         )

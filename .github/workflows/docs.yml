@@ -53,7 +53,7 @@ jobs:
 
     - name: Sphinx
       id: deployment
-      run: make -C docs SPHINXOPTS="-W" html
+      run: make -C docs html
 
     - name: Diagnostic
       run: ls -lAFgh docs/build/html

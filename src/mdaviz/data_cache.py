@@ -13,10 +13,10 @@ loading and processing MDA files.
 
 import time
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Optional
 from dataclasses import dataclass, field
 from collections import OrderedDict
-from PyQt5 import QtCore
+from PyQt5.QtCore import QObject, pyqtSignal
 from .synApps_mdalib.mda import readMDA
 from .utils import get_scan
 
@@ -26,8 +26,8 @@ class CachedFileData:
     """Cached file data with metadata."""
 
     file_path: str
-    metadata: Dict[str, Any]
-    scan_dict: Dict[str, Any]
+    metadata: dict[str, Any]
+    scan_dict: dict[str, Any]
     first_pos: int
     first_det: int
     pv_list: list
@@ -45,7 +45,7 @@ class CachedFileData:
         return self.size_bytes / (1024 * 1024)
 
 
-class DataCache(QtCore.QObject):
+class DataCache(QObject):
     """
     LRU cache for MDA file data to improve performance and manage memory usage.
 
@@ -59,10 +59,10 @@ class DataCache(QtCore.QObject):
     """
 
     # Signals
-    cache_hit = QtCore.pyqtSignal(str)  # file path
-    cache_miss = QtCore.pyqtSignal(str)  # file path
-    cache_eviction = QtCore.pyqtSignal(str)  # file path
-    cache_full = QtCore.pyqtSignal()
+    cache_hit = pyqtSignal(str)  # file path
+    cache_miss = pyqtSignal(str)  # file path
+    cache_eviction = pyqtSignal(str)  # file path
+    cache_full = pyqtSignal()
 
     def __init__(
         self,
@@ -238,7 +238,7 @@ class DataCache(QtCore.QObject):
         self.cache_eviction.emit(file_path)
         return True
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """
         Get cache statistics.
 
