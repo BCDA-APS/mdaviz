@@ -289,12 +289,21 @@ class TestCursorIntegration:
             event.xdata = 2.3
             event.ydata = 23.0
 
-            # Mock cursor storage
-            chart_view.cursors = {1: None, "pos1": None, 2: None, "pos2": None}
+            # Mock cursor storage with all required keys
+            chart_view.cursors = {
+                1: None,
+                "pos1": None,
+                2: None,
+                "pos2": None,
+                "text1": "",
+                "text2": "",
+                "diff": "",
+                "midpoint": "",
+            }
 
-            # Mock matplotlib plotting
+            # Mock matplotlib plotting - properly mock the plot method
             mock_line = Mock()
-            chart_view.main_axes.plot.return_value = [mock_line]
+            chart_view.main_axes.plot = Mock(return_value=[mock_line])
 
             # Call onclick
             chart_view.onclick(event)
@@ -329,9 +338,20 @@ class TestCursorIntegration:
             event.xdata = 2.3
             event.ydata = 23.0
 
-            chart_view.cursors = {1: None, "pos1": None, 2: None, "pos2": None}
+            # Mock cursor storage with all required keys
+            chart_view.cursors = {
+                1: None,
+                "pos1": None,
+                2: None,
+                "pos2": None,
+                "text1": "",
+                "text2": "",
+                "diff": "",
+                "midpoint": "",
+            }
 
-            chart_view.main_axes.plot.return_value = [Mock()]
+            # Mock matplotlib plotting - properly mock the plot method
+            chart_view.main_axes.plot = Mock(return_value=[Mock()])
 
             # Call onclick
             chart_view.onclick(event)
