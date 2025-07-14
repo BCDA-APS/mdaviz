@@ -2,13 +2,15 @@
 
 Python Qt5 application to visualize mda data.
 
-GH tag | GH release | PyPI
---- | --- | ---
-[![tag](https://img.shields.io/github/tag/BCDA-APS/mdaviz.svg)](https://github.com/BCDA-APS/mdaviz/tags) | [![release](https://img.shields.io/github/release/BCDA-APS/mdaviz.svg)](https://github.com/BCDA-APS/mdaviz/releases) | [![PyPi](https://img.shields.io/pypi/v/mdaviz.svg)](https://pypi.python.org/pypi/mdaviz)
+## Status Badges
 
-Python version(s) | Unit Tests | Code Coverage | License
+CI/CD | Code Quality | Documentation | Package
 --- | --- | --- | ---
-[![Python version](https://img.shields.io/pypi/pyversions/mdaviz.svg)](https://pypi.python.org/pypi/mdaviz) | [![Unit Tests](https://github.com/BCDA-APS/mdaviz/workflows/Unit%20Tests%20%26%20Code%20Coverage/badge.svg)](https://github.com/BCDA-APS/mdaviz/actions/workflows/unit_tests.yml) | [![Coverage Status](https://coveralls.io/repos/github/BCDA-APS/mdaviz/badge.svg?branch=main)](https://coveralls.io/github/BCDA-APS/mdaviz?branch=main) | [![license: ANL](https://img.shields.io/badge/license-ANL-brightgreen)](LICENSE.txt)
+[![CI](https://github.com/BCDA-APS/mdaviz/workflows/CI/badge.svg)](https://github.com/BCDA-APS/mdaviz/actions/workflows/ci.yml) | [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff) | [![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue.svg)](https://bcda-aps.github.io/mdaviz/) | [![PyPI version](https://badge.fury.io/py/mdaviz.svg)](https://badge.fury.io/py/mdaviz) [![GitHub release](https://img.shields.io/github/release/BCDA-APS/mdaviz.svg)](https://github.com/BCDA-APS/mdaviz/releases)
+
+Coverage | License | Python | Pre-commit
+--- | --- | --- | ---
+[![codecov](https://codecov.io/gh/BCDA-APS/mdaviz/branch/main/graph/badge.svg)](https://codecov.io/gh/BCDA-APS/mdaviz) | [![License: ANL](https://img.shields.io/badge/License-ANL-brightgreen.svg)](LICENSE.txt) | [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/) | [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 ## Features
 
@@ -31,17 +33,17 @@ Always activate the environment before running, testing, or using pre-commit hoo
 
 ### Install & run the application
 
-Mdaviz is available on PyPi:
+Mdaviz is available on PyPI:
 ```bash
 $ conda activate mdaviz
 $ pip install mdaviz
 ```
-Once install, you can run the application at anytime using:
+
+Once installed, you can run the application at any time using:
 ```bash
 $ conda activate mdaviz
 $ mdaviz
 ```
-
 
 ### Run the application in developer mode
 
@@ -58,11 +60,20 @@ $ pip install -e .
 $ mdaviz
 ```
 
-## Testing
+## Development
+
+### Testing
 
 Run all tests:
 ```bash
 pytest src/tests
+```
+
+### Code Quality
+
+The project uses pre-commit hooks for code quality. Run them before committing:
+```bash
+pre-commit run --all-files
 ```
 
 ## Contributing
