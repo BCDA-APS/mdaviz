@@ -571,6 +571,37 @@ class MDA_MVC(QWidget):
             self.mda_file.displayMetadata(file_data.get("metadata", None))
             self.mda_file.displayData(file_data.get("tabledata", None))
 
+        # Highlight the corresponding file in the folder table view if it belongs to the current folder
+        if file_path:
+            file_name = Path(file_path).name
+            current_folder_path = str(self.dataPath())
+
+            # Check if the file belongs to the currently loaded folder
+            if file_path.startswith(current_folder_path):
+                try:
+                    # Find the index of the file in the current folder's file list
+                    file_index = self.mdaFileList().index(file_name)
+
+                    # Get the model and create the index
+                    model = self.mda_folder_tableview.tableView.model()
+                    if model and file_index < model.rowCount():
+                        index = model.index(file_index, 0)
+
+                        # Highlight the file in the folder table view (without triggering onFileSelected)
+                        self.mda_folder_tableview.tableView.setFocus()
+                        self.selectionModel().setCurrentIndex(
+                            index,
+                            QItemSelectionModel.ClearAndSelect
+                            | QItemSelectionModel.Rows,
+                        )
+                        self.mda_folder_tableview.tableView.scrollTo(
+                            index, QAbstractItemView.EnsureVisible
+                        )
+
+                except ValueError:
+                    # File not found in the current folder's file list, ignore
+                    pass
+
         # NOTE: Consider disabling UI elements or actions that require an active file/folder to be meaningful.
 
     # # ------------ Folder Table View navigation & selection highlight:
