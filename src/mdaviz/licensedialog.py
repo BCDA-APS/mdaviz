@@ -17,7 +17,12 @@ class LicenseDialog(QDialog):
         self.setup()
 
     def setup(self):
-        LICENSE_FILE = "../LICENSE"
+        import pathlib
+
+        # Find the LICENSE.txt file relative to the project root
+        current_file = pathlib.Path(__file__)
+        project_root = current_file.parent.parent.parent
+        LICENSE_FILE = project_root / "LICENSE.txt"
 
         self.setModal(True)
         license_text = open(LICENSE_FILE, "r").read()

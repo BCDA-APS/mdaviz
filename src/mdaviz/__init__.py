@@ -28,11 +28,12 @@ AUTHOR_LIST = [
     for s in """
         Fanny Rodolakis
         Pete Jemian
+        Rafael Vescovi
+        Eric Codrea
     """.strip().splitlines()
 ]
 
 COPYRIGHT_TEXT = "(c) 2023, UChicago Argonne, LLC, (see LICENSE file for details)"
 DOCS_URL = "https://github.com/BCDA-APS/mdaviz/blob/main/README.md"
 ISSUES_URL = "https://github.com/BCDA-APS/mdaviz/issues"
-LICENSE_FILE = "LICENSE"
-VERSION = "1.1.0"
+LICENSE_FILE = "LICENSE.txt"
