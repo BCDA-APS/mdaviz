@@ -45,7 +45,7 @@ def command_line_interface() -> argparse.Namespace:
             "Provide logging level. "
             "Example '--log debug'. "
             "Default level: 'warning'"),
-        choices=[k.lower() for k in logging.getLevelNamesMapping()],
+        choices=["debug", "info", "warning", "error", "critical"],
     )
     # fmt: on
 
