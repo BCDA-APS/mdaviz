@@ -587,7 +587,13 @@ class MDA_MVC(QWidget):
                     if model and file_index < model.rowCount():
                         index = model.index(file_index, 0)
 
-                        # Highlight the file in the folder table view (without triggering onFileSelected)
+                        # Temporarily disconnect the currentChanged signal to avoid triggering onFileSelected
+                        if self.selectionModel():
+                            self.selectionModel().currentChanged.disconnect(
+                                self.onFileSelected
+                            )
+
+                        # Highlight the file in the folder table view
                         self.mda_folder_tableview.tableView.setFocus()
                         self.selectionModel().setCurrentIndex(
                             index,
@@ -597,6 +603,12 @@ class MDA_MVC(QWidget):
                         self.mda_folder_tableview.tableView.scrollTo(
                             index, QAbstractItemView.EnsureVisible
                         )
+
+                        # Reconnect the currentChanged signal
+                        if self.selectionModel():
+                            self.selectionModel().currentChanged.connect(
+                                self.onFileSelected
+                            )
 
                 except ValueError:
                     # File not found in the current folder's file list, ignore
