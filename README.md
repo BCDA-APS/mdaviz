@@ -16,43 +16,10 @@ Python version(s) | Unit Tests | Code Coverage | License
 - **Lazy Loading**: Efficient folder scanning with progress indicators for large datasets.
 - **Interactive Plotting**: Real-time data visualization with matplotlib integration.
 - **Recent Folders**: Remembers your recently opened folders for quick access.
-- **Configurable Settings**: User preferences are saved and restored between sessions.
-
-## Auto-Load Feature
-
-The auto-load feature automatically loads the first valid folder from your recent folders list when the application starts. This provides a better user experience by eliminating the need to manually select a folder each time you open the application.
-
-### Controlling Auto-Load
-
-You can control the auto-load behavior through the application menu:
-
-- **File → Toggle Auto-Load**: Check/uncheck this menu item to enable or disable auto-loading
-- The setting is automatically saved and will be remembered for future sessions
-- When disabled, the application will start without loading any folder, requiring manual folder selection
-
-### How It Works
-
-1. When the application starts, it checks if auto-loading is enabled (default: enabled)
-2. If enabled, it looks for the first folder in your recent folders list
-3. If the folder exists and is valid, it automatically loads and scans that folder
-4. If no valid folders are found, the application starts normally without loading any folder
 
 ## Quickstart
 
-```bash
-# Clone the repo
-$ git clone https://github.com/BCDA-APS/mdaviz.git
-$ cd mdaviz
-
-# Install with development dependencies
-$ pip install -e .[dev]
-
-# Run the application
-$ python -m mdaviz.app
-```
-
-## Conda Environment
-
+### Conda environment
 It is strongly recommended to use the provided conda environment for development and running the application. This ensures all dependencies (including PyQt5) are available and compatible.
 
 ```bash
@@ -62,19 +29,40 @@ conda activate mdaviz
 
 Always activate the environment before running, testing, or using pre-commit hooks.
 
+### Install & run the application
+
+Mdaviz is available on PyPi:
+```bash
+$ conda activate mdaviz
+$ pip install mdaviz
+```
+Once install, you can run the application at anytime using:
+```bash
+$ conda activate mdaviz
+$ mdaviz
+```
+
+
+### Run the application in developer mode
+
+```bash
+# Clone the repo
+$ git clone https://github.com/BCDA-APS/mdaviz.git
+$ cd mdaviz
+
+# Install with development dependencies
+$ conda activate mdaviz
+$ pip install -e .
+
+# Run the application
+$ mdaviz
+```
+
 ## Testing
 
 Run all tests:
 ```bash
 pytest src/tests
-```
-
-## Pre-commit hooks
-
-To ensure code quality, install and run pre-commit:
-```bash
-pre-commit install
-pre-commit run --all-files
 ```
 
 ## Contributing
