@@ -15,11 +15,10 @@ This document provides a comprehensive plan for the mdaviz project, covering env
 - **Comprehensive documentation** with Sphinx and GitHub Pages
 
 ### ⚠️ Areas for Improvement
-- **Low test coverage** (36%) - many critical paths untested
-- **Deprecation warnings** - PyQt5 sipPyTypeDict() deprecations
-- **Python 3.13 compatibility** - xdrlib deprecation
+- **Low test coverage** (34%) - many critical paths untested
 - **GUI test limitations** - headless environment challenges
 - **Memory management** - potential memory leaks in large datasets
+- **Documentation updates** - some plan docs need PyQt6 updates
 
 ## 1. Environment Setup and Dependencies
 
@@ -37,13 +36,12 @@ channels:
 dependencies:
   - libopenblas
   - matplotlib
-  - pyqt =5
   - pyqtgraph
-  - qt =5
   - tiled
   - scipy
   - lmfit
   - pyyaml
+  - psutil
 ```
 
 ### Installation Commands
@@ -52,6 +50,9 @@ dependencies:
 # Create and activate environment
 conda env create -f env.yml
 conda activate mda1
+
+# Install PyQt6 (not available in conda-forge for all platforms)
+pip install PyQt6
 
 # Install project in editable mode
 pip install -e .
@@ -69,7 +70,7 @@ pip install -e ".[build]"
 # Verify environment
 conda info --envs
 python --version  # Should be 3.11+
-pip list | grep -E "(PyQt5|matplotlib|scipy|lmfit|tiled)"
+pip list | grep -E "(PyQt6|matplotlib|scipy|lmfit|tiled)"
 
 # Test basic functionality
 python -c "import mdaviz; print('mdaviz imported successfully')"
@@ -213,53 +214,46 @@ User selects file → MDAFile → DataCache → ChartView → FitManager
 
 ### Critical Issues (High Priority)
 
-#### A. PyQt5 Deprecation Warnings
-- **Issue**: `sipPyTypeDict()` is deprecated in favor of `sipPyTypeDictRef()`
-- **Impact**: Future PyQt5 versions may break functionality
-- **Files affected**: 15+ files including:
-  - `src/mdaviz/aboutdialog.py:15`
-  - `src/mdaviz/mda_folder.py:76`
-  - `src/mdaviz/user_settings.py:48`
-  - `src/mdaviz/chartview.py:60`
-  - `src/mdaviz/mainwindow.py:27`
+#### A. Test Coverage Improvement
+- **Issue**: Low test coverage (34%) with many critical paths untested
+- **Impact**: Reduced confidence in code quality and potential for regressions
+- **Modules needing improvement**:
+  - `chartview.py` (12%) - Core plotting functionality
+  - `fit_manager.py` (27%) - Curve fitting
+  - `mda_file.py` (35%) - File handling
+  - `app.py` (0%) - Application startup
+  - `mainwindow.py` (46%) - Main UI
 
-**Fix Strategy:**
+**Improvement Strategy:**
 ```python
-# Before (deprecated)
-class MyWidget(QWidget):
-    pass
-
-# After (modern)
-class MyWidget(QWidget):
-    pass  # PyQt5 will handle this automatically
+# Add comprehensive tests for critical functionality
+def test_chartview_plotting(qtbot):
+    """Test ChartView plotting functionality."""
+    chart_view = ChartView()
+    qtbot.addWidget(chart_view)
+    
+    # Test data plotting
+    x_data = [1, 2, 3, 4, 5]
+    y_data = [1, 4, 9, 16, 25]
+    
+    chart_view.plot_data(x_data, y_data, "Test Curve")
+    
+    # Verify plot was created
+    assert len(chart_view.get_curves()) == 1
+    assert chart_view.get_curves()[0].label == "Test Curve"
 ```
 
-#### B. Python 3.13 Compatibility
-- **Issue**: `xdrlib` is deprecated and slated for removal in Python 3.13
-- **Location**: `src/mdaviz/synApps_mdalib/mda.py:25`
-- **Current mitigation**: Fallback to local `f_xdrlib` implementation
-- **Impact**: Application will break on Python 3.13+
-
-**Fix Strategy:**
-```python
-# Current implementation (good)
-try:
-    import xdrlib as xdr
-except ImportError:
-    from . import f_xdrlib as xdr_fallback
-    xdr = xdr_fallback
-```
-
-#### C. GUI Test Limitations
+#### B. GUI Test Implementation
 - **Issue**: GUI tests are limited in headless environments
-- **Location**: `src/tests/test_app.py`
+- **Location**: `src/tests/test_app.py` and other GUI tests
 - **Current status**: Tests are skipped with FIXME comments
+- **Impact**: Reduced confidence in UI functionality
 
-**Fix Strategy:**
+**Implementation Strategy:**
 ```python
-# Use pytest-qt for GUI testing
+# Use pytest-qt for proper GUI testing
 import pytest
-from PyQt5.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication
 
 @pytest.fixture
 def qtbot(qtbot):
@@ -270,6 +264,31 @@ def test_gui_functionality(qtbot):
     """Test GUI functionality with qtbot."""
     # GUI test implementation
     pass
+```
+
+#### C. Memory Management Optimization
+- **Issue**: Potential memory leaks with large datasets
+- **Location**: `src/mdaviz/data_cache.py`
+- **Impact**: Application may become unresponsive with large files
+
+**Improvement Strategy:**
+```python
+# Add memory monitoring
+import psutil
+import gc
+
+class DataCache(QObject):
+    def __init__(self, max_size=100, max_memory_mb=500):
+        self.max_memory_mb = max_memory_mb
+        # ... existing code ...
+
+    def _check_memory_usage(self):
+        """Monitor memory usage and cleanup if needed."""
+        process = psutil.Process()
+        memory_mb = process.memory_info().rss / 1024 / 1024
+        if memory_mb > self.max_memory_mb:
+            self.clear()
+            gc.collect()
 ```
 
 ### Performance Issues (Medium Priority)
@@ -371,13 +390,14 @@ class BackgroundWorker(QThread):
 ### High Priority Improvements
 
 #### A. Test Coverage Enhancement
-- **Current coverage**: 36%
+- **Current coverage**: 34%
 - **Target**: 80%+
 - **Areas to focus**:
   - ChartView plotting functionality
   - FitManager operations
   - DataCache operations
   - Error handling paths
+  - GUI components
 
 **Implementation Plan:**
 ```python
@@ -398,18 +418,15 @@ def test_chartview_plotting(qtbot):
     assert chart_view.get_curves()[0].label == "Test Curve"
 ```
 
-#### B. Modernize PyQt5 Usage
-- **Action**: Update deprecated `sipPyTypeDict()` calls
-- **Benefit**: Future compatibility and reduced warnings
-- **Effort**: Medium (requires careful testing)
+#### B. GUI Testing Implementation
+- **Action**: Implement proper GUI tests using pytest-qt
+- **Benefit**: Increased confidence in UI functionality
+- **Effort**: Medium (requires test infrastructure setup)
 
-#### C. Python 3.13+ Compatibility
-- **Action**: Replace `xdrlib` with modern alternatives
-- **Options**:
-  - Use `struct` module for binary data
-  - Implement custom XDR library
-  - Use third-party XDR libraries
-- **Benefit**: Long-term Python compatibility
+#### C. Memory Management Optimization
+- **Action**: Add memory monitoring and automatic cleanup
+- **Benefit**: Better performance with large datasets
+- **Effort**: Low (add monitoring to existing cache)
 
 ### Medium Priority Improvements
 
@@ -786,16 +803,16 @@ jobs:
 ## 8. Implementation Timeline
 
 ### Phase 1: Immediate Actions (Week 1-2)
-1. **Fix critical deprecation warnings** - Update PyQt5 usage
-2. **Improve test coverage** - Add tests for critical paths
-3. **Implement PyInstaller support** - Add executable compilation
-4. **Update documentation** - Add executable build instructions
+1. **Improve test coverage** - Add tests for critical paths (target: 60%+)
+2. **Implement GUI testing** - Use pytest-qt for UI testing
+3. **Update documentation** - Reflect current PyQt6 state
+4. **Memory management** - Add monitoring and cleanup
 
 ### Phase 2: Short-term Goals (Month 1-2)
-1. **Python 3.13 compatibility** - Replace xdrlib dependency
-2. **Enhanced error handling** - Implement comprehensive error system
-3. **Performance optimizations** - Improve memory management
-4. **CI/CD for executables** - Automated builds and releases
+1. **Enhanced error handling** - Implement comprehensive error system
+2. **Performance optimizations** - Progressive loading for large files
+3. **CI/CD for executables** - Automated builds and releases
+4. **Advanced testing** - Property-based and integration tests
 
 ### Phase 3: Medium-term Goals (Month 3-6)
 1. **Advanced features** - Statistical analysis, data export
@@ -825,11 +842,11 @@ jobs:
 
 ## 10. Conclusion
 
-The mdaviz project has a solid foundation with good architecture and modern development practices. The main areas for improvement are:
+The mdaviz project has a solid foundation with good architecture and modern development practices. The PyQt6 migration is complete, ensuring future compatibility. The main areas for improvement are:
 
-1. **Immediately**: Address PyQt5 deprecation warnings and improve test coverage
-2. **Short-term**: Implement executable compilation and Python 3.13 compatibility
-3. **Medium-term**: Add advanced features and performance optimizations
+1. **Immediately**: Improve test coverage and implement GUI testing
+2. **Short-term**: Add memory management and error handling improvements
+3. **Medium-term**: Implement executable compilation and advanced features
 4. **Long-term**: Build community and ecosystem
 
 With this comprehensive plan, the project can evolve into a robust, user-friendly tool for MDA data visualization with excellent cross-platform support and modern development practices.
@@ -837,15 +854,15 @@ With this comprehensive plan, the project can evolve into a robust, user-friendl
 ## Appendices
 
 ### A. Current Dependencies
-- **Core**: PyQt5, matplotlib, scipy, lmfit, tiled, PyYAML
-- **Development**: pytest, ruff, mypy, pre-commit
+- **Core**: PyQt6, matplotlib, scipy, lmfit, tiled, PyYAML, psutil
+- **Development**: pytest, ruff, mypy, pre-commit, pytest-qt
 - **Build**: pyinstaller, cx_Freeze, nuitka
 - **Vendored**: synApps_mdalib (mdalib)
 
 ### B. Platform Support
 - **Tested platforms**: Linux (Ubuntu), Windows, macOS
-- **Python versions**: 3.10, 3.11, 3.12
-- **Qt versions**: Qt5 (5.15.2)
+- **Python versions**: 3.10, 3.11, 3.12, 3.13
+- **Qt versions**: Qt6 (6.9.0)
 
 ### C. Performance Benchmarks
 - **Startup time**: <2 seconds
