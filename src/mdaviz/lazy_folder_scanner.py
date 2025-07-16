@@ -28,6 +28,7 @@ class FolderScanResult:
     scanned_files: int
     is_complete: bool
     error_message: Optional[str] = None
+    is_progressive: bool = False  # Whether this is a progressive scan
 
 
 class LazyFolderScanner(QObject):
@@ -41,18 +42,21 @@ class LazyFolderScanner(QObject):
         batch_size (int): Number of files to process in each batch
         max_files (int): Maximum number of files to scan before warning
         use_lightweight_scan (bool): Whether to use lightweight scanning
+        progressive_loading (bool): Whether to use progressive loading for large directories
     """
 
     # Signals
     scan_progress = pyqtSignal(int, int)  # current, total
     scan_complete = pyqtSignal(object)  # FolderScanResult
     scan_error = pyqtSignal(str)  # error message
+    progressive_scan_update = pyqtSignal(object)  # FolderScanResult (partial)
 
     def __init__(
         self,
         batch_size: int = 50,
-        max_files: int = 1000,
+        max_files: int = 10000,
         use_lightweight_scan: bool = True,
+        progressive_loading: bool = True,
     ):
         """
         Initialize the lazy folder scanner.
@@ -61,11 +65,13 @@ class LazyFolderScanner(QObject):
             batch_size (int): Number of files to process in each batch
             max_files (int): Maximum number of files to scan before warning
             use_lightweight_scan (bool): Whether to use lightweight scanning
+            progressive_loading (bool): Whether to use progressive loading for large directories
         """
         super().__init__()
         self.batch_size = batch_size
         self.max_files = max_files
         self.use_lightweight_scan = use_lightweight_scan
+        self.progressive_loading = progressive_loading
         self._scanning = False
         self._current_scan_path: Optional[Path] = None
         self.scanner_thread: Optional[QThread] = None
@@ -95,6 +101,10 @@ class LazyFolderScanner(QObject):
 
         if total_files == 0:
             return FolderScanResult([], [], 0, 0, True, "No MDA files found")
+
+        # For very large directories, use progressive loading
+        if total_files > self.max_files and self.progressive_loading:
+            return self._progressive_scan(folder_path, mda_files, progress_callback)
 
         if total_files > self.max_files:
             return FolderScanResult(
@@ -146,6 +156,145 @@ class LazyFolderScanner(QObject):
         self.scan_complete.emit(result)
         return result
 
+    def _progressive_scan(
+        self,
+        folder_path: Path,
+        mda_files: list[Path],
+        progress_callback: Optional[Callable[[int, int], None]] = None,
+    ) -> FolderScanResult:
+        """
+        Perform progressive scanning for very large directories.
+        
+        This method scans files in chunks and provides partial results
+        to keep the UI responsive.
+        
+        Parameters:
+            folder_path (Path): Path to the folder to scan
+            mda_files (list[Path]): List of MDA files to scan
+            progress_callback (callable, optional): Callback for progress updates
+            
+        Returns:
+            FolderScanResult: Initial result with first batch of files
+        """
+        total_files = len(mda_files)
+        
+        # For progressive loading, we'll scan the first batch immediately
+        # and return a partial result
+        initial_batch_size = min(self.batch_size * 2, total_files)
+        
+        file_list = []
+        file_info_list = []
+        scanned_files = 0
+
+        # Scan initial batch
+        for i in range(initial_batch_size):
+            file_path = mda_files[i]
+            try:
+                if self.use_lightweight_scan:
+                    file_info = get_file_info_lightweight(file_path)
+                else:
+                    file_info = get_file_info_full(file_path)
+
+                file_list.append(file_path.name)
+                file_info_list.append(file_info)
+                scanned_files += 1
+
+                # Emit progress signal
+                self.scan_progress.emit(scanned_files, total_files)
+                if progress_callback:
+                    progress_callback(scanned_files, total_files)
+
+            except Exception as e:
+                print(f"Error scanning {file_path}: {e}")
+                continue
+
+        # Return partial result
+        result = FolderScanResult(
+            file_list=file_list,
+            file_info_list=file_info_list,
+            total_files=total_files,
+            scanned_files=scanned_files,
+            is_complete=False,  # Not complete yet
+            is_progressive=True,
+        )
+
+        # Emit progressive update
+        self.progressive_scan_update.emit(result)
+        
+        # Continue scanning in background
+        self._continue_progressive_scan(folder_path, mda_files, scanned_files, progress_callback)
+        
+        return result
+
+    def _continue_progressive_scan(
+        self,
+        folder_path: Path,
+        mda_files: list[Path],
+        start_index: int,
+        progress_callback: Optional[Callable[[int, int], None]] = None,
+    ) -> None:
+        """
+        Continue progressive scanning from a given index.
+        
+        Parameters:
+            folder_path (Path): Path to the folder to scan
+            mda_files (list[Path]): List of MDA files to scan
+            start_index (int): Index to start scanning from
+            progress_callback (callable, optional): Callback for progress updates
+        """
+        total_files = len(mda_files)
+        file_list = []
+        file_info_list = []
+        scanned_files = start_index
+
+        # Continue scanning from where we left off
+        for i in range(start_index, total_files, self.batch_size):
+            batch_files = mda_files[i : i + self.batch_size]
+
+            for file_path in batch_files:
+                try:
+                    if self.use_lightweight_scan:
+                        file_info = get_file_info_lightweight(file_path)
+                    else:
+                        file_info = get_file_info_full(file_path)
+
+                    file_list.append(file_path.name)
+                    file_info_list.append(file_info)
+                    scanned_files += 1
+
+                    # Emit progress signal
+                    self.scan_progress.emit(scanned_files, total_files)
+                    if progress_callback:
+                        progress_callback(scanned_files, total_files)
+
+                except Exception as e:
+                    print(f"Error scanning {file_path}: {e}")
+                    continue
+
+            # Emit progressive update every batch
+            if file_list:
+                result = FolderScanResult(
+                    file_list=file_list,
+                    file_info_list=file_info_list,
+                    total_files=total_files,
+                    scanned_files=scanned_files,
+                    is_complete=(scanned_files >= total_files),
+                    is_progressive=True,
+                )
+                self.progressive_scan_update.emit(result)
+
+        # Final completion
+        if scanned_files >= total_files:
+            final_result = FolderScanResult(
+                file_list=file_list,
+                file_info_list=file_info_list,
+                total_files=total_files,
+                scanned_files=scanned_files,
+                is_complete=True,
+                is_progressive=True,
+            )
+            self.scan_complete.emit(final_result)
+
     def scan_folder_async(self, folder_path: Path) -> None:
         """
         Scan a folder asynchronously in a separate thread.
@@ -166,7 +315,11 @@ class LazyFolderScanner(QObject):
         # Create a worker thread for scanning
         self.scanner_thread = QThread()
         self.scanner_worker = FolderScanWorker(
-            folder_path, self.batch_size, self.max_files, self.use_lightweight_scan
+            folder_path, 
+            self.batch_size, 
+            self.max_files, 
+            self.use_lightweight_scan,
+            self.progressive_loading
         )
 
         # Move worker to thread
@@ -177,6 +330,7 @@ class LazyFolderScanner(QObject):
         self.scanner_worker.progress.connect(self.scan_progress)
         self.scanner_worker.complete.connect(self._on_scan_complete)
         self.scanner_worker.error.connect(self._on_scan_error)
+        self.scanner_worker.progressive_update.connect(self.progressive_scan_update)
         self.scanner_worker.finished.connect(self.scanner_thread.quit)
         self.scanner_thread.finished.connect(self.scanner_worker.deleteLater)
         self.scanner_thread.finished.connect(self.scanner_thread.deleteLater)
@@ -202,22 +356,10 @@ class LazyFolderScanner(QObject):
 
     def cancel_scan(self) -> None:
         """Cancel the current scan operation."""
-        if self._scanning and self.scanner_thread is not None:
-            # Cancel the worker first
-            if self.scanner_worker is not None:
-                self.scanner_worker.cancel()
-
-            # Quit the thread
-            self.scanner_thread.quit()
-
-            # Wait for the thread to finish (with timeout)
-            if not self.scanner_thread.wait(2000):  # Wait up to 2 seconds
-                # Force terminate if it doesn't finish gracefully
-                self.scanner_thread.terminate()
-                self.scanner_thread.wait(1000)  # Wait a bit more for termination
-
-            self._scanning = False
-            self._current_scan_path = None
+        if self.scanner_worker is not None:
+            self.scanner_worker.cancel()
+        self._scanning = False
+        self._current_scan_path = None
 
 
 class FolderScanWorker(QObject):
@@ -229,6 +371,7 @@ class FolderScanWorker(QObject):
     progress = pyqtSignal(int, int)  # current, total
     complete = pyqtSignal(object)  # FolderScanResult
     error = pyqtSignal(str)  # error message
+    progressive_update = pyqtSignal(object)  # FolderScanResult (partial)
     finished = pyqtSignal()
 
     def __init__(
@@ -237,29 +380,31 @@ class FolderScanWorker(QObject):
         batch_size: int,
         max_files: int,
         use_lightweight_scan: bool,
+        progressive_loading: bool = True,
     ):
         """
-        Initialize the scan worker.
+        Initialize the folder scan worker.
 
         Parameters:
             folder_path (Path): Path to the folder to scan
             batch_size (int): Number of files to process in each batch
             max_files (int): Maximum number of files to scan before warning
             use_lightweight_scan (bool): Whether to use lightweight scanning
+            progressive_loading (bool): Whether to use progressive loading
         """
         super().__init__()
         self.folder_path = folder_path
         self.batch_size = batch_size
         self.max_files = max_files
         self.use_lightweight_scan = use_lightweight_scan
+        self.progressive_loading = progressive_loading
         self._cancelled = False
 
     def scan(self) -> None:
-        """Perform the folder scan."""
+        """Perform the folder scan operation."""
         try:
             if not self.folder_path.exists() or not self.folder_path.is_dir():
                 self.error.emit("Folder does not exist")
-                self.finished.emit()
                 return
 
             # Get all MDA files in the folder
@@ -269,7 +414,11 @@ class FolderScanWorker(QObject):
             if total_files == 0:
                 result = FolderScanResult([], [], 0, 0, True, "No MDA files found")
                 self.complete.emit(result)
-                self.finished.emit()
+                return
+
+            # For very large directories, use progressive loading
+            if total_files > self.max_files and self.progressive_loading:
+                self._progressive_scan(mda_files)
                 return
 
             if total_files > self.max_files:
@@ -282,10 +431,9 @@ class FolderScanWorker(QObject):
                     f"Too many files ({total_files} > {self.max_files})",
                 )
                 self.complete.emit(result)
-                self.finished.emit()
                 return
 
-            # Scan files in batches
+            # Regular batch scanning
             file_list = []
             file_info_list = []
             scanned_files = 0
@@ -314,7 +462,6 @@ class FolderScanWorker(QObject):
                         self.progress.emit(scanned_files, total_files)
 
                     except Exception as e:
-                        # Continue scanning other files even if one fails
                         print(f"Error scanning {file_path}: {e}")
                         continue
 
@@ -329,9 +476,126 @@ class FolderScanWorker(QObject):
                 self.complete.emit(result)
 
         except Exception as e:
-            self.error.emit(str(e))
+            self.error.emit(f"Scan error: {e}")
         finally:
             self.finished.emit()
+
+    def _progressive_scan(self, mda_files: list[Path]) -> None:
+        """
+        Perform progressive scanning for very large directories.
+        
+        Parameters:
+            mda_files (list[Path]): List of MDA files to scan
+        """
+        total_files = len(mda_files)
+        
+        # Initial batch
+        initial_batch_size = min(self.batch_size * 2, total_files)
+        file_list = []
+        file_info_list = []
+        scanned_files = 0
+
+        # Scan initial batch
+        for i in range(initial_batch_size):
+            if self._cancelled:
+                break
+
+            file_path = mda_files[i]
+            try:
+                if self.use_lightweight_scan:
+                    file_info = get_file_info_lightweight(file_path)
+                else:
+                    file_info = get_file_info_full(file_path)
+
+                file_list.append(file_path.name)
+                file_info_list.append(file_info)
+                scanned_files += 1
+
+                self.progress.emit(scanned_files, total_files)
+
+            except Exception as e:
+                print(f"Error scanning {file_path}: {e}")
+                continue
+
+        # Emit initial result
+        if not self._cancelled:
+            result = FolderScanResult(
+                file_list=file_list,
+                file_info_list=file_info_list,
+                total_files=total_files,
+                scanned_files=scanned_files,
+                is_complete=False,
+                is_progressive=True,
+            )
+            self.progressive_update.emit(result)
+
+        # Continue scanning in background
+        if not self._cancelled:
+            self._continue_progressive_scan(mda_files, scanned_files)
+
+    def _continue_progressive_scan(self, mda_files: list[Path], start_index: int) -> None:
+        """
+        Continue progressive scanning from a given index.
+        
+        Parameters:
+            mda_files (list[Path]): List of MDA files to scan
+            start_index (int): Index to start scanning from
+        """
+        total_files = len(mda_files)
+        file_list = []
+        file_info_list = []
+        scanned_files = start_index
+
+        # Continue scanning from where we left off
+        for i in range(start_index, total_files, self.batch_size):
+            if self._cancelled:
+                break
+
+            batch_files = mda_files[i : i + self.batch_size]
+
+            for file_path in batch_files:
+                if self._cancelled:
+                    break
+
+                try:
+                    if self.use_lightweight_scan:
+                        file_info = get_file_info_lightweight(file_path)
+                    else:
+                        file_info = get_file_info_full(file_path)
+
+                    file_list.append(file_path.name)
+                    file_info_list.append(file_info)
+                    scanned_files += 1
+
+                    self.progress.emit(scanned_files, total_files)
+
+                except Exception as e:
+                    print(f"Error scanning {file_path}: {e}")
+                    continue
+
+            # Emit progressive update every batch
+            if file_list and not self._cancelled:
+                result = FolderScanResult(
+                    file_list=file_list,
+                    file_info_list=file_info_list,
+                    total_files=total_files,
+                    scanned_files=scanned_files,
+                    is_complete=(scanned_files >= total_files),
+                    is_progressive=True,
+                )
+                self.progressive_update.emit(result)
+
+        # Final completion
+        if scanned_files >= total_files and not self._cancelled:
+            final_result = FolderScanResult(
+                file_list=file_list,
+                file_info_list=file_info_list,
+                total_files=total_files,
+                scanned_files=scanned_files,
+                is_complete=True,
+                is_progressive=True,
+            )
+            self.complete.emit(final_result)
 
     def cancel(self) -> None:
         """Cancel the scan operation."""
