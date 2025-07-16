@@ -512,7 +512,7 @@ class MainWindow(QMainWindow):
                     # Always update the folder view since it is a new folder
                     self.mvc_folder.updateFolderView()
 
-                # Highlight the selected file if one was specified
+                # Highlight the selected file if one was specified, otherwise select the first file
                 if hasattr(self, "_selected_file_name") and self._selected_file_name:
                     try:
                         # Find the index of the selected file
@@ -536,6 +536,18 @@ class MainWindow(QMainWindow):
                     finally:
                         # Clear the selected file name
                         self._selected_file_name = None
+                else:
+                    # Auto-select the first file if no specific file was selected
+                    if self.mvc_folder and hasattr(
+                        self.mvc_folder, "mda_folder_tableview"
+                    ):
+                        model = self.mvc_folder.mda_folder_tableview.tableView.model()
+                        if model and model.rowCount() > 0:
+                            first_index = model.index(0, 0)
+                            self.mvc_folder.selectAndShowIndex(first_index)
+                            self.setStatus(
+                                f"Auto-selected first file: {sorted_files[0]}"
+                            )
 
                 self.setStatus(
                     f"Loaded {len(sorted_files)} MDA files from {folder_path}"
