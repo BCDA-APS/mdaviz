@@ -50,7 +50,7 @@ mdaviz follows a Model-View-Controller (MVC) architecture with the following key
 - **Location**: Multiple files using PyQt5
 - **Issue**: `sipPyTypeDict()` is deprecated in favor of `sipPyTypeDictRef()`
 - **Impact**: Future PyQt5 versions may break functionality
-- **Files affected**: 
+- **Files affected**:
   - `src/mdaviz/aboutdialog.py:15`
   - `src/mdaviz/mda_folder.py:76`
   - `src/mdaviz/user_settings.py:48`
@@ -116,7 +116,7 @@ mdaviz follows a Model-View-Controller (MVC) architecture with the following key
 
 #### C. Python 3.13+ Compatibility
 - **Action**: Replace `xdrlib` with modern alternatives
-- **Options**: 
+- **Options**:
   - Use `struct` module for binary data
   - Implement custom XDR library
   - Use third-party XDR libraries
@@ -269,7 +269,7 @@ import sys
 
 build_exe_options = {
     "packages": [
-        "PyQt5", "matplotlib", "scipy", "numpy", "lmfit", 
+        "PyQt5", "matplotlib", "scipy", "numpy", "lmfit",
         "tiled", "yaml", "mdaviz"
     ],
     "excludes": [],
@@ -440,4 +440,4 @@ The project has strong foundations and with these improvements, it can become a 
 - **Startup time**: ~2-3 seconds
 - **Memory usage**: ~100-200MB baseline
 - **Large file handling**: Up to 10,000 files
-- **Cache efficiency**: 64% hit rate (estimated) 
+- **Cache efficiency**: 64% hit rate (estimated)

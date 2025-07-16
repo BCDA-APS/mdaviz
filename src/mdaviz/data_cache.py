@@ -97,31 +97,32 @@ class DataCache(QObject):
     def _check_memory_usage(self) -> float:
         """
         Check current memory usage and trigger cleanup if needed.
-        
+
         Returns:
             float: Current memory usage in MB
         """
         try:
             process = psutil.Process()
             memory_mb = process.memory_info().rss / 1024 / 1024
-            
+
             # Check if we need to perform memory cleanup
             current_time = time.time()
-            if (current_time - self._last_memory_check > self._memory_check_interval and 
-                memory_mb > self.max_memory_mb * 0.8):  # 80% threshold
-                
+            if (
+                current_time - self._last_memory_check > self._memory_check_interval
+                and memory_mb > self.max_memory_mb * 0.8
+            ):  # 80% threshold
                 self._perform_memory_cleanup()
                 self._last_memory_check = current_time
-                
+
                 # Re-check memory after cleanup
                 memory_mb = process.memory_info().rss / 1024 / 1024
-            
+
             # Emit warning if memory usage is high
             if memory_mb > self.max_memory_mb * 0.9:  # 90% threshold
                 self.memory_warning.emit(memory_mb)
-            
+
             return memory_mb
-            
+
         except ImportError:
             # psutil not available, skip memory monitoring
             return 0.0
@@ -131,18 +132,22 @@ class DataCache(QObject):
 
     def _perform_memory_cleanup(self) -> None:
         """Perform aggressive memory cleanup when usage is high."""
-        print(f"Performing memory cleanup - current cache size: {len(self._cache)} entries")
-        
+        print(
+            f"Performing memory cleanup - current cache size: {len(self._cache)} entries"
+        )
+
         # Clear half of the cache (least recently used)
         entries_to_remove = len(self._cache) // 2
         for _ in range(entries_to_remove):
             if not self._evict_lru():
                 break
-        
+
         # Force garbage collection
         gc.collect()
-        
-        print(f"Memory cleanup complete - remaining cache size: {len(self._cache)} entries")
+
+        print(
+            f"Memory cleanup complete - remaining cache size: {len(self._cache)} entries"
+        )
 
     def get(self, file_path: str) -> Optional[CachedFileData]:
         """
@@ -156,7 +161,7 @@ class DataCache(QObject):
         """
         # Check memory usage periodically
         self._check_memory_usage()
-        
+
         if file_path in self._cache:
             # Move to end (most recently used)
             cached_data = self._cache.pop(file_path)
@@ -178,7 +183,7 @@ class DataCache(QObject):
         """
         # Check memory usage before adding new data
         current_memory = self._check_memory_usage()
-        
+
         # Remove existing entry if present
         if file_path in self._cache:
             old_data = self._cache.pop(file_path)
@@ -217,10 +222,12 @@ class DataCache(QObject):
             # Check memory usage before loading large files
             file_size_mb = path_obj.stat().st_size / (1024 * 1024)
             current_memory = self._check_memory_usage()
-            
+
             # If file is large and memory usage is high, skip caching
-            if (file_size_mb > 100 and current_memory > self.max_memory_mb * 0.8):
-                print(f"Warning: Large file ({file_size_mb:.1f}MB) and high memory usage ({current_memory:.1f}MB) - loading without caching")
+            if file_size_mb > 100 and current_memory > self.max_memory_mb * 0.8:
+                print(
+                    f"Warning: Large file ({file_size_mb:.1f}MB) and high memory usage ({current_memory:.1f}MB) - loading without caching"
+                )
                 return self._load_without_caching(path_obj)
 
             # Load the file data
@@ -263,10 +270,10 @@ class DataCache(QObject):
     def _load_without_caching(self, path_obj: Path) -> Optional[CachedFileData]:
         """
         Load file data without caching it (for large files or high memory usage).
-        
+
         Parameters:
             path_obj (Path): Path object to the file
-            
+
         Returns:
             CachedFileData or None: Loaded data (not cached)
         """

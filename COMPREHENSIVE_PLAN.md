@@ -289,7 +289,7 @@ class DataCache(QObject):
     def __init__(self, max_size=100, max_memory_mb=500):
         self.max_memory_mb = max_memory_mb
         # ... existing code ...
-    
+
     def _check_memory_usage(self):
         """Monitor memory usage and cleanup if needed."""
         process = psutil.Process()
@@ -311,7 +311,7 @@ class LazyFolderScanner(QObject):
     def __init__(self, batch_size=50, max_files=10000, progressive_loading=True):
         self.progressive_loading = progressive_loading
         # ... existing code ...
-    
+
     def scan_large_directory(self, path):
         """Handle directories with >10,000 files."""
         if self.progressive_loading:
@@ -354,7 +354,7 @@ class BackgroundWorker(QThread):
     progress = pyqtSignal(int)
     finished = pyqtSignal(object)
     error = pyqtSignal(str)
-    
+
     def run(self):
         try:
             # Perform heavy operation
@@ -386,13 +386,13 @@ def test_chartview_plotting(qtbot):
     """Test ChartView plotting functionality."""
     chart_view = ChartView()
     qtbot.addWidget(chart_view)
-    
+
     # Test data plotting
     x_data = [1, 2, 3, 4, 5]
     y_data = [1, 4, 9, 16, 25]
-    
+
     chart_view.plot_data(x_data, y_data, "Test Curve")
-    
+
     # Verify plot was created
     assert len(chart_view.get_curves()) == 1
     assert chart_view.get_curves()[0].label == "Test Curve"
@@ -405,7 +405,7 @@ def test_chartview_plotting(qtbot):
 
 #### C. Python 3.13+ Compatibility
 - **Action**: Replace `xdrlib` with modern alternatives
-- **Options**: 
+- **Options**:
   - Use `struct` module for binary data
   - Implement custom XDR library
   - Use third-party XDR libraries
@@ -578,13 +578,13 @@ project_root = Path(__file__).parent
 
 build_exe_options = {
     "packages": [
-        "PyQt5", 
-        "matplotlib", 
-        "scipy", 
-        "numpy", 
-        "lmfit", 
-        "tiled", 
-        "yaml", 
+        "PyQt5",
+        "matplotlib",
+        "scipy",
+        "numpy",
+        "lmfit",
+        "tiled",
+        "yaml",
         "mdaviz",
         "mdaviz.mainwindow",
         "mdaviz.mda_folder",
@@ -860,4 +860,4 @@ With this comprehensive plan, the project can evolve into a robust, user-friendl
 4. Run pre-commit hooks
 5. Submit a pull request
 6. Ensure CI/CD passes
-7. Get code review approval 
+7. Get code review approval

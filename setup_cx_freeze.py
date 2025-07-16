@@ -9,7 +9,6 @@ Usage:
 
 from cx_Freeze import setup, Executable
 import sys
-import os
 from pathlib import Path
 
 # Get project root
@@ -17,13 +16,13 @@ project_root = Path(__file__).parent
 
 build_exe_options = {
     "packages": [
-        "PyQt5", 
-        "matplotlib", 
-        "scipy", 
-        "numpy", 
-        "lmfit", 
-        "tiled", 
-        "yaml", 
+        "PyQt5",
+        "matplotlib",
+        "scipy",
+        "numpy",
+        "lmfit",
+        "tiled",
+        "yaml",
         "mdaviz",
         "mdaviz.mainwindow",
         "mdaviz.mda_folder",
@@ -64,7 +63,9 @@ executables = [
         str(project_root / "src" / "mdaviz" / "app.py"),
         base=base,
         target_name="mdaviz",
-        icon=str(project_root / "src" / "mdaviz" / "resources" / "viz.png") if (project_root / "src" / "mdaviz" / "resources" / "viz.png").exists() else None,
+        icon=str(project_root / "src" / "mdaviz" / "resources" / "viz.png")
+        if (project_root / "src" / "mdaviz" / "resources" / "viz.png").exists()
+        else None,
     )
 ]
 
@@ -76,4 +77,4 @@ setup(
     author_email="rodolakis@anl.gov",
     options={"build_exe": build_exe_options},
     executables=executables,
-) 
+)

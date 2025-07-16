@@ -315,4 +315,4 @@ For issues with executable builds:
    - Platform and version information
    - Build command used
    - Error messages
-   - Expected vs actual behavior 
+   - Expected vs actual behavior

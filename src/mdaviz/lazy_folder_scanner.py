@@ -164,24 +164,24 @@ class LazyFolderScanner(QObject):
     ) -> FolderScanResult:
         """
         Perform progressive scanning for very large directories.
-        
+
         This method scans files in chunks and provides partial results
         to keep the UI responsive.
-        
+
         Parameters:
             folder_path (Path): Path to the folder to scan
             mda_files (list[Path]): List of MDA files to scan
             progress_callback (callable, optional): Callback for progress updates
-            
+
         Returns:
             FolderScanResult: Initial result with first batch of files
         """
         total_files = len(mda_files)
-        
+
         # For progressive loading, we'll scan the first batch immediately
         # and return a partial result
         initial_batch_size = min(self.batch_size * 2, total_files)
-        
+
         file_list = []
         file_info_list = []
         scanned_files = 0
@@ -220,10 +220,12 @@ class LazyFolderScanner(QObject):
 
         # Emit progressive update
         self.progressive_scan_update.emit(result)
-        
+
         # Continue scanning in background
-        self._continue_progressive_scan(folder_path, mda_files, scanned_files, progress_callback)
-        
+        self._continue_progressive_scan(
+            folder_path, mda_files, scanned_files, progress_callback
+        )
+
         return result
 
     def _continue_progressive_scan(
@@ -235,7 +237,7 @@ class LazyFolderScanner(QObject):
     ) -> None:
         """
         Continue progressive scanning from a given index.
-        
+
         Parameters:
             folder_path (Path): Path to the folder to scan
             mda_files (list[Path]): List of MDA files to scan
@@ -315,11 +317,11 @@ class LazyFolderScanner(QObject):
         # Create a worker thread for scanning
         self.scanner_thread = QThread()
         self.scanner_worker = FolderScanWorker(
-            folder_path, 
-            self.batch_size, 
-            self.max_files, 
+            folder_path,
+            self.batch_size,
+            self.max_files,
             self.use_lightweight_scan,
-            self.progressive_loading
+            self.progressive_loading,
         )
 
         # Move worker to thread
@@ -483,12 +485,12 @@ class FolderScanWorker(QObject):
     def _progressive_scan(self, mda_files: list[Path]) -> None:
         """
         Perform progressive scanning for very large directories.
-        
+
         Parameters:
             mda_files (list[Path]): List of MDA files to scan
         """
         total_files = len(mda_files)
-        
+
         # Initial batch
         initial_batch_size = min(self.batch_size * 2, total_files)
         file_list = []
@@ -533,10 +535,12 @@ class FolderScanWorker(QObject):
         if not self._cancelled:
             self._continue_progressive_scan(mda_files, scanned_files)
 
-    def _continue_progressive_scan(self, mda_files: list[Path], start_index: int) -> None:
+    def _continue_progressive_scan(
+        self, mda_files: list[Path], start_index: int
+    ) -> None:
         """
         Continue progressive scanning from a given index.
-        
+
         Parameters:
             mda_files (list[Path]): List of MDA files to scan
             start_index (int): Index to start scanning from
