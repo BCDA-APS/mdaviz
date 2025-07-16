@@ -729,8 +729,12 @@ class ChartView(QWidget):
 
     def onRemoveCursor(self, cursor_num):
         cross = self.cursors.get(cursor_num)
-        if cross:
-            cross.remove()
+        if cross is not None:
+            try:
+                cross.remove()
+            except (NotImplementedError, AttributeError):
+                # Handle case where artist cannot be removed
+                pass
             self.cursors[cursor_num] = None
             self.cursors[f"pos{cursor_num}"] = None
             self.cursors[f"text{cursor_num}"] = (
@@ -811,8 +815,12 @@ class ChartView(QWidget):
             if event.button == MIDDLE_BUTTON or (
                 event.button == RIGHT_BUTTON and self.alt_pressed
             ):
-                if self.cursors[1]:
-                    self.cursors[1].remove()  # Remove existing red cursor
+                if self.cursors[1] is not None:
+                    try:
+                        self.cursors[1].remove()  # Remove existing red cursor
+                    except (NotImplementedError, AttributeError):
+                        # Handle case where artist cannot be removed
+                        pass
                 (self.cursors[1],) = self.main_axes.plot(
                     x_nearest, y_nearest, "r+", markersize=15, linewidth=2
                 )
@@ -821,8 +829,12 @@ class ChartView(QWidget):
 
             # Right click (without Alt) for blue cursor (cursor 2)
             elif event.button == RIGHT_BUTTON and not self.alt_pressed:
-                if self.cursors[2]:
-                    self.cursors[2].remove()  # Remove existing blue cursor
+                if self.cursors[2] is not None:
+                    try:
+                        self.cursors[2].remove()  # Remove existing blue cursor
+                    except (NotImplementedError, AttributeError):
+                        # Handle case where artist cannot be removed
+                        pass
                 (self.cursors[2],) = self.main_axes.plot(
                     x_nearest, y_nearest, "b+", markersize=15, linewidth=2
                 )
@@ -911,7 +923,11 @@ class ChartView(QWidget):
         """
         # Remove existing fit line if any
         if curveID in self.fitObjects:
-            self.fitObjects[curveID].remove()
+            try:
+                self.fitObjects[curveID].remove()
+            except (NotImplementedError, AttributeError):
+                # Handle case where artist cannot be removed
+                pass
             del self.fitObjects[curveID]
 
         # Add new fit line
@@ -942,7 +958,11 @@ class ChartView(QWidget):
         """
         # Remove fit line from plot
         if curveID in self.fitObjects:
-            self.fitObjects[curveID].remove()
+            try:
+                self.fitObjects[curveID].remove()
+            except (NotImplementedError, AttributeError):
+                # Handle case where artist cannot be removed
+                pass
             del self.fitObjects[curveID]
 
             # Update plot
