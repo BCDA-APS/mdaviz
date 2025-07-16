@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-The mdaviz project is a well-structured Python Qt5 application for visualizing MDA (Measurement Data Acquisition) data. The project demonstrates modern development practices with a solid MVC architecture, comprehensive testing framework, and good documentation. However, there are several areas for improvement including test coverage, deprecation warnings, and executable compilation support.
+The mdaviz project is a well-structured Python Qt6 application for visualizing MDA (Measurement Data Acquisition) data. The project demonstrates modern development practices with a solid MVC architecture, comprehensive testing framework, and good documentation. The recent migration from PyQt5 to PyQt6 ensures future compatibility with Python 3.13+ and modern Qt features.
 
 ## Current Status
 
@@ -11,13 +11,13 @@ The mdaviz project is a well-structured Python Qt5 application for visualizing M
 - **Modern development practices** (pre-commit hooks, CI/CD, documentation)
 - **Well-structured MVC architecture**
 - **Performance optimizations** (lazy loading, data caching)
-- **Dual plotting backends** (Matplotlib and PyQt5)
+- **Dual plotting backends** (Matplotlib and PyQt6)
 - **Comprehensive documentation** with Sphinx and GitHub Pages
+- **PyQt6 migration complete** - Future-proof and Python 3.13+ compatible
+- **Comprehensive CI/CD pipeline** with cross-platform testing
 
 ### ⚠️ Areas for Improvement
 - **Low test coverage** (36%) - many critical paths untested
-- **Deprecation warnings** - PyQt5 sipPyTypeDict() deprecations
-- **Python 3.13 compatibility** - xdrlib deprecation
 - **GUI test limitations** - headless environment challenges
 - **Memory management** - potential memory leaks in large datasets
 
@@ -28,11 +28,12 @@ The mdaviz project is a well-structured Python Qt5 application for visualizing M
 # Environment: mda1
 conda env create -f env.yml
 conda activate mda1
+pip install PyQt6 Qt6  # Not available in conda-forge for all platforms
 pip install -e .
 ```
 
 ### Key Dependencies
-- **Core**: PyQt5, matplotlib, scipy, lmfit, tiled, PyYAML
+- **Core**: PyQt6, matplotlib, scipy, lmfit, tiled, PyYAML
 - **Development**: pytest, ruff, mypy, pre-commit
 - **Build**: pyinstaller, cx_Freeze, nuitka
 
@@ -43,6 +44,7 @@ pip install -e .
 - **Coverage**: 36%
 - **All tests passing**: ✅
 - **Pre-commit hooks**: ✅
+- **PyQt6 compatibility**: ✅
 
 ### Test Coverage Analysis
 - **Well-tested modules** (>70%): virtual_table_model.py (84%), lazy_loading_config.py (73%)
@@ -67,64 +69,21 @@ All pre-commit hooks are passing:
 - **Black formatting**: Applied via ruff
 - **Documentation**: Comprehensive Sphinx docs
 
-## Identified Issues
+## Recent Achievements
 
-### Critical Issues (High Priority)
+### PyQt6 Migration (Completed)
+- **Successfully migrated** from PyQt5 to PyQt6
+- **Python 3.13+ compatibility** ensured
+- **All API changes** implemented (QAction, QShortcut, Qt constants)
+- **Comprehensive testing** completed
+- **CI/CD pipeline updated** for PyQt6
 
-#### 1. PyQt5 Deprecation Warnings
-- **Issue**: `sipPyTypeDict()` is deprecated in favor of `sipPyTypeDictRef()`
-- **Impact**: Future PyQt5 versions may break functionality
-- **Files affected**: 15+ files including main components
-- **Status**: Needs immediate attention
-
-#### 2. Python 3.13 Compatibility
-- **Issue**: `xdrlib` is deprecated and slated for removal in Python 3.13
-- **Location**: `src/mdaviz/synApps_mdalib/mda.py:25`
-- **Current mitigation**: Fallback to local `f_xdrlib` implementation
-- **Status**: Good mitigation in place, but needs monitoring
-
-#### 3. GUI Test Limitations
-- **Issue**: GUI tests are limited in headless environments
-- **Location**: `src/tests/test_app.py`
-- **Current status**: Tests are skipped with FIXME comments
-- **Status**: Needs pytest-qt implementation
-
-### Performance Issues (Medium Priority)
-
-#### 1. Memory Management
-- **Issue**: Potential memory leaks with large datasets
-- **Location**: `src/mdaviz/data_cache.py`
-- **Impact**: Application may become unresponsive with large files
-- **Status**: Needs memory monitoring implementation
-
-#### 2. Large File Handling
-- **Issue**: Limited handling of very large directories (>10,000 files)
-- **Location**: `src/mdaviz/lazy_folder_scanner.py`
-- **Current limit**: 10,000 files maximum
-- **Status**: Needs progressive loading implementation
-
-## Executable Compilation
-
-### Current Status
-- **PyInstaller**: ✅ Successfully tested and working
-- **Executable size**: ~67MB (Linux)
-- **Build time**: ~1 minute
-- **Dependencies**: All included successfully
-
-### Tested Build
-```bash
-# Successfully built executable
-pyinstaller --onefile --windowed --name mdaviz src/mdaviz/app.py
-
-# Result: dist/mdaviz (67MB executable)
-```
-
-### Build Configuration
-The project includes comprehensive build support:
-- **PyInstaller**: Primary method (tested and working)
-- **cx_Freeze**: Alternative method (configuration ready)
-- **Nuitka**: Performance option (configuration ready)
-- **GitHub Actions**: Automated builds for all platforms
+### CI/CD Pipeline Improvements
+- **Consolidated workflows** for better efficiency
+- **Cross-platform testing** (Windows, macOS, Linux)
+- **Python 3.10-3.13** compatibility testing
+- **Automated builds** and releases
+- **Comprehensive test matrix** strategy
 
 ## Architecture Overview
 
@@ -144,7 +103,7 @@ MainWindow (QMainWindow)
 ### Key Components
 1. **MainWindow**: Central application window and state management
 2. **MDA_MVC**: Core MVC handling MDA file operations
-3. **ChartView**: Dual plotting (Matplotlib + PyQt5) with curve management
+3. **ChartView**: Dual plotting (Matplotlib + PyQt6) with curve management
 4. **DataCache**: LRU cache for performance optimization
 5. **LazyFolderScanner**: Efficient scanning of large directories
 6. **FitManager**: Curve fitting with 7 mathematical models
@@ -152,16 +111,14 @@ MainWindow (QMainWindow)
 ## Recommendations
 
 ### Immediate Actions (Week 1-2)
-1. **Fix PyQt5 deprecation warnings** - Update to modern PyQt5 usage
-2. **Improve test coverage** - Target 80% coverage
-3. **Implement GUI tests** - Use pytest-qt for UI testing
-4. **Add memory monitoring** - Implement cache cleanup
+1. **Improve test coverage** - Target 80% coverage
+2. **Implement GUI tests** - Use pytest-qt for UI testing
+3. **Add memory monitoring** - Implement cache cleanup
 
 ### Short-term Goals (Month 1-2)
-1. **Python 3.13 compatibility** - Monitor xdrlib deprecation
-2. **Enhanced error handling** - User-friendly error messages
-3. **Performance optimizations** - Progressive loading for large files
-4. **CI/CD for executables** - Automated builds and releases
+1. **Enhanced error handling** - User-friendly error messages
+2. **Performance optimizations** - Progressive loading for large files
+3. **CI/CD for executables** - Automated builds and releases
 
 ### Medium-term Goals (Month 3-6)
 1. **Advanced features** - Statistical analysis, data export
@@ -176,6 +133,7 @@ MainWindow (QMainWindow)
 - **Code quality**: Excellent (all pre-commit hooks passing)
 - **Documentation**: Comprehensive (Sphinx + GitHub Pages)
 - **Performance**: Good (lazy loading, caching)
+- **PyQt6 compatibility**: ✅ Complete
 
 ### Target Metrics
 - **Test coverage**: 80%+
@@ -208,12 +166,12 @@ MainWindow (QMainWindow)
 - **macOS**: macOS 12+ (via CI/CD)
 
 ### Python Versions
-- **Supported**: Python 3.10, 3.11, 3.12
-- **Target**: Python 3.13+ compatibility
+- **Supported**: Python 3.10, 3.11, 3.12, 3.13
+- **Primary**: Python 3.11+ (with PyQt6)
 
 ### Qt Versions
-- **Current**: Qt5 (5.15.2)
-- **Future**: Consider Qt6 migration
+- **Current**: Qt6 (6.9.0)
+- **PyQt6**: 6.9.1
 
 ## Distribution Strategy
 
@@ -229,20 +187,19 @@ MainWindow (QMainWindow)
 
 ## Conclusion
 
-The mdaviz project is in excellent shape with a solid foundation, modern development practices, and good architecture. The main areas for improvement are:
+The mdaviz project is in excellent shape with a solid foundation, modern development practices, and good architecture. The recent PyQt6 migration ensures future compatibility and access to modern Qt features. The main areas for improvement are:
 
 1. **Test coverage** - Increase from 36% to 80%+
-2. **Deprecation warnings** - Fix PyQt5 usage
-3. **GUI testing** - Implement proper UI tests
-4. **Performance** - Add memory monitoring and optimization
+2. **GUI testing** - Implement proper UI tests
+3. **Performance** - Add memory monitoring and optimization
 
 The executable compilation is working well, and the project is ready for distribution. With the recommended improvements, mdaviz can become a robust, user-friendly tool for MDA data visualization with excellent cross-platform support.
 
 ## Next Steps
 
-1. **Immediate**: Address PyQt5 deprecation warnings
-2. **Short-term**: Improve test coverage and add GUI tests
-3. **Medium-term**: Implement advanced features and optimizations
-4. **Long-term**: Build community and ecosystem
+1. **Immediate**: Improve test coverage and add GUI tests
+2. **Short-term**: Implement advanced features and optimizations
+3. **Medium-term**: Build community and ecosystem
+4. **Long-term**: Maintain PyQt6 compatibility and modern features
 
-The project has strong foundations and is well-positioned for future development and community adoption.
+The project has strong foundations and is well-positioned for future development and community adoption with modern Qt6 technology.

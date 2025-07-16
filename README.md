@@ -1,6 +1,6 @@
 # mdaviz
 
-Python Qt5 application to visualize mda data.
+Python Qt6 application to visualize mda data.
 
 ## Status Badges
 
@@ -22,14 +22,17 @@ Coverage | License | Python | Pre-commit
 ## Quickstart
 
 ### Conda environment
-It is strongly recommended to use the provided conda environment for development and running the application. This ensures all dependencies (including PyQt5) are available and compatible.
+It is strongly recommended to use the provided conda environment for development and running the application. This ensures all dependencies (including PyQt6) are available and compatible.
 
 ```bash
 conda env create -f env.yml
 conda activate mdaviz
+pip install PyQt6 Qt6
 ```
 
 Always activate the environment before running, testing, or using pre-commit hooks.
+
+**Note**: PyQt6 and Qt6 are installed via pip as they are not available in conda-forge for all platforms.
 
 ### Install & run the application
 

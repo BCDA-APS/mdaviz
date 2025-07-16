@@ -5,8 +5,8 @@ Define constants used throught the code.
 import pathlib
 import warnings
 
-# Suppress PyQt5 deprecation warnings for sipPyTypeDict
-# These warnings come from PyQt5's internal implementation, not our code
+# Suppress PyQt6 deprecation warnings for sipPyTypeDict
+# These warnings come from PyQt6's internal implementation, not our code
 warnings.filterwarnings(
     "ignore", category=DeprecationWarning, message=".*sipPyTypeDict.*"
 )

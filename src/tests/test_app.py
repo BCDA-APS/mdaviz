@@ -18,7 +18,7 @@ def app(qtbot):
     return qtbot.qapp
 
 
-# The following tests are skipped by default to avoid PyQt5/Qt crashes in headless/CI environments.
+# The following tests are skipped by default to avoid PyQt6/Qt crashes in headless/CI environments.
 # To re-enable, remove or comment out the @pytest.mark.skip decorators and run locally with a display.
 
 
@@ -176,7 +176,7 @@ def test_xdrlib_fallback():
 
 
 def test_deprecation_warnings_suppressed():
-    """Test that PyQt5 deprecation warnings are suppressed."""
+    """Test that PyQt6 deprecation warnings are suppressed."""
     import warnings
 
     # Capture warnings
@@ -189,7 +189,7 @@ def test_deprecation_warnings_suppressed():
         sip_warnings = [
             warning for warning in w if "sipPyTypeDict" in str(warning.message)
         ]
-        assert len(sip_warnings) == 0, "PyQt5 deprecation warnings should be suppressed"
+        assert len(sip_warnings) == 0, "PyQt6 deprecation warnings should be suppressed"
 
 
 # Note: The following test is kept for reference but commented out

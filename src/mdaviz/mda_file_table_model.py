@@ -116,7 +116,7 @@ class MDAFileTableModel(QAbstractTableModel):
     https://doc.qt.io/qtforpython-5/PySide2/QtCore/QAbstractTableModel.html
     """
 
-    # Signals in PyQt5 should be class attributes, not instance attributes, to work properly.
+    # Signals in PyQt6 should be class attributes, not instance attributes, to work properly.
     # They need to be defined at the class level so that PyQt can set them up correctly when instances of the class are created.
 
     checkboxStateChanged = pyqtSignal(

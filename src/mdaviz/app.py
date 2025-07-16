@@ -88,7 +88,7 @@ def main() -> None:  # for future command-line options
     logger.info("Logging level: %s", options.log)
 
     # set warning log level for (noisy) support packages
-    for package in "httpcore httpx PyQt5 tiled".split():
+    for package in "httpcore httpx PyQt6 tiled".split():
         logging.getLogger(package).setLevel(logging.WARNING)
 
     gui()

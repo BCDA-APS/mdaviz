@@ -239,7 +239,7 @@ python_version = "3.11"
 
 [[tool.mypy.overrides]]
 module = [
-    "PyQt5.*",
+    "PyQt6.*",
     "matplotlib.*",
     "scipy.*",
     "numpy.*",

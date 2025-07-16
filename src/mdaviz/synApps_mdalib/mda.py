@@ -265,9 +265,9 @@ def readScan(scanFile, verbose=0, out=sys.stdout, unpacker=None):
 		# if curr_pt < npts, plower_scans will have garbage for pointers to
 		# scans that were planned for but not written
 		if have_fast_xdr:
-			scan.plower_scans = u.unpack_farray_int(scan.npts)
+			scan.plower_scans = u.unpack_array(u.unpack_int, scan.npts)
 		else:
-			scan.plower_scans = u.unpack_farray(scan.npts, u.unpack_int)
+			scan.plower_scans = u.unpack_array(u.unpack_int, scan.npts)
 		if verbose:
 			out.write("scan.plower_scans = ")
 			verboseData(scan.plower_scans, out, asHex=True)
@@ -345,9 +345,9 @@ def readScan(scanFile, verbose=0, out=sys.stdout, unpacker=None):
 	u.reset(buf)
 
 	if have_fast_xdr:
-		data = u.unpack_farray_double(scan.npts*scan.np)
+		data = u.unpack_array(u.unpack_double, scan.npts*scan.np)
 	else:
-		data = u.unpack_farray(scan.npts*scan.np, u.unpack_double)
+		data = u.unpack_array(u.unpack_double, scan.npts*scan.np)
 	start = 0
 	end = scan.npts
 	for j in range(scan.np):
@@ -358,9 +358,9 @@ def readScan(scanFile, verbose=0, out=sys.stdout, unpacker=None):
 
 	# detectors
 	if have_fast_xdr:
-		data = u.unpack_farray_float(scan.npts*scan.nd)
+		data = u.unpack_array(u.unpack_float, scan.npts*scan.nd)
 	else:
-		data = u.unpack_farray(scan.npts*scan.nd, u.unpack_float)
+		data = u.unpack_array(u.unpack_float, scan.npts*scan.nd)
 	start = 0
 	end = scan.npts
 	for j in range(scan.nd):
@@ -392,9 +392,9 @@ def readScanQuick(scanFile, unpacker=None, detToDat_offset=None, out=sys.stdout)
 
 	if (scan.rank > 1):
 		if have_fast_xdr:
-			scan.plower_scans = u.unpack_farray_int(scan.npts)
+			scan.plower_scans = u.unpack_array(u.unpack_int, scan.npts)
 		else:
-			scan.plower_scans = u.unpack_farray(scan.npts, u.unpack_int)
+			scan.plower_scans = u.unpack_array(u.unpack_int, scan.npts)
 
 	namelength = u.unpack_int()
 	scan.name = u.unpack_string()
@@ -461,9 +461,9 @@ def readScanQuick(scanFile, unpacker=None, detToDat_offset=None, out=sys.stdout)
 	u.reset(buf)
 
 	if have_fast_xdr:
-		data = u.unpack_farray_double(scan.npts*scan.np)
+		data = u.unpack_array(u.unpack_double, scan.npts*scan.np)
 	else:
-		data = u.unpack_farray(scan.npts*scan.np, u.unpack_double)
+		data = u.unpack_array(u.unpack_double, scan.npts*scan.np)
 	for j in range(scan.np):
 		start = j*scan.npts
 		scan.p[j].data = data[j*scan.npts : (j+1)*scan.npts]
@@ -575,7 +575,7 @@ def readMDA(fname=None, maxdim=4, verbose=0, showHelp=0, outFile=None, useNumpy=
 	if verbose: out.write("scan_number = %d\n" % scan_number)
 	rank = u.unpack_int()
 	if verbose: out.write("rank = %d\n" % rank)
-	dimensions = u.unpack_farray(rank, u.unpack_int)
+	dimensions = u.unpack_array(u.unpack_int, rank)
 	if verbose:
 		out.write("dimensions = ")
 		verboseData(dimensions, out)
@@ -818,20 +818,20 @@ def readMDA(fname=None, maxdim=4, verbose=0, showHelp=0, outFile=None, useNumpy=
 				if n: value = u.unpack_string()
 			elif EPICS_type == 32: # DBR_CTRL_CHAR
 				#value = u.unpack_fstring(count)
-				vect = u.unpack_farray(count, u.unpack_int)
+				vect = u.unpack_array(u.unpack_int, count)
 				value = ""
 				for i in range(len(vect)):
 					# treat the byte array as a null-terminated string
 					if vect[i] == 0: break
 					value = value + chr(vect[i])
 			elif EPICS_type == 29: # DBR_CTRL_SHORT
-				value = u.unpack_farray(count, u.unpack_int)
+				value = u.unpack_array(u.unpack_int, count)
 			elif EPICS_type == 33: # DBR_CTRL_LONG
-				value = u.unpack_farray(count, u.unpack_int)
+				value = u.unpack_array(u.unpack_int, count)
 			elif EPICS_type == 30: # DBR_CTRL_FLOAT
-				value = u.unpack_farray(count, u.unpack_float)
+				value = u.unpack_array(u.unpack_float, count)
 			elif EPICS_type == 34: # DBR_CTRL_DOUBLE
-				value = u.unpack_farray(count, u.unpack_double)
+				value = u.unpack_array(u.unpack_double, count)
 			if verbose:
 				if (EPICS_type == 0):
 					out.write("\tvalue = '%s'\n" % (value))
@@ -912,9 +912,9 @@ def skimScan(dataFile):
 		return None
 	if (scan.rank > 1):
 		if have_fast_xdr:
-			scan.plower_scans = u.unpack_farray_int(scan.npts)
+			scan.plower_scans = u.unpack_array(u.unpack_int, scan.npts)
 		else:
-			scan.plower_scans = u.unpack_farray(scan.npts, u.unpack_int)
+			scan.plower_scans = u.unpack_array(u.unpack_int, scan.npts)
 	namelength = u.unpack_int()
 	scan.name = u.unpack_string()
 	timelength = u.unpack_int()
@@ -954,7 +954,7 @@ def skimMDA(fname=None, verbose=False):
 #		return None
 	scan_number = u.unpack_int()
 	rank = u.unpack_int()
-	dimensions = u.unpack_farray(rank, u.unpack_int)
+	dimensions = u.unpack_array(u.unpack_int, rank)
 	isRegular = u.unpack_int()
 	pExtra = u.unpack_int()
 	pmain_scan = dataFile.tell() - (len(buf) - u.get_position())

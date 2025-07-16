@@ -16,7 +16,7 @@ project_root = Path(__file__).parent
 
 build_exe_options = {
     "packages": [
-        "PyQt5",
+        "PyQt6",
         "matplotlib",
         "scipy",
         "numpy",
