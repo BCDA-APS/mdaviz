@@ -35,7 +35,11 @@ def command_line_interface() -> argparse.Namespace:
     from mdaviz import __version__
 
     # Handle case where __doc__ is None (PyInstaller environment)
-    doc = __doc__.strip().splitlines()[0] if __doc__ else "mdaviz: Python Qt5 application to visualize mda data."
+    doc = (
+        __doc__.strip().splitlines()[0]
+        if __doc__
+        else "mdaviz: Python Qt5 application to visualize mda data."
+    )
     parser = argparse.ArgumentParser(description=doc)
 
     # fmt: off

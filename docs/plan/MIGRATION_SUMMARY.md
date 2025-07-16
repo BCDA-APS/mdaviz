@@ -125,4 +125,4 @@ The migration from PyQt5 to PyQt6 is complete and successful. The application:
 - Passes all tests
 - Is compatible with Python 3.13+
 - Has comprehensive CI/CD testing
-- Is ready for production use 
+- Is ready for production use

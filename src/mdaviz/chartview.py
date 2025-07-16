@@ -70,6 +70,10 @@ class ChartView(QWidget):
         self.mda_mvc = parent
         super().__init__()
 
+        # Initialize log scale attributes
+        self._log_x = False
+        self._log_y = False
+
         ############# UI initialization:
 
         # Set size policy to prevent unwanted expansion
@@ -281,23 +285,29 @@ class ChartView(QWidget):
         - log_y (bool): Whether to use logarithmic scale for Y-axis
         """
         try:
+            # Store the log scale state
+            self._log_x = log_x
+            self._log_y = log_y
+
             if log_x:
-                self.main_axes.set_xscale('log')
+                self.main_axes.set_xscale("log")
             else:
-                self.main_axes.set_xscale('linear')
-            
+                self.main_axes.set_xscale("linear")
+
             if log_y:
-                self.main_axes.set_yscale('log')
+                self.main_axes.set_yscale("log")
             else:
-                self.main_axes.set_yscale('linear')
-            
+                self.main_axes.set_yscale("linear")
+
             # Redraw the canvas to apply changes
             self.canvas.draw()
         except Exception as exc:
             print(f"Error setting log scales: {exc}")
             # If setting log scale fails (e.g., negative values), revert to linear
-            self.main_axes.set_xscale('linear')
-            self.main_axes.set_yscale('linear')
+            self._log_x = False
+            self._log_y = False
+            self.main_axes.set_xscale("linear")
+            self.main_axes.set_yscale("linear")
             self.canvas.draw()
 
     ########################################## Slot methods:

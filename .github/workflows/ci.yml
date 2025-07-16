@@ -102,7 +102,7 @@ jobs:
       - name: Run compatibility and deprecation checks
         run: |
           echo "=== Python ${{ matrix.python-version }} Compatibility Check ==="
-          
+
           # Check for deprecation warnings (excluding known xdrlib issue)
           python -W error::DeprecationWarning -c "
           import warnings
@@ -110,13 +110,13 @@ jobs:
           import mdaviz
           print('✅ mdaviz imports successfully without deprecation warnings')
           " || echo "⚠️ Deprecation warnings found (excluding xdrlib)"
-          
+
           # Check for future deprecation warnings
           python -W error::FutureWarning -c "
           import mdaviz
           print('✅ No FutureWarning issues found')
           " || echo "⚠️ FutureWarning issues found"
-          
+
           # Check for xdrlib usage in our codebase
           if grep -r "import xdrlib" src/; then
             echo "❌ xdrlib usage found in our codebase"

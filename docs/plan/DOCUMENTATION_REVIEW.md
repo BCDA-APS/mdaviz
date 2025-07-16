@@ -261,4 +261,4 @@ The mdaviz documentation is generally well-structured and comprehensive, with ex
 3. Add troubleshooting documentation
 4. Enhance user documentation with examples
 
-The documentation foundation is solid and ready for enhancement to support the growing user and developer community. 
+The documentation foundation is solid and ready for enhancement to support the growing user and developer community.

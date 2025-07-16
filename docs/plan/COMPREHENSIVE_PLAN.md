@@ -231,13 +231,13 @@ def test_chartview_plotting(qtbot):
     """Test ChartView plotting functionality."""
     chart_view = ChartView()
     qtbot.addWidget(chart_view)
-    
+
     # Test data plotting
     x_data = [1, 2, 3, 4, 5]
     y_data = [1, 4, 9, 16, 25]
-    
+
     chart_view.plot_data(x_data, y_data, "Test Curve")
-    
+
     # Verify plot was created
     assert len(chart_view.get_curves()) == 1
     assert chart_view.get_curves()[0].label == "Test Curve"

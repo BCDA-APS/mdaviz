@@ -199,4 +199,4 @@ Key classes:
 - :class:`mdaviz.fit_models.FitModel`: Base class for fit models
 - :class:`mdaviz.fit_manager.FitResult`: Container for fit results
 - :class:`mdaviz.fit_manager.FitManager`: Manages fit operations and state
-- :class:`mdaviz.fit_manager.FitData`: Stores fit information and metadata 
+- :class:`mdaviz.fit_manager.FitData`: Stores fit information and metadata

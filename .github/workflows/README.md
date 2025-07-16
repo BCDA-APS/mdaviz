@@ -149,4 +149,4 @@ mypy src/mdaviz --ignore-missing-imports
 1. **Performance Monitoring**: Add performance regression testing
 2. **Security Scanning**: Integrate security vulnerability scanning
 3. **Dependency Updates**: Automated dependency update workflows
-4. **Release Automation**: Streamlined release process 
+4. **Release Automation**: Streamlined release process

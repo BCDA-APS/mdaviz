@@ -16,8 +16,6 @@ especially for GUI testing with pytest-qt.
 
 from typing import TYPE_CHECKING
 import pytest
-import tempfile
-import shutil
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -25,20 +23,17 @@ import numpy as np
 from PyQt6.QtWidgets import QApplication
 
 if TYPE_CHECKING:
-    from _pytest.fixtures import FixtureRequest
-    from _pytest.capture import CaptureFixture
-    from _pytest.logging import LogCaptureFixture
-    from pytest_mock.plugin import MockerFixture
+    pass
 
 
 @pytest.fixture(scope="session")
 def qapp() -> "QApplication":
     """
     Create a QApplication instance for testing.
-    
+
     This fixture ensures that a QApplication exists for all Qt-based tests.
     The application is created once per test session.
-    
+
     Returns:
         QApplication: The Qt application instance
     """
@@ -52,7 +47,7 @@ def qapp() -> "QApplication":
 def sample_mda_data() -> dict:
     """
     Create sample MDA data for testing.
-    
+
     Returns:
         dict: Sample MDA data structure with metadata and scan data
     """
@@ -72,7 +67,7 @@ def sample_mda_data() -> dict:
                 "unit": "mm",
             },
             "det1": {
-                "name": "Detector 1", 
+                "name": "Detector 1",
                 "values": [i * 2.5 for i in range(100)],
                 "unit": "counts",
             },
@@ -93,12 +88,12 @@ def sample_mda_data() -> dict:
 def mock_chartview_parent() -> MagicMock:
     """
     Create a mock parent for ChartView testing.
-    
+
     Returns:
         MagicMock: Mock parent with all required attributes
     """
     parent = MagicMock()
-    
+
     # Mock mda_file_viz attributes
     parent.mda_file_viz.curveBox = MagicMock()
     parent.mda_file_viz.clearAll = MagicMock()
@@ -108,13 +103,13 @@ def mock_chartview_parent() -> MagicMock:
     parent.mda_file_viz.offset_value = MagicMock()
     parent.mda_file_viz.factor_value = MagicMock()
     parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    
+
     # Mock mda_file attributes
     parent.mda_file.tabManager.tabRemoved = MagicMock()
-    
+
     # Mock other required attributes
     parent.detRemoved = MagicMock()
-    
+
     return parent
 
 
@@ -122,10 +117,10 @@ def mock_chartview_parent() -> MagicMock:
 def temp_test_files(tmp_path: Path) -> Path:
     """
     Create temporary test files for testing.
-    
+
     Args:
         tmp_path: Pytest's temporary path fixture
-        
+
     Returns:
         Path: Path to directory containing test files
     """
@@ -133,14 +128,14 @@ def temp_test_files(tmp_path: Path) -> Path:
     for i in range(5):
         test_file = tmp_path / f"test_{i:04d}.mda"
         test_file.write_bytes(b"fake mda data")
-    
+
     # Create a subdirectory with more files
     subdir = tmp_path / "subdir"
     subdir.mkdir()
     for i in range(3):
         test_file = subdir / f"sub_test_{i:04d}.mda"
         test_file.write_bytes(b"fake mda data")
-    
+
     return tmp_path
 
 
@@ -148,12 +143,12 @@ def temp_test_files(tmp_path: Path) -> Path:
 def sample_plot_data() -> tuple[np.ndarray, np.ndarray]:
     """
     Create sample plotting data.
-    
+
     Returns:
         tuple: (x_data, y_data) arrays for plotting
     """
     x = np.linspace(0, 10, 100)
-    y = np.sin(x) * np.exp(-x/5)
+    y = np.sin(x) * np.exp(-x / 5)
     return x, y
 
 
@@ -161,7 +156,7 @@ def sample_plot_data() -> tuple[np.ndarray, np.ndarray]:
 def mock_settings() -> MagicMock:
     """
     Create a mock settings object for testing.
-    
+
     Returns:
         MagicMock: Mock settings with common configuration values
     """
@@ -174,10 +169,10 @@ def mock_settings() -> MagicMock:
 def mock_file_dialog(monkeypatch: "MonkeyPatch") -> MagicMock:
     """
     Create a mock file dialog for testing.
-    
+
     Args:
         monkeypatch: Pytest's monkeypatch fixture
-        
+
     Returns:
         MagicMock: Mock file dialog
     """
@@ -190,24 +185,20 @@ def mock_file_dialog(monkeypatch: "MonkeyPatch") -> MagicMock:
 def pytest_configure(config: pytest.Config) -> None:
     """Configure pytest for Qt testing."""
     # Add markers for Qt tests
-    config.addinivalue_line(
-        "markers", "qt: mark test as requiring Qt environment"
-    )
-    config.addinivalue_line(
-        "markers", "gui: mark test as GUI test requiring display"
-    )
-    config.addinivalue_line(
-        "markers", "slow: mark test as slow running"
-    )
+    config.addinivalue_line("markers", "qt: mark test as requiring Qt environment")
+    config.addinivalue_line("markers", "gui: mark test as GUI test requiring display")
+    config.addinivalue_line("markers", "slow: mark test as slow running")
 
 
-def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
+def pytest_collection_modifyitems(
+    config: pytest.Config, items: list[pytest.Item]
+) -> None:
     """Modify test collection to add markers."""
     for item in items:
         # Add qt marker to tests that import Qt modules
         if "PyQt6" in str(item.fspath) or "qt" in str(item.fspath).lower():
             item.add_marker(pytest.mark.qt)
-        
+
         # Add gui marker to GUI-specific tests
         if "gui" in str(item.fspath).lower() or "gui" in item.name.lower():
             item.add_marker(pytest.mark.gui)
@@ -219,6 +210,7 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
     if item.get_closest_marker("gui"):
         # Check if we have a display
         import os
+
         if not os.environ.get("DISPLAY") and os.name != "nt":
             pytest.skip("GUI tests require a display")
 
@@ -230,4 +222,5 @@ def cleanup_after_test() -> None:
     yield
     # Force garbage collection to clean up Qt objects
     import gc
-    gc.collect() 
+
+    gc.collect()

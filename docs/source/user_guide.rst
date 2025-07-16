@@ -80,7 +80,7 @@ mdaviz provides advanced curve fitting capabilities with 7 mathematical models:
 
 **Available Models:**
 - **Gaussian**: Peak analysis, spectroscopy data
-- **Lorentzian**: Resonance peaks, spectral lines  
+- **Lorentzian**: Resonance peaks, spectral lines
 - **Linear**: Trend analysis, calibration curves
 - **Exponential**: Decay processes, growth curves
 - **Quadratic**: Curved trends, parabolic data

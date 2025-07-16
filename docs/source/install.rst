@@ -15,10 +15,10 @@ For most users, the quickest way to get started is:
     # Create conda environment
     conda env create -f env.yml
     conda activate mdaviz
-    
+
     # Install PyQt6 (not available in conda-forge for all platforms)
     pip install PyQt6 Qt6
-    
+
     # Install mdaviz
     pip install mdaviz
 
@@ -140,7 +140,7 @@ Common Installation Issues
 
     # Ensure PyQt6 is installed
     pip install PyQt6 Qt6
-    
+
     # Verify installation
     python -c "import PyQt6; print('PyQt6 installed successfully')"
 
