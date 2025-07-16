@@ -556,7 +556,7 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
     inspired by:
     http://stackoverflow.com/questions/14892713/how-do-you-load-ui-files-onto-python-classes-with-pyside?lq=1
     """
-    from PyQt5 import uic
+    from PyQt6 import uic
 
     from . import UI_DIR
 

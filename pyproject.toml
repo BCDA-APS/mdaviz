@@ -22,7 +22,7 @@ maintainers = [
 ]
 dynamic = ["version"]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.14"
 keywords = ["bluesky", "databroker", "tiled", "catalog"]
 # https://packaging.python.org/en/latest/specifications/declaring-project-metadata/?highlight=license
 license = {file = "LICENSE"}
@@ -44,16 +44,20 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Visualization",
     "Topic :: Scientific/Engineering",
     "Topic :: Utilities",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 
 dependencies = [
-  "matplotlib",
-  "PyQt5",
-  "PyYAML",
-  "tiled",
-  "scipy>=1.9.0",
-  "lmfit>=1.2.0",
-  "psutil>=5.8.0",
+  "matplotlib>=3.8.0",
+  "PyQt6>=6.6.0",
+  "PyYAML>=6.0.1",
+  "tiled>=0.1.0a80",
+  "scipy>=1.12.0",
+  "lmfit>=1.3.0",
+  "psutil>=5.9.0",
 ]
 
 [project.optional-dependencies]

@@ -1,6 +1,7 @@
-from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtGui import QFont, QKeySequence
-from PyQt5.QtWidgets import QShortcut, QWidget, QDialog, QSizePolicy
+from PyQt6 import QtWidgets, QtCore
+from PyQt6.QtGui import QFont, QKeySequence
+from PyQt6.QtWidgets import QWidget, QDialog, QSizePolicy
+from PyQt6.QtGui import QShortcut
 
 from . import utils
 from .chartview import ChartView
@@ -37,13 +38,13 @@ class MDAFileVisualization(QWidget):
         self.metadata.setFont(font)
 
         # Set size policy for the main visualization widget to prevent unwanted expansion
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         # Set size policy for the plot page to prevent vertical expansion
-        self.plotPageMpl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.plotPageMpl.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         # Set size policy for the tab widget to prevent vertical expansion
-        self.tabWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.tabWidget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 
         # Get maximum height from user settings with default fallback
         from .user_settings import settings
@@ -173,7 +174,7 @@ class MDAFileVisualization(QWidget):
         utils.removeAllLayoutWidgets(layout)
 
         # Set size policy to prevent vertical expansion
-        plot_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        plot_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 
         # Don't override the ChartView's own height constraints
         # The ChartView already has proper max height constraints set
@@ -382,10 +383,10 @@ class MetadataSearchDialog(QDialog):
 
     def keyPressEvent(self, event):
         """Handle key press events."""
-        if event.key() == QtCore.Qt.Key_Return or event.key() == QtCore.Qt.Key_Enter:
+        if event.key() == QtCore.Qt.Key.Key_Return or event.key() == QtCore.Qt.Key.Key_Enter:
             # Enter key finds next
             self.findNext()
-        elif event.key() == QtCore.Qt.Key_Escape:
+        elif event.key() == QtCore.Qt.Key.Key_Escape:
             # Escape key closes dialog
             self.close()
         else:

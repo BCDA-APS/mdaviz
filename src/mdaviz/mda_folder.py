@@ -66,9 +66,9 @@ import time
 from functools import partial
 from pathlib import Path
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import QItemSelectionModel, Qt, pyqtSignal
-from PyQt5.QtWidgets import QAbstractItemView, QWidget
+from PyQt6 import QtCore
+from PyQt6.QtCore import QItemSelectionModel, Qt, pyqtSignal
+from PyQt6.QtWidgets import QAbstractItemView, QWidget
 
 from . import utils
 
@@ -133,12 +133,12 @@ class MDA_MVC(QWidget):
             selection_model = self.mda_folder_tableview.tableView.selectionModel()
             self.setSelectionModel(selection_model)
         # Ensure focus policy and selection mode for keyboard navigation
-        self.mda_folder_tableview.tableView.setFocusPolicy(Qt.StrongFocus)
+        self.mda_folder_tableview.tableView.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.mda_folder_tableview.tableView.setSelectionMode(
-            QAbstractItemView.SingleSelection
+            QAbstractItemView.SelectionMode.SingleSelection
         )
         self.mda_folder_tableview.tableView.setSelectionBehavior(
-            QAbstractItemView.SelectRows
+            QAbstractItemView.SelectionBehavior.SelectRows
         )
 
         # Folder table view signal/slot connections:
@@ -597,11 +597,11 @@ class MDA_MVC(QWidget):
                         self.mda_folder_tableview.tableView.setFocus()
                         self.selectionModel().setCurrentIndex(
                             index,
-                            QItemSelectionModel.ClearAndSelect
-                            | QItemSelectionModel.Rows,
+                            QItemSelectionModel.SelectionFlag.ClearAndSelect
+                            | QItemSelectionModel.SelectionFlag.Rows,
                         )
                         self.mda_folder_tableview.tableView.scrollTo(
-                            index, QAbstractItemView.EnsureVisible
+                            index, QAbstractItemView.ScrollHint.EnsureVisible
                         )
 
                         # Reconnect the currentChanged signal
@@ -683,14 +683,14 @@ class MDA_MVC(QWidget):
         # Determine the appropriate scrollHint based on the row position:
         model = self.mda_folder_tableview.tableView.model()
         rowCount = model.rowCount()
-        scrollHint = QAbstractItemView.EnsureVisible
+        scrollHint = QAbstractItemView.ScrollHint.EnsureVisible
         if index.row() == 0:
-            scrollHint = QAbstractItemView.PositionAtTop
+            scrollHint = QAbstractItemView.ScrollHint.PositionAtTop
         elif index.row() == rowCount - 1:
-            scrollHint = QAbstractItemView.PositionAtBottom
+            scrollHint = QAbstractItemView.ScrollHint.PositionAtBottom
         # Select the row and ensure it's visible:
         self.selectionModel().setCurrentIndex(
-            index, QItemSelectionModel.ClearAndSelect | QItemSelectionModel.Rows
+            index, QItemSelectionModel.SelectionFlag.ClearAndSelect | QItemSelectionModel.SelectionFlag.Rows
         )
         self.mda_folder_tableview.tableView.scrollTo(index, scrollHint)
         # Trigger actions associated with file selection

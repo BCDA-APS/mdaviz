@@ -6,7 +6,7 @@ QAbstractTableModel of folder content.
     ~MDAFolderTableModel
 """
 
-from PyQt5.QtCore import QAbstractTableModel
+from PyQt6.QtCore import QAbstractTableModel
 from .utils import HEADERS
 
 

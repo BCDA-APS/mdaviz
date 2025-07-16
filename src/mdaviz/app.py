@@ -12,7 +12,7 @@ mdaviz: Python Qt5 application to visualize mda data.
 
 import logging
 import sys
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets
 from .mainwindow import MainWindow
 import argparse
 

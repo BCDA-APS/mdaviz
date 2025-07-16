@@ -7,7 +7,7 @@ and retrieval, and coordinates between UI and fit calculations.
 
 from typing import Optional, Tuple, Dict
 import numpy as np
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt6.QtCore import QObject, pyqtSignal
 from .fit_models import FitModel, FitResult, get_available_models
 
 

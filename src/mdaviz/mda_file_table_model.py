@@ -35,9 +35,9 @@ from .utils import mda2ftm, ftm2mda
 from dataclasses import KW_ONLY
 from dataclasses import dataclass
 
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtGui import QBrush, QColor
-from PyQt5.QtCore import QAbstractTableModel
+from PyQt6.QtCore import pyqtSignal, Qt
+from PyQt6.QtGui import QBrush, QColor
+from PyQt6.QtCore import QAbstractTableModel
 
 
 class ColumnDataType:
@@ -160,7 +160,7 @@ class MDAFileTableModel(QAbstractTableModel):
         row = index.row()
         column = index.column()
 
-        if role == Qt.DisplayRole:
+        if role == Qt.ItemDataRole.DisplayRole:
             # Only show text for text columns
             if column in self.textColumns:
                 if column == 0:  # Name column
@@ -171,13 +171,13 @@ class MDAFileTableModel(QAbstractTableModel):
             # (the checkbox will be shown via CheckStateRole)
             return ""
 
-        elif role == Qt.CheckStateRole:
+        elif role == Qt.ItemDataRole.CheckStateRole:
             # Only show checkboxes for checkbox columns
             if column in self.checkboxColumns:
                 return self.checkbox(index)
             return None
 
-        elif role == Qt.BackgroundRole:
+        elif role == Qt.ItemDataRole.BackgroundRole:
             if row == self.highlightedRow:
                 return QBrush(QColor(210, 226, 247))
 
@@ -185,24 +185,24 @@ class MDAFileTableModel(QAbstractTableModel):
 
     def headerData(self, section, orientation, role):
         """Return the header data for the given section and role."""
-        if role == Qt.DisplayRole:
-            if orientation == Qt.Horizontal:
+        if role == Qt.ItemDataRole.DisplayRole:
+            if orientation == Qt.Orientation.Horizontal:
                 return self.columnName(section)
-            elif orientation == Qt.Vertical:
+            elif orientation == Qt.Orientation.Vertical:
                 return str(section + 1)
         return None
 
     def flags(self, index):
         """Return the flags for the given index."""
         if not index.isValid():
-            return Qt.NoItemFlags
+            return Qt.ItemFlag.NoItemFlags
 
         column = index.column()
-        flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        flags = Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
 
         # Make checkbox columns checkable
         if column in self.checkboxColumns:
-            flags |= Qt.ItemIsUserCheckable
+            flags |= Qt.ItemFlag.ItemIsUserCheckable
 
         return flags
 
@@ -221,14 +221,14 @@ class MDAFileTableModel(QAbstractTableModel):
         """Return the checkbox state for a given cell: (row, column) = (index.row(), index.column())."""
         nm = self.columnName(index.column())  # selection name of THIS column
         selection = self.selections.get(index.row())  # user selection
-        return Qt.Checked if selection == nm else Qt.Unchecked
+        return Qt.CheckState.Checked if selection == nm else Qt.CheckState.Unchecked
 
     def setCheckbox(self, index, state):
         """Set the checkbox state."""
         old_selection = ftm2mda(self.selections)
         row, column = index.row(), index.column()
         column_name = self.columnName(column)
-        checked = state == Qt.Checked
+        checked = state == Qt.CheckState.Checked
         prior = self.selections.get(row)  # value if row exist as a key, None otherwise
         self.selections[row] = column_name if checked else None  # Rule 1
         changes = self.selections[row] != prior
@@ -244,7 +244,7 @@ class MDAFileTableModel(QAbstractTableModel):
         col = self.columnNumber(column_name)  # Translate column name to its index
         index = self.index(row, col)
         self.dataChanged.emit(
-            index, index, [Qt.CheckStateRole]
+            index, index, [Qt.ItemDataRole.CheckStateRole]
         )  # Update view with Qt.CheckStateRole
 
     def uncheckCheckBox(self, row):
@@ -256,7 +256,7 @@ class MDAFileTableModel(QAbstractTableModel):
             # Update view
             index = self.index(row, col)
             self.dataChanged.emit(
-                index, index, [Qt.CheckStateRole]
+                index, index, [Qt.ItemDataRole.CheckStateRole]
             )  # Qt.CheckStateRole
             # Update the mda_mvc selection
             self.updateMdaMvcSelection(self.selections)
@@ -274,7 +274,7 @@ class MDAFileTableModel(QAbstractTableModel):
         self.dataChanged.emit(
             topLeftIndex,
             bottomRightIndex,
-            [Qt.CheckStateRole],  # Qt.CheckStateRole
+            [Qt.ItemDataRole.CheckStateRole],  # Qt.CheckStateRole
         )
         # Update the mda_mvc selection
         self.mda_mvc.setSelectionField()
@@ -314,7 +314,7 @@ class MDAFileTableModel(QAbstractTableModel):
         corner1 = self.index(top, left)
         corner2 = self.index(bottom, right)
         self.dataChanged.emit(
-            corner1, corner2, [Qt.CheckStateRole]
+            corner1, corner2, [Qt.ItemDataRole.CheckStateRole]
         )  # Qt.CheckStateRole
         # prune empty data from new_selection
         new_selection = {k: v for k, v in new_selection.items() if v is not None}
@@ -340,8 +340,8 @@ class MDAFileTableModel(QAbstractTableModel):
             for c in self.checkboxColumns:
                 state = self.checkbox(self.index(r, c))
                 choices = {
-                    Qt.Checked: "*",
-                    Qt.Unchecked: "-",
+                    Qt.CheckState.Checked: "*",
+                    Qt.CheckState.Unchecked: "-",
                 }  # {Qt.Checked: "*", Qt.Unchecked: "-"}
                 text += choices[state]
             text += f" {self.fieldName(r)}"
@@ -618,13 +618,13 @@ class MDAFileTableModel(QAbstractTableModel):
         if not index.isValid():
             return False
 
-        if role == Qt.CheckStateRole:
+        if role == Qt.ItemDataRole.CheckStateRole:
             # Handle checkbox state changes
             if index.column() in self.checkboxColumns:
                 self.setCheckbox(index, value)
                 return True
 
-        elif role == Qt.EditRole:
+        elif role == Qt.ItemDataRole.EditRole:
             # Handle data editing if needed
             return True
 

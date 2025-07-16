@@ -9,9 +9,9 @@ for long-running operations like folder scanning.
     ~ProgressDialog
 """
 
-from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QWidget, QProgressDialog, QApplication
+from PyQt6 import QtWidgets, QtCore
+from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtWidgets import QWidget, QProgressDialog, QApplication
 from typing import Optional, Callable
 
 

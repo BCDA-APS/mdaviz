@@ -1,6 +1,6 @@
 from contextlib import nullcontext as does_not_raise
 import pytest
-from PyQt5.QtCore import Qt
+from PyQt6.QtCore import Qt
 
 # Import the application modules
 from mdaviz.mainwindow import MainWindow
@@ -35,7 +35,7 @@ def test_app_startup(qtbot):
 
         # Test basic window properties
         assert main_window.isVisible() == False  # Window not shown yet
-        assert main_window.windowFlags() & Qt.Window
+        assert main_window.windowFlags() & Qt.WindowType.Window
 
         # Close the window without showing it to avoid crashes
         main_window.close()

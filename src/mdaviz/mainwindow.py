@@ -8,9 +8,10 @@ Defines MainWindow class.
 
 from pathlib import Path
 from typing import Optional, List
-from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QSizePolicy, QDesktopWidget, QAction
+from PyQt6 import QtWidgets
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QMainWindow, QSizePolicy, QApplication
+from PyQt6.QtGui import QAction
 
 from . import APP_TITLE
 from .mda_folder import MDA_MVC
@@ -58,22 +59,22 @@ class MainWindow(QMainWindow):
 
         # Set proper window flags for macOS resizing
         self.setWindowFlags(
-            Qt.Window
-            | Qt.WindowMinimizeButtonHint
-            | Qt.WindowMaximizeButtonHint
-            | Qt.WindowCloseButtonHint
+            Qt.WindowType.Window
+            | Qt.WindowType.WindowMinimizeButtonHint
+            | Qt.WindowType.WindowMaximizeButtonHint
+            | Qt.WindowType.WindowCloseButtonHint
         )
 
         # Additional macOS-specific properties for proper resizing
-        self.setAttribute(Qt.WA_MacShowFocusRect, False)
-        self.setAttribute(Qt.WA_MacNormalSize, True)
+        self.setAttribute(Qt.WidgetAttribute.WA_MacShowFocusRect, False)
+        self.setAttribute(Qt.WidgetAttribute.WA_MacNormalSize, True)
 
         # Ensure the window can be resized
         self.setMinimumSize(400, 300)
         self.resize(720, 400)  # More reasonable initial size
 
         # Ensure the window is resizable
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         # Ensure central widget and main content area are resizable
         self._setup_resizable_layout()
@@ -99,7 +100,7 @@ class MainWindow(QMainWindow):
         print("Settings are saved in:", settings.fileName())
 
         # Ensure the window size is reasonable (not too large)
-        screen = QDesktopWidget().screenGeometry()
+        screen = QApplication.primaryScreen().geometry()
         max_width = min(screen.width() * 0.8, 1200)  # Max 80% of screen width or 1200px
         max_height = min(
             screen.height() * 0.8, 800
@@ -175,7 +176,7 @@ class MainWindow(QMainWindow):
         """
         Show the Preferences dialog
         """
-        from PyQt5.QtWidgets import (
+        from PyQt6.QtWidgets import (
             QDialog,
             QVBoxLayout,
             QHBoxLayout,
@@ -576,31 +577,31 @@ class MainWindow(QMainWindow):
         # Ensure central widget is resizable
         if hasattr(self, "centralwidget"):
             self.centralwidget.setSizePolicy(
-                QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+                QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding
             )
 
         # Ensure the main content area (groupbox) is resizable
         if hasattr(self, "groupbox"):
             self.groupbox.setSizePolicy(
-                QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+                QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding
             )
 
         # Ensure the tab widget is resizable
         if hasattr(self, "mainTabWidget"):
             self.mainTabWidget.setSizePolicy(
-                QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+                QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding
             )
 
         # Ensure the fit data tab is resizable
         if hasattr(self, "fitDataTab"):
             self.fitDataTab.setSizePolicy(
-                QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+                QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding
             )
 
         # Ensure the fit data text widget is resizable
         if hasattr(self, "fitDataText"):
             self.fitDataText.setSizePolicy(
-                QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+                QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding
             )
 
     def _auto_load_first_folder(self) -> None:
@@ -680,7 +681,7 @@ class MainWindow(QMainWindow):
 
     def _center_window(self):
         """Center the window on the screen."""
-        screen = QtWidgets.QDesktopWidget().screenGeometry()
+        screen = QtWidgets.QApplication.primaryScreen().geometry()
         window_geometry = self.geometry()
         x = (screen.width() - window_geometry.width()) // 2
         y = (screen.height() - window_geometry.height()) // 2

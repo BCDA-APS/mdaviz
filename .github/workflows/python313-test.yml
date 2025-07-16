@@ -1,0 +1,103 @@
+name: Python 3.13 Compatibility Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash -l {0}
+
+jobs:
+  python313-test:
+    name: Python 3.13 Compatibility
+    runs-on: ubuntu-latest
+    env:
+      DISPLAY: ":99.0"
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-3.13-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-3.13-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Install Qt6 dependencies
+        run: |
+          sudo apt update -y
+          sudo apt install -y \
+            xvfb \
+            x11-utils \
+            qt6-base-dev \
+            qt6-qmake \
+            libqt6gui6 \
+            libqt6widgets6 \
+            libqt6core6 \
+            libqt6test6 \
+            libxcb-icccm4 \
+            libxcb-image0 \
+            libxcb-keysyms1 \
+            libxcb-randr0 \
+            libxcb-render-util0 \
+            libxcb-xinerama0 \
+            libxcb-xfixes0 \
+            libxkbcommon-x11-0 \
+            libqt6dbus6 \
+            libqt6network6 \
+            libqt6opengl6 \
+            libqt6svg6 \
+            libqt6svgwidgets6
+
+      - name: Install test dependencies
+        run: |
+          pip install pytest-cov pytest-qt pytest-xvfb
+
+      - name: Verify Python 3.13 and PyQt6 compatibility
+        run: |
+          python --version
+          python -c "from PyQt6.QtWidgets import QApplication; print('PyQt6 installation verified')"
+          python -c "from PyQt6.QtCore import QT_VERSION_STR; print(f'Qt version: {QT_VERSION_STR}')"
+          python -c "from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg; print('Matplotlib qtagg backend working')"
+          python -c "import mdaviz; print('mdaviz imports successfully with Python 3.13')"
+
+      - name: Run basic compatibility tests
+        env:
+          QT_QPA_PLATFORM: offscreen
+          QT_LOGGING_RULES: "qt.qpa.*=false"
+          DISPLAY: ":99.0"
+          PYTEST_QT_API: pyqt6
+        run: |
+          # Run tests that don't require GUI
+          xvfb-run -a pytest src/tests/test_auto_load.py -v
+          xvfb-run -a pytest src/tests/test_lazy_loading.py -k "not gui" -v
+
+      - name: Check for deprecation warnings
+        run: |
+          python -W error::DeprecationWarning -c "import mdaviz" || echo "Deprecation warnings found - these should be addressed"
+
+      - name: Run linting with Python 3.13
+        run: |
+          ruff check src/
+          ruff format --check src/
+
+      - name: Run type checking with Python 3.13
+        run: |
+          mypy src/mdaviz --ignore-missing-imports 

@@ -6,9 +6,9 @@
 """
 
 from typing import Any, Optional
-from PyQt5.QtCore import QModelIndex, QObject
-from PyQt5.QtCore import QAbstractTableModel
-from PyQt5.QtCore import QVariant
+from PyQt6.QtCore import QModelIndex, QObject
+from PyQt6.QtCore import QAbstractTableModel
+from PyQt6.QtCore import QVariant
 
 
 class DataTableModel(QAbstractTableModel):

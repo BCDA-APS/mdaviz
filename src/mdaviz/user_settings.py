@@ -36,8 +36,8 @@ This module uses QtCore.QSettings.
 
 import datetime
 
-from PyQt5.QtCore import QSettings, QSize, QRect
-from PyQt5.QtWidgets import QDesktopWidget
+from PyQt6.QtCore import QSettings, QSize, QRect
+from PyQt6.QtWidgets import QApplication
 
 from . import __package_name__
 from . import __settings_orgName__
@@ -70,8 +70,8 @@ class ApplicationQSettings(QSettings):
     def __init__(self, orgName, appName):
         QSettings.__init__(
             self,
-            QSettings.IniFormat,
-            QSettings.UserScope,
+            QSettings.Format.IniFormat,
+            QSettings.Scope.UserScope,
             orgName,
             appName,
         )
@@ -191,13 +191,16 @@ class ApplicationQSettings(QSettings):
             return
 
         # is this window on any available screen?
-        qdw = QDesktopWidget()
+        app = QApplication.instance()
+        primary_screen = app.primaryScreen()
         x_onscreen = False
         y_onscreen = False
-        for screen_num in range(qdw.screenCount()):
+        
+        # Check if window position is on any available screen
+        for screen in app.screens():
             # find the "available" screen dimensions
             # (excludes docks, menu bars, ...)
-            available_rect = qdw.availableGeometry(screen_num)
+            available_rect = screen.availableGeometry()
             if (
                 available_rect.x()
                 <= int(x)
@@ -212,7 +215,7 @@ class ApplicationQSettings(QSettings):
                 y_onscreen = True
 
         # Move the window to the primary window if it would otherwise be drawn off screen
-        available_rect = qdw.availableGeometry(qdw.primaryScreen())
+        available_rect = primary_screen.availableGeometry()
         if not x_onscreen:
             offset = available_rect.x() + available_rect.width() / 10
             x = available_rect.x() + offset

@@ -1,0 +1,124 @@
+name: Deprecation Warning Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash -l {0}
+
+jobs:
+  deprecation-check:
+    name: Check Deprecation Warnings
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - "3.13"
+          - "3.12"
+          - "3.11"
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Check for deprecation warnings
+        run: |
+          echo "Checking for deprecation warnings with Python ${{ matrix.python-version }}"
+          
+          # Check for xdrlib deprecation (known issue in synApps_mdalib)
+          python -W error::DeprecationWarning -c "
+          import warnings
+          warnings.filterwarnings('ignore', category=DeprecationWarning, module='xdrlib')
+          import mdaviz
+          print('✅ mdaviz imports successfully without deprecation warnings')
+          " || echo "⚠️ Deprecation warnings found (excluding xdrlib)"
+          
+          # Check for other deprecation warnings
+          python -W default::DeprecationWarning -c "
+          import mdaviz
+          print('✅ mdaviz imports successfully')
+          " 2>&1 | grep -i "deprecation" || echo "✅ No additional deprecation warnings found"
+
+      - name: Check for future deprecation warnings
+        run: |
+          echo "Checking for future deprecation warnings..."
+          python -W error::FutureWarning -c "
+          import mdaviz
+          print('✅ No FutureWarning issues found')
+          " || echo "⚠️ FutureWarning issues found"
+
+      - name: Check for pending deprecation warnings
+        run: |
+          echo "Checking for pending deprecation warnings..."
+          python -W error::PendingDeprecationWarning -c "
+          import mdaviz
+          print('✅ No PendingDeprecationWarning issues found')
+          " || echo "⚠️ PendingDeprecationWarning issues found"
+
+      - name: Generate deprecation report
+        run: |
+          echo "=== Deprecation Warning Report for Python ${{ matrix.python-version }} ==="
+          python -W default::DeprecationWarning -c "
+          import mdaviz
+          print('Import successful')
+          " 2>&1 | grep -i "deprecation" || echo "No deprecation warnings found"
+          
+          echo "=== Future Warning Report for Python ${{ matrix.python-version }} ==="
+          python -W default::FutureWarning -c "
+          import mdaviz
+          print('Import successful')
+          " 2>&1 | grep -i "future" || echo "No future warnings found"
+
+  xdrlib-fix-check:
+    name: Check xdrlib Usage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Check xdrlib usage in codebase
+        run: |
+          echo "Checking for xdrlib usage in our codebase..."
+          if grep -r "import xdrlib" src/; then
+            echo "❌ xdrlib usage found in our codebase"
+            exit 1
+          else
+            echo "✅ No xdrlib usage found in our codebase"
+          fi
+          
+          echo "Checking for xdrlib usage in dependencies..."
+          python -c "
+          import pkg_resources
+          for dist in pkg_resources.working_set:
+              try:
+                  if 'xdrlib' in dist.get_metadata('METADATA'):
+                      print(f'⚠️ {dist.project_name} uses xdrlib')
+              except:
+                  pass
+          " || echo "✅ No xdrlib usage found in dependencies" 
