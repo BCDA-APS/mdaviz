@@ -97,7 +97,9 @@ class ChartView(QWidget):
         # Set size constraints on the canvas to prevent vertical expansion
         canvas_max_height = max_height - 50  # Leave room for toolbar
         self.canvas.setMaximumHeight(canvas_max_height)
-        self.canvas.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        self.canvas.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
+        )
 
         # Create the navigation toolbar
         self.toolbar = NavigationToolbar(self.canvas, self)
@@ -235,7 +237,9 @@ class ChartView(QWidget):
         # Get the curve ID from the item data instead of display text
         current_index = self.curveBox.currentIndex()
         if current_index >= 0:
-            curve_id = self.curveBox.itemData(current_index, QtCore.Qt.ItemDataRole.UserRole)
+            curve_id = self.curveBox.itemData(
+                current_index, QtCore.Qt.ItemDataRole.UserRole
+            )
 
             # Check if the curve ID exists in the curve manager
             if curve_id in self.curveManager.curves():
@@ -646,7 +650,9 @@ class ChartView(QWidget):
                 ):
                     # Found matching curve, update the combo box item
                     if old_curve_id != curve_id:
-                        self.curveBox.setItemData(i, curve_id, QtCore.Qt.ItemDataRole.UserRole)
+                        self.curveBox.setItemData(
+                            i, curve_id, QtCore.Qt.ItemDataRole.UserRole
+                        )
                     break
 
     def onOffsetUpdated(self):

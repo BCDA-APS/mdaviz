@@ -577,31 +577,36 @@ class MainWindow(QMainWindow):
         # Ensure central widget is resizable
         if hasattr(self, "centralwidget"):
             self.centralwidget.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding
+                QtWidgets.QSizePolicy.Policy.Expanding,
+                QtWidgets.QSizePolicy.Policy.Expanding,
             )
 
         # Ensure the main content area (groupbox) is resizable
         if hasattr(self, "groupbox"):
             self.groupbox.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding
+                QtWidgets.QSizePolicy.Policy.Expanding,
+                QtWidgets.QSizePolicy.Policy.Expanding,
             )
 
         # Ensure the tab widget is resizable
         if hasattr(self, "mainTabWidget"):
             self.mainTabWidget.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding
+                QtWidgets.QSizePolicy.Policy.Expanding,
+                QtWidgets.QSizePolicy.Policy.Expanding,
             )
 
         # Ensure the fit data tab is resizable
         if hasattr(self, "fitDataTab"):
             self.fitDataTab.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding
+                QtWidgets.QSizePolicy.Policy.Expanding,
+                QtWidgets.QSizePolicy.Policy.Expanding,
             )
 
         # Ensure the fit data text widget is resizable
         if hasattr(self, "fitDataText"):
             self.fitDataText.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding
+                QtWidgets.QSizePolicy.Policy.Expanding,
+                QtWidgets.QSizePolicy.Policy.Expanding,
             )
 
     def _auto_load_first_folder(self) -> None:

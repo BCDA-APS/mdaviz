@@ -35,8 +35,12 @@ class TestMainWindowResizing:
 
             # Check that the window has expanding size policy
             size_policy = window.sizePolicy()
-            assert size_policy.horizontalPolicy() == QtWidgets.QSizePolicy.Policy.Expanding
-            assert size_policy.verticalPolicy() == QtWidgets.QSizePolicy.Policy.Expanding
+            assert (
+                size_policy.horizontalPolicy() == QtWidgets.QSizePolicy.Policy.Expanding
+            )
+            assert (
+                size_policy.verticalPolicy() == QtWidgets.QSizePolicy.Policy.Expanding
+            )
 
             # Check that the window has reasonable minimum size
             min_size = window.minimumSize()
@@ -46,14 +50,22 @@ class TestMainWindowResizing:
             # Check that central widget has expanding size policy
             central_widget = window.centralwidget
             size_policy = central_widget.sizePolicy()
-            assert size_policy.horizontalPolicy() == QtWidgets.QSizePolicy.Policy.Expanding
-            assert size_policy.verticalPolicy() == QtWidgets.QSizePolicy.Policy.Expanding
+            assert (
+                size_policy.horizontalPolicy() == QtWidgets.QSizePolicy.Policy.Expanding
+            )
+            assert (
+                size_policy.verticalPolicy() == QtWidgets.QSizePolicy.Policy.Expanding
+            )
 
             # Check that groupbox has expanding size policy
             groupbox = window.groupbox
             size_policy = groupbox.sizePolicy()
-            assert size_policy.horizontalPolicy() == QtWidgets.QSizePolicy.Policy.Expanding
-            assert size_policy.verticalPolicy() == QtWidgets.QSizePolicy.Policy.Expanding
+            assert (
+                size_policy.horizontalPolicy() == QtWidgets.QSizePolicy.Policy.Expanding
+            )
+            assert (
+                size_policy.verticalPolicy() == QtWidgets.QSizePolicy.Policy.Expanding
+            )
 
         finally:
             # Clean up

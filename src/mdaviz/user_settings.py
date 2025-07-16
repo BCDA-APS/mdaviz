@@ -195,7 +195,7 @@ class ApplicationQSettings(QSettings):
         primary_screen = app.primaryScreen()
         x_onscreen = False
         y_onscreen = False
-        
+
         # Check if window position is on any available screen
         for screen in app.screens():
             # find the "available" screen dimensions

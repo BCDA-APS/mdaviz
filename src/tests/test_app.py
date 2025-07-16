@@ -21,6 +21,7 @@ def app(qtbot):
 # The following tests are skipped by default to avoid PyQt5/Qt crashes in headless/CI environments.
 # To re-enable, remove or comment out the @pytest.mark.skip decorators and run locally with a display.
 
+
 @pytest.mark.skip(reason="Skip GUI test in CI/headless environment")
 def test_app_startup(qtbot):
     """Test that the application can start without errors."""
@@ -34,7 +35,7 @@ def test_app_startup(qtbot):
         assert main_window.windowTitle() == "mdaviz"
 
         # Test basic window properties
-        assert main_window.isVisible() == False  # Window not shown yet
+        assert not main_window.isVisible()  # Window not shown yet
         assert main_window.windowFlags() & Qt.WindowType.Window
 
         # Close the window without showing it to avoid crashes

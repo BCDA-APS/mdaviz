@@ -13,10 +13,8 @@ it works correctly and handles large folders efficiently.
 """
 
 import pytest
-import tempfile
-import shutil
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, Any, Generator
+from typing import TYPE_CHECKING, Dict, Any
 from unittest.mock import Mock
 
 from PyQt6 import QtCore
@@ -80,15 +78,15 @@ class TestLazyFolderScanner:
         assert result.total_files == 5
 
     @pytest.mark.skip(reason="Skip in CI/headless: uses Qt/QThread")
-    def test_scan_folder_nonexistent(
-        self, scanner: LazyFolderScanner
-    ) -> None:
+    def test_scan_folder_nonexistent(self, scanner: LazyFolderScanner) -> None:
         """Test scanning a non-existent folder."""
         result = scanner.scan_folder(Path("/nonexistent/folder"))
         assert not result.is_complete
         assert result.error_message == "Folder does not exist"
 
-    @pytest.mark.skip(reason="Skip in CI/headless: triggers Qt crash with too many files")
+    @pytest.mark.skip(
+        reason="Skip in CI/headless: triggers Qt crash with too many files"
+    )
     def test_scan_folder_too_many_files(
         self, scanner: LazyFolderScanner, temp_folder: Path
     ) -> None:
@@ -118,7 +116,9 @@ class TestLazyFolderScanner:
         result = scanner.scan_folder(temp_folder, progress_callback)
         assert result.is_complete
         assert len(progress_calls) > 0
-        assert progress_calls[-1][0] == progress_calls[-1][1]  # Final call should be complete
+        assert (
+            progress_calls[-1][0] == progress_calls[-1][1]
+        )  # Final call should be complete
 
     @pytest.mark.skip(reason="Skip in CI/headless: uses Qt/QThread")
     def test_cancel_scan(self, scanner: LazyFolderScanner, temp_folder: Path) -> None:
@@ -129,10 +129,10 @@ class TestLazyFolderScanner:
 
         # Start async scan
         scanner.scan_folder_async(temp_folder)
-        
+
         # Cancel immediately
         scanner.cancel_scan()
-        
+
         # Should not be scanning anymore
         assert not scanner.is_scanning()
 
@@ -321,7 +321,9 @@ class TestVirtualTableModel:
         assert data == "test_data"
         mock_data_provider.get_data.assert_called_with(0, 0)
 
-    def test_header_data(self, virtual_model: VirtualTableModel, mock_data_provider: Mock) -> None:
+    def test_header_data(
+        self, virtual_model: VirtualTableModel, mock_data_provider: Mock
+    ) -> None:
         """Test getting header data."""
         header = virtual_model.headerData(
             0,

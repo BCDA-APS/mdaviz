@@ -162,6 +162,7 @@ class VirtualTableModel(QAbstractTableModel):
         """Get header data for the table."""
         if role == 0:  # Qt.DisplayRole
             from PyQt6.QtCore import Qt
+
             if orientation == Qt.Orientation.Horizontal:
                 headers = self.data_provider.get_column_headers()
                 if 0 <= section < len(headers):

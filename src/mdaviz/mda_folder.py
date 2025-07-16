@@ -690,7 +690,9 @@ class MDA_MVC(QWidget):
             scrollHint = QAbstractItemView.ScrollHint.PositionAtBottom
         # Select the row and ensure it's visible:
         self.selectionModel().setCurrentIndex(
-            index, QItemSelectionModel.SelectionFlag.ClearAndSelect | QItemSelectionModel.SelectionFlag.Rows
+            index,
+            QItemSelectionModel.SelectionFlag.ClearAndSelect
+            | QItemSelectionModel.SelectionFlag.Rows,
         )
         self.mda_folder_tableview.tableView.scrollTo(index, scrollHint)
         # Trigger actions associated with file selection
