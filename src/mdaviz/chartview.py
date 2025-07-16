@@ -10,9 +10,9 @@ import numpy
 from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtCore import QObject, QTimer, Qt, pyqtSignal
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QApplication
-from . import utils
-from .fit_manager import FitManager
-from .user_settings import settings
+from mdaviz import utils
+from mdaviz.fit_manager import FitManager
+from mdaviz.user_settings import settings
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas

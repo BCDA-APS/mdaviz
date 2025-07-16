@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QFileDialog
 
 from pathlib import Path
-from .user_settings import settings
+from mdaviz.user_settings import settings
 
 DIR_SETTINGS_KEY = "directory"
 

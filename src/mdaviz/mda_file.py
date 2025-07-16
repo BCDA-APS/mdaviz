@@ -23,15 +23,15 @@ User: clearButton.clicked (emit: no data)
 
 """
 
-from .synApps_mdalib.mda import readMDA
+from mdaviz.synApps_mdalib.mda import readMDA
 from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import QAbstractItemView, QWidget
 from PyQt6.QtCore import QObject
 import yaml
 
-from . import utils
-from .mda_file_table_view import MDAFileTableView
-from .data_cache import get_global_cache
+from mdaviz import utils
+from mdaviz.mda_file_table_view import MDAFileTableView
+from mdaviz.data_cache import get_global_cache
 
 
 class MDAFile(QWidget):

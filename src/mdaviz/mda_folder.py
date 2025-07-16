@@ -70,7 +70,7 @@ from PyQt6 import QtCore
 from PyQt6.QtCore import QItemSelectionModel, Qt, pyqtSignal
 from PyQt6.QtWidgets import QAbstractItemView, QWidget
 
-from . import utils
+from mdaviz import utils
 
 
 class MDA_MVC(QWidget):
@@ -100,10 +100,10 @@ class MDA_MVC(QWidget):
         self.setup()
 
     def setup(self):
-        from .user_settings import settings
-        from .mda_folder_table_view import MDAFolderTableView
-        from .mda_file_viz import MDAFileVisualization
-        from .mda_file import MDAFile
+        from mdaviz.user_settings import settings
+        from mdaviz.mda_folder_table_view import MDAFolderTableView
+        from mdaviz.mda_file_viz import MDAFileVisualization
+        from mdaviz.mda_file import MDAFile
 
         # Folders table view:
         self.mda_folder_tableview = MDAFolderTableView(self)
@@ -487,7 +487,7 @@ class MDA_MVC(QWidget):
         - Exits with a status message if no file is selected or no detectors (Y) are selected for plotting.
         """
 
-        from .chartview import ChartView
+        from mdaviz.chartview import ChartView
 
         action = args[0]
         tableview = self.currentFileTableview()
@@ -720,7 +720,7 @@ class MDA_MVC(QWidget):
         - If I0 is selected, Y data will be normalized as Y/I0.
         """
 
-        from .chartview import ChartView
+        from mdaviz.chartview import ChartView
 
         mode = self.mda_file.mode()
         tableview = self.currentFileTableview()
@@ -813,7 +813,7 @@ class MDA_MVC(QWidget):
         Parameters:
         - key (str): Identifier for the splitter being monitored '(hsplitter' or 'vsplitter')
         """
-        from .user_settings import settings
+        from mdaviz.user_settings import settings
 
         splitter = getattr(self, key)
         while time.time() < getattr(self, f"{key}_deadline"):

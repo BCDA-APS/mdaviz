@@ -3,10 +3,10 @@ from PyQt6.QtGui import QFont, QKeySequence
 from PyQt6.QtWidgets import QWidget, QDialog, QSizePolicy
 from PyQt6.QtGui import QShortcut
 
-from . import utils
-from .chartview import ChartView
-from .data_table_view import DataTableView
-from .fit_models import get_available_models
+from mdaviz import utils
+from mdaviz.chartview import ChartView
+from mdaviz.data_table_view import DataTableView
+from mdaviz.fit_models import get_available_models
 
 MD_FONT = "Arial"
 MD_FONT_SIZE = 12
@@ -51,7 +51,7 @@ class MDAFileVisualization(QWidget):
         )
 
         # Get maximum height from user settings with default fallback
-        from .user_settings import settings
+        from mdaviz.user_settings import settings
 
         max_height = settings.getKey("plot_max_height")
         try:
@@ -195,7 +195,7 @@ class MDAFileVisualization(QWidget):
 
     def _updateTabWidgetMaxHeight(self):
         """Update the tab widget's maximum height to match the plot height setting."""
-        from .user_settings import settings
+        from mdaviz.user_settings import settings
 
         max_height = settings.getKey("plot_max_height")
         try:

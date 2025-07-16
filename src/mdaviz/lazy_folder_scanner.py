@@ -14,7 +14,7 @@ with support for batch processing and progress tracking.
 from pathlib import Path
 from typing import Any, Optional, Callable
 from PyQt6.QtCore import QObject, QThread, pyqtSignal
-from .utils import get_file_info_lightweight, get_file_info_full
+from mdaviz.utils import get_file_info_lightweight, get_file_info_full
 from dataclasses import dataclass
 
 

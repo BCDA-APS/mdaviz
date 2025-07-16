@@ -4,8 +4,8 @@ Search for mda files.
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QStyledItemDelegate, QWidget, QHeaderView
-from . import utils
-from .mda_folder_table_model import HEADERS
+from mdaviz import utils
+from mdaviz.mda_folder_table_model import HEADERS
 
 
 class _AlignCenterDelegate(QStyledItemDelegate):
@@ -40,8 +40,8 @@ class MDAFolderTableView(QWidget):
         header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
     def displayTable(self):
-        from .mda_folder_table_model import MDAFolderTableModel
-        from .empty_table_model import EmptyTableModel
+        from mdaviz.mda_folder_table_model import MDAFolderTableModel
+        from mdaviz.empty_table_model import EmptyTableModel
 
         data = self.mdaInfoList()
         if len(data) > 0:

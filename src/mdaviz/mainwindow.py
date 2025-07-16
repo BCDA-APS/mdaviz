@@ -13,12 +13,12 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QMainWindow, QSizePolicy, QApplication
 from PyQt6.QtGui import QAction
 
-from . import APP_TITLE
-from .mda_folder import MDA_MVC
-from . import utils
-from .user_settings import settings
-from .opendialog import DIR_SETTINGS_KEY
-from .lazy_folder_scanner import LazyFolderScanner, FolderScanResult
+from mdaviz import APP_TITLE
+from mdaviz.mda_folder import MDA_MVC
+from mdaviz import utils
+from mdaviz.user_settings import settings
+from mdaviz.opendialog import DIR_SETTINGS_KEY
+from mdaviz.lazy_folder_scanner import LazyFolderScanner, FolderScanResult
 
 UI_FILE = utils.getUiFileName(__file__)
 MAX_FILES = 500
@@ -167,7 +167,7 @@ class MainWindow(QMainWindow):
         """
         Show the "About ..." dialog
         """
-        from .aboutdialog import AboutDialog
+        from mdaviz.aboutdialog import AboutDialog
 
         about = AboutDialog(self)
         about.open()
@@ -271,7 +271,7 @@ class MainWindow(QMainWindow):
         """
         User chose to open (connect with) a tiled server.
         """
-        from .opendialog import OpenDialog
+        from mdaviz.opendialog import OpenDialog
 
         self.setStatus("Please select a file...")
         open_dialog = OpenDialog(self)
@@ -312,7 +312,7 @@ class MainWindow(QMainWindow):
         """
         User chose to open (connect with) a tiled server.
         """
-        from .popup import PopUp
+        from mdaviz.popup import PopUp
 
         popup = PopUp(self, message)
         return popup.exec_() == QtWidgets.QDialog.Accepted

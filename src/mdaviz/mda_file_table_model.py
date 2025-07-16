@@ -31,7 +31,7 @@ such a 'list(object)' or 'dict(str=object)', then change both 'columns()' and
 """
 
 from typing import Optional, List, Dict, Tuple
-from .utils import mda2ftm, ftm2mda
+from mdaviz.utils import mda2ftm, ftm2mda
 from dataclasses import KW_ONLY
 from dataclasses import dataclass
 

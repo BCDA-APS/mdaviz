@@ -19,7 +19,7 @@ import re
 import threading
 from datetime import datetime
 from typing import Any
-from .synApps_mdalib.mda import readMDA, scanPositioner, skimMDA
+from mdaviz.synApps_mdalib.mda import readMDA, scanPositioner, skimMDA
 
 HEADERS = "Prefix", "Scan #", "Points", "Dim", "Date", "Size"
 
@@ -558,7 +558,7 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
     """
     from PyQt6 import uic
 
-    from . import UI_DIR
+    from mdaviz import UI_DIR
 
     if isinstance(ui_file, str):
         ui_file = UI_DIR / ui_file

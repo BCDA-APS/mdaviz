@@ -24,7 +24,7 @@ have_fast_xdr = False
 try:
     import xdrlib as xdr
 except ImportError:
-    from . import f_xdrlib as xdr_fallback  # type: ignore[attr-defined]
+    from mdaviz.synApps_mdalib import f_xdrlib as xdr_fallback  # type: ignore[attr-defined]
     xdr = xdr_fallback
     have_fast_xdr = True
 

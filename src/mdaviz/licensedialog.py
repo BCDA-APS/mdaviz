@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QDialog
 
-from . import utils
+from mdaviz import utils
 
 
 class LicenseDialog(QDialog):

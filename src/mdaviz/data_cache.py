@@ -19,8 +19,8 @@ from typing import Any, Optional
 from dataclasses import dataclass, field
 from collections import OrderedDict
 from PyQt6.QtCore import QObject, pyqtSignal
-from .synApps_mdalib.mda import readMDA
-from .utils import get_scan
+from mdaviz.synApps_mdalib.mda import readMDA
+from mdaviz.utils import get_scan
 
 
 @dataclass

@@ -11,11 +11,11 @@ Uses :class:`mda_file_table_model.MDAFileTableModel`.
 from PyQt6.QtWidgets import QWidget, QHeaderView
 import numpy as np
 
-from . import utils
-from .mda_file_table_model import ColumnDataType
-from .mda_file_table_model import FieldRuleType
-from .mda_file_table_model import TableColumn
-from .mda_file_table_model import TableField
+from mdaviz import utils
+from mdaviz.mda_file_table_model import ColumnDataType
+from mdaviz.mda_file_table_model import FieldRuleType
+from mdaviz.mda_file_table_model import TableColumn
+from mdaviz.mda_file_table_model import TableField
 
 HEADERS = "Field", "X", "Y", "I0", "PV", "DESC", "Unit"
 
@@ -97,8 +97,8 @@ class MDAFileTableView(QWidget):
         self._data = {"fileInfo": fileInfo, "fields": fields}
 
     def displayTable(self, selection_field):
-        from .mda_file_table_model import MDAFileTableModel
-        from .empty_table_model import EmptyTableModel
+        from mdaviz.mda_file_table_model import MDAFileTableModel
+        from mdaviz.empty_table_model import EmptyTableModel
 
         if self.data() is not None:
             fields = self.data()["fields"]

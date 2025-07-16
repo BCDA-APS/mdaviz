@@ -7,7 +7,7 @@ QAbstractTableModel of folder content.
 """
 
 from PyQt6.QtCore import QAbstractTableModel
-from .utils import HEADERS
+from mdaviz.utils import HEADERS
 
 
 class MDAFolderTableModel(QAbstractTableModel):

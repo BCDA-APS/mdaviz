@@ -39,8 +39,8 @@ import datetime
 from PyQt6.QtCore import QSettings, QSize, QRect
 from PyQt6.QtWidgets import QApplication
 
-from . import __package_name__
-from . import __settings_orgName__
+from mdaviz import __package_name__
+from mdaviz import __settings_orgName__
 
 GLOBAL_GROUP = "___global___"
 

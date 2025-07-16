@@ -13,7 +13,7 @@ mdaviz: Python Qt5 application to visualize mda data.
 import logging
 import sys
 from PyQt6 import QtWidgets
-from .mainwindow import MainWindow
+from mdaviz.mainwindow import MainWindow
 import argparse
 
 
@@ -32,7 +32,7 @@ def command_line_interface() -> argparse.Namespace:
     Returns:
         argparse.Namespace: Parsed command line arguments
     """
-    from . import __version__
+    from mdaviz import __version__
 
     doc = __doc__.strip().splitlines()[0]
     parser = argparse.ArgumentParser(description=doc)

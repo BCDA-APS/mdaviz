@@ -31,8 +31,8 @@ class DataTableView(QWidget):
         header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
     def displayTable(self):
-        from .data_table_model import DataTableModel
-        from .empty_table_model import EmptyTableModel
+        from mdaviz.data_table_model import DataTableModel
+        from mdaviz.empty_table_model import EmptyTableModel
 
         data = self.data()
         if len(data) > 0:
