@@ -3,6 +3,7 @@ Define constants used throught the code.
 """
 
 import pathlib
+import sys
 import warnings
 
 # Suppress PyQt6 deprecation warnings for sipPyTypeDict
@@ -36,7 +37,22 @@ def _get_version() -> str:
 
 __version__ = _get_version()
 
-ROOT_DIR = pathlib.Path(__file__).parent
+def _get_root_dir() -> pathlib.Path:
+    """Get the root directory, handling PyInstaller's temporary directory structure."""
+    if getattr(sys, 'frozen', False):
+        # Running in PyInstaller executable
+        # Use sys._MEIPASS which points to the temporary directory where PyInstaller extracts files
+        if hasattr(sys, '_MEIPASS'):
+            return pathlib.Path(sys._MEIPASS) / "mdaviz"
+        else:
+            # Fallback: use executable directory
+            base_path = pathlib.Path(sys.executable).parent
+            return base_path / "mdaviz"
+    else:
+        # Running in development
+        return pathlib.Path(__file__).parent
+
+ROOT_DIR = _get_root_dir()
 UI_DIR = ROOT_DIR / "resources"
 
 APP_DESC = "Visualize mda files."

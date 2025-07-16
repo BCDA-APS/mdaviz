@@ -20,13 +20,8 @@ import string
 
 import string
 
-have_fast_xdr = False
-try:
-    import xdrlib as xdr
-except ImportError:
-    from mdaviz.synApps_mdalib import f_xdrlib as xdr_fallback  # type: ignore[attr-defined]
-    xdr = xdr_fallback
-    have_fast_xdr = True
+from mdaviz.synApps_mdalib import f_xdrlib as xdr  # Always use fallback
+have_fast_xdr = True
 
 try:
 	import tkinter

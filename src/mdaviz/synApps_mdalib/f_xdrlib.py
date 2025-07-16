@@ -233,12 +233,9 @@ class Unpacker:
             result.append(unpack_item())
         return result
 
-    def unpack_array(self, unpack_item, length: int) -> List[Any]:
-        """Unpack an array of items."""
-        result = []
-        for _ in range(length):
-            result.append(unpack_item())
-        return result
+    def unpack_array(self, unpack_item, n: int) -> list:
+        """Unpack an array of items, matching the xdrlib signature used in mda.py."""
+        return [unpack_item() for _ in range(n)]
 
 
 # Convenience functions for common operations
