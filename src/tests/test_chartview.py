@@ -611,3 +611,164 @@ def test_chartview_combo_box_curve_management(qtbot):
     widget.updateComboBoxCurveIDs()
     # Should call itemData and setItemData
     assert mock_combo.itemData.called 
+
+
+def test_chartview_log_scale_functionality(qtbot):
+    """Test log scale functionality."""
+    # Mock the parent and required attributes
+    parent = MagicMock()
+    parent.mda_file_viz.curveBox = MagicMock()
+    parent.mda_file_viz.clearAll = MagicMock()
+    parent.mda_file_viz.curveRemove = MagicMock()
+    parent.mda_file_viz.cursor1_remove = MagicMock()
+    parent.mda_file_viz.cursor2_remove = MagicMock()
+    parent.mda_file_viz.offset_value = MagicMock()
+    parent.mda_file_viz.factor_value = MagicMock()
+    parent.mda_file.tabManager.tabRemoved = MagicMock()
+    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
+    parent.detRemoved = MagicMock()
+    
+    # Patch settings.getKey to avoid config issues
+    import mdaviz.user_settings
+    mdaviz.user_settings.settings.getKey = lambda key: 800
+    
+    widget = ChartView(parent)
+    qtbot.addWidget(widget)
+    
+    # Test log scale functionality
+    # Mock the axes methods
+    widget.main_axes.set_xscale = MagicMock()
+    widget.main_axes.set_yscale = MagicMock()
+    widget.canvas.draw = MagicMock()
+    
+    # Test setting log scales
+    widget.setLogScales(True, False)
+    widget.main_axes.set_xscale.assert_called_once_with('log')
+    widget.main_axes.set_yscale.assert_called_once_with('linear')
+    widget.canvas.draw.assert_called()
+    
+    # Reset mocks
+    widget.main_axes.set_xscale.reset_mock()
+    widget.main_axes.set_yscale.reset_mock()
+    widget.canvas.draw.reset_mock()
+    
+    # Test setting both log scales
+    widget.setLogScales(True, True)
+    widget.main_axes.set_xscale.assert_called_once_with('log')
+    widget.main_axes.set_yscale.assert_called_once_with('log')
+    widget.canvas.draw.assert_called()
+    
+    # Reset mocks
+    widget.main_axes.set_xscale.reset_mock()
+    widget.main_axes.set_yscale.reset_mock()
+    widget.canvas.draw.reset_mock()
+    
+    # Test setting linear scales
+    widget.setLogScales(False, False)
+    widget.main_axes.set_xscale.assert_called_once_with('linear')
+    widget.main_axes.set_yscale.assert_called_once_with('linear')
+    widget.canvas.draw.assert_called() 
+
+
+def test_chartview_log_scale_toggling(qtbot: "FixtureRequest") -> None:
+    """Test toggling log scale for X and Y axes in ChartView."""
+    parent = MagicMock()
+    parent.mda_file_viz.curveBox = MagicMock()
+    parent.mda_file_viz.clearAll = MagicMock()
+    parent.mda_file_viz.curveRemove = MagicMock()
+    parent.mda_file_viz.cursor1_remove = MagicMock()
+    parent.mda_file_viz.cursor2_remove = MagicMock()
+    parent.mda_file_viz.offset_value = MagicMock()
+    parent.mda_file_viz.factor_value = MagicMock()
+    parent.mda_file.tabManager.tabRemoved = MagicMock()
+    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
+    parent.detRemoved = MagicMock()
+    
+    import mdaviz.user_settings
+    mdaviz.user_settings.settings.getKey = lambda key: 800
+    
+    widget = ChartView(parent)
+    qtbot.addWidget(widget)
+    widget.show()
+    # Simulate enabling log scale controls
+    widget.setLogScales(True, False)
+    assert widget._log_x is True
+    assert widget._log_y is False
+    widget.setLogScales(True, True)
+    assert widget._log_x is True
+    assert widget._log_y is True
+    widget.setLogScales(False, True)
+    assert widget._log_x is False
+    assert widget._log_y is True
+    widget.setLogScales(False, False)
+    assert widget._log_x is False
+    assert widget._log_y is False
+
+def test_chartview_curve_style_changes(qtbot: "FixtureRequest") -> None:
+    """Test changing curve style in ChartView and error handling for invalid styles."""
+    parent = MagicMock()
+    parent.mda_file_viz.curveBox = MagicMock()
+    parent.mda_file_viz.clearAll = MagicMock()
+    parent.mda_file_viz.curveRemove = MagicMock()
+    parent.mda_file_viz.cursor1_remove = MagicMock()
+    parent.mda_file_viz.cursor2_remove = MagicMock()
+    parent.mda_file_viz.offset_value = MagicMock()
+    parent.mda_file_viz.factor_value = MagicMock()
+    parent.mda_file.tabManager.tabRemoved = MagicMock()
+    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
+    parent.detRemoved = MagicMock()
+    
+    import mdaviz.user_settings
+    mdaviz.user_settings.settings.getKey = lambda key: 800
+    
+    widget = ChartView(parent)
+    qtbot.addWidget(widget)
+    widget.show()
+    # Add a curve
+    x = np.array([1, 2, 3])
+    y = np.array([1, 4, 9])
+    widget.curveManager.addCurve(
+        row=0,
+        x=x,
+        y=y,
+        plot_options={"filePath": "/test.mda", "fileName": "test"},
+        ds_options={"label": "Test"}
+    )
+    curve_id = list(widget.curveManager.curves().keys())[0]
+    # Change style
+    widget.curveManager.updateCurveStyle(curve_id, style='--')
+    assert widget.curveManager.getCurveData(curve_id)["style"] == '--'
+    # Try invalid style (should not raise)
+    try:
+        widget.curveManager.updateCurveStyle(curve_id, style='invalid-style')
+    except Exception as e:
+        pytest.fail(f"updateCurveStyle raised an exception: {e}")
+
+def test_chartview_error_handling_on_invalid_curve(qtbot: "FixtureRequest") -> None:
+    """Test error handling when updating/removing a non-existent curve in ChartView."""
+    parent = MagicMock()
+    parent.mda_file_viz.curveBox = MagicMock()
+    parent.mda_file_viz.clearAll = MagicMock()
+    parent.mda_file_viz.curveRemove = MagicMock()
+    parent.mda_file_viz.cursor1_remove = MagicMock()
+    parent.mda_file_viz.cursor2_remove = MagicMock()
+    parent.mda_file_viz.offset_value = MagicMock()
+    parent.mda_file_viz.factor_value = MagicMock()
+    parent.mda_file.tabManager.tabRemoved = MagicMock()
+    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
+    parent.detRemoved = MagicMock()
+    
+    import mdaviz.user_settings
+    mdaviz.user_settings.settings.getKey = lambda key: 800
+    
+    widget = ChartView(parent)
+    qtbot.addWidget(widget)
+    widget.show()
+    # Try to update/remove a non-existent curve
+    non_existent_id = "not_a_real_curve_id"
+    # Should not raise
+    try:
+        widget.curveManager.updateCurveStyle(non_existent_id, style='-')
+        widget.curveManager.removeCurve(non_existent_id)
+    except Exception as e:
+        pytest.fail(f"CurveManager raised an exception on invalid curve id: {e}") 

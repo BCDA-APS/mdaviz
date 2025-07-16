@@ -272,6 +272,34 @@ class ChartView(QWidget):
         # Redraw the canvas
         self.canvas.draw()
 
+    def setLogScales(self, log_x: bool, log_y: bool):
+        """
+        Set logarithmic scales for X and Y axes.
+
+        Parameters:
+        - log_x (bool): Whether to use logarithmic scale for X-axis
+        - log_y (bool): Whether to use logarithmic scale for Y-axis
+        """
+        try:
+            if log_x:
+                self.main_axes.set_xscale('log')
+            else:
+                self.main_axes.set_xscale('linear')
+            
+            if log_y:
+                self.main_axes.set_yscale('log')
+            else:
+                self.main_axes.set_yscale('linear')
+            
+            # Redraw the canvas to apply changes
+            self.canvas.draw()
+        except Exception as exc:
+            print(f"Error setting log scales: {exc}")
+            # If setting log scale fails (e.g., negative values), revert to linear
+            self.main_axes.set_xscale('linear')
+            self.main_axes.set_yscale('linear')
+            self.canvas.draw()
+
     ########################################## Slot methods:
 
     def onCurveAdded(self, curveID):

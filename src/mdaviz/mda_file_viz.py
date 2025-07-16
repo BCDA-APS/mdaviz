@@ -149,6 +149,26 @@ class MDAFileVisualization(QWidget):
         # Initially disable until a curve is selected
         self.curveStyle.setEnabled(False)
 
+        # Setup log scale controls
+        self.setupLogScaleUI()
+
+    def setupLogScaleUI(self):
+        """Setup the log scale UI components and connections."""
+        # Connect log scale checkboxes
+        self.logXCheckBox.toggled.connect(self.onLogScaleChanged)
+        self.logYCheckBox.toggled.connect(self.onLogScaleChanged)
+
+        # Initially disable until a curve is selected
+        self.logXCheckBox.setEnabled(False)
+        self.logYCheckBox.setEnabled(False)
+
+    def onLogScaleChanged(self):
+        """Handle log scale checkbox changes."""
+        if hasattr(self, "chart_view") and self.chart_view:
+            log_x = self.logXCheckBox.isChecked()
+            log_y = self.logYCheckBox.isChecked()
+            self.chart_view.setLogScales(log_x, log_y)
+
     def onCurveStyleChanged(self, style_name: str):
         """Handle curve style change."""
         if hasattr(self, "chart_view") and self.chart_view:
@@ -162,6 +182,8 @@ class MDAFileVisualization(QWidget):
         - curve_selected: Whether a curve is currently selected
         """
         self.curveStyle.setEnabled(curve_selected)
+        self.logXCheckBox.setEnabled(curve_selected)
+        self.logYCheckBox.setEnabled(curve_selected)
 
     def setTableData(self, data):
         self.data_table_view = DataTableView(data, self)

@@ -137,6 +137,9 @@ class FitManager(QObject):
 
         # Perform the fit
         try:
+            # Check for NaNs in data
+            if np.isnan(x_fit).any() or np.isnan(y_fit).any():
+                raise ValueError("Input data contains NaN values.")
             fit_result = model.fit(x_fit, y_fit, initial_params, bounds)
         except Exception as e:
             raise ValueError(f"Fit failed: {str(e)}")

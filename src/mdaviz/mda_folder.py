@@ -748,13 +748,12 @@ class MDA_MVC(QWidget):
             widgetMpl.curveManager.removeAllCurves()
             return
 
-        # If a DET is uncheked:
+        # Handle detector removal - emit signals but don't return early
         if det_removed:
             for y in det_removed:
                 tab_index = self.mda_file.tabWidget.currentIndex()
                 file_path = self.mda_file.tabIndex2Path(tab_index)
                 self.detRemoved.emit(file_path, y)
-                return
 
         # Get dataset for the positioner/detector selection:
         datasets, plot_options = tableview.data2Plot(selection)

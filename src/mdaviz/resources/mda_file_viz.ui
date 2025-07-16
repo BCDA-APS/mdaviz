@@ -273,6 +273,39 @@
            </spacer>
           </item>
           <item>
+           <widget class="QCheckBox" name="logXCheckBox">
+            <property name="toolTip">
+             <string>Use logarithmic scale for X-axis</string>
+            </property>
+            <property name="text">
+             <string>LogX</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="logYCheckBox">
+            <property name="toolTip">
+             <string>Use logarithmic scale for Y-axis</string>
+            </property>
+            <property name="text">
+             <string>LogY</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
            <widget class="QPushButton" name="clearAll">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
