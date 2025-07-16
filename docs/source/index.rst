@@ -21,10 +21,14 @@ Documentation
 =============
 
 .. icons: https://fonts.google.com/icons
-.. grid:: 3
+.. grid:: 2 2
 
     .. grid-item-card:: :material-regular:`summarize;3em` User Guide
       :link: user_guide
+      :link-type: doc
+
+    .. grid-item-card:: :material-regular:`functions;3em` Fit Functionality
+      :link: fit_functionality
       :link-type: doc
 
     .. grid-item-card:: :material-regular:`install_desktop;3em` Install
@@ -52,6 +56,7 @@ Documentation
    :hidden:
 
    user_guide
+   fit_functionality
    install
    api
    changes

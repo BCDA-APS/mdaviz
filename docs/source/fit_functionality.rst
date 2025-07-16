@@ -1,14 +1,19 @@
-# Fit Functionality in mdaviz
+====================================
+Fit Functionality
+====================================
 
 This document describes the curve fitting functionality implemented in mdaviz.
 
-## Overview
+Overview
+--------
 
 The fit functionality allows users to perform mathematical curve fitting on plotted data curves. It provides a comprehensive set of fit models and tools for analyzing experimental data.
 
-## Features
+Features
+--------
 
-### Available Fit Models
+Available Fit Models
+^^^^^^^^^^^^^^^^^^^
 
 The following fit models are available:
 
@@ -40,14 +45,16 @@ The following fit models are available:
    - Parameters: amplitude, center, sigma, offset
    - Useful for: Step functions, cumulative distributions, edge detection
 
-### Fit Range Selection
+Fit Range Selection
+^^^^^^^^^^^^^^^^^^
 
 - **Full Range**: Fit to all data points in the curve
 - **Cursor Range**: Use cursor positions to define a specific x-range for fitting
   - Set cursor 1 (middle click) and cursor 2 (right click) to define range
   - Check "Use cursor range" option before fitting
 
-### Fit Results
+Fit Results
+^^^^^^^^^^
 
 For each fit, the following information is provided:
 
@@ -57,9 +64,11 @@ For each fit, the following information is provided:
   - Chi-squared (χ²): Sum of squared residuals
   - Reduced Chi-squared: χ² normalized by degrees of freedom
 
-## How to Use
+How to Use
+----------
 
-### Basic Fitting
+Basic Fitting
+^^^^^^^^^^^^
 
 1. **Load Data**: Open an MDA file and plot the desired curves
 2. **Select Curve**: Choose the curve to fit from the curve dropdown
@@ -68,57 +77,67 @@ For each fit, the following information is provided:
 5. **Perform Fit**: Click the "Fit" button
 6. **View Results**: The fit results will appear in the "Fit Results" section
 
-### Multiple Fits
+Multiple Fits
+^^^^^^^^^^^^
 
 - You can perform multiple fits on the same curve
 - Each fit will be listed in the fit list
 - Click on a fit in the list to view its detailed results
 - Fit curves are displayed as dashed lines on the plot
 
-### Managing Fits
+Managing Fits
+^^^^^^^^^^^^
 
 - **View Fit Details**: Select a fit from the list to see parameters and quality metrics
 - **Clear Individual Fits**: Remove specific fits (future enhancement)
 - **Clear All Fits**: Click "Clear All" to remove all fits from the current curve
 
-## Technical Details
+Technical Details
+----------------
 
-### Fit Implementation
+Fit Implementation
+^^^^^^^^^^^^^^^^^
 
 - Uses `scipy.optimize.curve_fit` for robust curve fitting
 - Automatic initial parameter estimation based on data characteristics
 - Support for parameter bounds and initial guesses (future enhancement)
 - Handles NaN and infinite values gracefully
 
-### Data Processing
+Data Processing
+^^^^^^^^^^^^^^
 
 - Applies current offset and factor settings to data before fitting
 - Supports x-range selection for focused fitting
 - Automatic data cleaning (removes invalid values)
 
-### Quality Assessment
+Quality Assessment
+^^^^^^^^^^^^^^^^^
 
 - R-squared calculation for goodness of fit
 - Chi-squared analysis for fit quality
 - Parameter uncertainties from covariance matrix
 - Reduced chi-squared for model comparison
 
-## Best Practices
+Best Practices
+-------------
 
-### Choosing a Fit Model
+Choosing a Fit Model
+^^^^^^^^^^^^^^^^^^^
 
 1. **Examine the Data**: Look at the shape and characteristics of your data
 2. **Consider Physics**: Choose models that match the underlying physical process
 3. **Start Simple**: Begin with simpler models (linear, Gaussian) before trying complex ones
 4. **Check Quality**: Use R-squared and reduced chi-squared to assess fit quality
 
-### Range Selection
+Range Selection
+^^^^^^^^^^^^^^
 
 - Use cursor range when you want to focus on a specific region
 - Ensure sufficient data points in the selected range
 - Consider the physical meaning of the selected range
 
-### Interpreting Results
+Interpreting Results
+^^^^^^^^^^^^^^^^^^^
 
 - **R-squared > 0.9**: Excellent fit
 - **R-squared 0.7-0.9**: Good fit
@@ -126,7 +145,8 @@ For each fit, the following information is provided:
 - **Reduced χ² ≈ 1**: Good fit with appropriate uncertainties
 - **Reduced χ² >> 1**: Poor fit or underestimated uncertainties
 
-## Future Enhancements
+Future Enhancements
+------------------
 
 Planned improvements include:
 
@@ -137,9 +157,11 @@ Planned improvements include:
 - **Custom Models**: User-defined fit functions
 - **Batch Fitting**: Fit multiple curves simultaneously
 
-## Troubleshooting
+Troubleshooting
+--------------
 
-### Common Issues
+Common Issues
+^^^^^^^^^^^^
 
 1. **Fit Fails**:
    - Check that you have enough data points
@@ -156,23 +178,25 @@ Planned improvements include:
    - Check units and scaling of your data
    - Consider using parameter bounds (future feature)
 
-### Error Messages
+Error Messages
+^^^^^^^^^^^^^
 
 - **"Not enough data points"**: Increase the number of data points or reduce the number of fit parameters
 - **"Fit failed"**: The optimization algorithm couldn't converge, try different initial conditions or model
 - **"Model not available"**: Check that the selected model is properly loaded
 
-## API Reference
+API Reference
+------------
 
 For developers, the fit functionality is implemented in the following modules:
 
-- `fit_models.py`: Fit model definitions and implementations
-- `fit_manager.py`: Fit management and coordination
-- `chartview.py`: Integration with plotting system
-- `mda_file_viz.py`: UI integration
+- :mod:`mdaviz.fit_models`: Fit model definitions and implementations
+- :mod:`mdaviz.fit_manager`: Fit management and coordination
+- :mod:`mdaviz.chartview`: Integration with plotting system
+- :mod:`mdaviz.mda_file_viz`: UI integration
 
 Key classes:
-- `FitModel`: Base class for fit models
-- `FitResult`: Container for fit results
-- `FitManager`: Manages fit operations and state
-- `FitData`: Stores fit information and metadata
+- :class:`mdaviz.fit_models.FitModel`: Base class for fit models
+- :class:`mdaviz.fit_manager.FitResult`: Container for fit results
+- :class:`mdaviz.fit_manager.FitManager`: Manages fit operations and state
+- :class:`mdaviz.fit_manager.FitData`: Stores fit information and metadata 
