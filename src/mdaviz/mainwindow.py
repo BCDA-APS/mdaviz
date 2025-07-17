@@ -9,7 +9,7 @@ Defines MainWindow class.
 from pathlib import Path
 from typing import Optional, List
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QMainWindow, QSizePolicy, QDesktopWidget, QAction
 
 from . import APP_TITLE
@@ -95,28 +95,30 @@ class MainWindow(QMainWindow):
 
         self.connect()
 
+        # Restore window geometry from settings
         settings.restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
 
-        # Ensure the window size is reasonable (not too large)
+        # Apply size constraints only if geometry wasn't restored or if size is unreasonable
         screen = QDesktopWidget().screenGeometry()
         max_width = min(screen.width() * 0.8, 1200)  # Max 80% of screen width or 1200px
         max_height = min(
             screen.height() * 0.8, 800
         )  # Max 80% of screen height or 800px
 
+        # Only apply constraints if the window is too large or too small
         if self.width() > max_width or self.height() > max_height:
             self.resize(
                 int(min(self.width(), max_width)), int(min(self.height(), max_height))
             )
         elif self.width() < 400 or self.height() < 300:
             self.resize(720, 400)  # Reasonable default size
+            # Only center if we had to resize due to being too small
+            self._center_window()
 
-        # Center the window on the screen
-        self._center_window()
-
-        # Auto-load the first valid folder from recent folders
-        self._auto_load_first_folder()
+        # Auto-load the first valid folder from recent folders with a slight delay
+        # to allow "Application started..." message to appear first
+        QTimer.singleShot(100, self._auto_load_first_folder)
 
     def connect(self):
         self.actionOpen.triggered.connect(self.doOpen)
