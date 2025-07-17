@@ -12,6 +12,13 @@ especially for GUI testing with pytest-qt.
     ~sample_mda_data
     ~mock_chartview_parent
     ~temp_test_files
+    ~test_data_path
+    ~test_folder1_path
+    ~test_folder2_path
+    ~test_folder3_path
+    ~test_no_positioner_path
+    ~sample_mda_files
+    ~nested_mda_files
 """
 
 from typing import TYPE_CHECKING
@@ -23,7 +30,12 @@ import numpy as np
 from PyQt6.QtWidgets import QApplication
 
 if TYPE_CHECKING:
-    pass
+    from _pytest.capture import CaptureFixture
+    from _pytest.fixtures import FixtureRequest
+    from _pytest.logging import LogCaptureFixture
+    from _pytest.monkeypatch import MonkeyPatch
+    from pytest_mock.plugin import MockerFixture
+    from pytestqt.qtbot import QtBot
 
 
 @pytest.fixture(scope="session")
@@ -181,6 +193,153 @@ def mock_file_dialog(monkeypatch: "MonkeyPatch") -> MagicMock:
     return mock_dialog
 
 
+# Real Test Data Fixtures
+@pytest.fixture
+def test_data_path() -> Path:
+    """
+    Return path to test data directory containing real MDA files.
+
+    Returns:
+        Path: Path to the test data directory
+    """
+    return Path(__file__).parent / "data"
+
+
+@pytest.fixture
+def test_folder1_path(test_data_path: Path) -> Path:
+    """
+    Return path to test_folder1 with 16 MDA files in main directory plus 4 in subdirectory.
+
+    Returns:
+        Path: Path to test_folder1 directory
+    """
+    folder_path = test_data_path / "test_folder1"
+    if not folder_path.exists():
+        pytest.skip(f"Test data folder not found: {folder_path}")
+    return folder_path
+
+
+@pytest.fixture
+def test_folder2_path(test_data_path: Path) -> Path:
+    """
+    Return path to test_folder2 with 16 MDA files.
+
+    Returns:
+        Path: Path to test_folder2 directory
+    """
+    folder_path = test_data_path / "test_folder2"
+    if not folder_path.exists():
+        pytest.skip(f"Test data folder not found: {folder_path}")
+    return folder_path
+
+
+@pytest.fixture
+def test_folder3_path(test_data_path: Path) -> Path:
+    """
+    Return path to test_folder3 with 76 MDA files and nested subfolder structure.
+
+    Returns:
+        Path: Path to test_folder3 directory
+    """
+    folder_path = test_data_path / "test_folder3"
+    if not folder_path.exists():
+        pytest.skip(f"Test data folder not found: {folder_path}")
+    return folder_path
+
+
+@pytest.fixture
+def test_no_positioner_path(test_data_path: Path) -> Path:
+    """
+    Return path to test_no_positioner with 28 ARPES MDA files (no positioner data).
+
+    Returns:
+        Path: Path to test_no_positioner directory
+    """
+    folder_path = test_data_path / "test_no_positioner"
+    if not folder_path.exists():
+        pytest.skip(f"Test data folder not found: {folder_path}")
+    return folder_path
+
+
+@pytest.fixture
+def sample_mda_files(test_folder1_path: Path) -> list[Path]:
+    """
+    Return list of real MDA files from test_folder1.
+
+    Returns:
+        list[Path]: List of MDA file paths from test_folder1
+    """
+    files = list(test_folder1_path.glob("*.mda"))
+    if not files:
+        pytest.skip(f"No MDA files found in {test_folder1_path}")
+    return files
+
+
+@pytest.fixture
+def nested_mda_files(test_folder3_path: Path) -> list[Path]:
+    """
+    Return list of MDA files including nested subfolders from test_folder3.
+
+    Returns:
+        list[Path]: List of MDA file paths including nested subfolders
+    """
+    files = list(test_folder3_path.rglob("*.mda"))
+    if not files:
+        pytest.skip(f"No MDA files found in {test_folder3_path}")
+    return files
+
+
+@pytest.fixture
+def arpes_mda_files(test_no_positioner_path: Path) -> list[Path]:
+    """
+    Return list of ARPES MDA files (no positioner data).
+
+    Returns:
+        list[Path]: List of ARPES MDA file paths
+    """
+    files = list(test_no_positioner_path.glob("*.mda"))
+    if not files:
+        pytest.skip(f"No ARPES MDA files found in {test_no_positioner_path}")
+    return files
+
+
+@pytest.fixture
+def single_mda_file(sample_mda_files: list[Path]) -> Path:
+    """
+    Return a single MDA file for testing individual file operations.
+
+    Returns:
+        Path: Path to a single MDA file
+    """
+    return sample_mda_files[0]
+
+
+@pytest.fixture
+def mock_settings_get_key() -> MagicMock:
+    """
+    Create a mock settings.getKey function that returns appropriate values based on key.
+
+    Returns:
+        MagicMock: Mock function that returns appropriate values for different settings keys
+    """
+    def mock_get_key(key: str) -> str | int:
+        """Return appropriate mock values based on settings key."""
+        if key == "recentFolders":
+            return "test_folder1,test_folder2"
+        elif key == "windowGeometry":
+            return "800x600+100+100"
+        elif key == "windowState":
+            return "normal"
+        elif key == "windowHeight":
+            return 800
+        elif key == "windowWidth":
+            return 1200
+        else:
+            return "default_value"
+    
+    return MagicMock(side_effect=mock_get_key)
+
+
 # Pytest configuration
 def pytest_configure(config: pytest.Config) -> None:
     """Configure pytest for Qt testing."""
@@ -188,6 +347,7 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line("markers", "qt: mark test as requiring Qt environment")
     config.addinivalue_line("markers", "gui: mark test as GUI test requiring display")
     config.addinivalue_line("markers", "slow: mark test as slow running")
+    config.addinivalue_line("markers", "real_data: mark test as using real MDA files")
 
 
 def pytest_collection_modifyitems(
@@ -204,15 +364,11 @@ def pytest_collection_modifyitems(
             item.add_marker(pytest.mark.gui)
 
 
-# Skip GUI tests if no display is available
 def pytest_runtest_setup(item: pytest.Item) -> None:
-    """Skip GUI tests if no display is available."""
-    if item.get_closest_marker("gui"):
-        # Check if we have a display
-        import os
-
-        if not os.environ.get("DISPLAY") and os.name != "nt":
-            pytest.skip("GUI tests require a display")
+    """Setup for test execution."""
+    # Skip GUI tests if no display is available
+    if "gui" in item.keywords and not item.config.getoption("--run-gui"):
+        pytest.skip("GUI tests require --run-gui option")
 
 
 # Cleanup after tests

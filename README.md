@@ -22,6 +22,7 @@ Coverage | License | Python | Pre-commit
 - **Curve Management**: Add, remove, and style multiple data curves.
 - **Data Analysis**: Basic statistics, cursor measurements, and curve fitting.
 - **Recent Folders**: Remembers your recently opened folders for quick access.
+- **PyQt6 Migration**: Complete migration to PyQt6 for future compatibility with Python 3.13+.
 
 ## Quickstart
 
@@ -99,6 +100,12 @@ Run all tests:
 ```bash
 pytest src/tests
 ```
+
+Current test status:
+- **130 tests passing** with 46% coverage
+- **26 failed tests** (mostly GUI tests needing fixes)
+- **54 skipped tests** (GUI tests in headless environment)
+- **5 test errors** (import and setup issues)
 
 ### Code Quality
 

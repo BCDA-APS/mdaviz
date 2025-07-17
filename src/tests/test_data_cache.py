@@ -7,6 +7,7 @@ memory management, LRU eviction, and performance optimizations.
 """
 
 import time
+from pathlib import Path
 from typing import TYPE_CHECKING
 from unittest.mock import patch, Mock
 
@@ -114,32 +115,35 @@ class TestDataCache:
         assert cache.enable_compression is False
         assert cache.max_memory_mb == 1000.0
 
-    def test_put_and_get(self) -> None:
-        """Test basic put and get operations."""
+    def test_put_and_get(self, single_mda_file: Path) -> None:
+        """Test basic put and get operations using real test data."""
         cache = DataCache(max_entries=10)
 
+        # Use real file data
+        real_size_bytes = single_mda_file.stat().st_size
         data = CachedFileData(
-            file_path="/test/file.mda",
+            file_path=str(single_mda_file),
             metadata={"test": "data"},
             scan_dict={},
             first_pos=1,
             first_det=1,
             pv_list=[],
-            file_name="file.mda",
-            folder_path="/test",
-            size_bytes=1024,
+            file_name=single_mda_file.name,
+            folder_path=str(single_mda_file.parent),
+            size_bytes=real_size_bytes,
         )
 
         # Test put
-        cache.put("/test/file.mda", data)
+        cache.put(str(single_mda_file), data)
         assert len(cache._cache) == 1
         assert cache._current_size_mb == data.get_size_mb()
 
         # Test get
-        retrieved_data = cache.get("/test/file.mda")
+        retrieved_data = cache.get(str(single_mda_file))
         assert retrieved_data is not None
-        assert retrieved_data.file_path == "/test/file.mda"
+        assert retrieved_data.file_path == str(single_mda_file)
         assert retrieved_data.metadata == {"test": "data"}
+        assert retrieved_data.file_name == single_mda_file.name
 
     def test_get_nonexistent_file(self) -> None:
         """Test getting a file that doesn't exist in cache."""
@@ -541,25 +545,61 @@ class TestDataCacheIntegration:
         # Should return None due to mock error
         assert result is None
 
-    def test_get_or_load_cached(self) -> None:
-        """Test get_or_load when file is already cached."""
+    def test_cache_with_real_mda_file_access(self, single_mda_file: Path) -> None:
+        """Test cache functionality with real MDA file access (file existence check only)."""
+        cache = DataCache()
+        
+        # Test that the real file exists
+        assert single_mda_file.exists()
+        
+        # Create cached data based on real file properties
+        real_size = single_mda_file.stat().st_size
+        data = CachedFileData(
+            file_path=str(single_mda_file),
+            metadata={"test": "metadata", "file_size": real_size},
+            scan_dict={"test": "scan_data"},
+            first_pos=0,
+            first_det=1,
+            pv_list=["test_pv"],
+            file_name=single_mda_file.name,
+            folder_path=str(single_mda_file.parent),
+            size_bytes=real_size,
+        )
+        
+        # Test cache operations with real file path
+        cache.put(str(single_mda_file), data)
+        
+        # Verify cache contains the file
+        assert str(single_mda_file) in cache._cache
+        
+        # Verify data integrity
+        retrieved = cache.get(str(single_mda_file))
+        assert retrieved is not None
+        assert retrieved.file_name == single_mda_file.name
+        assert retrieved.size_bytes == real_size
+        assert single_mda_file.parent.name in retrieved.folder_path
+
+    def test_get_or_load_cached(self, single_mda_file: Path) -> None:
+        """Test get_or_load when file is already cached using real test data."""
         cache = DataCache()
 
+        # Use real file data
         data = CachedFileData(
-            file_path="/test/file.mda",
+            file_path=str(single_mda_file),
             metadata={},
             scan_dict={},
             first_pos=1,
             first_det=1,
             pv_list=[],
-            file_name="file.mda",
-            folder_path="/test",
+            file_name=single_mda_file.name,
+            folder_path=str(single_mda_file.parent),
         )
-        cache.put("/test/file.mda", data)
+        cache.put(str(single_mda_file), data)
 
         # Should return cached data
-        result = cache.get_or_load("/test/file.mda")
+        result = cache.get_or_load(str(single_mda_file))
         assert result is data
+        assert result.file_name == single_mda_file.name
 
     @patch("mdaviz.data_cache.readMDA")
     @patch("mdaviz.data_cache.get_scan")

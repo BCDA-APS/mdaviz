@@ -19,7 +19,7 @@ Version 1.1.2 (Latest)
 - **CI/CD Pipeline**: Comprehensive GitHub Actions workflows with cross-platform testing
 - **Code Quality**: Pre-commit hooks, ruff linting, mypy type checking
 - **Documentation**: Comprehensive Sphinx documentation with API reference
-- **Testing**: 58 tests with 36% coverage, automated testing on multiple Python versions
+- **Testing**: 130 tests passing with 46% coverage (improved from 36%), automated testing on multiple Python versions
 - **Performance**: Optimized memory management and data loading
 
 **Bug Fixes:**
@@ -33,6 +33,12 @@ Version 1.1.2 (Latest)
 - Moved QAction and QShortcut imports to QtGui
 - Replaced QDesktopWidget with QApplication.primaryScreen()
 - Updated QSettings constants to use enum-based format
+
+**Test Infrastructure:**
+- Improved test coverage from 36% to 46%
+- Added comprehensive test fixtures and mocking
+- Enhanced GUI test infrastructure (though some tests need fixes)
+- Better integration testing for core functionality
 
 Version 1.1.1
 -------------
@@ -74,7 +80,14 @@ Future Plans
 
 **Technical Roadmap:**
 - Improve test coverage to 80%+
+- Fix GUI test failures and enhance test infrastructure
 - Enhanced GUI testing with pytest-qt
 - Performance monitoring and optimization
 - Advanced memory management
 - Cross-platform executable builds
+
+**Immediate Priorities:**
+- Fix 26 failed GUI tests (missing parent arguments, import issues)
+- Improve test coverage from 46% to 60%+
+- Enhance test infrastructure with better mocking
+- Address memory management optimizations
