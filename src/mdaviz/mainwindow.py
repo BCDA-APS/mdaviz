@@ -129,31 +129,8 @@ class MainWindow(QMainWindow):
         utils.reconnect(self.refresh.released, self.onRefresh)
         self.folder.currentTextChanged.connect(self.onFolderSelected)
 
-        # Add auto-load toggle action to File menu
-        self._setup_auto_load_menu()
-
         # Create tab widget and fit data components if they don't exist
         self._setup_fit_data_tab()
-
-    def _setup_auto_load_menu(self):
-        """Set up the auto-load toggle menu action."""
-        # Create the auto-load toggle action
-        self.actionToggleAutoLoad = QAction("Toggle Auto-Load", self)
-        self.actionToggleAutoLoad.setStatusTip(
-            "Toggle automatic folder loading on startup"
-        )
-        self.actionToggleAutoLoad.setCheckable(True)
-        self.actionToggleAutoLoad.setChecked(self.get_auto_load_setting())
-        self.actionToggleAutoLoad.triggered.connect(self._on_toggle_auto_load)
-
-        # Add to File menu
-        self.menuFile.addSeparator()
-        self.menuFile.addAction(self.actionToggleAutoLoad)
-
-    def _on_toggle_auto_load(self):
-        """Handle auto-load toggle menu action."""
-        new_setting = self.toggle_auto_load()
-        self.actionToggleAutoLoad.setChecked(new_setting)
 
     @property
     def status(self):
@@ -643,42 +620,6 @@ class MainWindow(QMainWindow):
                 self.setStatus("No valid recent folders to auto-load")
         else:
             self.setStatus("No recent folders available for auto-loading")
-
-    def toggle_auto_load(self) -> bool:
-        """
-        Toggle the auto-load folder setting.
-
-        Returns:
-            bool: The new state of the auto-load setting (True if enabled, False if disabled)
-        """
-        current_setting = settings.getKey("auto_load_folder")
-        if current_setting is None:
-            current_setting = True
-
-        new_setting = not current_setting
-        settings.setKey("auto_load_folder", new_setting)
-
-        status_text = "Auto-loading enabled" if new_setting else "Auto-loading disabled"
-        self.setStatus(status_text)
-
-        return new_setting
-
-    def get_auto_load_setting(self) -> bool:
-        """
-        Get the current auto-load folder setting.
-
-        Returns:
-            bool: True if auto-loading is enabled, False if disabled
-        """
-        setting = settings.getKey("auto_load_folder")
-        if setting is None:
-            # Default to True if not set
-            setting = True
-            settings.setKey("auto_load_folder", True)
-        elif isinstance(setting, str):
-            # Convert string to boolean
-            setting = setting.lower() in ("true", "1", "yes", "on")
-        return bool(setting)
 
     def _center_window(self):
         """Center the window on the screen."""
