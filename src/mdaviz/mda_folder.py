@@ -100,7 +100,7 @@ class MDA_MVC(QWidget):
         self.setup()
 
     def setup(self):
-        from mdaviz.user_settings import settings
+        from mdaviz.user_settings import settings, restoreSplitter
         from mdaviz.mda_folder_table_view import MDAFolderTableView
         from mdaviz.mda_file_viz import MDAFileVisualization
         from mdaviz.mda_file import MDAFile
@@ -168,7 +168,7 @@ class MDA_MVC(QWidget):
         for key in "hsplitter vsplitter".split():
             splitter = getattr(self, key)
             sname = self.splitter_settings_name(key)
-            settings.restoreSplitter(splitter, sname)
+            restoreSplitter(splitter, sname)
             splitter.splitterMoved.connect(partial(self.splitter_moved, key))
 
     # # ------------ set & get methods:
@@ -812,7 +812,7 @@ class MDA_MVC(QWidget):
         Parameters:
         - key (str): Identifier for the splitter being monitored '(hsplitter' or 'vsplitter')
         """
-        from mdaviz.user_settings import settings
+        from mdaviz.user_settings import saveSplitter
 
         splitter = getattr(self, key)
         while time.time() < getattr(self, f"{key}_deadline"):
@@ -820,7 +820,7 @@ class MDA_MVC(QWidget):
 
         sname = self.splitter_settings_name(key)
         self.setStatus(f"Update settings: {sname=} {splitter.sizes()=}")
-        settings.saveSplitter(splitter, sname)
+        saveSplitter(splitter, sname)
 
     # # ------------ Status method
 

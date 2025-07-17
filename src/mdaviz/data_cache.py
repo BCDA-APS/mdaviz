@@ -85,6 +85,15 @@ class CachedFileData:
         self.last_accessed = time.time()
         self.access_count += 1
 
+    def get_size_mb(self) -> float:
+        """
+        Get the size of this cached data in megabytes.
+
+        Returns:
+            float: Size in megabytes
+        """
+        return self.size_bytes / (1024 * 1024)
+
 
 class DataCache(QObject):
     """

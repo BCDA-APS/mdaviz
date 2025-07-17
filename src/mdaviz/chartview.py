@@ -362,6 +362,8 @@ class ChartView(QWidget):
         if new_backend == self.backend:
             return True
 
+        old_backend = self.backend  # Save this before try block
+
         try:
             # Save current curve data
             saved_curves = self._curve_data.copy()
@@ -376,7 +378,6 @@ class ChartView(QWidget):
                     widget.setParent(None)
 
             # Switch backend
-            old_backend = self.backend
             self.backend = new_backend
             self._setup_backend()
 

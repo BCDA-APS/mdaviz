@@ -10,13 +10,13 @@ from pathlib import Path
 from typing import Optional, List
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QMainWindow, QSizePolicy, QApplication
+from PyQt6.QtWidgets import QMainWindow, QSizePolicy, QApplication, QFileDialog, QDialog, QDialogButtonBox
 from PyQt6.QtGui import QAction
 
 from mdaviz import APP_TITLE
 from mdaviz.mda_folder import MDA_MVC
 from mdaviz import utils
-from mdaviz.user_settings import settings
+from mdaviz.user_settings import settings, restoreWindowGeometry, saveWindowGeometry
 from mdaviz.opendialog import DIR_SETTINGS_KEY
 from mdaviz.lazy_folder_scanner import LazyFolderScanner, FolderScanResult
 
@@ -96,7 +96,6 @@ class MainWindow(QMainWindow):
 
         self.connect()
 
-        from .user_settings import restoreWindowGeometry, saveWindowGeometry
         restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
 
@@ -221,7 +220,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(button_box)
 
         # Show dialog
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.DialogCode.Accepted:
             # Save the new plot height setting
             new_height = plot_spinbox.value()
             settings.setKey("plot_max_height", new_height)
@@ -278,8 +277,8 @@ class MainWindow(QMainWindow):
         open_dialog = OpenDialog(self)
         open_dialog.setWindowTitle("Select a File")
 
-        # Use exec_() to show the dialog and get the result
-        if open_dialog.exec_() == OpenDialog.Accepted:
+        # Use exec() to show the dialog and get the result
+        if open_dialog.exec() == QFileDialog.DialogCode.Accepted:
             # Get the selected files
             selected_files = open_dialog.selectedFiles()
             if selected_files:
@@ -316,7 +315,7 @@ class MainWindow(QMainWindow):
         from mdaviz.popup import PopUp
 
         popup = PopUp(self, message)
-        return popup.exec_() == QtWidgets.QDialog.Accepted
+        return popup.exec() == QtWidgets.QDialog.DialogCode.Accepted
 
     def proceed(self):
         """Handle the logic when the user clicks 'OK'."""

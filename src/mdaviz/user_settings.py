@@ -231,7 +231,7 @@ class ApplicationQSettings(QSettings):
 
         # Initialize with defaults if empty
         if not self.allKeys():
-        self.init_global_keys()
+            self.init_global_keys()
 
     def _ensure_backup_dir(self) -> None:
         """Ensure backup directory exists."""
@@ -280,7 +280,7 @@ class ApplicationQSettings(QSettings):
             bool: True if key exists
         """
         try:
-        return key in self.allKeys()
+            return key in self.allKeys()
         except Exception as e:
             logger.warning(f"Error checking key existence '{key}': {e}")
             return False
@@ -301,8 +301,8 @@ class ApplicationQSettings(QSettings):
         """
         try:
             # Handle missing slash in global keys
-        if "/" not in key and not self.keyExists(key):
-            key = f"{GLOBAL_GROUP}/{key}"
+            if "/" not in key and not self.keyExists(key):
+                key = f"{GLOBAL_GROUP}/{key}"
 
             value = self.value(key, default)
 
@@ -345,19 +345,19 @@ class ApplicationQSettings(QSettings):
                 value = self.validator.validate_value(key, value, validate_type)
 
             # Split key into group and key components
-        group, k = self._keySplit_(key)
+            group, k = self._keySplit_(key)
 
             # Remove existing key
-        self.remove(key)
+            self.remove(key)
 
             # Set new value
-        self.beginGroup(group)
-        self.setValue(k, value)
-        self.endGroup()
+            self.beginGroup(group)
+            self.setValue(k, value)
+            self.endGroup()
 
             # Update timestamp (but don't create infinite recursion)
-        if key != "timestamp":
-            self.updateTimeStamp()
+            if key != "timestamp":
+                self.updateTimeStamp()
 
             return True
 
@@ -422,11 +422,11 @@ class ApplicationQSettings(QSettings):
             self._create_backup()
 
             # Clear all keys
-        for key in self.allKeys():
-            self.remove(key)
+            for key in self.allKeys():
+                self.remove(key)
 
             # Reinitialize with defaults
-        self.init_global_keys()
+            self.init_global_keys()
 
             logger.info("Settings reset to defaults")
             return True
@@ -689,6 +689,58 @@ def saveWindowGeometry(window: QMainWindow, key: str = "geometry") -> bool:
 
     except Exception as e:
         logger.warning(f"Error saving window geometry: {e}")
+        return False
+
+
+def saveSplitter(splitter, label: str) -> bool:
+    """
+    Save splitter sizes to settings.
+
+    Parameters:
+        splitter: Instance of QSplitter
+        label (str): Group name to use in settings file
+
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        global settings
+        if settings is None:
+            return False
+
+        sizes = map(int, splitter.sizes())
+        settings.setKey(f"{label}/sizes", " ".join(map(str, sizes)))
+        return True
+
+    except Exception as e:
+        logger.warning(f"Error saving splitter sizes: {e}")
+        return False
+
+
+def restoreSplitter(splitter, label: str) -> bool:
+    """
+    Restore splitter sizes from settings.
+
+    Parameters:
+        splitter: Instance of QSplitter
+        label (str): Group name to use in settings file
+
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        global settings
+        if settings is None:
+            return False
+
+        sizes = settings.getKey(f"{label}/sizes")
+        if sizes is not None:
+            splitter.setSizes(map(int, str(sizes).split()))
+            return True
+        return False
+
+    except Exception as e:
+        logger.warning(f"Error restoring splitter sizes: {e}")
         return False
 
 

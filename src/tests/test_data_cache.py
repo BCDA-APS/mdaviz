@@ -49,7 +49,7 @@ class TestCachedFileData:
         assert data.file_name == "file.mda"
         assert data.folder_path == "/test/path"
         assert data.size_bytes == 1024
-        assert data.access_time > 0
+        assert data.last_accessed > 0
 
     def test_update_access_time(self) -> None:
         """Test updating access time."""
@@ -62,13 +62,14 @@ class TestCachedFileData:
             pv_list=[],
             file_name="file.mda",
             folder_path="/test/path",
+            size_bytes=1024,
         )
 
-        original_time = data.access_time
+        original_time = data.last_accessed
         time.sleep(0.001)  # Small delay to ensure time difference
-        data.update_access_time()
+        data.update_access()
 
-        assert data.access_time > original_time
+        assert data.last_accessed > original_time
 
     def test_get_size_mb(self) -> None:
         """Test size conversion to megabytes."""
@@ -186,6 +187,7 @@ class TestDataCache:
             pv_list=[],
             file_name="file.mda",
             folder_path="/test",
+            size_bytes=1024,
         )
         cache.put("/test/file.mda", data)
 
@@ -210,6 +212,7 @@ class TestDataCache:
             pv_list=[],
             file_name="file1.mda",
             folder_path="/test",
+            size_bytes=1024,
         )
         data2 = CachedFileData(
             file_path="/test/file2.mda",
@@ -220,6 +223,7 @@ class TestDataCache:
             pv_list=[],
             file_name="file2.mda",
             folder_path="/test",
+            size_bytes=1024,
         )
 
         cache.put("/test/file1.mda", data1)
@@ -237,6 +241,7 @@ class TestDataCache:
             pv_list=[],
             file_name="file3.mda",
             folder_path="/test",
+            size_bytes=1024,
         )
 
         cache.put("/test/file3.mda", data3)
@@ -310,6 +315,7 @@ class TestDataCache:
             pv_list=[],
             file_name="file1.mda",
             folder_path="/test",
+            size_bytes=1024,
         )
         data2 = CachedFileData(
             file_path="/test/file2.mda",
@@ -320,6 +326,7 @@ class TestDataCache:
             pv_list=[],
             file_name="file2.mda",
             folder_path="/test",
+            size_bytes=1024,
         )
 
         cache.put("/test/file1.mda", data1)
@@ -406,6 +413,7 @@ class TestDataCache:
             pv_list=[],
             file_name="file.mda",
             folder_path="/test",
+            size_bytes=1024,
         )
         cache.put("/test/file.mda", data)
 
@@ -476,6 +484,7 @@ class TestDataCache:
             pv_list=[],
             file_name="file1.mda",
             folder_path="/test",
+            size_bytes=1024,
         )
         cache.put("/test/file1.mda", data1)
 
@@ -489,6 +498,7 @@ class TestDataCache:
             pv_list=[],
             file_name="file2.mda",
             folder_path="/test",
+            size_bytes=1024,
         )
         cache.put("/test/file2.mda", data2)
 
@@ -593,6 +603,7 @@ class TestDataCacheIntegration:
             pv_list=[],
             file_name=single_mda_file.name,
             folder_path=str(single_mda_file.parent),
+            size_bytes=single_mda_file.stat().st_size,
         )
         cache.put(str(single_mda_file), data)
 
