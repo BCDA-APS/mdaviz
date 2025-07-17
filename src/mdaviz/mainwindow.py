@@ -96,7 +96,8 @@ class MainWindow(QMainWindow):
 
         self.connect()
 
-        settings.restoreWindowGeometry(self, "mainwindow_geometry")
+        from .user_settings import restoreWindowGeometry, saveWindowGeometry
+        restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
 
         # Ensure the window size is reasonable (not too large)
@@ -264,7 +265,7 @@ class MainWindow(QMainWindow):
         if hasattr(self, "lazy_scanner"):
             self.lazy_scanner.cancel_scan()
 
-        settings.saveWindowGeometry(self, "mainwindow_geometry")
+        saveWindowGeometry(self, "mainwindow_geometry")
         self.close()
 
     def doOpen(self, *args, **kw):

@@ -336,7 +336,7 @@ class ChartView(QWidget):
 
                 process = psutil.Process()
                 self._memory_usage_mb = process.memory_info().rss / 1024 / 1024
-            except Exception:
+            except:
                 self._memory_usage_mb = 0.0
 
             stats = {
@@ -418,7 +418,7 @@ class ChartView(QWidget):
                 if obj is not None:
                     try:
                         obj.deleteLater()
-                    except Exception:
+                    except:
                         pass
 
             self._weak_references.clear()

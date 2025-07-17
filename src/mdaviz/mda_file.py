@@ -121,7 +121,7 @@ class MDAFile(QWidget):
 
             # Set up memory monitoring if available
             try:
-                import psutil  # noqa: F401
+                import psutil
 
                 self._memory_timer = QTimer()
                 self._memory_timer.timeout.connect(self._check_memory_usage)
@@ -149,7 +149,7 @@ class MDAFile(QWidget):
 
         try:
             # Get file information
-            folder_path = self.dataPath()
+        folder_path = self.dataPath()
             file_list = self.mdaFileList()
 
             if not file_list or index >= len(file_list):
@@ -213,10 +213,10 @@ class MDAFile(QWidget):
                 raise ValueError(f"Could not read file: {file_path}")
 
             # Load full data using cache system
-            cache = get_global_cache()
-            cached_data = cache.get_or_load(str(file_path))
+        cache = get_global_cache()
+        cached_data = cache.get_or_load(str(file_path))
 
-            if cached_data:
+        if cached_data:
                 self._populate_data_from_cache(cached_data, index)
             else:
                 # Fallback direct loading
@@ -307,17 +307,17 @@ class MDAFile(QWidget):
             cached_data (CachedFileData): Cached file data
             index (int): File index
         """
-        self._data = {
-            "fileName": cached_data.file_name,
-            "filePath": cached_data.file_path,
-            "folderPath": cached_data.folder_path,
-            "metadata": cached_data.metadata,
-            "scanDict": cached_data.scan_dict,
-            "firstPos": cached_data.first_pos,
-            "firstDet": cached_data.first_det,
-            "pvList": cached_data.pv_list,
-            "index": index,
-        }
+            self._data = {
+                "fileName": cached_data.file_name,
+                "filePath": cached_data.file_path,
+                "folderPath": cached_data.folder_path,
+                "metadata": cached_data.metadata,
+                "scanDict": cached_data.scan_dict,
+                "firstPos": cached_data.first_pos,
+                "firstDet": cached_data.first_det,
+                "pvList": cached_data.pv_list,
+                "index": index,
+            }
 
     def _load_direct(self, file_path: Path, index: int) -> None:
         """
@@ -327,8 +327,8 @@ class MDAFile(QWidget):
             file_path (Path): Path to the MDA file
             index (int): File index
         """
-        result = readMDA(str(file_path))
-        if result is None:
+            result = readMDA(str(file_path))
+            if result is None:
             raise ValueError(f"Could not read file: {file_path}")
 
         file_metadata, file_data_dim1, *_ = result
@@ -339,17 +339,17 @@ class MDAFile(QWidget):
         scan_dict, first_pos, first_det = utils.get_scan(file_data_dim1)
         pv_list = [v["name"] for v in scan_dict.values()]
 
-        self._data = {
-            "fileName": file_path.stem,
-            "filePath": str(file_path),
+                self._data = {
+                    "fileName": file_path.stem,
+                    "filePath": str(file_path),
             "folderPath": str(file_path.parent),
             "metadata": file_metadata,
             "scanDict": scan_dict,
             "firstPos": first_pos,
             "firstDet": first_det,
             "pvList": pv_list,
-            "index": index,
-        }
+                    "index": index,
+                }
 
     def _create_fallback_data(self, index: int) -> None:
         """
@@ -444,7 +444,7 @@ class MDAFile(QWidget):
 
             if memory_mb > self.memory_limit_mb:
                 self.memory_warning.emit(memory_mb)
-        except Exception:
+        except:
             pass
 
     def _on_file_loaded(self, file_path: str, success: bool) -> None:

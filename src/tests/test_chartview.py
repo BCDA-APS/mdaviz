@@ -2,819 +2,511 @@
 """
 Tests for the mdaviz chartview module.
 
-Covers utility functions and widget instantiation.
+Covers ChartView widget functionality including curve management,
+backend switching, and performance optimization.
 """
 
 from typing import TYPE_CHECKING
 import pytest
-from unittest.mock import MagicMock
-
-from mdaviz.chartview import auto_color, auto_symbol, ChartView, CurveManager
+from unittest.mock import MagicMock, patch, Mock
 import numpy as np
-from PyQt6.QtWidgets import QComboBox
+from PyQt6.QtWidgets import QApplication, QWidget
+from PyQt6.QtCore import QTimer
+from PyQt6.QtTest import QTest
 
+from mdaviz.chartview import ChartView, MATPLOTLIB_AVAILABLE, PYQTGRAPH_AVAILABLE
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
+    from _pytest.capture import CaptureFixture
+    from _pytest.logging import LogCaptureFixture
+    from _pytest.monkeypatch import MonkeyPatch
+    from pytest_mock.plugin import MockerFixture
 
 
-def test_auto_color_and_symbol() -> None:
-    """Test color and symbol cycling utilities."""
-    colors = [auto_color() for _ in range(5)]
-    symbols = [auto_symbol() for _ in range(5)]
-    assert len(set(colors)) > 1
-    assert len(set(symbols)) > 1
+@pytest.fixture
+def qt_app() -> QApplication:
+    """Create QApplication instance for tests."""
+    return QApplication.instance() or QApplication([])
 
 
-def test_chartview_instantiation(qtbot: "FixtureRequest") -> None:
-    """Test that ChartView can be instantiated with a mock parent."""
-    # Mock the parent and required attributes
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = MagicMock()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    # Patch settings.getKey to avoid config issues
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-    assert widget is not None
-    assert hasattr(widget, "figure")
-    assert hasattr(widget, "canvas")
-    assert hasattr(widget, "main_axes")
-    assert hasattr(widget, "toolbar")
-    assert widget.layout() is not None
+@pytest.fixture
+def chart_view(qt_app: QApplication) -> ChartView:
+    """Create a ChartView instance for testing."""
+    with patch('mdaviz.chartview.MATPLOTLIB_AVAILABLE', True), \
+         patch('mdaviz.chartview.Figure') as mock_figure, \
+         patch('mdaviz.chartview.FigureCanvas') as mock_canvas, \
+         patch('mdaviz.chartview.plt'):
+        
+        # Setup mocks
+        mock_fig_instance = Mock()
+        mock_figure.return_value = mock_fig_instance
+        mock_fig_instance.add_subplot.return_value = Mock()
+        mock_fig_instance.patch.set_facecolor = Mock()
+        mock_fig_instance.set_constrained_layout = Mock()
+        
+        mock_canvas_instance = Mock()
+        mock_canvas.return_value = mock_canvas_instance
+        mock_canvas_instance.setParent = Mock()
+        mock_canvas_instance.draw = Mock()
+        
+        return ChartView()
 
 
-def test_curve_manager_add_update_remove(qtbot):
-    """Test adding, updating, and removing curves in CurveManager."""
-    manager = CurveManager()
-    curve_added = []
-    curve_updated = []
-    curve_removed = []
-    all_curves_removed = []
+@pytest.fixture
+def sample_data() -> tuple[list[float], list[float]]:
+    """Create sample data for testing curves."""
+    x_data = [1.0, 2.0, 3.0, 4.0, 5.0]
+    y_data = [1.0, 4.0, 9.0, 16.0, 25.0]
+    return x_data, y_data
 
-    manager.curveAdded.connect(lambda cid: curve_added.append(cid))
-    manager.curveUpdated.connect(
-        lambda cid, recompute_y, update_x: curve_updated.append(
-            (cid, recompute_y, update_x)
+
+class TestChartViewInitialization:
+    """Test ChartView initialization and setup."""
+
+    @patch('mdaviz.chartview.MATPLOTLIB_AVAILABLE', True)
+    @patch('mdaviz.chartview.Figure')
+    @patch('mdaviz.chartview.FigureCanvas')
+    @patch('mdaviz.chartview.plt')
+    def test_default_initialization(self, mock_plt: Mock, mock_canvas: Mock, mock_figure: Mock, qt_app: QApplication) -> None:
+        """Test ChartView with default parameters."""
+        # Setup mocks
+        mock_fig_instance = Mock()
+        mock_figure.return_value = mock_fig_instance
+        mock_fig_instance.add_subplot.return_value = Mock()
+        
+        chart = ChartView()
+        
+        assert chart.backend == "matplotlib"
+        assert chart.max_curves == 50
+        assert chart.enable_lazy_rendering is True
+        assert chart.memory_limit_mb == 200.0
+        assert chart._curve_count == 0
+        assert len(chart._curves) == 0
+        assert len(chart._curve_data) == 0
+
+    @patch('mdaviz.chartview.MATPLOTLIB_AVAILABLE', True)
+    @patch('mdaviz.chartview.Figure')
+    @patch('mdaviz.chartview.FigureCanvas')
+    @patch('mdaviz.chartview.plt')
+    def test_custom_initialization(self, mock_plt: Mock, mock_canvas: Mock, mock_figure: Mock, qt_app: QApplication) -> None:
+        """Test ChartView with custom parameters."""
+        # Setup mocks
+        mock_fig_instance = Mock()
+        mock_figure.return_value = mock_fig_instance
+        mock_fig_instance.add_subplot.return_value = Mock()
+        
+        chart = ChartView(
+            backend="matplotlib",  # Force matplotlib since we're mocking it
+            max_curves=25,
+            enable_lazy_rendering=False,
+            memory_limit_mb=100.0
         )
-    )
-    manager.curveRemoved.connect(
-        lambda cid, data, count: curve_removed.append((cid, data, count))
-    )
-    manager.allCurvesRemoved.connect(
-        lambda doNotClear: all_curves_removed.append(doNotClear)
-    )
-
-    # Add a curve
-    row = 0
-    x = np.array([1, 2, 3])
-    y = np.array([4, 5, 6])
-    label = "test"
-    file_path = "/tmp/test.mda"
-    plot_options = {"filePath": file_path, "fileName": "test"}
-    ds_options = {"label": label}
-    manager.addCurve(row, x, y, plot_options=plot_options, ds_options=ds_options)
-    curve_id = manager.generateCurveID(label, file_path, row)
-    assert curve_id in manager.curves()
-    assert curve_added[-1] == curve_id
-
-    # Update the curve with different data to trigger update
-    # The CurveManager only updates if the x data is different, not y data
-    x2 = np.array([1, 2, 4])  # Different x data
-    y2 = np.array([7, 8, 9])
-    manager.addCurve(row, x2, y2, plot_options=plot_options, ds_options=ds_options)
-    # The curve should be updated since x data is different
-    assert len(curve_updated) > 0
-    assert manager.getCurveData(curve_id)["ds"][0] is x2
-
-    # Remove the curve
-    manager.removeCurve(curve_id)
-    assert curve_removed[-1][0] == curve_id
-    assert curve_id not in manager.curves()
-
-    # Add again and remove all
-    manager.addCurve(row, x, y, plot_options=plot_options, ds_options=ds_options)
-    manager.removeAllCurves()
-    assert all_curves_removed[-1] is True
-    assert len(manager.curves()) == 0
-
-
-def test_curve_manager_persistent_properties():
-    """Test persistent offset and factor properties in CurveManager."""
-    manager = CurveManager()
-    row = 1
-    file_path = "/tmp/test2.mda"
-    label = "curve2"
-    plot_options = {"filePath": file_path, "fileName": "test2"}
-    ds_options = {"label": label}
-    x = np.array([1, 2, 3])
-    y = np.array([4, 5, 6])
-    manager.addCurve(row, x, y, plot_options=plot_options, ds_options=ds_options)
-    curve_id = manager.generateCurveID(label, file_path, row)
-    manager.updateCurveOffset(curve_id, 42)
-    manager.updateCurveFactor(curve_id, 3.14)
-    # Remove and re-add to test persistence
-    manager.removeCurve(curve_id)
-    manager.addCurve(row, x, y, plot_options=plot_options, ds_options=ds_options)
-    curve_data = manager.getCurveData(curve_id)
-    assert curve_data["offset"] == 42
-    assert curve_data["factor"] == 3.14
-
-
-def test_curve_manager_find_curve_id():
-    """Test finding curve ID by file path and row."""
-    manager = CurveManager()
-    row = 2
-    file_path = "/tmp/test3.mda"
-    label = "curve3"
-    plot_options = {"filePath": file_path, "fileName": "test3"}
-    ds_options = {"label": label}
-    x = np.array([1, 2, 3])
-    y = np.array([4, 5, 6])
-    manager.addCurve(row, x, y, plot_options=plot_options, ds_options=ds_options)
-    curve_id = manager.generateCurveID(label, file_path, row)
-    found_id = manager.findCurveID(file_path, row)
-    assert found_id == curve_id
-
-
-def test_chartview_plotting_methods(qtbot):
-    """Test basic plotting methods and configuration."""
-    # Mock the parent and required attributes
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = MagicMock()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    # Patch settings.getKey to avoid config issues
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-
-    # Test title and axis label methods
-    widget.setTitle("Test Title")
-    assert widget.title() == "Test Title"
-
-    widget.setXlabel("X Axis")
-    assert widget.xlabel() == "X Axis"
-
-    widget.setYlabel("Y Axis")
-    assert widget.ylabel() == "Y Axis"
-
-    # Test plot configuration - mock the grid methods
-    widget.main_axes.grid = MagicMock()
-    widget.configPlot(grid=True)
-    # The actual call includes additional parameters, so we check it was called
-    assert widget.main_axes.grid.called
-
-    widget.configPlot(grid=False)
-    assert widget.main_axes.grid.called
-
-
-def test_chartview_curve_selection(qtbot):
-    """Test curve selection and combo box management."""
-    # Mock the parent and required attributes
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = MagicMock()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    # Patch settings.getKey to avoid config issues
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-
-    # Mock the curve manager to return a valid curve
-    widget.curveManager = MagicMock()
-    widget.curveManager.curves.return_value = {"test_curve_id": {}}
-
-    # Mock the combo box properly
-    mock_combo = MagicMock()
-    mock_combo.currentIndex.return_value = 0  # Return an integer
-    mock_combo.itemData.return_value = "test_curve_id"
-    widget.curveBox = mock_combo
-
-    # Test getting selected curve ID
-    selected_id = widget.getSelectedCurveID()
-    assert selected_id == "test_curve_id"
-
-    # Test when no item is selected
-    mock_combo.currentIndex.return_value = -1
-    selected_id = widget.getSelectedCurveID()
-    assert selected_id is None
-
-
-def test_chartview_cursor_management(qtbot):
-    """Test cursor management functionality."""
-    # Mock the parent and required attributes
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = MagicMock()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    # Patch settings.getKey to avoid config issues
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-
-    # Test cursor removal
-    widget.onRemoveCursor(cursor_num=1)
-    assert widget.cursors[1] is None
-    assert widget.cursors["pos1"] is None
-
-    widget.onRemoveCursor(cursor_num=2)
-    assert widget.cursors[2] is None
-    assert widget.cursors["pos2"] is None
-
-    # Test clearing all cursors
-    widget.clearCursors()
-    assert widget.cursors[1] is None
-    assert widget.cursors[2] is None
-    assert widget.cursors["pos1"] is None
-    assert widget.cursors["pos2"] is None
-
-
-def test_chartview_find_nearest_point(qtbot):
-    """Test finding nearest point functionality."""
-    # Mock the parent and required attributes
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = MagicMock()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    # Patch settings.getKey to avoid config issues
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-
-    # Mock the curve manager to return a valid curve
-    widget.curveManager = MagicMock()
-    widget.curveManager.curves.return_value = {"test_curve": {}}
-    widget.curveManager.getCurveData.return_value = {
-        "ds": [np.array([1.0, 2.0, 3.0]), np.array([4.0, 5.0, 6.0])],
-        "factor": 1,
-        "offset": 0,
-    }
-
-    # Mock the combo box to return a valid index
-    mock_combo = MagicMock()
-    mock_combo.currentIndex.return_value = 0
-    mock_combo.itemData.return_value = "test_curve"
-    widget.curveBox = mock_combo
-
-    # Test with no curves
-    widget.curveManager.curves.return_value = {}
-    result = widget.findNearestPoint(1.0, 2.0)
-    assert result is None
-
-    # Test with mock curve data
-    widget.curveManager.curves.return_value = {"test_curve": {}}
-    result = widget.findNearestPoint(2.1, 5.1)
-    assert result is not None
-    assert len(result) == 2
-
-
-def test_chartview_offset_factor_updates(qtbot):
-    """Test offset and factor update handling."""
-    # Mock the parent and required attributes
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = MagicMock()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    # Patch settings.getKey to avoid config issues
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-
-    # Mock the curve manager to return a valid curve
-    widget.curveManager = MagicMock()
-    widget.curveManager.curves.return_value = {"test_curve": {}}
-
-    # Mock the combo box to return a valid index
-    mock_combo = MagicMock()
-    mock_combo.currentIndex.return_value = 0
-    mock_combo.itemData.return_value = "test_curve"
-    widget.curveBox = mock_combo
-
-    # Mock the offset and factor line edits
-    mock_offset = MagicMock()
-    mock_offset.text.return_value = "10.5"
-    widget.offset_value = mock_offset
-
-    mock_factor = MagicMock()
-    mock_factor.text.return_value = "2.0"
-    widget.factor_value = mock_factor
-
-    # Test offset update
-    widget.onOffsetUpdated()
-    widget.curveManager.updateCurveOffset.assert_called()
-
-    # Test factor update
-    widget.onFactorUpdated()
-    widget.curveManager.updateCurveFactor.assert_called()
-
-
-def test_chartview_curve_removal_signals(qtbot):
-    """Test curve removal signal handling."""
-    # Mock the parent and required attributes
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = MagicMock()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    # Patch settings.getKey to avoid config issues
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-
-    # Mock the curve manager to return a valid curve with proper data structure
-    widget.curveManager = MagicMock()
-    widget.curveManager.curves.return_value = {"test_curve": {}, "other_curve": {}}
-    widget.curveManager.getCurveData.return_value = {
-        "plot_options": {"x": "test_x_label", "y": "test_y_label"}
-    }
-
-    # Mock the combo box to return a valid index
-    mock_combo = MagicMock()
-    mock_combo.currentIndex.return_value = 0
-    mock_combo.itemData.return_value = "test_curve"
-    widget.curveBox = mock_combo
-
-    # Test remove button click - need to mock the curves() method to return more than one curve
-    widget.onRemoveButtonClicked()
-    widget.curveManager.removeCurve.assert_called_with("test_curve")
-
-    # Test curve removal signal
-    widget.plotObjects = {"test_curve": MagicMock()}
-    # Provide a curveData dict with required keys
-    curve_data = {"row": 0, "file_path": "/tmp/test.mda"}
-    widget.mda_mvc.mda_file.tabPath2Tableview.return_value = (
-        None  # Avoids further calls
-    )
-    widget.onCurveRemoved("test_curve", curve_data, 0)
-    assert "test_curve" not in widget.plotObjects
-
-
-def test_chartview_tab_and_det_removal(qtbot):
-    """Test tab and detector removal handling."""
-    # Mock the parent and required attributes
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = MagicMock()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    # Patch settings.getKey to avoid config issues
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-
-    # Mock the curve manager
-    widget.curveManager = MagicMock()
-    widget.curveManager.curves.return_value = {
-        "test_curve": {"file_path": "/path/to/file.mda"}
-    }
-
-    # Mock the mda_file mode
-    widget.mda_mvc.mda_file.mode.return_value = "Auto-add"
-
-    # Test tab removal
-    widget.onTabRemoved("/path/to/file.mda")
-    widget.curveManager.removeCurve.assert_called()
-
-    # Test detector removal
-    widget.curveManager.findCurveID.return_value = "test_curve"
-    widget.onDetRemoved("/path/to/file.mda", 0)
-    widget.curveManager.removeCurve.assert_called()
-
-
-def test_chartview_has_data_items(qtbot):
-    """Test checking if chart has data items."""
-    # Mock the parent and required attributes
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = MagicMock()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    # Patch settings.getKey to avoid config issues
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-
-    # Test with no data
-    widget.main_axes.has_data = MagicMock(return_value=False)
-    assert not widget.hasDataItems()
-
-    # Test with data
-    widget.main_axes.has_data = MagicMock(return_value=True)
-    assert widget.hasDataItems()
-
-
-def test_chartview_clear_plot(qtbot):
-    """Test clearing the plot."""
-    # Mock the parent and required attributes
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = MagicMock()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    # Patch settings.getKey to avoid config issues
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-
-    # Mock the axes clear method
-    widget.main_axes.clear = MagicMock()
-
-    # Test clearing the plot
-    widget.clearPlot()
-    widget.main_axes.clear.assert_called()
-
-
-def test_chartview_maximum_height_setting(qtbot):
-    """Test setting maximum plot height."""
-    # Mock the parent and required attributes
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = MagicMock()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    # Patch settings.getKey to avoid config issues
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-
-    # Test setting maximum height
-    widget.setMaximumPlotHeight(600)
-    assert widget.maximumHeight() == 600
-    assert widget.canvas.maximumHeight() == 550  # 600 - 50 for toolbar
-
-
-def test_chartview_modifier_key_checking(qtbot):
-    """Test modifier key checking functionality."""
-    # Mock the parent and required attributes
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = MagicMock()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    # Patch settings.getKey to avoid config issues
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-
-    # Test modifier key checking
-    widget.check_modifier_keys()
-    # Should not raise an exception and should set alt_pressed to a Qt modifier
-    assert hasattr(widget.alt_pressed, "__class__")
-
-
-def test_chartview_combo_box_curve_management(qtbot):
-    """Test combo box curve ID management."""
-    # Mock the parent and required attributes
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = MagicMock()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    # Patch settings.getKey to avoid config issues
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-
-    # Mock the combo box
-    mock_combo = MagicMock()
-    mock_combo.count.return_value = 1
-    mock_combo.itemData.return_value = "test_curve_id"
-    widget.curveBox = mock_combo
-
-    # Test removing item from curve box
-    widget.removeItemCurveBox("test_curve_id")
-    mock_combo.removeItem.assert_called_with(0)
-
-    # Test updating combo box curve IDs
-    widget.plotObjects = {"curve1": MagicMock(), "curve2": MagicMock()}
-    widget.curveManager = MagicMock()
-    widget.curveManager.curves.return_value = {
-        "curve1": {"file_path": "/path1", "ds_options": {"label": "label1"}},
-        "curve2": {"file_path": "/path2", "ds_options": {"label": "label2"}},
-    }
-    widget.updateComboBoxCurveIDs()
-    # Should call itemData and setItemData
-    assert mock_combo.itemData.called
-
-
-def test_chartview_log_scale_functionality(qtbot):
-    """Test log scale functionality."""
-    # Mock the parent and required attributes
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = MagicMock()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    # Patch settings.getKey to avoid config issues
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-
-    # Test log scale functionality
-    # Mock the axes methods
-    widget.main_axes.set_xscale = MagicMock()
-    widget.main_axes.set_yscale = MagicMock()
-    widget.canvas.draw = MagicMock()
-
-    # Test setting log scales
-    widget.setLogScales(True, False)
-    widget.main_axes.set_xscale.assert_called_once_with("log")
-    widget.main_axes.set_yscale.assert_called_once_with("linear")
-    widget.canvas.draw.assert_called()
-
-    # Reset mocks
-    widget.main_axes.set_xscale.reset_mock()
-    widget.main_axes.set_yscale.reset_mock()
-    widget.canvas.draw.reset_mock()
-
-    # Test setting both log scales
-    widget.setLogScales(True, True)
-    widget.main_axes.set_xscale.assert_called_once_with("log")
-    widget.main_axes.set_yscale.assert_called_once_with("log")
-    widget.canvas.draw.assert_called()
-
-    # Reset mocks
-    widget.main_axes.set_xscale.reset_mock()
-    widget.main_axes.set_yscale.reset_mock()
-    widget.canvas.draw.reset_mock()
-
-    # Test setting linear scales
-    widget.setLogScales(False, False)
-    widget.main_axes.set_xscale.assert_called_once_with("linear")
-    widget.main_axes.set_yscale.assert_called_once_with("linear")
-    widget.canvas.draw.assert_called()
-
-
-def test_chartview_log_scale_toggling(qtbot: "FixtureRequest") -> None:
-    """Test toggling log scale for X and Y axes in ChartView."""
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = MagicMock()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-    widget.show()
-    # Simulate enabling log scale controls
-    widget.setLogScales(True, False)
-    assert widget._log_x is True
-    assert widget._log_y is False
-    widget.setLogScales(True, True)
-    assert widget._log_x is True
-    assert widget._log_y is True
-    widget.setLogScales(False, True)
-    assert widget._log_x is False
-    assert widget._log_y is True
-    widget.setLogScales(False, False)
-    assert widget._log_x is False
-    assert widget._log_y is False
-
-
-def test_chartview_curve_style_changes(qtbot: "FixtureRequest") -> None:
-    """Test changing curve style in ChartView and error handling for invalid styles."""
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = QComboBox()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    # Assign the real style dictionary to the mock
-    parent.mda_file_viz.curve_styles = {
-        "Line": "-",
-        "Points": ".",
-        "Circle Markers": "o-",
-        "Square Markers": "s-",
-        "Triangle Markers": "^-",
-        "Diamond Markers": "D-",
-        "Dashed": "--",
-        "Dots": ":",
-        "Dash-Dot": "-.",
-    }
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-    widget.show()
-    # Add a curve - pass x and y as positional arguments
-    x = np.array([1, 2, 3])
-    y = np.array([1, 4, 9])
-    widget.curveManager.addCurve(
-        0,  # row as positional
-        x,
-        y,  # x and y as positional
-        plot_options={"filePath": "/test.mda", "fileName": "test"},
-        ds_options={"label": "Test"},
-    )
-    curve_id = list(widget.curveManager.curves().keys())[0]
-    # Set up the combo box to select the curve
-    widget.curveBox.addItem("Test")
-    widget.curveBox.setItemData(0, curve_id, 32)  # 32 = QtCore.Qt.ItemDataRole.UserRole
-    widget.curveBox.setCurrentIndex(0)
-
-    # Change style using ChartView method
-    widget.updateCurveStyle("Dashed")
-    # Verify the style was updated in the curve data
-    curve_data = widget.curveManager.getCurveData(curve_id)
-    assert curve_data["style"] == "--"
-    # Try invalid style (should not raise)
-    try:
-        widget.updateCurveStyle("invalid-style")
-    except Exception as e:
-        pytest.fail(f"updateCurveStyle raised an exception: {e}")
-
-
-def test_chartview_error_handling_on_invalid_curve(qtbot: "FixtureRequest") -> None:
-    """Test error handling when updating/removing a non-existent curve in ChartView."""
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = MagicMock()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-    widget.show()
-    # Try to remove a non-existent curve
-    non_existent_id = "not_a_real_curve_id"
-    # Should not raise
-    try:
-        widget.curveManager.removeCurve(non_existent_id)
-    except Exception as e:
-        pytest.fail(f"CurveManager raised an exception on invalid curve id: {e}")
+        
+        assert chart.max_curves == 25
+        assert chart.enable_lazy_rendering is False
+        assert chart.memory_limit_mb == 100.0
+
+    @patch('mdaviz.chartview.MATPLOTLIB_AVAILABLE', True)
+    @patch('mdaviz.chartview.Figure')
+    @patch('mdaviz.chartview.FigureCanvas')
+    @patch('mdaviz.chartview.plt')
+    def test_parent_widget(self, mock_plt: Mock, mock_canvas: Mock, mock_figure: Mock, qt_app: QApplication) -> None:
+        """Test ChartView with parent widget."""
+        # Setup mocks
+        mock_fig_instance = Mock()
+        mock_figure.return_value = mock_fig_instance
+        mock_fig_instance.add_subplot.return_value = Mock()
+        
+        parent = QWidget()
+        chart = ChartView(parent=parent)
+        
+        assert chart.parent() == parent
+
+    @patch('mdaviz.chartview.MATPLOTLIB_AVAILABLE', False)
+    @patch('mdaviz.chartview.PYQTGRAPH_AVAILABLE', False)
+    def test_no_backend_available(self, qt_app: QApplication) -> None:
+        """Test initialization when no plotting backend is available."""
+        with pytest.raises(RuntimeError, match="No plotting backend available"):
+            ChartView()
+
+
+class TestChartViewCurveManagement:
+    """Test curve addition, removal, and management."""
+
+    def test_add_curve_success(self, chart_view: ChartView, sample_data: tuple) -> None:
+        """Test successful curve addition."""
+        x_data, y_data = sample_data
+        
+        with patch.object(chart_view, 'axes') as mock_axes:
+            mock_line = Mock()
+            mock_axes.plot.return_value = [mock_line]
+            mock_axes.legend = Mock()
+            
+            result = chart_view.add_curve("test_curve", x_data, y_data)
+            
+            assert result is True
+            assert "test_curve" in chart_view._curves
+            assert "test_curve" in chart_view._curve_data
+            assert chart_view._curve_count == 1
+
+    def test_add_curve_with_kwargs(self, chart_view: ChartView, sample_data: tuple) -> None:
+        """Test curve addition with plotting kwargs."""
+        x_data, y_data = sample_data
+        
+        with patch.object(chart_view, 'axes') as mock_axes:
+            mock_line = Mock()
+            mock_axes.plot.return_value = [mock_line]
+            mock_axes.legend = Mock()
+            
+            result = chart_view.add_curve("test_curve", x_data, y_data, color="red", linestyle="--")
+            
+            assert result is True
+            assert "test_curve" in chart_view._curves
+
+    def test_add_multiple_curves(self, chart_view: ChartView, sample_data: tuple) -> None:
+        """Test adding multiple curves."""
+        x_data, y_data = sample_data
+        
+        with patch.object(chart_view, 'axes') as mock_axes:
+            mock_line = Mock()
+            mock_axes.plot.return_value = [mock_line]
+            mock_axes.legend = Mock()
+            
+            result1 = chart_view.add_curve("curve1", x_data, y_data)
+            result2 = chart_view.add_curve("curve2", x_data, [y * 2 for y in y_data])
+            
+            assert result1 is True
+            assert result2 is True
+            assert chart_view._curve_count == 2
+            assert len(chart_view._curves) == 2
+
+    def test_memory_limit_exceeded(self, chart_view: ChartView) -> None:
+        """Test curve addition when memory limit is exceeded."""
+        # Create large data that exceeds memory limit
+        large_data = [0.0] * 10000000  # 10M points should exceed 200MB limit
+        
+        with patch.object(chart_view, 'memory_warning') as mock_warning:
+            result = chart_view.add_curve("large_curve", large_data, large_data)
+            
+            assert result is False
+            mock_warning.emit.assert_called()
+
+    def test_max_curves_limit(self, chart_view: ChartView, sample_data: tuple) -> None:
+        """Test behavior when max curves limit is reached."""
+        chart_view.max_curves = 2
+        x_data, y_data = sample_data
+        
+        with patch.object(chart_view, 'axes') as mock_axes:
+            mock_line = Mock()
+            mock_axes.plot.return_value = [mock_line]
+            mock_axes.legend = Mock()
+            
+            # Add curves up to limit
+            chart_view.add_curve("curve1", x_data, y_data)
+            chart_view.add_curve("curve2", x_data, y_data)
+            
+            # Adding third curve should remove oldest
+            with patch.object(chart_view, '_remove_oldest_curve') as mock_remove:
+                chart_view.add_curve("curve3", x_data, y_data)
+                mock_remove.assert_called_once()
+
+    def test_remove_curve_success(self, chart_view: ChartView, sample_data: tuple) -> None:
+        """Test successful curve removal."""
+        x_data, y_data = sample_data
+        
+        with patch.object(chart_view, 'axes') as mock_axes:
+            mock_line = Mock()
+            mock_axes.plot.return_value = [mock_line]
+            mock_axes.legend = Mock()
+            chart_view.add_curve("test_curve", x_data, y_data)
+            
+            # Now test removal
+            mock_line.remove = Mock()
+            result = chart_view.remove_curve("test_curve")
+            
+            assert result is True
+            assert "test_curve" not in chart_view._curves
+            assert "test_curve" not in chart_view._curve_data
+            assert chart_view._curve_count == 0
+
+    def test_remove_nonexistent_curve(self, chart_view: ChartView) -> None:
+        """Test removing a curve that doesn't exist."""
+        result = chart_view.remove_curve("nonexistent")
+        
+        assert result is False
+
+    def test_clear_all_curves(self, chart_view: ChartView, sample_data: tuple) -> None:
+        """Test clearing all curves."""
+        x_data, y_data = sample_data
+        
+        with patch.object(chart_view, 'axes') as mock_axes:
+            mock_line = Mock()
+            mock_axes.plot.return_value = [mock_line]
+            mock_axes.legend = Mock()
+            chart_view.add_curve("curve1", x_data, y_data)
+            chart_view.add_curve("curve2", x_data, y_data)
+            
+            # Now test clearing
+            mock_axes.clear = Mock()
+            mock_axes.grid = Mock()
+            chart_view.clear_all_curves()
+            
+            assert len(chart_view._curves) == 0
+            assert len(chart_view._curve_data) == 0
+            assert chart_view._curve_count == 0
+
+    def test_remove_oldest_curve(self, chart_view: ChartView, sample_data: tuple) -> None:
+        """Test removing the oldest curve."""
+        x_data, y_data = sample_data
+        
+        with patch.object(chart_view, 'axes') as mock_axes:
+            mock_line = Mock()
+            mock_axes.plot.return_value = [mock_line]
+            mock_axes.legend = Mock()
+            mock_line.remove = Mock()
+            
+            chart_view.add_curve("oldest", x_data, y_data)
+            chart_view.add_curve("newer", x_data, y_data)
+            
+            chart_view._remove_oldest_curve()
+            
+            assert "oldest" not in chart_view._curves
+            assert "newer" in chart_view._curves
+
+
+class TestChartViewBackendManagement:
+    """Test backend switching and management."""
+
+    @pytest.mark.skipif(not MATPLOTLIB_AVAILABLE, reason="Matplotlib not available")
+    @patch('mdaviz.chartview.MATPLOTLIB_AVAILABLE', True)
+    @patch('mdaviz.chartview.Figure')
+    @patch('mdaviz.chartview.FigureCanvas')
+    @patch('mdaviz.chartview.plt')
+    def test_matplotlib_backend_setup(self, mock_plt: Mock, mock_canvas: Mock, mock_figure: Mock, qt_app: QApplication) -> None:
+        """Test setting up matplotlib backend."""
+        # Setup mocks
+        mock_fig_instance = Mock()
+        mock_figure.return_value = mock_fig_instance
+        mock_fig_instance.add_subplot.return_value = Mock()
+        
+        chart = ChartView(backend="matplotlib")
+        
+        assert chart.backend == "matplotlib"
+        assert hasattr(chart, 'figure')
+        assert hasattr(chart, 'canvas')
+        assert hasattr(chart, 'axes')
+
+    @pytest.mark.skipif(not PYQTGRAPH_AVAILABLE, reason="PyQtGraph not available")
+    @patch('mdaviz.chartview.PYQTGRAPH_AVAILABLE', True)
+    @patch('mdaviz.chartview.pg')
+    def test_pyqtgraph_backend_setup(self, mock_pg: Mock, qt_app: QApplication) -> None:
+        """Test setting up pyqtgraph backend."""
+        # Setup mock
+        mock_plot_widget = Mock()
+        mock_pg.PlotWidget.return_value = mock_plot_widget
+        
+        chart = ChartView(backend="pyqtgraph")
+        
+        assert chart.backend == "pyqtgraph"
+        assert hasattr(chart, 'plot_widget')
+
+    def test_switch_backend_same(self, chart_view: ChartView) -> None:
+        """Test switching to the same backend."""
+        current_backend = chart_view.backend
+        result = chart_view.switch_backend(current_backend)
+        
+        assert result is True
+        assert chart_view.backend == current_backend
+
+    @pytest.mark.skipif(not (MATPLOTLIB_AVAILABLE and PYQTGRAPH_AVAILABLE), 
+                       reason="Both backends needed for switching test")
+    def test_switch_backend_different(self, chart_view: ChartView, sample_data: tuple) -> None:
+        """Test switching to a different backend."""
+        x_data, y_data = sample_data
+        original_backend = chart_view.backend
+        target_backend = "pyqtgraph" if original_backend == "matplotlib" else "matplotlib"
+        
+        with patch.object(chart_view, 'axes') as mock_axes:
+            mock_line = Mock()
+            mock_axes.plot.return_value = [mock_line]
+            mock_axes.legend = Mock()
+            
+            # Add curve before switching
+            chart_view.add_curve("test_curve", x_data, y_data)
+            
+            # Mock the backend switch
+            with patch.object(chart_view, 'backend_switched') as mock_signal, \
+                 patch.object(chart_view, '_setup_backend'):
+                result = chart_view.switch_backend(target_backend)
+                
+                assert result is True
+                # Curve should be restored in curve_data
+                assert "test_curve" in chart_view._curve_data
+
+
+class TestChartViewPerformance:
+    """Test performance monitoring and optimization features."""
+
+    def test_get_performance_info(self, chart_view: ChartView) -> None:
+        """Test getting performance information."""
+        info = chart_view.get_performance_info()
+        
+        assert isinstance(info, dict)
+        assert "curve_count" in info
+        assert "memory_usage_mb" in info
+        assert "backend" in info
+        assert "memory_limit_mb" in info
+        assert "max_curves" in info
+        assert "lazy_rendering" in info
+        
+        assert info["curve_count"] == chart_view._curve_count
+        assert info["backend"] == chart_view.backend
+
+    def test_lazy_rendering_schedule(self, chart_view: ChartView) -> None:
+        """Test lazy rendering scheduling."""
+        chart_view.enable_lazy_rendering = True
+        
+        chart_view._schedule_render("test_curve")
+        
+        assert "test_curve" in chart_view._pending_renders
+        assert chart_view._render_timer.isActive()
+
+    def test_delayed_render(self, chart_view: ChartView) -> None:
+        """Test delayed rendering execution."""
+        chart_view._pending_renders = ["curve1", "curve2"]
+        
+        with patch.object(chart_view, 'canvas') as mock_canvas:
+            mock_canvas.draw = Mock()
+            chart_view._delayed_render()
+            
+            assert len(chart_view._pending_renders) == 0
+
+    @patch('mdaviz.chartview.psutil')
+    def test_update_performance_stats_with_psutil(self, mock_psutil: Mock, chart_view: ChartView) -> None:
+        """Test performance stats update with psutil available."""
+        mock_process = Mock()
+        mock_process.memory_info.return_value.rss = 100 * 1024 * 1024  # 100MB
+        mock_psutil.Process.return_value = mock_process
+        
+        # Force update by setting last check time to 0
+        chart_view._last_performance_check = 0.0
+        
+        with patch.object(chart_view, 'performance_stats') as mock_signal:
+            chart_view._update_performance_stats()
+            
+            assert chart_view._memory_usage_mb == 100.0
+            mock_signal.emit.assert_called()
+
+    @patch('mdaviz.chartview.psutil', side_effect=ImportError)
+    def test_update_performance_stats_no_psutil(self, mock_psutil: Mock, chart_view: ChartView) -> None:
+        """Test performance stats update without psutil."""
+        chart_view._last_performance_check = 0.0
+        
+        chart_view._update_performance_stats()
+        
+        assert chart_view._memory_usage_mb == 0.0
+
+
+class TestChartViewSignals:
+    """Test signal emission from ChartView."""
+
+    def test_curve_added_signal(self, chart_view: ChartView, sample_data: tuple) -> None:
+        """Test curve_added signal emission."""
+        x_data, y_data = sample_data
+        
+        with patch.object(chart_view, 'axes') as mock_axes, \
+             patch.object(chart_view, 'curve_added') as mock_signal:
+            mock_line = Mock()
+            mock_axes.plot.return_value = [mock_line]
+            mock_axes.legend = Mock()
+            
+            chart_view.add_curve("test_curve", x_data, y_data)
+            mock_signal.emit.assert_called_with("test_curve")
+
+    def test_curve_removed_signal(self, chart_view: ChartView, sample_data: tuple) -> None:
+        """Test curve_removed signal emission."""
+        x_data, y_data = sample_data
+        
+        with patch.object(chart_view, 'axes') as mock_axes, \
+             patch.object(chart_view, 'curve_removed') as mock_signal:
+            mock_line = Mock()
+            mock_axes.plot.return_value = [mock_line]
+            mock_axes.legend = Mock()
+            mock_line.remove = Mock()
+            
+            chart_view.add_curve("test_curve", x_data, y_data)
+            chart_view.remove_curve("test_curve")
+            mock_signal.emit.assert_called_with("test_curve")
+
+
+class TestChartViewCleanup:
+    """Test cleanup and resource management."""
+
+    def test_cleanup_method(self, chart_view: ChartView, sample_data: tuple) -> None:
+        """Test cleanup method."""
+        x_data, y_data = sample_data
+        
+        with patch.object(chart_view, 'axes') as mock_axes:
+            mock_line = Mock()
+            mock_axes.plot.return_value = [mock_line]
+            mock_axes.legend = Mock()
+            chart_view.add_curve("test_curve", x_data, y_data)
+            
+            chart_view.cleanup()
+            
+            assert len(chart_view._curves) == 0
+            assert len(chart_view._curve_data) == 0
+            assert not chart_view._render_timer.isActive()
+
+    def test_close_event(self, chart_view: ChartView) -> None:
+        """Test close event handling."""
+        mock_event = Mock()
+        
+        with patch.object(chart_view, 'cleanup') as mock_cleanup:
+            chart_view.closeEvent(mock_event)
+            mock_cleanup.assert_called_once()
+
+
+class TestChartViewErrorHandling:
+    """Test error handling in ChartView."""
+
+    def test_add_curve_error_handling(self, chart_view: ChartView) -> None:
+        """Test error handling during curve addition."""
+        # Test with invalid data that might cause errors
+        with patch.object(chart_view, '_curves', side_effect=Exception("Test error")):
+            result = chart_view.add_curve("error_curve", [1, 2], [3, 4])
+            assert result is False
+
+    def test_remove_curve_error_handling(self, chart_view: ChartView, sample_data: tuple) -> None:
+        """Test error handling during curve removal."""
+        x_data, y_data = sample_data
+        
+        with patch.object(chart_view, 'axes') as mock_axes:
+            mock_line = Mock()
+            mock_axes.plot.return_value = [mock_line]
+            mock_axes.legend = Mock()
+            chart_view.add_curve("test_curve", x_data, y_data)
+            
+            # Mock an error during removal
+            with patch.object(chart_view._curves, '__delitem__', side_effect=Exception("Test error")):
+                result = chart_view.remove_curve("test_curve")
+                assert result is False
+
+    def test_clear_curves_error_handling(self, chart_view: ChartView) -> None:
+        """Test error handling during curve clearing."""
+        with patch.object(chart_view, '_curves', side_effect=Exception("Test error")):
+            # Should not raise exception
+            chart_view.clear_all_curves()
+
+    def test_switch_backend_error_handling(self, chart_view: ChartView) -> None:
+        """Test error handling during backend switching."""
+        with patch.object(chart_view, '_setup_backend', side_effect=Exception("Test error")):
+            result = chart_view.switch_backend("matplotlib")
+            assert result is False
+
+    def test_cleanup_error_handling(self, chart_view: ChartView) -> None:
+        """Test error handling during cleanup."""
+        with patch.object(chart_view, 'clear_all_curves', side_effect=Exception("Test error")):
+            # Should not raise exception
+            chart_view.cleanup()

@@ -296,7 +296,7 @@ class DataCache(QObject):
                     target_reduction = 0.5  # More aggressive cleanup
                 elif system_memory.percent > 80:
                     target_reduction = 0.4
-            except Exception:
+            except:
                 pass
 
         # Remove entries using smart eviction

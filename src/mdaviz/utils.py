@@ -254,7 +254,7 @@ def get_file_info_lightweight(file_path: pathlib.Path) -> Dict[str, Any]:
         file_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
             "%Y-%m-%d %H:%M:%S"
         )
-    except Exception:
+    except:
         file_date = "Unknown"
 
     # Build comprehensive file info
@@ -325,7 +325,7 @@ def get_file_info_full(file_path: pathlib.Path) -> Dict[str, Any]:
                 byte2str(file_data_dim1.time) if hasattr(file_data_dim1, "time") else ""
             )
             file_date = str(raw_time).split(".")[0] if raw_time else "Unknown"
-        except Exception:
+        except:
             file_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
                 "%Y-%m-%d %H:%M:%S"
             )
@@ -340,7 +340,7 @@ def get_file_info_full(file_path: pathlib.Path) -> Dict[str, Any]:
                 pos = file_data_dim1.p[0]
                 if hasattr(pos, "name") and pos.name:
                     positioner_name = byte2str(pos.name)
-        except Exception:
+        except:
             pass
 
         # Monitor memory usage
@@ -397,7 +397,7 @@ def _create_minimal_file_info(file_path: Path) -> Dict[str, Any]:
             "%Y-%m-%d %H:%M:%S"
         )
         file_size = human_readable_size(file_path.stat().st_size)
-    except Exception:
+    except:
         file_date = "Unknown"
         file_size = "Unknown"
 
@@ -441,7 +441,7 @@ def get_scan(file_data_dim1) -> Tuple[Dict[str, Any], str, str]:
                     if NUMPY_AVAILABLE and hasattr(data, "__iter__"):
                         try:
                             data = np.asarray(data, dtype=np.float64).tolist()
-                        except Exception:
+                        except:
                             data = list(data) if hasattr(data, "__iter__") else []
 
                     scan_dict[field_name] = {
@@ -471,7 +471,7 @@ def get_scan(file_data_dim1) -> Tuple[Dict[str, Any], str, str]:
                     if NUMPY_AVAILABLE and hasattr(data, "__iter__"):
                         try:
                             data = np.asarray(data, dtype=np.float32).tolist()
-                        except Exception:
+                        except:
                             data = list(data) if hasattr(data, "__iter__") else []
 
                     scan_dict[field_name] = {

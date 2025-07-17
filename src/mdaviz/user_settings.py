@@ -120,11 +120,11 @@ class SettingsValidator:
         try:
             # Handle None values
             if value is None:
-                if expected_type is bool:
+                if expected_type == bool:
                     return False
                 elif expected_type in (int, float):
                     return 0
-                elif expected_type is str:
+                elif expected_type == str:
                     return ""
                 elif expected_type in (list, dict):
                     return expected_type()
@@ -132,21 +132,21 @@ class SettingsValidator:
                     return None
 
             # Type conversion and validation
-            if expected_type is bool:
+            if expected_type == bool:
                 if isinstance(value, str):
                     return value.lower() in ("true", "1", "yes", "on")
                 return bool(value)
 
-            elif expected_type is int:
+            elif expected_type == int:
                 return int(float(value))  # Handle string representations
 
-            elif expected_type is float:
+            elif expected_type == float:
                 return float(value)
 
-            elif expected_type is str:
+            elif expected_type == str:
                 return str(value)
 
-            elif expected_type is list:
+            elif expected_type == list:
                 if isinstance(value, str):
                     try:
                         return json.loads(value)
@@ -154,7 +154,7 @@ class SettingsValidator:
                         return value.split(",") if value else []
                 return list(value) if hasattr(value, "__iter__") else [value]
 
-            elif expected_type is dict:
+            elif expected_type == dict:
                 if isinstance(value, str):
                     try:
                         return json.loads(value)
@@ -231,7 +231,7 @@ class ApplicationQSettings(QSettings):
 
         # Initialize with defaults if empty
         if not self.allKeys():
-            self.init_global_keys()
+        self.init_global_keys()
 
     def _ensure_backup_dir(self) -> None:
         """Ensure backup directory exists."""
@@ -280,7 +280,7 @@ class ApplicationQSettings(QSettings):
             bool: True if key exists
         """
         try:
-            return key in self.allKeys()
+        return key in self.allKeys()
         except Exception as e:
             logger.warning(f"Error checking key existence '{key}': {e}")
             return False
@@ -301,8 +301,8 @@ class ApplicationQSettings(QSettings):
         """
         try:
             # Handle missing slash in global keys
-            if "/" not in key and not self.keyExists(key):
-                key = f"{GLOBAL_GROUP}/{key}"
+        if "/" not in key and not self.keyExists(key):
+            key = f"{GLOBAL_GROUP}/{key}"
 
             value = self.value(key, default)
 
@@ -345,19 +345,19 @@ class ApplicationQSettings(QSettings):
                 value = self.validator.validate_value(key, value, validate_type)
 
             # Split key into group and key components
-            group, k = self._keySplit_(key)
+        group, k = self._keySplit_(key)
 
             # Remove existing key
-            self.remove(key)
+        self.remove(key)
 
             # Set new value
-            self.beginGroup(group)
-            self.setValue(k, value)
-            self.endGroup()
+        self.beginGroup(group)
+        self.setValue(k, value)
+        self.endGroup()
 
             # Update timestamp (but don't create infinite recursion)
-            if key != "timestamp":
-                self.updateTimeStamp()
+        if key != "timestamp":
+            self.updateTimeStamp()
 
             return True
 
@@ -422,11 +422,11 @@ class ApplicationQSettings(QSettings):
             self._create_backup()
 
             # Clear all keys
-            for key in self.allKeys():
-                self.remove(key)
+        for key in self.allKeys():
+            self.remove(key)
 
             # Reinitialize with defaults
-            self.init_global_keys()
+        self.init_global_keys()
 
             logger.info("Settings reset to defaults")
             return True

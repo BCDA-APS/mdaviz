@@ -339,11 +339,11 @@ class FitManager(QObject):
                 progress_callback(0, 100)
             self.fitProgress.emit(curveID, 0, 100)
 
-            # Perform the fit
-            try:
-                fit_result = model.fit(x_fit, y_fit, initial_params, bounds)
+        # Perform the fit
+        try:
+            fit_result = model.fit(x_fit, y_fit, initial_params, bounds)
                 convergence_status = "converged"
-            except Exception as e:
+        except Exception as e:
                 raise FitError(f"Fit algorithm failed: {str(e)}")
 
             # Emit progress
@@ -355,7 +355,7 @@ class FitManager(QObject):
             fit_time = time.time() - start_time
 
             # Create fit data
-            fit_data = FitData(
+        fit_data = FitData(
                 model_name=model_name,
                 fit_result=fit_result,
                 x_range=x_range,
@@ -367,7 +367,7 @@ class FitManager(QObject):
 
             # Store fit data
             had_existing_fit = curveID in self._fits
-            self._fits[curveID] = fit_data
+        self._fits[curveID] = fit_data
 
             # Update fit history
             if curveID not in self._fit_history:
@@ -389,9 +389,9 @@ class FitManager(QObject):
             if self.enable_auto_quality_check:
                 self._check_fit_quality(curveID, fit_data)
 
-            # Emit appropriate signal
+        # Emit appropriate signal
             fit_summary = fit_data.get_summary()
-            if had_existing_fit:
+        if had_existing_fit:
                 self.fitUpdated.emit(curveID, fit_summary)
             else:
                 self.fitAdded.emit(curveID, fit_summary)
@@ -581,17 +581,17 @@ class FitManager(QObject):
             bool: True if fit was removed, False if not found
         """
         try:
-            if curveID in self._fits:
+        if curveID in self._fits:
                 # Cancel active fit if running
                 if curveID in self._active_fits:
                     try:
                         self._active_fits[curveID].cancel()
                         del self._active_fits[curveID]
-                    except Exception:
+                    except:
                         pass  # Future may already be completed
 
-                del self._fits[curveID]
-                self.fitRemoved.emit(curveID)
+            del self._fits[curveID]
+            self.fitRemoved.emit(curveID)
                 return True
             return False
 
@@ -671,7 +671,7 @@ class FitManager(QObject):
         try:
             if curveID in self._fits:
                 self._fits[curveID].visible = visible
-                self.fitVisibilityChanged.emit(curveID, visible)
+            self.fitVisibilityChanged.emit(curveID, visible)
                 return True
             return False
 
@@ -795,7 +795,7 @@ class FitManager(QObject):
             for future in self._active_fits.values():
                 try:
                     future.cancel()
-                except Exception:
+                except:
                     pass
 
             # Clear data structures
