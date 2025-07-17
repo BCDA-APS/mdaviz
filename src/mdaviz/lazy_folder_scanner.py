@@ -2,7 +2,7 @@
 Lazy folder scanning functionality.
 
 This module provides efficient folder scanning capabilities for MDA files
-with support for batch processing and progress tracking.
+with support for batch processing, parallel processing, and progress tracking.
 
 .. autosummary::
 
@@ -11,8 +11,10 @@ with support for batch processing and progress tracking.
     ~FolderScanWorker
 """
 
+import os
 from pathlib import Path
 from typing import Any, Optional, Callable
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from PyQt6.QtCore import QObject, QThread, pyqtSignal
 from mdaviz.utils import get_file_info_lightweight, get_file_info_full
 from dataclasses import dataclass
@@ -36,13 +38,16 @@ class LazyFolderScanner(QObject):
     Lazy folder scanner for handling large MDA folders efficiently.
 
     This class provides methods to scan folders in batches, allowing the UI
-    to remain responsive while processing large numbers of files.
+    to remain responsive while processing large numbers of files. It includes
+    optimizations for large directories and parallel processing capabilities.
 
     Attributes:
         batch_size (int): Number of files to process in each batch
         max_files (int): Maximum number of files to scan before warning
         use_lightweight_scan (bool): Whether to use lightweight scanning
         progressive_loading (bool): Whether to use progressive loading for large directories
+        use_parallel_processing (bool): Whether to use parallel processing for better performance
+        max_workers (int): Maximum number of worker threads for parallel processing
     """
 
     # Signals
@@ -57,7 +62,9 @@ class LazyFolderScanner(QObject):
         max_files: int = 10000,
         use_lightweight_scan: bool = True,
         progressive_loading: bool = True,
-    ):
+        use_parallel_processing: bool = True,
+        max_workers: int = 4,
+    ) -> None:
         """
         Initialize the lazy folder scanner.
 
@@ -66,16 +73,103 @@ class LazyFolderScanner(QObject):
             max_files (int): Maximum number of files to scan before warning
             use_lightweight_scan (bool): Whether to use lightweight scanning
             progressive_loading (bool): Whether to use progressive loading for large directories
+            use_parallel_processing (bool): Whether to use parallel processing
+            max_workers (int): Maximum number of worker threads for parallel processing
         """
         super().__init__()
         self.batch_size = batch_size
         self.max_files = max_files
         self.use_lightweight_scan = use_lightweight_scan
         self.progressive_loading = progressive_loading
+        self.use_parallel_processing = use_parallel_processing
+        self.max_workers = max_workers
         self._scanning = False
         self._current_scan_path: Optional[Path] = None
         self.scanner_thread: Optional[QThread] = None
         self.scanner_worker: Optional[FolderScanWorker] = None
+
+    def _get_mda_files_optimized(self, folder_path: Path) -> list[Path]:
+        """
+        Get MDA files using optimized methods for better performance.
+
+        This method uses os.scandir for better performance compared to pathlib.glob
+        for large directories.
+
+        Parameters:
+            folder_path (Path): Path to the folder to scan
+
+        Returns:
+            list[Path]: List of MDA file paths
+        """
+        try:
+            mda_files = []
+            with os.scandir(folder_path) as entries:
+                for entry in entries:
+                    if entry.is_file(
+                        follow_symlinks=False
+                    ) and entry.name.lower().endswith(".mda"):
+                        mda_files.append(folder_path / entry.name)
+
+            # Sort files for consistent ordering
+            return sorted(mda_files)
+        except (OSError, PermissionError) as e:
+            print(f"Warning: Could not access some files in {folder_path}: {e}")
+            # Fallback to pathlib method
+            return list(folder_path.glob("*.mda"))
+
+    def _process_file_batch_parallel(
+        self, batch_files: list[Path]
+    ) -> tuple[list[str], list[dict[str, Any]]]:
+        """
+        Process a batch of files using parallel processing.
+
+        Parameters:
+            batch_files (list[Path]): List of file paths to process
+
+        Returns:
+            tuple: (file_list, file_info_list)
+        """
+        file_list = []
+        file_info_list = []
+
+        def process_single_file(
+            file_path: Path,
+        ) -> tuple[str, Optional[dict[str, Any]]]:
+            """Process a single file and return its info."""
+            try:
+                if self.use_lightweight_scan:
+                    file_info = get_file_info_lightweight(file_path)
+                else:
+                    file_info = get_file_info_full(file_path)
+                return file_path.name, file_info
+            except Exception as e:
+                print(f"Error scanning {file_path}: {e}")
+                return file_path.name, None
+
+        if self.use_parallel_processing and len(batch_files) > 1:
+            # Use parallel processing for larger batches
+            with ThreadPoolExecutor(
+                max_workers=min(self.max_workers, len(batch_files))
+            ) as executor:
+                future_to_file = {
+                    executor.submit(process_single_file, file_path): file_path
+                    for file_path in batch_files
+                }
+
+                for future in as_completed(future_to_file):
+                    file_name, file_info = future.result()
+                    if file_info is not None:
+                        file_list.append(file_name)
+                        file_info_list.append(file_info)
+        else:
+            # Sequential processing for small batches
+            for file_path in batch_files:
+                file_name, file_info = process_single_file(file_path)
+                if file_info is not None:
+                    file_list.append(file_name)
+                    file_info_list.append(file_info)
+
+        return file_list, file_info_list
 
     def scan_folder(
         self,
@@ -83,7 +177,7 @@ class LazyFolderScanner(QObject):
         progress_callback: Optional[Callable[[int, int], None]] = None,
     ) -> FolderScanResult:
         """
-        Scan a folder for MDA files using lazy loading.
+        Scan a folder for MDA files using lazy loading with optimized performance.
 
         Parameters:
             folder_path (Path): Path to the folder to scan
@@ -95,8 +189,8 @@ class LazyFolderScanner(QObject):
         if not folder_path.exists() or not folder_path.is_dir():
             return FolderScanResult([], [], 0, 0, False, "Folder does not exist")
 
-        # Get all MDA files in the folder
-        mda_files = list(folder_path.glob("*.mda"))
+        # Use optimized file discovery
+        mda_files = self._get_mda_files_optimized(folder_path)
         total_files = len(mda_files)
 
         if total_files == 0:
@@ -116,7 +210,7 @@ class LazyFolderScanner(QObject):
                 f"Too many files ({total_files} > {self.max_files})",
             )
 
-        # Scan files in batches
+        # Scan files in batches with optimized processing
         file_list = []
         file_info_list = []
         scanned_files = 0
@@ -124,26 +218,19 @@ class LazyFolderScanner(QObject):
         for i in range(0, total_files, self.batch_size):
             batch_files = mda_files[i : i + self.batch_size]
 
-            for file_path in batch_files:
-                try:
-                    if self.use_lightweight_scan:
-                        file_info = get_file_info_lightweight(file_path)
-                    else:
-                        file_info = get_file_info_full(file_path)
+            # Process batch (potentially in parallel)
+            batch_file_list, batch_file_info_list = self._process_file_batch_parallel(
+                batch_files
+            )
 
-                    file_list.append(file_path.name)
-                    file_info_list.append(file_info)
-                    scanned_files += 1
+            file_list.extend(batch_file_list)
+            file_info_list.extend(batch_file_info_list)
+            scanned_files += len(batch_file_list)
 
-                    # Emit progress signal
-                    self.scan_progress.emit(scanned_files, total_files)
-                    if progress_callback:
-                        progress_callback(scanned_files, total_files)
-
-                except Exception as e:
-                    # Continue scanning other files even if one fails
-                    print(f"Error scanning {file_path}: {e}")
-                    continue
+            # Emit progress signal
+            self.scan_progress.emit(scanned_files, total_files)
+            if progress_callback:
+                progress_callback(scanned_files, total_files)
 
         result = FolderScanResult(
             file_list=file_list,

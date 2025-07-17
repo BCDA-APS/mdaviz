@@ -1,8 +1,8 @@
 """
-Data caching functionality for MDA files.
+Data caching functionality for improved performance.
 
-This module provides caching capabilities to improve performance when
-loading and processing MDA files.
+This module provides an LRU cache system for MDA file data with advanced
+memory management and performance optimizations.
 
 .. autosummary::
 
@@ -11,13 +11,20 @@ loading and processing MDA files.
     ~get_global_cache
 """
 
-import time
 import gc
-import psutil
-from pathlib import Path
-from typing import Any, Optional
-from dataclasses import dataclass, field
+import time
 from collections import OrderedDict
+from pathlib import Path
+from typing import Optional, Any, Dict
+from dataclasses import dataclass
+
+try:
+    import psutil
+
+    PSUTIL_AVAILABLE = True
+except ImportError:
+    PSUTIL_AVAILABLE = False
+
 from PyQt6.QtCore import QObject, pyqtSignal
 from mdaviz.synApps_mdalib.mda import readMDA
 from mdaviz.utils import get_scan
@@ -25,40 +32,75 @@ from mdaviz.utils import get_scan
 
 @dataclass
 class CachedFileData:
-    """Cached file data with metadata."""
+    """Container for cached MDA file data."""
 
     file_path: str
-    metadata: dict[str, Any]
-    scan_dict: dict[str, Any]
-    first_pos: int
-    first_det: int
-    pv_list: list
+    metadata: Dict[str, Any]
+    scan_dict: Dict[str, Any]
+    first_pos: str
+    first_det: str
+    pv_list: list[str]
     file_name: str
     folder_path: str
-    access_time: float = field(default_factory=time.time)
-    size_bytes: int = 0
+    size_bytes: int
+    cached_time: float = 0.0
+    access_count: int = 0
+    last_accessed: float = 0.0
 
-    def update_access_time(self) -> None:
-        """Update the last access time."""
-        self.access_time = time.time()
+    def __post_init__(self) -> None:
+        """Initialize cache-specific fields."""
+        current_time = time.time()
+        if self.cached_time == 0.0:
+            self.cached_time = current_time
+        if self.last_accessed == 0.0:
+            self.last_accessed = current_time
 
-    def get_size_mb(self) -> float:
-        """Get the size in megabytes."""
-        return self.size_bytes / (1024 * 1024)
+    def get_memory_estimate_mb(self) -> float:
+        """
+        Estimate memory usage of this cached data in megabytes.
+
+        Returns:
+            float: Estimated memory usage in MB
+        """
+        # Base size from file size
+        base_size = self.size_bytes
+
+        # Add estimated overhead for scan_dict data
+        scan_dict_size = 0
+        for key, value in self.scan_dict.items():
+            if isinstance(value, dict) and "data" in value:
+                data = value["data"]
+                if hasattr(data, "__len__"):
+                    # Estimate 8 bytes per numeric value
+                    scan_dict_size += len(data) * 8
+
+        # Add overhead for strings and objects (rough estimate)
+        overhead = len(str(self.metadata)) + len(str(self.pv_list)) + 1024
+
+        total_bytes = base_size + scan_dict_size + overhead
+        return total_bytes / (1024 * 1024)
+
+    def update_access(self) -> None:
+        """Update access statistics."""
+        self.last_accessed = time.time()
+        self.access_count += 1
 
 
 class DataCache(QObject):
     """
-    LRU cache for MDA file data to improve performance and manage memory usage.
+    Advanced LRU cache for MDA file data with smart memory management.
 
     This cache stores loaded MDA file data in memory and automatically evicts
-    least recently used entries when memory limits are exceeded.
+    least recently used entries when memory limits are exceeded. It includes
+    advanced features like access pattern analysis and adaptive cache sizing.
 
     Attributes:
         max_size_mb (float): Maximum cache size in megabytes
         max_entries (int): Maximum number of cached entries
         enable_compression (bool): Whether to compress cached data
         max_memory_mb (float): Maximum system memory usage in megabytes
+        adaptive_sizing (bool): Whether to use adaptive cache sizing
+        access_pattern_tracking (bool): Whether to track access patterns for better eviction
     """
 
     # Signals
@@ -67,6 +109,7 @@ class DataCache(QObject):
     cache_eviction = pyqtSignal(str)  # file path
     cache_full = pyqtSignal()
     memory_warning = pyqtSignal(float)  # current memory usage in MB
+    cache_stats_updated = pyqtSignal(dict)  # cache statistics
 
     def __init__(
         self,
@@ -74,135 +117,276 @@ class DataCache(QObject):
         max_entries: int = 100,
         enable_compression: bool = False,
         max_memory_mb: float = 1000.0,
-    ):
+        adaptive_sizing: bool = True,
+        access_pattern_tracking: bool = True,
+    ) -> None:
         """
-        Initialize the data cache.
+        Initialize the advanced data cache.
 
         Parameters:
             max_size_mb (float): Maximum cache size in megabytes
             max_entries (int): Maximum number of cached entries
             enable_compression (bool): Whether to compress cached data
             max_memory_mb (float): Maximum system memory usage in megabytes
+            adaptive_sizing (bool): Whether to use adaptive cache sizing
+            access_pattern_tracking (bool): Whether to track access patterns
         """
         super().__init__()
         self.max_size_mb = max_size_mb
         self.max_entries = max_entries
         self.enable_compression = enable_compression
         self.max_memory_mb = max_memory_mb
+        self.adaptive_sizing = adaptive_sizing
+        self.access_pattern_tracking = access_pattern_tracking
+
         self._cache: OrderedDict[str, CachedFileData] = OrderedDict()
         self._current_size_mb = 0.0
         self._last_memory_check = time.time()
-        self._memory_check_interval = 60.0  # Check memory every 60 seconds
+        self._memory_check_interval = (
+            30.0  # Check memory every 30 seconds (more frequent)
+        )
+
+        # Performance tracking
+        self._cache_hits = 0
+        self._cache_misses = 0
+        self._evictions = 0
+        self._last_stats_update = time.time()
+
+    def _calculate_smart_eviction_score(self, cached_data: CachedFileData) -> float:
+        """
+        Calculate a smart eviction score based on multiple factors.
+
+        Lower scores indicate higher priority for eviction.
+
+        Parameters:
+            cached_data (CachedFileData): Cached data to score
+
+        Returns:
+            float: Eviction score (lower = more likely to evict)
+        """
+        current_time = time.time()
+
+        # Time-based factors
+        time_since_cached = current_time - cached_data.cached_time
+        time_since_accessed = current_time - cached_data.last_accessed
+
+        # Access pattern factors
+        access_frequency = cached_data.access_count / max(
+            1, time_since_cached / 3600
+        )  # per hour
+
+        # Size factor (larger files have slight bias toward eviction)
+        size_factor = cached_data.get_memory_estimate_mb() / max(
+            1, self.max_size_mb / 10
+        )
+
+        # Calculate composite score
+        # Higher access frequency and recent access = higher score (less likely to evict)
+        recency_score = 1.0 / (1.0 + time_since_accessed / 3600)  # hours
+        frequency_score = min(10.0, access_frequency)  # cap at 10 accesses/hour
+        size_penalty = min(2.0, size_factor)  # cap penalty
+
+        score = (recency_score * 2.0 + frequency_score) / size_penalty
+        return score
+
+    def _evict_smart(self) -> bool:
+        """
+        Perform smart eviction based on access patterns and file characteristics.
+
+        Returns:
+            bool: True if eviction was successful, False otherwise
+        """
+        if not self._cache:
+            return False
+
+        if self.access_pattern_tracking:
+            # Use smart scoring for eviction
+            scores = {}
+            for file_path, cached_data in self._cache.items():
+                scores[file_path] = self._calculate_smart_eviction_score(cached_data)
+
+            # Evict the item with the lowest score
+            evict_path = min(scores.keys(), key=lambda k: scores[k])
+        else:
+            # Fall back to LRU eviction
+            evict_path = next(iter(self._cache))
+
+        evicted_data = self._cache.pop(evict_path)
+        self._current_size_mb -= evicted_data.get_memory_estimate_mb()
+        self._evictions += 1
+
+        self.cache_eviction.emit(evict_path)
+        return True
+
+    def _update_cache_stats(self) -> None:
+        """Update and emit cache statistics."""
+        current_time = time.time()
+        if current_time - self._last_stats_update > 60.0:  # Update every minute
+            stats = {
+                "cache_size_mb": self._current_size_mb,
+                "cache_entries": len(self._cache),
+                "cache_hits": self._cache_hits,
+                "cache_misses": self._cache_misses,
+                "evictions": self._evictions,
+                "hit_rate": self._cache_hits
+                / max(1, self._cache_hits + self._cache_misses),
+                "memory_usage_mb": self._check_memory_usage()
+                if PSUTIL_AVAILABLE
+                else 0.0,
+            }
+            self.cache_stats_updated.emit(stats)
+            self._last_stats_update = current_time
 
     def _check_memory_usage(self) -> float:
         """
-        Check current memory usage and trigger cleanup if needed.
+        Check current memory usage with improved monitoring.
 
         Returns:
             float: Current memory usage in MB
         """
+        if not PSUTIL_AVAILABLE:
+            return 0.0
+
         try:
             process = psutil.Process()
             memory_mb = process.memory_info().rss / 1024 / 1024
 
             # Check if we need to perform memory cleanup
             current_time = time.time()
-            if (
-                current_time - self._last_memory_check > self._memory_check_interval
-                and memory_mb > self.max_memory_mb * 0.8
-            ):  # 80% threshold
-                self._perform_memory_cleanup()
+            if current_time - self._last_memory_check > self._memory_check_interval:
                 self._last_memory_check = current_time
 
-                # Re-check memory after cleanup
-                memory_mb = process.memory_info().rss / 1024 / 1024
+                # Adaptive memory management
+                if self.adaptive_sizing:
+                    system_memory = psutil.virtual_memory()
+                    available_mb = system_memory.available / 1024 / 1024
 
-            # Emit warning if memory usage is high
-            if memory_mb > self.max_memory_mb * 0.9:  # 90% threshold
-                self.memory_warning.emit(memory_mb)
+                    # Adjust cache size based on available memory
+                    if available_mb < 1000:  # Less than 1GB available
+                        self.max_size_mb = min(self.max_size_mb, available_mb * 0.2)
+
+                # Trigger cleanup if memory usage is high
+                if memory_mb > self.max_memory_mb * 0.8:  # 80% threshold
+                    self._perform_memory_cleanup()
+                    memory_mb = process.memory_info().rss / 1024 / 1024
+
+                # Emit warning if memory usage is critical
+                if memory_mb > self.max_memory_mb * 0.9:  # 90% threshold
+                    self.memory_warning.emit(memory_mb)
 
             return memory_mb
 
-        except ImportError:
-            # psutil not available, skip memory monitoring
-            return 0.0
         except Exception as e:
             print(f"Error checking memory usage: {e}")
             return 0.0
 
     def _perform_memory_cleanup(self) -> None:
-        """Perform aggressive memory cleanup when usage is high."""
+        """Perform intelligent memory cleanup when usage is high."""
         print(
-            f"Performing memory cleanup - current cache size: {len(self._cache)} entries"
+            f"Performing smart memory cleanup - current cache: {len(self._cache)} entries"
         )
 
-        # Clear half of the cache (least recently used)
-        entries_to_remove = len(self._cache) // 2
+        # Calculate how much to clean based on current memory pressure
+        target_reduction = 0.3  # Remove 30% of cache by default
+
+        if PSUTIL_AVAILABLE:
+            try:
+                system_memory = psutil.virtual_memory()
+                if system_memory.percent > 90:
+                    target_reduction = 0.5  # More aggressive cleanup
+                elif system_memory.percent > 80:
+                    target_reduction = 0.4
+            except Exception:
+                pass
+
+        # Remove entries using smart eviction
+        entries_to_remove = int(len(self._cache) * target_reduction)
         for _ in range(entries_to_remove):
-            if not self._evict_lru():
+            if not self._evict_smart():
                 break
 
         # Force garbage collection
         gc.collect()
 
-        print(
-            f"Memory cleanup complete - remaining cache size: {len(self._cache)} entries"
-        )
+        print(f"Memory cleanup complete - remaining cache: {len(self._cache)} entries")
 
     def get(self, file_path: str) -> Optional[CachedFileData]:
         """
-        Get cached data for a file.
+        Get cached data with improved access tracking.
 
         Parameters:
             file_path (str): Path to the file
 
         Returns:
-            CachedFileData or None: Cached data if available, None otherwise
+            CachedFileData or None: Cached data if available
         """
-        # Check memory usage periodically
-        self._check_memory_usage()
-
         if file_path in self._cache:
-            # Move to end (most recently used)
-            cached_data = self._cache.pop(file_path)
-            self._cache[file_path] = cached_data
-            cached_data.update_access_time()
-            self.cache_hit.emit(file_path)
-            return cached_data
-        else:
-            self.cache_miss.emit(file_path)
-            return None
+            cached_data = self._cache[file_path]
 
-    def put(self, file_path: str, cached_data: CachedFileData) -> None:
+            # Move to end (most recently used) and update access stats
+            self._cache.move_to_end(file_path)
+            cached_data.update_access()
+
+            self._cache_hits += 1
+            self.cache_hit.emit(file_path)
+            self._update_cache_stats()
+
+            return cached_data
+
+        self._cache_misses += 1
+        self.cache_miss.emit(file_path)
+        self._update_cache_stats()
+        return None
+
+    def put(self, file_path: str, cached_data: CachedFileData) -> bool:
         """
-        Store data in the cache.
+        Store data in cache with advanced management.
 
         Parameters:
             file_path (str): Path to the file
             cached_data (CachedFileData): Data to cache
+
+        Returns:
+            bool: True if successful, False otherwise
         """
-        # Check memory usage before adding new data
-        current_memory = self._check_memory_usage()
+        try:
+            data_size_mb = cached_data.get_memory_estimate_mb()
 
-        # Remove existing entry if present
-        if file_path in self._cache:
-            old_data = self._cache.pop(file_path)
-            self._current_size_mb -= old_data.get_size_mb()
+            # Don't cache extremely large files
+            max_single_file_mb = self.max_size_mb * 0.3  # 30% of total cache
+            if data_size_mb > max_single_file_mb:
+                print(
+                    f"Skipping cache for large file: {file_path} ({data_size_mb:.1f}MB)"
+                )
+                return False
 
-        # Check if we need to evict entries
-        while (
-            len(self._cache) >= self.max_entries
-            or self._current_size_mb + cached_data.get_size_mb() > self.max_size_mb
-            or (current_memory > 0 and current_memory > self.max_memory_mb * 0.9)
-        ):
-            if not self._evict_lru():
-                # Cannot evict any more entries
-                self.cache_full.emit()
-                return
+            # Remove existing entry if present
+            if file_path in self._cache:
+                old_data = self._cache.pop(file_path)
+                self._current_size_mb -= old_data.get_memory_estimate_mb()
 
-        # Add new entry
-        self._cache[file_path] = cached_data
-        self._current_size_mb += cached_data.get_size_mb()
+            # Evict entries until we have space
+            while (
+                self._current_size_mb + data_size_mb > self.max_size_mb
+                or len(self._cache) >= self.max_entries
+            ):
+                if not self._evict_smart():
+                    # If we can't evict, don't cache this item
+                    return False
+
+            # Add new entry
+            self._cache[file_path] = cached_data
+            self._current_size_mb += data_size_mb
+
+            # Check memory usage periodically
+            self._check_memory_usage()
+            self._update_cache_stats()
+
+            return True
+
+        except Exception as e:
+            print(f"Error caching file {file_path}: {e}")
+            return False
 
     def load_and_cache(self, file_path: str) -> Optional[CachedFileData]:
         """
@@ -329,7 +513,7 @@ class DataCache(QObject):
         """
         if file_path in self._cache:
             cached_data = self._cache.pop(file_path)
-            self._current_size_mb -= cached_data.get_size_mb()
+            self._current_size_mb -= cached_data.get_memory_estimate_mb()
             return True
         return False
 
@@ -337,22 +521,6 @@ class DataCache(QObject):
         """Clear all cached data."""
         self._cache.clear()
         self._current_size_mb = 0.0
-
-    def _evict_lru(self) -> bool:
-        """
-        Evict the least recently used entry from the cache.
-
-        Returns:
-            bool: True if an entry was evicted, False if cache is empty
-        """
-        if not self._cache:
-            return False
-
-        # Remove the first (least recently used) entry
-        file_path, cached_data = self._cache.popitem(last=False)
-        self._current_size_mb -= cached_data.get_size_mb()
-        self.cache_eviction.emit(file_path)
-        return True
 
     def get_stats(self) -> dict[str, Any]:
         """
@@ -381,7 +549,7 @@ class DataCache(QObject):
         self.max_size_mb = max_size_mb
         # Evict entries if necessary
         while self._current_size_mb > self.max_size_mb:
-            if not self._evict_lru():
+            if not self._evict_smart():  # Changed to _evict_smart
                 break
 
     def set_max_entries(self, max_entries: int) -> None:
@@ -394,7 +562,7 @@ class DataCache(QObject):
         self.max_entries = max_entries
         # Evict entries if necessary
         while len(self._cache) > self.max_entries:
-            if not self._evict_lru():
+            if not self._evict_smart():  # Changed to _evict_smart
                 break
 
 

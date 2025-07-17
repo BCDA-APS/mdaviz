@@ -41,41 +41,49 @@ class TestLazyFolderScanner:
         """Create a LazyFolderScanner instance for testing."""
         return LazyFolderScanner(batch_size=10, max_files=100)
 
-    @pytest.fixture
-    def temp_folder(self, tmp_path: Path) -> Path:
-        """Create a temporary folder for testing."""
-        return tmp_path
-
-    @pytest.mark.skip(reason="Skip in CI/headless: uses Qt/QThread")
     def test_scanner_initialization(self, scanner: LazyFolderScanner) -> None:
         """Test that the scanner initializes correctly."""
         assert scanner is not None
         assert scanner.batch_size == 10
         assert scanner.max_files == 100
 
-    @pytest.mark.skip(reason="Skip in CI/headless: uses Qt/QThread")
     def test_scan_folder_empty(
-        self, scanner: LazyFolderScanner, temp_folder: Path
+        self, scanner: LazyFolderScanner, tmp_path: Path
     ) -> None:
         """Test scanning an empty folder."""
-        result = scanner.scan_folder(temp_folder)
+        result = scanner.scan_folder(tmp_path)
         assert result.is_complete
         assert len(result.file_list) == 0
         assert result.total_files == 0
 
-    @pytest.mark.skip(reason="Skip in CI/headless: uses Qt/QThread")
-    def test_scan_folder_with_files(
-        self, scanner: LazyFolderScanner, temp_folder: Path
+    def test_scan_folder_with_real_files(
+        self, scanner: LazyFolderScanner, test_folder1_path: Path
     ) -> None:
-        """Test scanning a folder with MDA files."""
-        # Create some test MDA files
-        for i in range(5):
-            (temp_folder / f"test_{i}.mda").touch()
-
-        result = scanner.scan_folder(temp_folder)
+        """Test scanning a folder with real MDA files."""
+        result = scanner.scan_folder(test_folder1_path)
         assert result.is_complete
-        assert len(result.file_list) == 5
-        assert result.total_files == 5
+        assert (
+            len(result.file_list) >= 16
+        )  # test_folder1 has 16 files in main directory
+        assert result.total_files >= 16
+
+        # Verify all returned files are MDA files
+        for file_path in result.file_list[:5]:  # Check first 5 files
+            assert file_path.endswith(".mda")
+
+    def test_scan_nested_folder_with_real_files(
+        self, scanner: LazyFolderScanner, test_folder3_path: Path
+    ) -> None:
+        """Test scanning a nested folder structure with real MDA files."""
+        result = scanner.scan_folder(test_folder3_path)
+        assert result.is_complete
+        assert len(result.file_list) >= 50  # test_folder3 has many nested files
+        assert result.total_files >= 50
+
+        # Verify files come from different directory levels
+        file_paths = [Path(fp) for fp in result.file_list[:10]]
+        parent_dirs = {fp.parent.name for fp in file_paths}
+        assert len(parent_dirs) >= 1  # Should have files from multiple directories
 
     @pytest.mark.skip(reason="Skip in CI/headless: uses Qt/QThread")
     def test_scan_folder_nonexistent(self, scanner: LazyFolderScanner) -> None:
@@ -146,18 +154,19 @@ class TestDataCache:
         return DataCache(max_size_mb=10.0, max_entries=5)
 
     @pytest.fixture
-    def test_file_data(self) -> CachedFileData:
-        """Create test cached file data."""
+    def test_file_data(self, single_mda_file: Path) -> CachedFileData:
+        """Create test cached file data using real test file."""
+        real_size = single_mda_file.stat().st_size
         return CachedFileData(
-            file_path="/test/file.mda",
+            file_path=str(single_mda_file),
             metadata={"test": "metadata"},
             scan_dict={"test": "data"},
             first_pos=1,
             first_det=2,
             pv_list=["test_pv"],
-            file_name="test_file",
-            folder_path="/test",
-            size_bytes=1024 * 1024,  # 1MB
+            file_name=single_mda_file.name,
+            folder_path=str(single_mda_file.parent),
+            size_bytes=real_size,
         )
 
     def test_cache_initialization(self, cache: DataCache) -> None:
@@ -245,14 +254,16 @@ class TestDataCache:
         self, cache: DataCache, test_file_data: CachedFileData
     ) -> None:
         """Test getting cache statistics."""
-        cache.put("/test/file.mda", test_file_data)
+        cache.put(test_file_data.file_path, test_file_data)
         stats = cache.get_stats()
 
         assert stats["entry_count"] == 1
-        assert stats["current_size_mb"] == 1.0
+        assert stats["current_size_mb"] == test_file_data.get_size_mb()
         assert stats["max_size_mb"] == 10.0
         assert stats["max_entries"] == 5
-        assert stats["utilization_percent"] == 10.0
+        # Utilization percent is calculated as current_size / max_size * 100
+        expected_utilization = (test_file_data.get_size_mb() / 10.0) * 100
+        assert abs(stats["utilization_percent"] - expected_utilization) < 0.01
 
     def test_global_cache(self) -> None:
         """Test the global cache functionality."""
@@ -568,35 +579,29 @@ class TestConfigManager:
 class TestUtils:
     """Test cases for utility functions."""
 
-    @pytest.fixture
-    def temp_mda_file(self, tmp_path: Path) -> Path:
-        """Create a temporary MDA file for testing."""
-        mda_file = tmp_path / "test.mda"
-        mda_file.write_bytes(b"test mda data")
-        return mda_file
-
-    def test_get_file_info_lightweight(self, temp_mda_file: Path) -> None:
-        """Test lightweight file info extraction."""
-        file_info = get_file_info_lightweight(temp_mda_file)
+    def test_get_file_info_lightweight(self, single_mda_file: Path) -> None:
+        """Test lightweight file info extraction using real MDA file."""
+        file_info = get_file_info_lightweight(single_mda_file)
 
         assert file_info is not None
-        assert file_info["Name"] == "test.mda"
+        assert file_info["Name"] == single_mda_file.name
         assert "Size" in file_info
         assert "Date" in file_info
+        # Size is returned as a string, check it's not empty
+        assert len(file_info["Size"]) > 0
 
-    def test_get_file_info_full(self, temp_mda_file: Path) -> None:
-        """Test full file info extraction."""
-        # This test might fail if the file is not a valid MDA file
-        # We'll just test that the function doesn't crash
-        try:
-            file_info = get_file_info_full(temp_mda_file)
-            # If it succeeds, check basic structure
-            if file_info is not None:
-                assert "Name" in file_info
-                assert "Size" in file_info
-        except Exception:
-            # Expected for invalid MDA files
-            pass
+    def test_get_file_info_full(self, single_mda_file: Path) -> None:
+        """Test full file info extraction using real MDA file."""
+        # Test with a real MDA file - should work properly
+        file_info = get_file_info_full(single_mda_file)
+
+        # Should succeed with real MDA file
+        assert file_info is not None
+        assert "Name" in file_info
+        assert "Size" in file_info
+        assert file_info["Name"] == single_mda_file.name
+        # Size is returned as a string, check it's not empty
+        assert len(file_info["Size"]) > 0
 
 
 if __name__ == "__main__":

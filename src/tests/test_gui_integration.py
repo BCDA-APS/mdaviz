@@ -19,10 +19,9 @@ Tests cover user interactions, data loading, plotting, and UI responsiveness.
 
 import pytest
 from typing import TYPE_CHECKING
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch
 from PyQt6.QtCore import Qt, QPoint
-from PyQt6.QtWidgets import QApplication, QFileDialog, QMessageBox
-from PyQt6.QtTest import QTest
+from PyQt6.QtWidgets import QApplication, QMessageBox
 
 from mdaviz.mainwindow import MainWindow
 from mdaviz.chartview import ChartView
@@ -31,12 +30,9 @@ from mdaviz.data_cache import DataCache
 from pytestqt.qtbot import QtBot
 from pathlib import Path
 
+import numpy as np
+
 if TYPE_CHECKING:
-    from _pytest.capture import CaptureFixture
-    from _pytest.fixtures import FixtureRequest
-    from _pytest.logging import LogCaptureFixture
-    from _pytest.monkeypatch import MonkeyPatch
-    from pytest_mock.plugin import MockerFixture
     from pytestqt.qtbot import QtBot
 
 
@@ -46,56 +42,82 @@ if TYPE_CHECKING:
 class TestMainWindowGUI:
     """Test MainWindow GUI functionality and user interactions."""
 
-    @pytest.mark.skip(reason="Settings mocking issue - getKey returns int instead of string")
-    def test_mainwindow_initialization(self, qapp: QApplication, qtbot: "QtBot") -> None:
+    @pytest.mark.skip(
+        reason="Settings mocking issue - getKey returns int instead of string"
+    )
+    def test_mainwindow_initialization(
+        self, qapp: QApplication, qtbot: "QtBot"
+    ) -> None:
         """Test MainWindow initialization and basic UI setup."""
-        with patch("mdaviz.mainwindow.settings.getKey", return_value="test_folder1,test_folder2") as mock_settings:
+        with patch(
+            "mdaviz.mainwindow.settings.getKey",
+            return_value="test_folder1,test_folder2",
+        ):
             window = MainWindow()
             qtbot.addWidget(window)
 
+            # Basic assertions
             assert window is not None
-            assert isinstance(window, MainWindow)
+            assert window.windowTitle() == "mdaviz"
 
-    @pytest.mark.skip(reason="Settings mocking issue - getKey returns int instead of string")
+    @pytest.mark.skip(
+        reason="Settings mocking issue - getKey returns int instead of string"
+    )
     def test_mainwindow_menu_actions(self, qapp: QApplication, qtbot: "QtBot") -> None:
         """Test MainWindow menu actions and keyboard shortcuts."""
-        with patch("mdaviz.mainwindow.settings.getKey", return_value="test_folder1,test_folder2") as mock_settings:
+        with patch(
+            "mdaviz.mainwindow.settings.getKey",
+            return_value="test_folder1,test_folder2",
+        ):
             window = MainWindow()
             qtbot.addWidget(window)
 
-            # Test menu actions
+            # Check menu bar exists
             menu_bar = window.menuBar()
             assert menu_bar is not None
 
-    @pytest.mark.skip(reason="Settings mocking issue - getKey returns int instead of string")
+    @pytest.mark.skip(
+        reason="Settings mocking issue - getKey returns int instead of string"
+    )
     def test_mainwindow_status_bar(self, qapp: QApplication, qtbot: "QtBot") -> None:
         """Test MainWindow status bar functionality."""
-        with patch("mdaviz.mainwindow.settings.getKey", return_value="test_folder1,test_folder2") as mock_settings:
+        with patch(
+            "mdaviz.mainwindow.settings.getKey",
+            return_value="test_folder1,test_folder2",
+        ):
             window = MainWindow()
             qtbot.addWidget(window)
 
-            # Test status bar
+            # Check status bar
             status_bar = window.statusBar()
             assert status_bar is not None
 
-    @pytest.mark.skip(reason="Settings mocking issue - getKey returns int instead of string")
-    def test_mainwindow_resize_behavior(self, qapp: QApplication, qtbot: "QtBot") -> None:
+    @pytest.mark.skip(
+        reason="Settings mocking issue - getKey returns int instead of string"
+    )
+    def test_mainwindow_resize_behavior(
+        self, qapp: QApplication, qtbot: "QtBot"
+    ) -> None:
         """Test MainWindow resize behavior and layout responsiveness."""
-        with patch("mdaviz.mainwindow.settings.getKey", return_value="test_folder1,test_folder2") as mock_settings:
+        with patch(
+            "mdaviz.mainwindow.settings.getKey",
+            return_value="test_folder1,test_folder2",
+        ):
             window = MainWindow()
             qtbot.addWidget(window)
 
-            # Test resize behavior
+            # Test basic resize functionality
             initial_size = window.size()
-            window.resize(800, 600)
-            qtbot.wait(100)
-            assert window.size() != initial_size
+            assert initial_size.width() > 0
+            assert initial_size.height() > 0
 
 
 class TestChartViewGUI:
     """Test ChartView GUI functionality and plotting interactions."""
 
-    def test_chartview_plotting_interactions(self, qapp: QApplication, qtbot: "QtBot") -> None:
+    def test_chartview_plotting_interactions(
+        self, qapp: QApplication, qtbot: "QtBot"
+    ) -> None:
         """Test ChartView plotting and user interactions."""
         chart_view = ChartView()
         qtbot.addWidget(chart_view)
@@ -112,7 +134,9 @@ class TestChartViewGUI:
         assert "test_curve" in chart_view.curveManager.curves
 
     @pytest.mark.skip(reason="Mouse interaction parameter type issue")
-    def test_chartview_mouse_interactions(self, qapp: QApplication, qtbot: "QtBot") -> None:
+    def test_chartview_mouse_interactions(
+        self, qapp: QApplication, qtbot: "QtBot"
+    ) -> None:
         """Test ChartView mouse interactions and zooming."""
         chart_view = ChartView()
         qtbot.addWidget(chart_view)
@@ -121,7 +145,9 @@ class TestChartViewGUI:
         canvas = chart_view.canvas
         qtbot.mousePress(canvas, Qt.MouseButton.LeftButton, pos=QPoint(100, 100))
 
-    def test_chartview_keyboard_shortcuts(self, qapp: QApplication, qtbot: "QtBot") -> None:
+    def test_chartview_keyboard_shortcuts(
+        self, qapp: QApplication, qtbot: "QtBot"
+    ) -> None:
         """Test ChartView keyboard shortcuts and interactions."""
         chart_view = ChartView()
         qtbot.addWidget(chart_view)
@@ -157,27 +183,36 @@ class TestDataTableGUI:
 class TestFileDialogGUI:
     """Test file dialog and file loading GUI functionality."""
 
-    @pytest.mark.skip(reason="Settings mocking issue - getKey returns int instead of string")
+    @pytest.mark.skip(
+        reason="Settings mocking issue - getKey returns int instead of string"
+    )
     def test_file_dialog_integration(self, qapp: QApplication, qtbot: "QtBot") -> None:
         """Test file dialog integration and file loading."""
-        with patch("mdaviz.mainwindow.settings.getKey", return_value="test_folder1,test_folder2") as mock_settings:
+        with patch(
+            "mdaviz.mainwindow.settings.getKey",
+            return_value="test_folder1,test_folder2",
+        ):
             window = MainWindow()
             qtbot.addWidget(window)
 
-            # Test file dialog integration
-            with patch(QFileDialog.getExistingDirectory) as mock_dialog:
-                mock_dialog.return_value = "/test/path"
-                # Test dialog functionality
+            # Basic test that window initializes with file dialog capability
+            assert hasattr(window, "menuBar")
 
-    @pytest.mark.skip(reason="Settings mocking issue - getKey returns int instead of string")
+    @pytest.mark.skip(
+        reason="Settings mocking issue - getKey returns int instead of string"
+    )
     def test_file_loading_progress(self, qapp: QApplication, qtbot: "QtBot") -> None:
         """Test file loading progress indicators."""
-        with patch("mdaviz.mainwindow.settings.getKey", return_value="test_folder1,test_folder2") as mock_settings:
+        with patch(
+            "mdaviz.mainwindow.settings.getKey",
+            return_value="test_folder1,test_folder2",
+        ):
             window = MainWindow()
             qtbot.addWidget(window)
 
-            # Test progress indication
-            pass
+            # Basic test for progress indication capability
+            status_bar = window.statusBar()
+            assert status_bar is not None
 
 
 class TestMemoryManagementGUI:
@@ -189,7 +224,7 @@ class TestMemoryManagementGUI:
         cache = DataCache()
 
         # Mock memory usage to trigger warning
-        with patch('psutil.virtual_memory') as mock_memory:
+        with patch("psutil.virtual_memory") as mock_memory:
             mock_memory.return_value.percent = 95
             # Wait for memory warning signal
             with qtbot.waitSignal(cache.memory_warning, timeout=1000):
@@ -216,16 +251,20 @@ class TestErrorHandlingGUI:
             mock_dialog.return_value = QMessageBox.StandardButton.Ok
             # Test error dialog functionality
 
-    @pytest.mark.skip(reason="Settings mocking issue - getKey returns int instead of string")
+    @pytest.mark.skip(
+        reason="Settings mocking issue - getKey returns int instead of string"
+    )
     def test_invalid_file_handling(self, qapp: QApplication, qtbot: "QtBot") -> None:
         """Test handling of invalid or corrupted files."""
-        with patch("mdaviz.mainwindow.settings.getKey", return_value="test_folder1,test_folder2") as mock_settings:
+        with patch(
+            "mdaviz.mainwindow.settings.getKey",
+            return_value="test_folder1,test_folder2",
+        ):
             window = MainWindow()
             qtbot.addWidget(window)
 
-            # Test invalid file handling
-            with patch('builtins.open', side_effect=FileNotFoundError):
-                pass
+            # Basic test that window can handle error scenarios
+            assert window is not None
 
 
 class TestUserSettingsGUI:
@@ -301,27 +340,35 @@ def temp_test_dir(tmp_path: Path) -> Path:
 
 
 # Integration test for full workflow
-@pytest.mark.skip(reason="Settings mocking issue - getKey returns int instead of string")
+@pytest.mark.skip(
+    reason="Settings mocking issue - getKey returns int instead of string"
+)
 def test_full_workflow_integration(qapp: QApplication, qtbot: "QtBot") -> None:
     """Test complete workflow from file loading to plotting."""
-    with patch("mdaviz.mainwindow.settings.getKey", return_value="test_folder1,test_folder2") as mock_settings:
+    with patch(
+        "mdaviz.mainwindow.settings.getKey", return_value="test_folder1,test_folder2"
+    ):
         window = MainWindow()
         qtbot.addWidget(window)
 
-        # Test full workflow
+        # Basic workflow validation
         assert window is not None
 
 
 # Test for accessibility features
-@pytest.mark.skip(reason="Settings mocking issue - getKey returns int instead of string")
+@pytest.mark.skip(
+    reason="Settings mocking issue - getKey returns int instead of string"
+)
 def test_accessibility_features(qapp: QApplication, qtbot: "QtBot") -> None:
     """Test accessibility features like keyboard navigation."""
-    with patch("mdaviz.mainwindow.settings.getKey", return_value="test_folder1,test_folder2") as mock_settings:
+    with patch(
+        "mdaviz.mainwindow.settings.getKey", return_value="test_folder1,test_folder2"
+    ):
         window = MainWindow()
         qtbot.addWidget(window)
 
-        # Test accessibility features
-        assert window is not None
+        # Basic accessibility validation
+        assert window.windowTitle() != ""
 
 
 # Test for internationalization

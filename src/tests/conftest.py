@@ -21,7 +21,7 @@ especially for GUI testing with pytest-qt.
     ~nested_mda_files
 """
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Generator
 import pytest
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -30,12 +30,7 @@ import numpy as np
 from PyQt6.QtWidgets import QApplication
 
 if TYPE_CHECKING:
-    from _pytest.capture import CaptureFixture
-    from _pytest.fixtures import FixtureRequest
-    from _pytest.logging import LogCaptureFixture
     from _pytest.monkeypatch import MonkeyPatch
-    from pytest_mock.plugin import MockerFixture
-    from pytestqt.qtbot import QtBot
 
 
 @pytest.fixture(scope="session")
@@ -322,7 +317,8 @@ def mock_settings_get_key() -> MagicMock:
     Returns:
         MagicMock: Mock function that returns appropriate values for different settings keys
     """
-    def mock_get_key(key: str) -> str | int:
+
+    def mock_get_key(key: str) -> str | int | None:
         """Return appropriate mock values based on settings key."""
         if key == "recentFolders":
             return "test_folder1,test_folder2"
@@ -330,17 +326,34 @@ def mock_settings_get_key() -> MagicMock:
             return "800x600+100+100"
         elif key == "windowState":
             return "normal"
-        elif key == "windowHeight":
+        elif key == "windowHeight" or key.endswith("/height"):
             return 800
-        elif key == "windowWidth":
+        elif key == "windowWidth" or key.endswith("/width"):
             return 1200
+        elif key.endswith("/x") or key.endswith("/y"):
+            return 100
+        elif key.endswith("/sizes"):
+            return "400 600"
+        elif "geometry" in key or "splitter" in key:
+            # Return None for geometry/splitter settings to skip restoration
+            return None
         else:
             return "default_value"
-    
+
     return MagicMock(side_effect=mock_get_key)
 
 
 # Pytest configuration
+def pytest_addoption(parser: pytest.Parser) -> None:
+    """Add custom command line options."""
+    parser.addoption(
+        "--run-gui",
+        action="store_true",
+        default=False,
+        help="run GUI tests (requires display)",
+    )
+
+
 def pytest_configure(config: pytest.Config) -> None:
     """Configure pytest for Qt testing."""
     # Add markers for Qt tests
@@ -373,7 +386,7 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
 
 # Cleanup after tests
 @pytest.fixture(autouse=True)
-def cleanup_after_test() -> None:
+def cleanup_after_test() -> Generator[None, None, None]:
     """Clean up after each test."""
     yield
     # Force garbage collection to clean up Qt objects

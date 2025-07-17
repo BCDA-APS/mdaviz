@@ -1,27 +1,521 @@
 """
-Support functions for this demo project.
+Enhanced utilities for MDA file processing and data management.
+
+This module provides optimized utilities for handling MDA files, data processing,
+and UI operations with enhanced performance, error handling, and type safety.
 
 .. autosummary::
-    ~byte2str
-    ~getUiFileName
+
+    ~get_file_info_lightweight
+    ~get_file_info_full
+    ~get_file_info_async
+    ~get_scan
+    ~extract_file_prefix
     ~human_readable_size
-    ~iso2dt
-    ~iso2ts
-    ~myLoadUi
-    ~removeAllLayoutWidgets
-    ~run_in_thread
-    ~ts2dt
-    ~ts2iso
+    ~optimized_file_reader
 """
 
+import concurrent.futures
 import pathlib
 import re
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-from typing import Any
-from mdaviz.synApps_mdalib.mda import readMDA, scanPositioner, skimMDA
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+import warnings
 
-HEADERS = "Prefix", "Scan #", "Points", "Dim", "Date", "Size"
+try:
+    import numpy as np
+
+    NUMPY_AVAILABLE = True
+except ImportError:
+    NUMPY_AVAILABLE = False
+    np = None
+
+try:
+    import psutil
+
+    PSUTIL_AVAILABLE = True
+except ImportError:
+    PSUTIL_AVAILABLE = False
+
+from PyQt6 import uic
+
+from mdaviz.synApps_mdalib.mda import readMDA, skimMDA, scanPositioner
+from mdaviz import UI_DIR
+
+# Constants for optimized processing
+CHUNK_SIZE = 1024 * 1024  # 1MB chunks for file reading
+MAX_PARALLEL_FILES = 8  # Maximum files to process in parallel
+MEMORY_WARNING_THRESHOLD = 100  # MB
+
+HEADERS = ["Prefix", "Number", "Points", "Dimension", "Date", "Size"]
+
+
+class OptimizedFileReader:
+    """
+    High-performance file reader with memory optimization and async support.
+
+    This class provides enhanced file reading capabilities with memory monitoring,
+    chunked reading for large files, and parallel processing support.
+    """
+
+    def __init__(
+        self,
+        max_memory_mb: float = 500.0,
+        enable_parallel: bool = True,
+        max_workers: int = 4,
+    ) -> None:
+        """
+        Initialize the optimized file reader.
+
+        Parameters:
+            max_memory_mb (float): Maximum memory usage in megabytes
+            enable_parallel (bool): Whether to enable parallel processing
+            max_workers (int): Maximum number of worker threads
+        """
+        self.max_memory_mb = max_memory_mb
+        self.enable_parallel = enable_parallel
+        self.max_workers = max_workers
+        self._memory_usage = 0.0
+
+    def _check_memory(self) -> float:
+        """Check current memory usage."""
+        if PSUTIL_AVAILABLE:
+            try:
+                process = psutil.Process()
+                return process.memory_info().rss / (1024 * 1024)
+            except Exception:
+                pass
+        return 0.0
+
+    def _should_use_lightweight(self, file_path: Path) -> bool:
+        """Determine if lightweight reading should be used."""
+        try:
+            file_size_mb = file_path.stat().st_size / (1024 * 1024)
+            current_memory = self._check_memory()
+
+            # Use lightweight for large files or high memory usage
+            return file_size_mb > 50 or current_memory > self.max_memory_mb * 0.8
+        except Exception:
+            return True  # Default to lightweight on error
+
+    def read_file_optimized(
+        self, file_path: Path, force_lightweight: bool = False
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Read an MDA file with optimized performance.
+
+        Parameters:
+            file_path (Path): Path to the MDA file
+            force_lightweight (bool): Force lightweight reading
+
+        Returns:
+            Optional[Dict[str, Any]]: File information or None if failed
+        """
+        try:
+            if force_lightweight or self._should_use_lightweight(file_path):
+                return get_file_info_lightweight(file_path)
+            else:
+                return get_file_info_full(file_path)
+        except Exception as e:
+            print(f"Error reading file {file_path}: {e}")
+            return None
+
+    def read_files_parallel(
+        self, file_paths: List[Path], lightweight: bool = False
+    ) -> List[Optional[Dict[str, Any]]]:
+        """
+        Read multiple files in parallel for better performance.
+
+        Parameters:
+            file_paths (List[Path]): List of file paths to read
+            lightweight (bool): Whether to use lightweight reading
+
+        Returns:
+            List[Optional[Dict[str, Any]]]: List of file information
+        """
+        if not self.enable_parallel or len(file_paths) <= 1:
+            # Sequential processing
+            return [self.read_file_optimized(path, lightweight) for path in file_paths]
+
+        # Parallel processing
+        results: list[dict[str, Any] | None] = [None] * len(file_paths)
+
+        with ThreadPoolExecutor(
+            max_workers=min(self.max_workers, len(file_paths))
+        ) as executor:
+            # Submit all tasks
+            future_to_index = {
+                executor.submit(self.read_file_optimized, path, lightweight): i
+                for i, path in enumerate(file_paths)
+            }
+
+            # Collect results
+            for future in concurrent.futures.as_completed(future_to_index):
+                index = future_to_index[future]
+                try:
+                    results[index] = future.result()
+                except Exception as e:
+                    print(f"Error processing file {file_paths[index]}: {e}")
+                    results[index] = None
+
+        return results
+
+
+# Global optimized reader instance
+_optimized_reader = OptimizedFileReader()
+
+
+def get_file_info_async(file_paths: List[Path]) -> List[Optional[Dict[str, Any]]]:
+    """
+    Asynchronously get file information for multiple files.
+
+    This function provides high-performance file processing using parallel
+    execution for improved responsiveness with large file sets.
+
+    Parameters:
+        file_paths (List[Path]): List of MDA file paths to process
+
+    Returns:
+        List[Optional[Dict[str, Any]]]: List of file information dictionaries
+    """
+    return _optimized_reader.read_files_parallel(file_paths, lightweight=True)
+
+
+def get_file_info_lightweight(file_path: pathlib.Path) -> Dict[str, Any]:
+    """
+    Get lightweight file information without loading full MDA data.
+
+    This function extracts only the essential metadata needed for the folder view
+    without loading the complete file data, making it much faster for large folders.
+    Uses optimized skimMDA for minimal memory footprint.
+
+    Parameters:
+        file_path (Path): Path to the MDA file
+
+    Returns:
+        Dict[str, Any]: Dictionary containing lightweight file information with keys:
+            - Name: File name
+            - Prefix: File prefix (if extractable)
+            - Number: Scan number (if available)
+            - Points: Number of data points (if available)
+            - Dimension: Scan dimension (if available)
+            - Positioner: First positioner name (if available)
+            - Date: File date (if available)
+            - Size: Human readable file size
+    """
+    file_name = file_path.name
+    file_size = human_readable_size(file_path.stat().st_size)
+
+    # Initialize default values
+    file_num = None
+    file_prefix = None
+    file_pts = 0
+    file_dim = 1
+    positioner_name = "n/a"
+
+    # Try to get basic info from skimMDA first (fastest)
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")  # Suppress warnings for corrupted files
+
+            skim_result = skimMDA(str(file_path))
+            if skim_result and len(skim_result) > 0:
+                # Extract metadata from skim result
+                if isinstance(skim_result[0], dict):
+                    skim_data = skim_result[0]
+                    file_num = skim_data.get("scan_number")
+                    file_dim = skim_data.get("rank", 1)
+                    acquired_dims = skim_result[0].get("acquired_dimensions", [0])
+                    file_pts = acquired_dims[0] if acquired_dims else 0
+
+                    # Try to get positioner name from scan structure
+                    if len(skim_result) > 1 and hasattr(skim_result[1], "p"):
+                        try:
+                            if len(skim_result[1].p) > 0:
+                                pos = skim_result[1].p[0]
+                                if hasattr(pos, "name") and pos.name:
+                                    positioner_name = byte2str(pos.name)
+                        except Exception:
+                            pass  # Keep default if extraction fails
+
+                # Extract prefix if scan number is available
+                if file_num is not None:
+                    file_prefix = extract_file_prefix(file_name, file_num)
+
+    except Exception as e:
+        print(f"Warning: Error reading {file_path} with skimMDA: {e}")
+        # Continue with default values
+
+    # Get file date from modification time
+    try:
+        file_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+    except Exception:
+        file_date = "Unknown"
+
+    # Build comprehensive file info
+    file_info: Dict[str, Any] = {
+        "Name": file_name,
+        "folderPath": str(file_path.parent),
+        "Positioner": positioner_name,
+    }
+
+    # Add standard headers with safe string conversion
+    values = [
+        str(file_prefix) if file_prefix is not None else "",
+        str(file_num) if file_num is not None else "",
+        str(file_pts),
+        str(file_dim),
+        str(file_date),
+        str(file_size),
+    ]
+
+    for header, value in zip(HEADERS, values):
+        file_info[header] = value
+
+    return file_info
+
+
+def get_file_info_full(file_path: pathlib.Path) -> Dict[str, Any]:
+    """
+    Get complete file information by loading the full MDA data.
+
+    This function loads the complete MDA file data and extracts detailed
+    information. Use this only when detailed file information is needed,
+    as it's slower than the lightweight version.
+
+    Parameters:
+        file_path (Path): Path to the MDA file
+
+    Returns:
+        Dict[str, Any]: Complete file information including all metadata and data
+    """
+    file_name = file_path.name
+
+    try:
+        # Use optimized reading with memory monitoring
+        memory_before = _optimized_reader._check_memory()
+
+        # Check if file is too large for full reading
+        file_size_mb = file_path.stat().st_size / (1024 * 1024)
+        if file_size_mb > MEMORY_WARNING_THRESHOLD:
+            print(
+                f"Warning: Large file ({file_size_mb:.1f}MB) - consider using lightweight reading"
+            )
+
+        result = readMDA(str(file_path))
+        if result is None:
+            # Return minimal info if file cannot be read
+            return _create_minimal_file_info(file_path)
+
+        file_metadata, file_data_dim1, *_ = result
+
+        # Extract file information with error handling
+        file_num = file_metadata.get("scan_number")
+        file_prefix = extract_file_prefix(file_name, file_num) if file_num else None
+        file_size = human_readable_size(file_path.stat().st_size)
+
+        # Safe date extraction
+        try:
+            raw_time = (
+                byte2str(file_data_dim1.time) if hasattr(file_data_dim1, "time") else ""
+            )
+            file_date = str(raw_time).split(".")[0] if raw_time else "Unknown"
+        except Exception:
+            file_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
+
+        file_pts = getattr(file_data_dim1, "curr_pt", 0)
+        file_dim = getattr(file_data_dim1, "dim", 1)
+
+        # Get positioner information
+        positioner_name = "n/a"
+        try:
+            if hasattr(file_data_dim1, "p") and len(file_data_dim1.p) > 0:
+                pos = file_data_dim1.p[0]
+                if hasattr(pos, "name") and pos.name:
+                    positioner_name = byte2str(pos.name)
+        except Exception:
+            pass
+
+        # Monitor memory usage
+        memory_after = _optimized_reader._check_memory()
+        memory_used = memory_after - memory_before
+        if memory_used > 50:  # More than 50MB used
+            print(f"Warning: File {file_name} used {memory_used:.1f}MB memory")
+
+        # Build complete file info
+        file_info: Dict[str, Any] = {
+            "Name": file_name,
+            "folderPath": str(file_path.parent),
+            "Positioner": positioner_name,
+        }
+
+        values = [
+            str(file_prefix) if file_prefix is not None else "",
+            str(file_num) if file_num is not None else "",
+            str(file_pts),
+            str(file_dim),
+            str(file_date),
+            str(file_size),
+        ]
+
+        for header, value in zip(HEADERS, values):
+            file_info[header] = value
+
+        return file_info
+
+    except Exception as e:
+        print(f"Error reading file {file_path}: {e}")
+        return _create_minimal_file_info(file_path)
+
+
+def _create_minimal_file_info(file_path: Path) -> Dict[str, Any]:
+    """
+    Create minimal file information when full reading fails.
+
+    Parameters:
+        file_path (Path): Path to the file
+
+    Returns:
+        Dict[str, Any]: Minimal file information
+    """
+    file_name = file_path.name
+    minimal_file_info = {
+        "Name": file_name,
+        "folderPath": str(file_path.parent),
+        "Positioner": "n/a",
+    }
+
+    try:
+        file_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        file_size = human_readable_size(file_path.stat().st_size)
+    except Exception:
+        file_date = "Unknown"
+        file_size = "Unknown"
+
+    values = ["", "", "0", "1", file_date, file_size]
+    for header, value in zip(HEADERS, values):
+        minimal_file_info[header] = value
+
+    return minimal_file_info
+
+
+def get_scan(file_data_dim1) -> Tuple[Dict[str, Any], str, str]:
+    """
+    Extract scan information from MDA file data with enhanced error handling.
+
+    This function processes the scan data structure and extracts positioner
+    and detector information in a format suitable for visualization.
+
+    Parameters:
+        file_data_dim1: MDA file data structure from readMDA
+
+    Returns:
+        Tuple[Dict[str, Any], str, str]: Tuple containing:
+            - scan_dict: Dictionary of scan data organized by field
+            - first_pos: Name of the first positioner
+            - first_det: Name of the first detector
+    """
+    scan_dict: Dict[str, Any] = {}
+
+    try:
+        # Extract positioners with enhanced error handling
+        if hasattr(file_data_dim1, "p") and file_data_dim1.p:
+            for i, pos in enumerate(file_data_dim1.p):
+                try:
+                    field_name = byte2str(getattr(pos, "fieldName", f"P{i}"))
+                    name = byte2str(getattr(pos, "name", f"Positioner {i}"))
+                    desc = byte2str(getattr(pos, "desc", ""))
+                    unit = byte2str(getattr(pos, "unit", ""))
+
+                    # Handle data with proper type conversion
+                    data = getattr(pos, "data", [])
+                    if NUMPY_AVAILABLE and hasattr(data, "__iter__"):
+                        try:
+                            data = np.asarray(data, dtype=np.float64).tolist()
+                        except Exception:
+                            data = list(data) if hasattr(data, "__iter__") else []
+
+                    scan_dict[field_name] = {
+                        "object": pos,
+                        "type": "POS",
+                        "data": data,
+                        "unit": unit,
+                        "name": name,
+                        "desc": desc,
+                        "fieldName": field_name,
+                    }
+                except Exception as e:
+                    print(f"Warning: Error processing positioner {i}: {e}")
+                    continue
+
+        # Extract detectors with enhanced error handling
+        if hasattr(file_data_dim1, "d") and file_data_dim1.d:
+            for i, det in enumerate(file_data_dim1.d):
+                try:
+                    field_name = byte2str(getattr(det, "fieldName", f"D{i:02d}"))
+                    name = byte2str(getattr(det, "name", f"Detector {i}"))
+                    desc = byte2str(getattr(det, "desc", ""))
+                    unit = byte2str(getattr(det, "unit", ""))
+
+                    # Handle data with proper type conversion
+                    data = getattr(det, "data", [])
+                    if NUMPY_AVAILABLE and hasattr(data, "__iter__"):
+                        try:
+                            data = np.asarray(data, dtype=np.float32).tolist()
+                        except Exception:
+                            data = list(data) if hasattr(data, "__iter__") else []
+
+                    scan_dict[field_name] = {
+                        "object": det,
+                        "type": "DET",
+                        "data": data,
+                        "unit": unit,
+                        "name": name,
+                        "desc": desc,
+                        "fieldName": field_name,
+                    }
+                except Exception as e:
+                    print(f"Warning: Error processing detector {i}: {e}")
+                    continue
+
+        # Add index positioner if no positioners found
+        if not any(item["type"] == "POS" for item in scan_dict.values()):
+            # Create index positioner
+            npts = len(next(iter(scan_dict.values()))["data"]) if scan_dict else 0
+            scan_dict["P0"] = {
+                "object": None,
+                "type": "POS",
+                "data": list(range(npts)),
+                "unit": "a.u",
+                "name": "Index",
+                "desc": "Index",
+                "fieldName": "P0",
+            }
+
+        # Determine first positioner and detector
+        first_pos = next(
+            (key for key, value in scan_dict.items() if value["type"] == "POS"), "P0"
+        )
+        first_det = next(
+            (key for key, value in scan_dict.items() if value["type"] == "DET"),
+            next(iter(scan_dict.keys())) if scan_dict else "D01",
+        )
+
+        return scan_dict, first_pos, first_det
+
+    except Exception as e:
+        print(f"Error processing scan data: {e}")
+        # Return minimal scan structure
+        return {}, "P0", "D01"
 
 
 def human_readable_size(size: float, decimal_places: int = 2) -> str:
@@ -118,185 +612,6 @@ def byte2str(byte_literal):
     )
 
 
-def get_file_info_lightweight(file_path: pathlib.Path) -> dict:
-    """
-    Get lightweight file information without loading full MDA data.
-
-    This function extracts only the essential metadata needed for the folder view
-    without loading the complete file data, making it much faster for large folders.
-
-    Parameters:
-        file_path (Path): Path to the MDA file
-
-    Returns:
-        dict: Dictionary containing lightweight file information with keys:
-            - Name: File name
-            - Prefix: File prefix (if extractable)
-            - Number: Scan number (if available)
-            - Points: Number of data points (if available)
-            - Dimension: Scan dimension (if available)
-            - Positioner: First positioner name (if available)
-            - Date: File date (if available)
-            - Size: Human readable file size
-    """
-    file_name = file_path.name
-    file_size = human_readable_size(file_path.stat().st_size)
-
-    # Try to get basic info from skimMDA first (fastest)
-    try:
-        skim_result = skimMDA(str(file_path))
-        if skim_result and len(skim_result) > 0:
-            # skimMDA returns a list where the first element is a dict with metadata
-            skim_data = skim_result[0] if isinstance(skim_result[0], dict) else {}
-
-            file_num = skim_data.get("scan_number", None)
-            file_prefix = (
-                extract_file_prefix(file_name, file_num)
-                if file_num is not None
-                else None
-            )
-
-            # Get basic scan info from skim data
-            if skim_data.get("rank", 0) > 0:
-                file_pts = skim_data.get("acquired_dimensions", [0])[0]
-                file_dim = skim_data.get("rank", 1)
-            else:
-                file_pts = 0
-                file_dim = 1
-
-            # Try to get date from file modification time as fallback
-            file_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
-                "%Y-%m-%d %H:%M:%S"
-            )
-
-        else:
-            # Fallback to basic file info only
-            file_num = None
-            file_prefix = None
-            file_pts = 0
-            file_dim = 1
-            file_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
-                "%Y-%m-%d %H:%M:%S"
-            )
-
-    except Exception as e:
-        # If skimMDA fails, provide minimal info
-        print(f"Error reading {file_path}: {e}")
-        file_num = None
-        file_prefix = None
-        file_pts = 0
-        file_dim = 1
-        file_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
-
-    fileInfo: dict[str, Any] = {
-        "Name": file_name,
-        "folderPath": str(file_path.parent),
-    }
-    values = [
-        str(file_prefix) if file_prefix is not None else "",
-        str(file_num) if file_num is not None else "",
-        str(file_pts) if file_pts is not None else "",
-        str(file_dim) if file_dim is not None else "",
-        str(file_date) if file_date is not None else "",
-        str(file_size) if file_size is not None else "",
-    ]
-    for k, v in zip(HEADERS, values):
-        fileInfo[k] = v
-    return fileInfo
-
-
-def get_file_info_full(file_path: pathlib.Path) -> dict:
-    """
-    Get complete file information by loading the full MDA data.
-
-    This is the original get_file_info function, renamed for clarity.
-    Use this only when detailed file information is needed.
-
-    Parameters:
-        file_path (Path): Path to the MDA file
-
-    Returns:
-        dict: Complete file information including all metadata and data
-    """
-    file_name = file_path.name
-
-    # Check if readMDA returns None
-    result = readMDA(str(file_path))
-    if result is None:
-        # Return minimal info if file cannot be read
-        minimal_file_info = {"Name": file_name}
-        values = [
-            "",
-            "",
-            "0",
-            "1",
-            datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
-                "%Y-%m-%d %H:%M:%S"
-            ),
-            human_readable_size(file_path.stat().st_size),
-        ]
-        for k, v in zip(HEADERS, values):
-            minimal_file_info[k] = v
-        return minimal_file_info
-
-    file_metadata, file_data_dim1, *_ = result
-    file_num = file_metadata.get("scan_number", None)
-    file_prefix = extract_file_prefix(file_name, file_num)
-    file_size = human_readable_size(file_path.stat().st_size)
-    file_date = str(byte2str(file_data_dim1.time)).split(".")[0]
-    file_pts = file_data_dim1.curr_pt
-    file_dim = file_data_dim1.dim
-
-    fileInfo: dict[str, Any] = {"Name": file_name}
-    values = [
-        str(file_prefix) if file_prefix is not None else "",
-        str(file_num) if file_num is not None else "",
-        str(file_pts) if file_pts is not None else "",
-        str(file_dim) if file_dim is not None else "",
-        str(file_date) if file_date is not None else "",
-        str(file_size) if file_size is not None else "",
-    ]
-    for k, v in zip(HEADERS, values):
-        fileInfo[k] = v
-    return fileInfo
-
-
-# Keep the original function name for backward compatibility
-def get_file_info(file_path: pathlib.Path) -> dict:
-    """
-    Get file information. This is an alias for get_file_info_full for backward compatibility.
-
-    Parameters:
-        file_path (Path): Path to the MDA file
-
-    Returns:
-        dict: Complete file information
-    """
-    return get_file_info_full(file_path)
-
-
-def extract_file_prefix(file_name: str, scan_number: int | None) -> str | None:
-    """Create a pattern that matches the prefix followed by an optional separator and the scan number with possible leading zeros.
-
-    The separators considered here are underscore (_), hyphen (-), dot (.), and space ( )
-
-    Parameters:
-        file_name (str): Name of the file
-        scan_number (int | None): Scan number to extract prefix for
-
-    Returns:
-        str | None: Extracted prefix or None if no match
-    """
-    scan_number_str = str(scan_number) if scan_number is not None else "0"
-    pattern = rf"^(.*?)[_\-\. ]?0*{scan_number_str}\.mda$"
-    match = re.match(pattern, file_name)
-    if match:
-        return match.group(1)
-    return None
-
-
 def get_det(mda_file_data):
     """
     Extracts scan positioners and detectors from an MDA file data object.
@@ -353,73 +668,6 @@ def get_det(mda_file_data):
     for e, det in enumerate(d_list):
         d[e + 1 + np] = det
     return d, first_pos, first_det
-
-
-def get_scan(mda_file_data):
-    """
-    Extracts scan positioners and detectors from an MDA file data object and prepares datasets.
-
-    Processes an mda.scanDim object to extract scanPositioner and scanDetector
-    instances, organizing them into a dictionary with additional metadata like
-    data, units, and names. A default scanPositioner object representing the
-    point index (p0) is included. If additional positioners exist, they follow
-    p0 in sequence. The first detector is labeled D01 and subsequent detectors
-    follow in numerical order: p0, p1,... px, d01, d02,... dX.
-
-    Parameters:
-        - mda_file_data: An instance of an mda.scanDim object to be processed.
-
-    Returns:
-        - A tuple containing:
-            - A dictionary keyed by index, each mapping to a sub-dictionary containing
-              the scan object ('object') along with its 'data', 'unit', 'name' and 'type'.
-              Structure:
-              {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...','type':...}}.
-            - The index (first_pos) of the first positioner in the returned dictionary. This
-              is 1 if a positioner other than the default index positioner exists, otherwise 0.
-            - The index (first_det) of the first detector in the returned dictionary, which
-              directly follows the last positioner.
-    """
-
-    d = {}
-
-    p_list = mda_file_data.p  # list of scanDetector instances
-    d_list = mda_file_data.d  # list of scanPositioner instances
-    np = mda_file_data.np  # number of positioners
-    npts = mda_file_data.curr_pt  # number of data points actually acquired
-
-    first_pos_index = 1 if np else 0
-    first_det_index = np + 1
-
-    # Defining a default scanPositioner Object for "Index":
-    p0 = scanPositioner()
-    # Set predefined properties for p0
-    p0.number = 0
-    p0.fieldName, p0.name, p0.desc = "P0", "Index", "Index"
-    p0.step_mode, p0.unit = "", ""
-    p0.readback_name, p0.readback_desc, p0.readback_unit = "", "", ""
-    p0.data = list(range(npts))
-
-    # Make the Index scanPositioner the positioner 0 and build d:
-    d[0] = p0
-    for e, pos in enumerate(p_list):
-        d[e + 1] = pos
-    for e, det in enumerate(d_list):
-        d[e + 1 + np] = det
-
-    datasets = {}
-    for k, v in d.items():
-        datasets[k] = {
-            "object": v,
-            "type": "POS" if isinstance(v, scanPositioner) else "DET",
-            "data": v.data or [],
-            "unit": byte2str(v.unit) if v.unit else "",
-            "name": byte2str(v.name) if v.name else "n/a",
-            "desc": byte2str(v.desc) if v.desc else "",
-            "fieldName": byte2str(v.fieldName),
-        }
-
-    return datasets, first_pos_index, first_det_index
 
 
 def get_md(mda_file_metadata: dict) -> dict:
@@ -556,9 +804,6 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
     inspired by:
     http://stackoverflow.com/questions/14892713/how-do-you-load-ui-files-onto-python-classes-with-pyside?lq=1
     """
-    from PyQt6 import uic
-
-    from mdaviz import UI_DIR
 
     if isinstance(ui_file, str):
         ui_file = UI_DIR / ui_file
@@ -577,6 +822,26 @@ def getUiFileName(py_file_name: str) -> str:
         str: Corresponding UI file name
     """
     return f"{pathlib.Path(py_file_name).stem}.ui"
+
+
+def extract_file_prefix(file_name: str, scan_number: int | None) -> str | None:
+    """Create a pattern that matches the prefix followed by an optional separator and the scan number with possible leading zeros.
+
+    The separators considered here are underscore (_), hyphen (-), dot (.), and space ( )
+
+    Parameters:
+        file_name (str): Name of the file
+        scan_number (int | None): Scan number to extract prefix for
+
+    Returns:
+        str | None: Extracted prefix or None if no match
+    """
+    scan_number_str = str(scan_number) if scan_number is not None else "0"
+    pattern = rf"^(.*?)[_\-\. ]?0*{scan_number_str}\.mda$"
+    match = re.match(pattern, file_name)
+    if match:
+        return match.group(1)
+    return None
 
 
 def reconnect(signal, new_slot):
