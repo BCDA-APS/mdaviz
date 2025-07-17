@@ -497,19 +497,8 @@ class ChartView(QWidget):
                 else:
                     detector_name = combo_text
 
-                # Check if I0 is toggled on by looking at the plot_options y-label
-                curve_data = self.curveManager.getCurveData(curveID)
-                plot_options = curve_data.get("plot_options", {})
-                y_label = plot_options.get("y", "")
-
-                # Check if I0 normalization is active by looking for "/" in the y_label
-                # But we need to check if this y_label corresponds to the current curve's detector
-                if "/" in y_label and detector_name in y_label:
-                    # This curve has I0 normalization, use the y_label
-                    self.setYlabel(y_label)
-                else:
-                    # No I0 normalization or wrong y_label, use just the detector name
-                    self.setYlabel(detector_name)
+                # Set y-axis label to the detector name (which includes [norm] if normalized)
+                self.setYlabel(detector_name)
             else:
                 self.setYlabel("")
         else:
@@ -1120,9 +1109,9 @@ class ChartView(QWidget):
             persistent_key = (curve_data["file_path"], curve_data["row"])
             if persistent_key not in self.curveManager._persistent_properties:
                 self.curveManager._persistent_properties[persistent_key] = {}
-            self.curveManager._persistent_properties[persistent_key]["style"] = (
-                format_string
-            )
+            self.curveManager._persistent_properties[persistent_key][
+                "style"
+            ] = format_string
             print(
                 f"DEBUG: Saved style to persistent storage: {persistent_key} -> {format_string}"
             )
@@ -1213,7 +1202,9 @@ class CurveManager(QObject):
         super().__init__(parent)
         self._curves = {}  # Store curves with a unique identifier as the key
         # Persistent storage for curve properties across manager clears
-        self._persistent_properties = {}  # key: (file_path, row), value: {style, offset, factor}
+        self._persistent_properties = (
+            {}
+        )  # key: (file_path, row), value: {style, offset, factor}
 
     def addCurve(self, row, *ds, **options):
         """Add a new curve to the manager if not already present on the graph."""
