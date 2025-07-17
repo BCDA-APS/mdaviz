@@ -488,6 +488,7 @@ class MDAFile(QWidget):
             scrollHint = QAbstractItemView.PositionAtBottom
         # Get the QModelIndex for the specified row
         index = model.index(row, 0)
+        # Ensures the table view scrolls to the selected item.
         tableview.tableView.scrollTo(index, scrollHint)
 
     # ------ Button methods:
