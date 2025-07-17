@@ -170,8 +170,8 @@ class MDAFileTableView(QWidget):
                         1  # Replace zeros with 1 to avoid division by zero
                     )
                     y_data = np.array(y_data) / i0_data_safe
-                    # Display label always shows base detector name (for curve legend and combo box)
-                    y_label = f"{fileName}: {y_name}"
+                    # Display label shows detector name with normalization indicator
+                    y_label = f"{fileName}: {y_name} [norm]"
                     y_unit = ""  # Normalized data typically has no units
                 else:
                     y_unit = f"({y_unit})" if y_unit else ""
