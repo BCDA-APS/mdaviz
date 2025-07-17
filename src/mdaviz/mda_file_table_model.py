@@ -178,7 +178,11 @@ class MDAFileTableModel(QAbstractTableModel):
             return None
 
         elif role == Qt.BackgroundRole:
+            # Highlight the selected row (light blue)
             if row == self.highlightedRow:
+                return QBrush(QColor(210, 226, 247))
+            # Highlight the I0 column (light blue) when I0 is selected
+            elif column == 3 and self.hasI0Selected():  # I0 column is at index 3
                 return QBrush(QColor(210, 226, 247))
 
         return None
@@ -214,6 +218,13 @@ class MDAFileTableModel(QAbstractTableModel):
         if self.highlightedRow == row:
             self.highlightedRow = None
             self.layoutChanged.emit()
+
+    def hasI0Selected(self):
+        """Check if I0 is selected."""
+        for row, column_name in self.selections.items():
+            if column_name == "I0":
+                return True
+        return False
 
     # ------------ checkbox methods
 
@@ -316,6 +327,9 @@ class MDAFileTableModel(QAbstractTableModel):
         self.dataChanged.emit(
             corner1, corner2, [Qt.CheckStateRole]
         )  # Qt.CheckStateRole
+
+        # Update the entire table to refresh I0 column highlighting
+        self.layoutChanged.emit()
         # prune empty data from new_selection
         new_selection = {k: v for k, v in new_selection.items() if v is not None}
         self.selections = new_selection
