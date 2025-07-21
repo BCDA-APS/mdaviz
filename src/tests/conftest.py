@@ -21,7 +21,7 @@ especially for GUI testing with pytest-qt.
     ~nested_mda_files
 """
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Generator
 import pytest
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -30,12 +30,7 @@ import numpy as np
 from PyQt6.QtWidgets import QApplication
 
 if TYPE_CHECKING:
-    from _pytest.capture import CaptureFixture
-    from _pytest.fixtures import FixtureRequest
-    from _pytest.logging import LogCaptureFixture
     from _pytest.monkeypatch import MonkeyPatch
-    from pytest_mock.plugin import MockerFixture
-    from pytestqt.qtbot import QtBot
 
 
 @pytest.fixture(scope="session")
@@ -322,6 +317,7 @@ def mock_settings_get_key() -> MagicMock:
     Returns:
         MagicMock: Mock function that returns appropriate values for different settings keys
     """
+
     def mock_get_key(key: str) -> str | int:
         """Return appropriate mock values based on settings key."""
         if key == "recentFolders":
@@ -336,7 +332,7 @@ def mock_settings_get_key() -> MagicMock:
             return 1200
         else:
             return "default_value"
-    
+
     return MagicMock(side_effect=mock_get_key)
 
 
@@ -348,6 +344,19 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line("markers", "gui: mark test as GUI test requiring display")
     config.addinivalue_line("markers", "slow: mark test as slow running")
     config.addinivalue_line("markers", "real_data: mark test as using real MDA files")
+
+    # Add command line options
+    config.addinivalue_line("addopts", "--run-gui")
+
+
+def pytest_addoption(parser: pytest.Parser) -> None:
+    """Add custom command line options."""
+    parser.addoption(
+        "--run-gui",
+        action="store_true",
+        default=False,
+        help="Run GUI tests that require display",
+    )
 
 
 def pytest_collection_modifyitems(
@@ -373,7 +382,7 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
 
 # Cleanup after tests
 @pytest.fixture(autouse=True)
-def cleanup_after_test() -> None:
+def cleanup_after_test() -> Generator[None, None, None]:
     """Clean up after each test."""
     yield
     # Force garbage collection to clean up Qt objects

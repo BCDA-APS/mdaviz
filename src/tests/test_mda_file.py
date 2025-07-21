@@ -7,18 +7,13 @@ Covers file loading, caching, error handling, and tab management.
 
 import pytest
 from typing import TYPE_CHECKING
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 from PyQt6.QtWidgets import QApplication
 from pathlib import Path
 
 from mdaviz.mda_file import MDAFile, TabManager
 
 if TYPE_CHECKING:
-    from _pytest.capture import CaptureFixture
-    from _pytest.fixtures import FixtureRequest
-    from _pytest.logging import LogCaptureFixture
-    from _pytest.monkeypatch import MonkeyPatch
-    from pytest_mock.plugin import MockerFixture
     from pytestqt.qtbot import QtBot
 
 
@@ -48,26 +43,29 @@ class TestMDAFile:
         mock_parent = Mock()
         mock_parent.dataPath.return_value = single_mda_file.parent
         mock_parent.mdaFileList.return_value = [single_mda_file.name]
-        
+
         mda_file = MDAFile(parent=mock_parent)
         qtbot.addWidget(mda_file)
 
-        # Set data (index 0, since only one file in list)  
+        # Set data (index 0, since only one file in list)
         mda_file.setData(0)
 
         assert mda_file._data["fileName"] == single_mda_file.stem
 
-    def test_mda_file_set_data_with_missing_file(self, qapp: QApplication, qtbot: "QtBot") -> None:
+    def test_mda_file_set_data_with_missing_file(
+        self, qapp: QApplication, qtbot: "QtBot"
+    ) -> None:
         """Test setting data with a missing file path using real test data path."""
         # Create a mock parent that points to a real directory but missing file
         from pathlib import Path
+
         test_dir = Path(__file__).parent / "data" / "test_folder1"
         missing_file = "nonexistent_file.mda"
-        
+
         mock_parent = Mock()
         mock_parent.dataPath.return_value = test_dir
         mock_parent.mdaFileList.return_value = [missing_file]
-        
+
         mda_file = MDAFile(parent=mock_parent)
         qtbot.addWidget(mda_file)
 
@@ -78,7 +76,9 @@ class TestMDAFile:
         assert mda_file._data["fileName"] == "nonexistent_file"
 
     @pytest.mark.skip(reason="Mock data path issue - needs proper mock setup")
-    def test_mda_file_set_data_with_read_error(self, qapp: QApplication, qtbot: "QtBot") -> None:
+    def test_mda_file_set_data_with_read_error(
+        self, qapp: QApplication, qtbot: "QtBot"
+    ) -> None:
         """Test setting data when file read fails."""
         mda_file = MDAFile()
         qtbot.addWidget(mda_file)
@@ -95,7 +95,9 @@ class TestMDAFile:
             mock_settings.dataPath.return_value.__truediv__.return_value = mock_path
 
             # Mock read error
-            with patch('mdaviz.synApps_mdalib.mda.readMDA', side_effect=Exception("Read error")):
+            with patch(
+                "mdaviz.synApps_mdalib.mda.readMDA", side_effect=Exception("Read error")
+            ):
                 mda_file.setData(0)
 
                 assert mda_file._data["fileName"] == "test"
@@ -108,14 +110,16 @@ class TestMDAFile:
         mock_parent = Mock()
         mock_parent.dataPath.return_value = single_mda_file.parent
         mock_parent.mdaFileList.return_value = [single_mda_file.name]
-        
+
         mda_file = MDAFile(parent=mock_parent)
         qtbot.addWidget(mda_file)
 
         # Mock cache to verify it's called
         mock_cache_instance = Mock()
-        mock_cache_instance.get_or_load.return_value = None  # Force fallback to direct loading
-        
+        mock_cache_instance.get_or_load.return_value = (
+            None  # Force fallback to direct loading
+        )
+
         with patch("mdaviz.mda_file.get_global_cache") as mock_cache:
             mock_cache.return_value = mock_cache_instance
 
@@ -123,9 +127,13 @@ class TestMDAFile:
             mda_file.setData(0)
 
             # Verify cache was called with the real file path
-            mock_cache_instance.get_or_load.assert_called_once_with(str(single_mda_file))
+            mock_cache_instance.get_or_load.assert_called_once_with(
+                str(single_mda_file)
+            )
 
-    def test_mda_file_display_metadata(self, qapp: QApplication, qtbot: "QtBot") -> None:
+    def test_mda_file_display_metadata(
+        self, qapp: QApplication, qtbot: "QtBot"
+    ) -> None:
         """Test displaying metadata in the visualization panel."""
         mock_parent = Mock()
         mda_file = MDAFile(parent=mock_parent)
@@ -149,7 +157,9 @@ class TestMDAFile:
 
         assert mda_file is not None
 
-    def test_mda_file_default_selection(self, qapp: QApplication, qtbot: "QtBot") -> None:
+    def test_mda_file_default_selection(
+        self, qapp: QApplication, qtbot: "QtBot"
+    ) -> None:
         """Test default field selection logic."""
         mock_parent = Mock()
         mda_file = MDAFile(parent=mock_parent)
@@ -176,7 +186,7 @@ class TestMDAFile:
         # Test that the MDAFile has the necessary UI components
         # The clearGraph functionality would be via the visualization panel
         assert mda_file is not None
-        assert hasattr(mda_file, 'clearGraphButton')
+        assert hasattr(mda_file, "clearGraphButton")
 
 
 class TestTabManager:
@@ -209,7 +219,9 @@ class TestTabManager:
         tab_manager.removeTab("/test/path.mda")
         assert len(tab_manager._tabs) == 0
 
-    def test_tab_manager_remove_all_tabs(self, qapp: QApplication, qtbot: "QtBot") -> None:
+    def test_tab_manager_remove_all_tabs(
+        self, qapp: QApplication, qtbot: "QtBot"
+    ) -> None:
         """Test removing all tabs from the manager."""
         tab_manager = TabManager()
 
@@ -221,7 +233,9 @@ class TestTabManager:
         tab_manager.removeAllTabs()
         assert len(tab_manager._tabs) == 0
 
-    def test_tab_manager_get_tab_data_nonexistent(self, qapp: QApplication, qtbot: "QtBot") -> None:
+    def test_tab_manager_get_tab_data_nonexistent(
+        self, qapp: QApplication, qtbot: "QtBot"
+    ) -> None:
         """Test getting data for a non-existent tab."""
         tab_manager = TabManager()
 

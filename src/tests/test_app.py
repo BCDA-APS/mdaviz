@@ -151,21 +151,23 @@ class TestGuiFunction:
     """Test the gui function."""
 
     @pytest.mark.skip(reason="GUI tests cause segmentation faults in test environment")
-    @patch('sys.exit')
-    def test_gui_function_creates_application(self, mock_exit: "MockerFixture", qtbot: "FixtureRequest") -> None:
+    @patch("sys.exit")
+    def test_gui_function_creates_application(
+        self, mock_exit: "MockerFixture", qtbot: "FixtureRequest"
+    ) -> None:
         """Test that gui function creates QApplication."""
         # Use qtbot to manage QApplication - don't create our own
         # This test verifies the function can be called without error
         try:
             # Mock command line interface to avoid actual GUI creation
-            with patch('mdaviz.app.command_line_interface') as mock_cli:
+            with patch("mdaviz.app.command_line_interface") as mock_cli:
                 mock_args = MagicMock()
                 mock_args.log = "warning"
                 mock_cli.return_value = mock_args
-                
+
                 # Call gui function - it should handle QApplication creation internally
                 gui()
-                
+
                 # If we get here, the function ran without error
                 assert True
         except Exception as e:
@@ -174,20 +176,22 @@ class TestGuiFunction:
             assert True
 
     @pytest.mark.skip(reason="GUI tests cause segmentation faults in test environment")
-    @patch('sys.exit')
-    def test_gui_function_creates_main_window(self, mock_exit: "MockerFixture", qtbot: "FixtureRequest") -> None:
+    @patch("sys.exit")
+    def test_gui_function_creates_main_window(
+        self, mock_exit: "MockerFixture", qtbot: "FixtureRequest"
+    ) -> None:
         """Test that gui function creates MainWindow."""
         # Use qtbot to manage QApplication - don't create our own
         try:
             # Mock command line interface to avoid actual GUI creation
-            with patch('mdaviz.app.command_line_interface') as mock_cli:
+            with patch("mdaviz.app.command_line_interface") as mock_cli:
                 mock_args = MagicMock()
                 mock_args.log = "warning"
                 mock_cli.return_value = mock_args
-                
+
                 # Call gui function - it should handle QApplication creation internally
                 gui()
-                
+
                 # If we get here, the function ran without error
                 assert True
         except Exception as e:
@@ -200,14 +204,16 @@ class TestAppIntegration:
     """Integration tests for the application."""
 
     @pytest.mark.skip(reason="GUI tests cause segmentation faults in test environment")
-    @patch('sys.exit')
-    def test_app_startup_flow(self, mock_exit: "MockerFixture", qtbot: "FixtureRequest") -> None:
+    @patch("sys.exit")
+    def test_app_startup_flow(
+        self, mock_exit: "MockerFixture", qtbot: "FixtureRequest"
+    ) -> None:
         """Test complete application startup flow."""
         # Test the main function with command line arguments
         # This is an integration test that verifies the complete flow
         try:
             # Mock command line interface to return valid arguments
-            with patch('mdaviz.app.command_line_interface') as mock_cli:
+            with patch("mdaviz.app.command_line_interface") as mock_cli:
                 mock_args = MagicMock()
                 mock_args.log = "warning"
                 mock_cli.return_value = mock_args
@@ -215,7 +221,7 @@ class TestAppIntegration:
                 # Call main function - it should handle the flow without error
                 # qtbot will manage QApplication internally
                 main()
-                
+
                 # If we get here, the function ran without error
                 assert True
         except Exception as e:
@@ -312,12 +318,11 @@ class TestCompatibility:
 
             # Import should work without raising deprecation warnings
 
-            # Check that no unexpected deprecation warnings were raised
-            # (xdrlib deprecation is expected and handled)
-            unexpected_warnings = [
+            # Filter out xdrlib deprecation warnings
+            deprecation_warnings = [
                 warning
                 for warning in w
-                if warning.category == DeprecationWarning
+                if warning.category is DeprecationWarning
                 and "xdrlib" not in str(warning.message)
             ]
-            assert len(unexpected_warnings) == 0
+            assert len(deprecation_warnings) == 0

@@ -548,10 +548,10 @@ class TestDataCacheIntegration:
     def test_cache_with_real_mda_file_access(self, single_mda_file: Path) -> None:
         """Test cache functionality with real MDA file access (file existence check only)."""
         cache = DataCache()
-        
+
         # Test that the real file exists
         assert single_mda_file.exists()
-        
+
         # Create cached data based on real file properties
         real_size = single_mda_file.stat().st_size
         data = CachedFileData(
@@ -565,13 +565,13 @@ class TestDataCacheIntegration:
             folder_path=str(single_mda_file.parent),
             size_bytes=real_size,
         )
-        
+
         # Test cache operations with real file path
         cache.put(str(single_mda_file), data)
-        
+
         # Verify cache contains the file
         assert str(single_mda_file) in cache._cache
-        
+
         # Verify data integrity
         retrieved = cache.get(str(single_mda_file))
         assert retrieved is not None
