@@ -189,6 +189,10 @@ class MDAFileTableModel(QAbstractTableModel):
             if orientation == Qt.Orientation.Horizontal:
                 return self.columnName(section)
             elif orientation == Qt.Orientation.Vertical:
+                # Return field name instead of row number
+                if section < len(self._fields):
+                    field_names = list(self._fields.keys())
+                    return field_names[section]
                 return str(section + 1)
         return None
 
