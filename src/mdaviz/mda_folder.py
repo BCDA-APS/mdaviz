@@ -521,6 +521,12 @@ class MDA_MVC(QWidget):
                 # Connect fit signals to main window
                 if hasattr(self.mainWindow, "connectToFitSignals"):
                     self.mainWindow.connectToFitSignals(widgetMpl)
+
+                # Apply stored log scale state to the new chart
+                if hasattr(self.mda_file_viz, "getLogScaleState"):
+                    stored_log_x, stored_log_y = self.mda_file_viz.getLogScaleState()
+                    widgetMpl.setLogScales(stored_log_x, stored_log_y)
+
             if action in ("replace"):
                 widgetMpl.curveManager.removeAllCurves()
             for i, (ds, ds_options) in zip(y_index, datasets):
@@ -763,6 +769,12 @@ class MDA_MVC(QWidget):
             # Connect fit signals to main window
             if hasattr(self.mainWindow, "connectToFitSignals"):
                 self.mainWindow.connectToFitSignals(widgetMpl)
+
+            # Apply stored log scale state to the new chart
+            if hasattr(self.mda_file_viz, "getLogScaleState"):
+                stored_log_x, stored_log_y = self.mda_file_viz.getLogScaleState()
+                widgetMpl.setLogScales(stored_log_x, stored_log_y)
+
         if mode in ("Auto-replace"):
             widgetMpl.curveManager.removeAllCurves()
         for row, (ds, ds_options) in zip(new_y_selection, datasets):

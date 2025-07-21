@@ -20,19 +20,21 @@ class MDAFileVisualization(QWidget):
 
     def __init__(self, parent):
         """
-        Create the vizualization widget and connect with its parent.
+        Initialize the MDA file visualization widget.
 
-        PARAMETERS
-
-        parent object:
-            Instance of mdaviz.mda_folder.MDAMVC
+        Parameters:
+        - parent: Parent widget
         """
-        self.mda_mvc = parent
-        super().__init__()
+        super().__init__(parent)
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
 
+        # Initialize log scale state storage
+        self._log_x_state = False
+        self._log_y_state = False
+
     def setup(self):
+        """Setup the UI components and connections."""
         font = QFont(MD_FONT)
         font.setPointSize(MD_FONT_SIZE)
         self.metadata.setFont(font)
@@ -164,10 +166,35 @@ class MDAFileVisualization(QWidget):
 
     def onLogScaleChanged(self):
         """Handle log scale checkbox changes."""
+        # Store the log scale state centrally
+        self._log_x_state = self.logXCheckBox.isChecked()
+        self._log_y_state = self.logYCheckBox.isChecked()
+
+        # Apply to chart if available
         if hasattr(self, "chart_view") and self.chart_view:
-            log_x = self.logXCheckBox.isChecked()
-            log_y = self.logYCheckBox.isChecked()
+            self.chart_view.setLogScales(self._log_x_state, self._log_y_state)
+
+    def getLogScaleState(self):
+        """Get the current log scale state."""
+        return self._log_x_state, self._log_y_state
+
+    def setLogScaleState(self, log_x: bool, log_y: bool):
+        """Set the log scale state and update checkboxes."""
+        self._log_x_state = log_x
+        self._log_y_state = log_y
+
+        # Update checkbox states to match stored state
+        self.logXCheckBox.setChecked(log_x)
+        self.logYCheckBox.setChecked(log_y)
+
+        # Apply to chart if available
+        if hasattr(self, "chart_view") and self.chart_view:
             self.chart_view.setLogScales(log_x, log_y)
+
+    def syncLogScaleCheckboxes(self):
+        """Sync checkbox states with the stored log scale state."""
+        self.logXCheckBox.setChecked(self._log_x_state)
+        self.logYCheckBox.setChecked(self._log_y_state)
 
     def onCurveStyleChanged(self, style_name: str):
         """Handle curve style change."""
@@ -211,6 +238,9 @@ class MDAFileVisualization(QWidget):
 
         # Store reference to chart view for fit functionality
         self.chart_view = plot_widget
+
+        # Sync log scale checkbox states with the stored state
+        self.syncLogScaleCheckboxes()
 
         # Update tab widget max height to match the chart view
         self._updateTabWidgetMaxHeight()
