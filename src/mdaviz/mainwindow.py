@@ -272,13 +272,14 @@ class MainWindow(QMainWindow):
         User chose to open (connect with) a tiled server.
         """
         from mdaviz.opendialog import OpenDialog
+        from PyQt6.QtWidgets import QFileDialog
 
         self.setStatus("Please select a file...")
         open_dialog = OpenDialog(self)
         open_dialog.setWindowTitle("Select a File")
 
-        # Use exec_() to show the dialog and get the result
-        if open_dialog.exec_() == OpenDialog.Accepted:
+        # Use exec() to show the dialog and get the result
+        if open_dialog.exec() == QFileDialog.DialogCode.Accepted:
             # Get the selected files
             selected_files = open_dialog.selectedFiles()
             if selected_files:
@@ -308,6 +309,9 @@ class MainWindow(QMainWindow):
                     folder_list.insert(0, str(folder_path))
                     self.setFolderList(folder_list)
 
+                    # The folder will be loaded automatically when the combo box changes
+                    # No need to call onFolderSelected manually
+
     def doPopUp(self, message):
         """
         User chose to open (connect with) a tiled server.
@@ -315,7 +319,7 @@ class MainWindow(QMainWindow):
         from mdaviz.popup import PopUp
 
         popup = PopUp(self, message)
-        return popup.exec_() == QtWidgets.QDialog.Accepted
+        return popup.exec() == QtWidgets.QDialog.accepted
 
     def proceed(self):
         """Handle the logic when the user clicks 'OK'."""
