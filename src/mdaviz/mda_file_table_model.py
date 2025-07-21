@@ -277,7 +277,8 @@ class MDAFileTableModel(QAbstractTableModel):
             [Qt.ItemDataRole.CheckStateRole],  # Qt.CheckStateRole
         )
         # Update the mda_mvc selection
-        self.mda_mvc.setSelectionField()
+        if self.mda_mvc is not None:
+            self.mda_mvc.setSelectionField()
 
     def applySelectionRules(self, index, changes=False):
         """Apply selection rules 2-4."""
@@ -328,7 +329,7 @@ class MDAFileTableModel(QAbstractTableModel):
         return det_removed
 
     def updateMdaMvcSelection(self, new_selection):
-        if new_selection is None:
+        if new_selection is None or self.mda_mvc is None:
             return
         new_selection = ftm2mda(new_selection)
         self.mda_mvc.setSelectionField(new_selection)
@@ -438,7 +439,8 @@ class MDAFileTableModel(QAbstractTableModel):
         return choices
 
     def setStatus(self, text):
-        self.mda_mvc.setStatus(text)
+        if self.mda_mvc is not None:
+            self.mda_mvc.setStatus(text)
 
     def columnLabels(self) -> List[str]:
         """Return the column labels."""
@@ -621,7 +623,13 @@ class MDAFileTableModel(QAbstractTableModel):
         if role == Qt.ItemDataRole.CheckStateRole:
             # Handle checkbox state changes
             if index.column() in self.checkboxColumns:
-                self.setCheckbox(index, value)
+                # PyQt6 checkbox behavior fix: toggle the state
+                current_state = self.data(index, Qt.ItemDataRole.CheckStateRole)
+                if current_state == Qt.CheckState.Checked:
+                    new_state = Qt.CheckState.Unchecked
+                else:
+                    new_state = Qt.CheckState.Checked
+                self.setCheckbox(index, new_state)
                 return True
 
         elif role == Qt.ItemDataRole.EditRole:
