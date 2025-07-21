@@ -9,9 +9,9 @@
 
 ### Test Data Infrastructure
 - **Real Test Data Available**: Comprehensive set of real MDA files in `src/tests/data/`
-- **Test Folders**: 
+- **Test Folders**:
   - `test_folder1/` - 12 MDA files with various naming patterns
-  - `test_folder2/` - 16 MDA files 
+  - `test_folder2/` - 16 MDA files
   - `test_folder3/` - 50 MDA files with nested subfolders
   - `test_no_positioner/` - 28 ARPES MDA files (no positioner data)
 - **File Types**: Real MDA files with actual data structures, not mock data
@@ -45,7 +45,7 @@ def mock_settings_get_key(key: str) -> str | int:
 # Before
 widget = QWidget()
 
-# After  
+# After
 widget = QWidget(parent=main_window)
 ```
 
@@ -131,7 +131,7 @@ def nested_mda_files(test_folder3_path: Path) -> list[Path]:
 ### 3.1 Core Module Coverage
 **Target Modules**:
 - `mda_file.py` - File loading and parsing
-- `data_cache.py` - Caching and memory management  
+- `data_cache.py` - Caching and memory management
 - `lazy_folder_scanner.py` - Folder scanning
 - `chartview.py` - Plotting and visualization
 - `mainwindow.py` - Main application logic
@@ -229,4 +229,4 @@ def nested_mda_files(test_folder3_path: Path) -> list[Path]:
 
 ## Conclusion
 
-This plan prioritizes leveraging the existing comprehensive test data infrastructure to create more robust and realistic tests. By using real MDA files instead of mock data, we can catch actual issues and improve confidence in the application's reliability. The focus on fixing failed tests first ensures a stable foundation for further improvements. 
+This plan prioritizes leveraging the existing comprehensive test data infrastructure to create more robust and realistic tests. By using real MDA files instead of mock data, we can catch actual issues and improve confidence in the application's reliability. The focus on fixing failed tests first ensures a stable foundation for further improvements.

@@ -111,7 +111,7 @@ def monitor_memory_usage():
     import psutil
     process = psutil.Process()
     memory_mb = process.memory_info().rss / 1024 / 1024
-    
+
     if memory_mb > MAX_MEMORY_MB:
         cleanup_cache()
         gc.collect()

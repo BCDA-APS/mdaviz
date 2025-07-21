@@ -1191,9 +1191,9 @@ class ChartView(QWidget):
             persistent_key = (curve_data["file_path"], curve_data["row"])
             if persistent_key not in self.curveManager._persistent_properties:
                 self.curveManager._persistent_properties[persistent_key] = {}
-            self.curveManager._persistent_properties[persistent_key][
-                "style"
-            ] = format_string
+            self.curveManager._persistent_properties[persistent_key]["style"] = (
+                format_string
+            )
             print(
                 f"DEBUG: Saved style to persistent storage: {persistent_key} -> {format_string}"
             )
@@ -1284,9 +1284,7 @@ class CurveManager(QObject):
         super().__init__(parent)
         self._curves = {}  # Store curves with a unique identifier as the key
         # Persistent storage for curve properties across manager clears
-        self._persistent_properties = (
-            {}
-        )  # key: (file_path, row), value: {style, offset, factor}
+        self._persistent_properties = {}  # key: (file_path, row), value: {style, offset, factor}
 
     def addCurve(self, row, *ds, **options):
         """Add a new curve to the manager if not already present on the graph."""
