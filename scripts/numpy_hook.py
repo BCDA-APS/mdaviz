@@ -13,11 +13,21 @@ def _handle_numpy_docstrings():
         import numpy.core.multiarray
         import numpy.core.numeric
         import numpy.core.umath
-        import numpy.core.overrides
+
+        # Use the new API instead of deprecated numpy.core.overrides
+        try:
+            import numpy._core.overrides
+
+            overrides_module = np._core.overrides
+        except ImportError:
+            # Fallback to old API if new one is not available
+            import numpy.core.overrides
+
+            overrides_module = np.core.overrides
 
         # Patch the problematic function if needed
-        if hasattr(np.core.overrides, "add_docstring"):
-            original_add_docstring = np.core.overrides.add_docstring
+        if hasattr(overrides_module, "add_docstring"):
+            original_add_docstring = overrides_module.add_docstring
 
             def safe_add_docstring(func, docstring):
                 """Safe wrapper for add_docstring that handles non-string docstrings."""
@@ -25,7 +35,7 @@ def _handle_numpy_docstrings():
                     return original_add_docstring(func, docstring)
                 return func
 
-            np.core.overrides.add_docstring = safe_add_docstring
+            overrides_module.add_docstring = safe_add_docstring
 
     except ImportError:
         pass
