@@ -309,8 +309,8 @@ class MainWindow(QMainWindow):
                     folder_list.insert(0, str(folder_path))
                     self.setFolderList(folder_list)
 
-                    # The folder will be loaded automatically when the combo box changes
-                    # No need to call onFolderSelected manually
+                    # Set the combobox selection to the new folder
+                    self.folder.setCurrentText(str(folder_path))
 
     def doPopUp(self, message):
         """
@@ -378,7 +378,7 @@ class MainWindow(QMainWindow):
 
     def onFolderSelected(self, folder_name):
         """A folder was selected (from the open dialog or pull down menu)."""
-        if folder_name in [".", "", "Select a folder..."]:
+        if folder_name in [".", "", "Select a folder...", "Please select a folder..."]:
             pass
         elif folder_name == "Clear Recently Open...":
             settings.setKey(DIR_SETTINGS_KEY, "")
@@ -475,8 +475,15 @@ class MainWindow(QMainWindow):
         if folder_list is None:
             folder_list = []
         self.folder.clear()
-        if not folder_list:
-            folder_list = ["Select a folder..."]
+
+        # If no folders and auto-load is disabled, show "Please select a folder..."
+        if not folder_list and not self.get_auto_load_setting():
+            folder_list = ["Please select a folder..."]
+        else:
+            # If we have folders and auto-load is disabled, add "Please select a folder..." at the beginning
+            if not self.get_auto_load_setting():
+                folder_list = ["Please select a folder..."] + folder_list
+
         self.folder.addItems(folder_list)
         self.folder.addItems(["Clear Recently Open..."])
         count = self.folder.count()
@@ -623,12 +630,8 @@ class MainWindow(QMainWindow):
 
         The auto-loading can be disabled by setting the 'auto_load_folder' setting to False.
         """
-        # Check if auto-loading is enabled (default to True)
-        auto_load_enabled = settings.getKey("auto_load_folder")
-        if auto_load_enabled is None:
-            # Default to True if not set
-            auto_load_enabled = True
-            settings.setKey("auto_load_folder", True)
+        # Check if auto-loading is enabled using the proper boolean conversion
+        auto_load_enabled = self.get_auto_load_setting()
 
         if not auto_load_enabled:
             self.setStatus("Auto-loading disabled by user preference")
