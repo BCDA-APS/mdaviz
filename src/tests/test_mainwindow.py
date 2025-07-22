@@ -83,9 +83,7 @@ class TestMainWindow:
             window = MainWindow()
 
             # Test dataPath method
-            data_path = window.dataPath()
-            # dataPath might be None initially, which is okay
-            # assert data_path is not None
+            window.dataPath()  # dataPath might be None initially, which is okay
 
             # Test setDataPath method
             test_path = Path("/test/path")
@@ -482,9 +480,8 @@ class TestMainWindow:
             # Mock the settings.setKey to prevent RuntimeError
             mock_set_key.return_value = None
 
-            window = MainWindow()
-
             # Test doPreferences method - this creates a real dialog, so we'll just test it doesn't crash
+            MainWindow()
             # We can't easily mock the QDialog creation since it's done inline
             # For now, we'll skip this test to avoid popup dialogs
             # window.doPreferences()
@@ -667,8 +664,7 @@ class TestMainWindow:
             window = MainWindow()
 
             # Test _on_toggle_auto_load method
-            result = window._on_toggle_auto_load()
-            # If we get here without exceptions, the method works
+            window._on_toggle_auto_load()  # If we get here without exceptions, the method works
 
     def test_mainwindow_connect_to_fit_signals(self, qapp: QApplication) -> None:
         """Test connectToFitSignals method."""
