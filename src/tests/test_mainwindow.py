@@ -629,42 +629,7 @@ class TestMainWindow:
             window._setup_resizable_layout()
             # If we get here without exceptions, the method works
 
-    def test_mainwindow_setup_auto_load_menu(self, qapp: QApplication) -> None:
-        """Test _setup_auto_load_menu method."""
-        with (
-            patch(
-                "mdaviz.mainwindow.settings.getKey", side_effect=create_mock_settings()
-            ),
-            patch(
-                "mdaviz.mainwindow.settings.fileName",
-                return_value="/tmp/test_settings.ini",
-            ),
-        ):
-            window = MainWindow()
-
-            # Test _setup_auto_load_menu method
-            window._setup_auto_load_menu()
-            # If we get here without exceptions, the method works
-
-    def test_mainwindow_on_toggle_auto_load(self, qapp: QApplication) -> None:
-        """Test _on_toggle_auto_load method."""
-        with (
-            patch(
-                "mdaviz.mainwindow.settings.getKey", side_effect=create_mock_settings()
-            ),
-            patch(
-                "mdaviz.mainwindow.settings.fileName",
-                return_value="/tmp/test_settings.ini",
-            ),
-            patch("mdaviz.mainwindow.settings.setKey") as mock_set_key,
-        ):
-            # Mock the settings.setKey to prevent RuntimeError
-            mock_set_key.return_value = None
-
-            window = MainWindow()
-
-            # Test _on_toggle_auto_load method
-            window._on_toggle_auto_load()  # If we get here without exceptions, the method works
+    # Auto-load menu tests removed - functionality moved to preferences dialog
 
     def test_mainwindow_connect_to_fit_signals(self, qapp: QApplication) -> None:
         """Test connectToFitSignals method."""

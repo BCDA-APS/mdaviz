@@ -11,7 +11,8 @@ from typing import Optional, List
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QMainWindow, QSizePolicy, QApplication
-from PyQt6.QtGui import QAction
+
+# QAction import removed - no longer needed
 
 from mdaviz import APP_TITLE
 from mdaviz.mda_folder import MDA_MVC
@@ -128,31 +129,12 @@ class MainWindow(QMainWindow):
         utils.reconnect(self.refresh.released, self.onRefresh)
         self.folder.currentTextChanged.connect(self.onFolderSelected)
 
-        # Add auto-load toggle action to File menu
-        self._setup_auto_load_menu()
+        # Auto-load menu removed - now handled in preferences dialog
 
         # Create tab widget and fit data components if they don't exist
         self._setup_fit_data_tab()
 
-    def _setup_auto_load_menu(self):
-        """Set up the auto-load toggle menu action."""
-        # Create the auto-load toggle action
-        self.actionToggleAutoLoad = QAction("Toggle Auto-Load", self)
-        self.actionToggleAutoLoad.setStatusTip(
-            "Toggle automatic folder loading on startup"
-        )
-        self.actionToggleAutoLoad.setCheckable(True)
-        self.actionToggleAutoLoad.setChecked(self.get_auto_load_setting())
-        self.actionToggleAutoLoad.triggered.connect(self._on_toggle_auto_load)
-
-        # Add to File menu
-        self.menuFile.addSeparator()
-        self.menuFile.addAction(self.actionToggleAutoLoad)
-
-    def _on_toggle_auto_load(self):
-        """Handle auto-load toggle menu action."""
-        new_setting = self.toggle_auto_load()
-        self.actionToggleAutoLoad.setChecked(new_setting)
+    # Auto-load menu methods removed - now handled in preferences dialog
 
     @property
     def status(self):
@@ -183,6 +165,7 @@ class MainWindow(QMainWindow):
             QLabel,
             QSpinBox,
             QDialogButtonBox,
+            QCheckBox,
         )
 
         # Create preferences dialog
@@ -193,8 +176,20 @@ class MainWindow(QMainWindow):
 
         layout = QVBoxLayout(dialog)
 
-        # Plot height setting
-        plot_layout = QHBoxLayout()
+        # Auto-load setting (first)
+        auto_load_checkbox = QCheckBox("Auto-load first folder on startup")
+        auto_load_val = settings.getKey("auto_load_folder")
+        if auto_load_val is None:
+            auto_load_val = True
+        elif isinstance(auto_load_val, str):
+            auto_load_val = auto_load_val.lower() in ("true", "1", "yes", "on")
+        auto_load_checkbox.setChecked(bool(auto_load_val))
+        layout.addWidget(auto_load_checkbox)
+
+        # Add some spacing
+        layout.addStretch()
+
+        # Plot height setting (second)
         plot_label = QLabel("Maximum Plot Height (pixels):")
         plot_spinbox = QSpinBox()
         plot_spinbox.setRange(200, 2000)
@@ -206,24 +201,37 @@ class MainWindow(QMainWindow):
             plot_height_val = 800
         plot_spinbox.setValue(plot_height_val)
         plot_spinbox.setSuffix(" px")
-        plot_layout.addWidget(plot_label)
-        plot_layout.addWidget(plot_spinbox)
-        layout.addLayout(plot_layout)
+        layout.addWidget(plot_label)
+        layout.addWidget(plot_spinbox)
+
+        # Add helpful caption for plot height setting
+        plot_caption = QLabel(
+            "Use this setting if plot areas expand vertically unexpectedly due to UI bugs."
+        )
+        plot_caption.setWordWrap(True)
+        plot_caption.setStyleSheet("color: gray; font-size: 10px;")
+        layout.addWidget(plot_caption)
 
         # Add some spacing
         layout.addStretch()
 
         # Buttons
-        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        button_box = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+        )
         button_box.accepted.connect(dialog.accept)
         button_box.rejected.connect(dialog.reject)
         layout.addWidget(button_box)
 
         # Show dialog
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.DialogCode.Accepted:
             # Save the new plot height setting
             new_height = plot_spinbox.value()
             settings.setKey("plot_max_height", new_height)
+
+            # Save the new auto-load setting
+            new_auto_load = auto_load_checkbox.isChecked()
+            settings.setKey("auto_load_folder", new_auto_load)
 
             # Update any existing ChartView widgets
             if hasattr(self, "mvc_folder") and self.mvc_folder:
@@ -245,7 +253,9 @@ class MainWindow(QMainWindow):
                     ):
                         self.mvc_folder.mda_file_viz._updateTabWidgetMaxHeight()
 
-            self.setStatus(f"Plot height setting updated to {new_height} pixels")
+            self.setStatus(
+                f"Settings updated: plot height {new_height}px, auto-load {'enabled' if new_auto_load else 'disabled'}"
+            )
 
     def closeEvent(self, event):
         """
