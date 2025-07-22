@@ -1,7 +1,7 @@
-from PyQt5.QtWidgets import QFileDialog
+from PyQt6.QtWidgets import QFileDialog
 
 from pathlib import Path
-from .user_settings import settings
+from mdaviz.user_settings import settings
 
 DIR_SETTINGS_KEY = "directory"
 
@@ -19,15 +19,15 @@ class OpenDialog(QFileDialog):
         self.setModal(True)
 
         # Configure dialog to allow both file and directory selection
-        self.setFileMode(QFileDialog.ExistingFile)
-        self.setOption(QFileDialog.ShowDirsOnly, False)
-        self.setOption(QFileDialog.DontUseNativeDialog, False)
+        self.setFileMode(QFileDialog.FileMode.ExistingFile)
+        self.setOption(QFileDialog.Option.ShowDirsOnly, False)
+        self.setOption(QFileDialog.Option.DontUseNativeDialog, False)
 
         # Set up file filters to show mda files prominently
         self.setNameFilter("MDA files (*.mda);;All files (*)")
 
         # Set up options to show file details and counts
-        self.setViewMode(QFileDialog.Detail)
+        self.setViewMode(QFileDialog.ViewMode.Detail)
 
         # Set recent directory
         recent_dirs_str = settings.getKey(DIR_SETTINGS_KEY)

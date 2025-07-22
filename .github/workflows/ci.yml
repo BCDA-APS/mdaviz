@@ -18,6 +18,7 @@ jobs:
     strategy:
       matrix:
         python-version:
+          - "3.13"
           - "3.12"
           - "3.11"
           - "3.10"
@@ -61,18 +62,18 @@ jobs:
         with:
           timezoneLinux: "America/Chicago"
 
-      - name: Install Qt and X11 dependencies for PyQt5 testing
+      - name: Install Qt6 and X11 dependencies for PyQt6 testing
         run: |
           sudo apt update -y
           sudo apt install -y \
             xvfb \
             x11-utils \
-            qtbase5-dev \
-            qt5-qmake \
-            libqt5gui5 \
-            libqt5widgets5 \
-            libqt5core5a \
-            libqt5test5 \
+            qt6-base-dev \
+            qt6-qmake \
+            libqt6gui6 \
+            libqt6widgets6 \
+            libqt6core6 \
+            libqt6test6 \
             libxcb-icccm4 \
             libxcb-image0 \
             libxcb-keysyms1 \
@@ -81,40 +82,112 @@ jobs:
             libxcb-xinerama0 \
             libxcb-xfixes0 \
             libxkbcommon-x11-0 \
-            libqt5dbus5 \
-            libqt5network5 \
-            libqt5opengl5
+            libqt6dbus6 \
+            libqt6network6 \
+            libqt6opengl6 \
+            libqt6svg6 \
+            libqt6svgwidgets6
 
       - name: Install additional test dependencies
         run: |
           pip install pytest-cov pytest-qt pytest-xvfb
 
-      - name: Verify Qt installation
+      - name: Verify PyQt6 installation
         run: |
-          python -c "from PyQt5.QtWidgets import QApplication; print('PyQt5 installation verified')"
-          python -c "from PyQt5.QtCore import QT_VERSION_STR; print(f'Qt version: {QT_VERSION_STR}')"
+          python -c "from PyQt6.QtWidgets import QApplication; print('PyQt6 installation verified')"
+          python -c "from PyQt6.QtCore import QT_VERSION_STR; print(f'Qt version: {QT_VERSION_STR}')"
+          python -c "from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg; print('Matplotlib qtagg backend working')"
+          python -c "import mdaviz; print('mdaviz imports successfully')"
 
-      # Qt environment variables are now set in the pytest step
+      - name: Run compatibility and deprecation checks
+        run: |
+          echo "=== Python ${{ matrix.python-version }} Compatibility Check ==="
+
+          # Check for deprecation warnings (excluding known xdrlib issue)
+          python -W error::DeprecationWarning -c "
+          import warnings
+          warnings.filterwarnings('ignore', category=DeprecationWarning, module='xdrlib')
+          import mdaviz
+          print('✅ mdaviz imports successfully without deprecation warnings')
+          " || echo "⚠️ Deprecation warnings found (excluding xdrlib)"
+
+          # Check for future deprecation warnings
+          python -W error::FutureWarning -c "
+          import mdaviz
+          print('✅ No FutureWarning issues found')
+          " || echo "⚠️ FutureWarning issues found"
+
+          # Check for xdrlib usage in our codebase
+          if grep -r "import xdrlib" src/; then
+            echo "❌ xdrlib usage found in our codebase"
+            exit 1
+          else
+            echo "✅ No xdrlib usage found in our codebase"
+          fi
 
       - name: Run tests with pytest
         env:
           QT_QPA_PLATFORM: offscreen
           QT_LOGGING_RULES: "qt.qpa.*=false"
           DISPLAY: ":99.0"
-          PYTEST_QT_API: pyqt5
+          PYTEST_QT_API: pyqt6
         run: |
           xvfb-run -a pytest src/tests/ --cov=src/mdaviz --cov-report=xml --cov-report=term-missing -v
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          file: ./coverage.xml
+          files: ./coverage.xml
           flags: unittests
           name: codecov-umbrella
 
+  cross-platform:
+    name: Cross-Platform Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+        python-version: ["3.11", "3.12"]
+      max-parallel: 4
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Verify PyQt6 installation
+        run: |
+          python -c "from PyQt6.QtWidgets import QApplication; print('PyQt6 installation verified on ${{ runner.os }}')"
+          python -c "from PyQt6.QtCore import QT_VERSION_STR; print(f'Qt version: {QT_VERSION_STR}')"
+          python -c "import mdaviz; print('mdaviz imports successfully on ${{ runner.os }}')"
+
+      - name: Run basic tests
+        env:
+          PYTEST_QT_API: pyqt6
+        run: |
+          pytest src/tests/test_auto_load.py -v
+          pytest src/tests/test_lazy_loading.py -k "not gui" -v
+
   build:
     runs-on: ubuntu-latest
-    needs: test
+    needs: [test, cross-platform]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:

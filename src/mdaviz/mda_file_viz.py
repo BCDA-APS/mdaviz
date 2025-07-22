@@ -1,11 +1,12 @@
-from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtGui import QFont, QKeySequence
-from PyQt5.QtWidgets import QShortcut, QWidget, QDialog, QSizePolicy
+from PyQt6 import QtWidgets, QtCore
+from PyQt6.QtGui import QFont, QKeySequence
+from PyQt6.QtWidgets import QWidget, QDialog, QSizePolicy
+from PyQt6.QtGui import QShortcut
 
-from . import utils
-from .chartview import ChartView
-from .data_table_view import DataTableView
-from .fit_models import get_available_models
+from mdaviz import utils
+from mdaviz.chartview import ChartView
+from mdaviz.data_table_view import DataTableView
+from mdaviz.fit_models import get_available_models
 
 MD_FONT = "Arial"
 MD_FONT_SIZE = 12
@@ -19,34 +20,40 @@ class MDAFileVisualization(QWidget):
 
     def __init__(self, parent):
         """
-        Create the vizualization widget and connect with its parent.
+        Initialize the MDA file visualization widget.
 
-        PARAMETERS
-
-        parent object:
-            Instance of mdaviz.mda_folder.MDAMVC
+        Parameters:
+        - parent: Parent widget
         """
-        self.mda_mvc = parent
-        super().__init__()
+        super().__init__(parent)
         utils.myLoadUi(self.ui_file, baseinstance=self)
         self.setup()
 
+        # Initialize log scale state storage
+        self._log_x_state = False
+        self._log_y_state = False
+
     def setup(self):
+        """Setup the UI components and connections."""
         font = QFont(MD_FONT)
         font.setPointSize(MD_FONT_SIZE)
         self.metadata.setFont(font)
 
         # Set size policy for the main visualization widget to prevent unwanted expansion
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         # Set size policy for the plot page to prevent vertical expansion
-        self.plotPageMpl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.plotPageMpl.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )
 
         # Set size policy for the tab widget to prevent vertical expansion
-        self.tabWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.tabWidget.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
+        )
 
         # Get maximum height from user settings with default fallback
-        from .user_settings import settings
+        from mdaviz.user_settings import settings
 
         max_height = settings.getKey("plot_max_height")
         try:
@@ -144,6 +151,51 @@ class MDAFileVisualization(QWidget):
         # Initially disable until a curve is selected
         self.curveStyle.setEnabled(False)
 
+        # Setup log scale controls
+        self.setupLogScaleUI()
+
+    def setupLogScaleUI(self):
+        """Setup the log scale UI components and connections."""
+        # Connect log scale checkboxes
+        self.logXCheckBox.toggled.connect(self.onLogScaleChanged)
+        self.logYCheckBox.toggled.connect(self.onLogScaleChanged)
+
+        # Initially disable until a curve is selected
+        self.logXCheckBox.setEnabled(False)
+        self.logYCheckBox.setEnabled(False)
+
+    def onLogScaleChanged(self):
+        """Handle log scale checkbox changes."""
+        # Store the log scale state centrally
+        self._log_x_state = self.logXCheckBox.isChecked()
+        self._log_y_state = self.logYCheckBox.isChecked()
+
+        # Apply to chart if available
+        if hasattr(self, "chart_view") and self.chart_view:
+            self.chart_view.setLogScales(self._log_x_state, self._log_y_state)
+
+    def getLogScaleState(self):
+        """Get the current log scale state."""
+        return self._log_x_state, self._log_y_state
+
+    def setLogScaleState(self, log_x: bool, log_y: bool):
+        """Set the log scale state and update checkboxes."""
+        self._log_x_state = log_x
+        self._log_y_state = log_y
+
+        # Update checkbox states to match stored state
+        self.logXCheckBox.setChecked(log_x)
+        self.logYCheckBox.setChecked(log_y)
+
+        # Apply to chart if available
+        if hasattr(self, "chart_view") and self.chart_view:
+            self.chart_view.setLogScales(log_x, log_y)
+
+    def syncLogScaleCheckboxes(self):
+        """Sync checkbox states with the stored log scale state."""
+        self.logXCheckBox.setChecked(self._log_x_state)
+        self.logYCheckBox.setChecked(self._log_y_state)
+
     def onCurveStyleChanged(self, style_name: str):
         """Handle curve style change."""
         if hasattr(self, "chart_view") and self.chart_view:
@@ -157,6 +209,8 @@ class MDAFileVisualization(QWidget):
         - curve_selected: Whether a curve is currently selected
         """
         self.curveStyle.setEnabled(curve_selected)
+        self.logXCheckBox.setEnabled(curve_selected)
+        self.logYCheckBox.setEnabled(curve_selected)
 
     def setTableData(self, data):
         self.data_table_view = DataTableView(data, self)
@@ -173,7 +227,9 @@ class MDAFileVisualization(QWidget):
         utils.removeAllLayoutWidgets(layout)
 
         # Set size policy to prevent vertical expansion
-        plot_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        plot_widget.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
+        )
 
         # Don't override the ChartView's own height constraints
         # The ChartView already has proper max height constraints set
@@ -183,12 +239,15 @@ class MDAFileVisualization(QWidget):
         # Store reference to chart view for fit functionality
         self.chart_view = plot_widget
 
+        # Sync log scale checkbox states with the stored state
+        self.syncLogScaleCheckboxes()
+
         # Update tab widget max height to match the chart view
         self._updateTabWidgetMaxHeight()
 
     def _updateTabWidgetMaxHeight(self):
         """Update the tab widget's maximum height to match the plot height setting."""
-        from .user_settings import settings
+        from mdaviz.user_settings import settings
 
         max_height = settings.getKey("plot_max_height")
         try:
@@ -382,10 +441,13 @@ class MetadataSearchDialog(QDialog):
 
     def keyPressEvent(self, event):
         """Handle key press events."""
-        if event.key() == QtCore.Qt.Key_Return or event.key() == QtCore.Qt.Key_Enter:
+        if (
+            event.key() == QtCore.Qt.Key.Key_Return
+            or event.key() == QtCore.Qt.Key.Key_Enter
+        ):
             # Enter key finds next
             self.findNext()
-        elif event.key() == QtCore.Qt.Key_Escape:
+        elif event.key() == QtCore.Qt.Key.Key_Escape:
             # Escape key closes dialog
             self.close()
         else:

@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QHeaderView
+from PyQt6.QtWidgets import QWidget, QHeaderView
 
 HEADERS = ["X", "Y"]
 
@@ -28,11 +28,11 @@ class DataTableView(QWidget):
         self.mda_viz.tableView.verticalHeader().hide()
         # Configure the horizontal header to resize based on content.
         header = self.mda_viz.tableView.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
     def displayTable(self):
-        from .data_table_model import DataTableModel
-        from .empty_table_model import EmptyTableModel
+        from mdaviz.data_table_model import DataTableModel
+        from mdaviz.empty_table_model import EmptyTableModel
 
         data = self.data()
         if len(data) > 0:

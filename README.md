@@ -1,6 +1,6 @@
 # mdaviz
 
-Python Qt5 application to visualize mda data.
+Python Qt6 application to visualize mda data.
 
 ## Status Badges
 
@@ -17,19 +17,27 @@ Coverage | License | Python | Pre-commit
 - **Auto-Load Folders**: The application automatically loads the first valid folder from your recent folders list when it starts, providing a seamless experience without requiring manual folder selection.
 - **Lazy Loading**: Efficient folder scanning with progress indicators for large datasets.
 - **Interactive Plotting**: Real-time data visualization with matplotlib integration.
+- **Axis Selection**: Select X-axis (positioners), Y-axis (detectors), and I0 normalization using checkboxes.
+- **Log Scale Support**: Toggle between linear and logarithmic scales for both X and Y axes.
+- **Curve Management**: Add, remove, and style multiple data curves.
+- **Data Analysis**: Basic statistics, cursor measurements, and curve fitting.
 - **Recent Folders**: Remembers your recently opened folders for quick access.
+- **PyQt6 Migration**: Complete migration to PyQt6 for future compatibility with Python 3.13+.
 
 ## Quickstart
 
 ### Conda environment
-It is strongly recommended to use the provided conda environment for development and running the application. This ensures all dependencies (including PyQt5) are available and compatible.
+It is strongly recommended to use the provided conda environment for development and running the application. This ensures all dependencies (including PyQt6) are available and compatible.
 
 ```bash
 conda env create -f env.yml
 conda activate mdaviz
+pip install PyQt6 Qt6
 ```
 
 Always activate the environment before running, testing, or using pre-commit hooks.
+
+**Note**: PyQt6 and Qt6 are installed via pip as they are not available in conda-forge for all platforms.
 
 ### Install & run the application
 
@@ -60,6 +68,30 @@ $ pip install -e .
 $ mdaviz
 ```
 
+## Usage
+
+### Basic Operation
+
+1. **Load Data**: Select a folder containing MDA files
+2. **Select Axes**: Use the checkboxes in the data table to select:
+   - **X**: Positioner for the x-axis (only one can be selected)
+   - **Y**: Detectors for the y-axis (multiple can be selected)
+   - **I0**: Normalization detector (only one can be selected)
+3. **Plot Data**: Data will automatically plot based on your selection mode
+
+### Plot Controls
+
+- **Log Scale**: Use the "LogX" and "LogY" checkboxes to switch between linear and logarithmic scales
+- **Curve Styling**: Select different line styles and markers for your curves
+- **Data Manipulation**: Apply offset and scaling factors to individual curves
+- **Cursors**: Use mouse clicks to place measurement cursors on the plot
+
+### Plotting Modes
+
+- **Auto-add**: New curves are added to existing plots
+- **Auto-replace**: New curves replace existing plots
+- **Auto-off**: Manual plotting using buttons
+
 ## Development
 
 ### Testing
@@ -68,6 +100,12 @@ Run all tests:
 ```bash
 pytest src/tests
 ```
+
+Current test status:
+- **130 tests passing** with 46% coverage
+- **26 failed tests** (mostly GUI tests needing fixes)
+- **54 skipped tests** (GUI tests in headless environment)
+- **5 test errors** (import and setup issues)
 
 ### Code Quality
 

@@ -12,8 +12,8 @@ mdaviz: Python Qt5 application to visualize mda data.
 
 import logging
 import sys
-from PyQt5 import QtWidgets
-from .mainwindow import MainWindow
+from PyQt6 import QtWidgets
+from mdaviz.mainwindow import MainWindow
 import argparse
 
 
@@ -32,9 +32,14 @@ def command_line_interface() -> argparse.Namespace:
     Returns:
         argparse.Namespace: Parsed command line arguments
     """
-    from . import __version__
+    from mdaviz import __version__
 
-    doc = __doc__.strip().splitlines()[0]
+    # Handle case where __doc__ is None (PyInstaller environment)
+    doc = (
+        __doc__.strip().splitlines()[0]
+        if __doc__
+        else "mdaviz: Python Qt5 application to visualize mda data."
+    )
     parser = argparse.ArgumentParser(description=doc)
 
     # fmt: off
@@ -88,7 +93,7 @@ def main() -> None:  # for future command-line options
     logger.info("Logging level: %s", options.log)
 
     # set warning log level for (noisy) support packages
-    for package in "httpcore httpx PyQt5 tiled".split():
+    for package in "httpcore httpx PyQt6 tiled".split():
         logging.getLogger(package).setLevel(logging.WARNING)
 
     gui()

@@ -7,16 +7,16 @@ from functools import partial
 from itertools import cycle
 from typing import Optional
 import numpy
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import QObject, QTimer, Qt, pyqtSignal
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QApplication
-from . import utils
-from .fit_manager import FitManager
-from .user_settings import settings
+from PyQt6 import QtCore, QtWidgets
+from PyQt6.QtCore import QObject, QTimer, Qt, pyqtSignal
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QApplication
+from mdaviz import utils
+from mdaviz.fit_manager import FitManager
+from mdaviz.user_settings import settings
 
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as NavigationToolbar
 
 
 FONTSIZE = 10
@@ -70,10 +70,14 @@ class ChartView(QWidget):
         self.mda_mvc = parent
         super().__init__()
 
+        # Initialize log scale attributes
+        self._log_x = False
+        self._log_y = False
+
         ############# UI initialization:
 
         # Set size policy to prevent unwanted expansion
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         # Get maximum height from user settings with default fallback
         max_height = settings.getKey("plot_max_height")
@@ -97,7 +101,9 @@ class ChartView(QWidget):
         # Set size constraints on the canvas to prevent vertical expansion
         canvas_max_height = max_height - 50  # Leave room for toolbar
         self.canvas.setMaximumHeight(canvas_max_height)
-        self.canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.canvas.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
+        )
 
         # Create the navigation toolbar
         self.toolbar = NavigationToolbar(self.canvas, self)
@@ -191,7 +197,7 @@ class ChartView(QWidget):
         try:
             # Get the global keyboard state
             modifiers = QApplication.keyboardModifiers()
-            self.alt_pressed = modifiers & Qt.AltModifier
+            self.alt_pressed = modifiers & Qt.KeyboardModifier.AltModifier
         except Exception:
             # Fallback if Qt method fails
             pass
@@ -235,7 +241,9 @@ class ChartView(QWidget):
         # Get the curve ID from the item data instead of display text
         current_index = self.curveBox.currentIndex()
         if current_index >= 0:
-            curve_id = self.curveBox.itemData(current_index, QtCore.Qt.UserRole)
+            curve_id = self.curveBox.itemData(
+                current_index, QtCore.Qt.ItemDataRole.UserRole
+            )
 
             # Check if the curve ID exists in the curve manager
             if curve_id in self.curveManager.curves():
@@ -267,6 +275,40 @@ class ChartView(QWidget):
 
         # Redraw the canvas
         self.canvas.draw()
+
+    def setLogScales(self, log_x: bool, log_y: bool):
+        """
+        Set logarithmic scales for X and Y axes.
+
+        Parameters:
+        - log_x (bool): Whether to use logarithmic scale for X-axis
+        - log_y (bool): Whether to use logarithmic scale for Y-axis
+        """
+        try:
+            # Store the log scale state
+            self._log_x = log_x
+            self._log_y = log_y
+
+            if log_x:
+                self.main_axes.set_xscale("log")
+            else:
+                self.main_axes.set_xscale("linear")
+
+            if log_y:
+                self.main_axes.set_yscale("log")
+            else:
+                self.main_axes.set_yscale("linear")
+
+            # Redraw the canvas to apply changes
+            self.canvas.draw()
+        except Exception as exc:
+            print(f"Error setting log scales: {exc}")
+            # If setting log scale fails (e.g., negative values), revert to linear
+            self._log_x = False
+            self._log_y = False
+            self.main_axes.set_xscale("linear")
+            self.main_axes.set_yscale("linear")
+            self.canvas.draw()
 
     ########################################## Slot methods:
 
@@ -324,9 +366,9 @@ class ChartView(QWidget):
         display_label = curveData.get("ds_options", {}).get("label", curveID)
         self.curveBox.addItem(display_label)
         # Store the curveID as item data for later retrieval
-        self.curveBox.setItemData(index, curveID, QtCore.Qt.UserRole)
+        self.curveBox.setItemData(index, curveID, QtCore.Qt.ItemDataRole.UserRole)
         file_path = curveData.get("file_path", "No file path available")
-        self.curveBox.setItemData(index, file_path, QtCore.Qt.ToolTipRole)
+        self.curveBox.setItemData(index, file_path, QtCore.Qt.ItemDataRole.ToolTipRole)
         # Only select the new curve if it's the first one
         if self.curveBox.count() == 1:
             self.curveBox.setCurrentIndex(0)
@@ -431,6 +473,10 @@ class ChartView(QWidget):
             self.mda_mvc.mda_file.tabManager.removeTab(file_path)
 
     def onAllCurvesRemoved(self, doNotClearCheckboxes=True):
+        # Store current log scale state before clearing
+        current_log_x = self._log_x
+        current_log_y = self._log_y
+
         # Clears the plot completely, removing all curve representations.
         self.clearPlot()
         for curveID in self.curveManager.curves().keys():
@@ -442,6 +488,9 @@ class ChartView(QWidget):
                 if tableview and tableview.tableView.model():
                     tableview.tableView.model().clearAllCheckboxes()
                     tableview.tableView.model().setHighlightRow()
+
+        # Reapply log scale state after clearing
+        self.setLogScales(current_log_x, current_log_y)
 
     def onDetRemoved(self, file_path, row):
         curveID = self.curveManager.findCurveID(file_path, row)
@@ -557,7 +606,7 @@ class ChartView(QWidget):
         # Get the curve ID from the combo box item data
         curveID = None
         if index >= 0:
-            curveID = self.curveBox.itemData(index, QtCore.Qt.UserRole)
+            curveID = self.curveBox.itemData(index, QtCore.Qt.ItemDataRole.UserRole)
 
         # Update QLineEdit & QLabel widgets with the values for the selected curve
         if (
@@ -627,16 +676,16 @@ class ChartView(QWidget):
     def removeItemCurveBox(self, curveID):
         # Find the item by curve ID stored in item data
         for i in range(self.curveBox.count()):
-            if self.curveBox.itemData(i, QtCore.Qt.UserRole) == curveID:
+            if self.curveBox.itemData(i, QtCore.Qt.ItemDataRole.UserRole) == curveID:
                 self.curveBox.removeItem(i)
                 break
 
     def updateComboBoxCurveIDs(self):
         """Update combo box items to use new curve ID format."""
         for i in range(self.curveBox.count()):
-            old_curve_id = self.curveBox.itemData(i, QtCore.Qt.UserRole)
+            old_curve_id = self.curveBox.itemData(i, QtCore.Qt.ItemDataRole.UserRole)
             display_text = self.curveBox.itemText(i)
-            file_path = self.curveBox.itemData(i, QtCore.Qt.ToolTipRole)
+            file_path = self.curveBox.itemData(i, QtCore.Qt.ItemDataRole.ToolTipRole)
 
             # Try to find the corresponding curve in the manager
             for curve_id, curve_data in self.curveManager.curves().items():
@@ -646,7 +695,9 @@ class ChartView(QWidget):
                 ):
                     # Found matching curve, update the combo box item
                     if old_curve_id != curve_id:
-                        self.curveBox.setItemData(i, curve_id, QtCore.Qt.UserRole)
+                        self.curveBox.setItemData(
+                            i, curve_id, QtCore.Qt.ItemDataRole.UserRole
+                        )
                     break
 
     def onOffsetUpdated(self):
@@ -723,8 +774,12 @@ class ChartView(QWidget):
 
     def onRemoveCursor(self, cursor_num):
         cross = self.cursors.get(cursor_num)
-        if cross:
-            cross.remove()
+        if cross is not None:
+            try:
+                cross.remove()
+            except (NotImplementedError, AttributeError):
+                # Handle case where artist cannot be removed
+                pass
             self.cursors[cursor_num] = None
             self.cursors[f"pos{cursor_num}"] = None
             self.cursors[f"text{cursor_num}"] = (
@@ -805,8 +860,12 @@ class ChartView(QWidget):
             if event.button == MIDDLE_BUTTON or (
                 event.button == RIGHT_BUTTON and self.alt_pressed
             ):
-                if self.cursors[1]:
-                    self.cursors[1].remove()  # Remove existing red cursor
+                if self.cursors[1] is not None:
+                    try:
+                        self.cursors[1].remove()  # Remove existing red cursor
+                    except (NotImplementedError, AttributeError):
+                        # Handle case where artist cannot be removed
+                        pass
                 (self.cursors[1],) = self.main_axes.plot(
                     x_nearest, y_nearest, "r+", markersize=15, linewidth=2
                 )
@@ -815,8 +874,12 @@ class ChartView(QWidget):
 
             # Right click (without Alt) for blue cursor (cursor 2)
             elif event.button == RIGHT_BUTTON and not self.alt_pressed:
-                if self.cursors[2]:
-                    self.cursors[2].remove()  # Remove existing blue cursor
+                if self.cursors[2] is not None:
+                    try:
+                        self.cursors[2].remove()  # Remove existing blue cursor
+                    except (NotImplementedError, AttributeError):
+                        # Handle case where artist cannot be removed
+                        pass
                 (self.cursors[2],) = self.main_axes.plot(
                     x_nearest, y_nearest, "b+", markersize=15, linewidth=2
                 )
@@ -905,7 +968,11 @@ class ChartView(QWidget):
         """
         # Remove existing fit line if any
         if curveID in self.fitObjects:
-            self.fitObjects[curveID].remove()
+            try:
+                self.fitObjects[curveID].remove()
+            except (NotImplementedError, AttributeError):
+                # Handle case where artist cannot be removed
+                pass
             del self.fitObjects[curveID]
 
         # Add new fit line
@@ -936,7 +1003,11 @@ class ChartView(QWidget):
         """
         # Remove fit line from plot
         if curveID in self.fitObjects:
-            self.fitObjects[curveID].remove()
+            try:
+                self.fitObjects[curveID].remove()
+            except (NotImplementedError, AttributeError):
+                # Handle case where artist cannot be removed
+                pass
             del self.fitObjects[curveID]
 
             # Update plot

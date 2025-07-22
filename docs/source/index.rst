@@ -2,23 +2,33 @@
 mdaviz: MDA Data Viewer
 =======================
 
-
+A Python Qt6 application for visualizing MDA (Measurement Data Acquisition) data with advanced curve fitting capabilities.
 
 Key Features
 ============
 
-* Visualize MDA data (currently supports 1-D plots)
-* Basic mathematical information and cursor utilities
-* Fitting functionality coming soon
+* **Data Visualization**: Visualize MDA data with support for 1-D and multi-dimensional plots
+* **Interactive Plotting**: Real-time data visualization with matplotlib integration
+* **Advanced Curve Fitting**: 7 mathematical models (Gaussian, Lorentzian, Linear, Exponential, Quadratic, Cubic, Error Function)
+* **Auto-Load Folders**: Automatically loads the first valid folder from recent folders list
+* **Lazy Loading**: Efficient folder scanning with progress indicators for large datasets
+* **Recent Folders**: Remembers recently opened folders for quick access
+* **Cursor Utilities**: Interactive cursors for data analysis and range selection
+* **Mathematical Analysis**: Basic mathematical information and data processing
+* **Cross-Platform**: Runs on Windows, macOS, and Linux
 
 Documentation
 =============
 
 .. icons: https://fonts.google.com/icons
-.. grid:: 3
+.. grid:: 2 2
 
     .. grid-item-card:: :material-regular:`summarize;3em` User Guide
       :link: user_guide
+      :link-type: doc
+
+    .. grid-item-card:: :material-regular:`functions;3em` Fit Functionality
+      :link: fit_functionality
       :link-type: doc
 
     .. grid-item-card:: :material-regular:`install_desktop;3em` Install
@@ -37,7 +47,7 @@ Documentation
    :figclass: align-center
    :figwidth: 100%
 
-   Screenshot of the mdaviz GUI displaying sample data.
+   Screenshot of the mdaviz GUI displaying sample data with curve fitting.
 
 .. toctree::
    :maxdepth: 1
@@ -46,6 +56,7 @@ Documentation
    :hidden:
 
    user_guide
+   fit_functionality
    install
    api
    changes

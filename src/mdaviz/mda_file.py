@@ -23,15 +23,15 @@ User: clearButton.clicked (emit: no data)
 
 """
 
-from .synApps_mdalib.mda import readMDA
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QAbstractItemView, QWidget
-from PyQt5.QtCore import QObject
+from mdaviz.synApps_mdalib.mda import readMDA
+from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtWidgets import QAbstractItemView, QWidget
+from PyQt6.QtCore import QObject
 import yaml
 
-from . import utils
-from .mda_file_table_view import MDAFileTableView
-from .data_cache import get_global_cache
+from mdaviz import utils
+from mdaviz.mda_file_table_view import MDAFileTableView
+from mdaviz.data_cache import get_global_cache
 
 
 class MDAFile(QWidget):
@@ -481,11 +481,11 @@ class MDAFile(QWidget):
         model = tableview.tableView.model()
         model.setHighlightRow(row)
         rowCount = model.rowCount()
-        scrollHint = QAbstractItemView.EnsureVisible
+        scrollHint = QAbstractItemView.ScrollHint.EnsureVisible
         if row == 0:
-            scrollHint = QAbstractItemView.PositionAtTop
+            scrollHint = QAbstractItemView.ScrollHint.PositionAtTop
         elif row == rowCount - 1:
-            scrollHint = QAbstractItemView.PositionAtBottom
+            scrollHint = QAbstractItemView.ScrollHint.PositionAtBottom
         # Get the QModelIndex for the specified row
         index = model.index(row, 0)
         tableview.tableView.scrollTo(index, scrollHint)

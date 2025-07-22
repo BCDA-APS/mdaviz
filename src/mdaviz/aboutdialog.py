@@ -1,15 +1,15 @@
-from PyQt5.QtCore import QUrl
-from PyQt5.QtGui import QDesktopServices
-from PyQt5.QtWidgets import QDialog
+from PyQt6.QtCore import QUrl
+from PyQt6.QtGui import QDesktopServices
+from PyQt6.QtWidgets import QDialog
 
-from . import APP_DESC
-from . import APP_TITLE
-from . import AUTHOR_LIST
-from . import COPYRIGHT_TEXT
-from . import DOCS_URL
-from . import ISSUES_URL
-from . import __version__
-from . import utils
+from mdaviz import APP_DESC
+from mdaviz import APP_TITLE
+from mdaviz import AUTHOR_LIST
+from mdaviz import COPYRIGHT_TEXT
+from mdaviz import DOCS_URL
+from mdaviz import ISSUES_URL
+from mdaviz import __version__
+from mdaviz import utils
 
 
 class AboutDialog(QDialog):
@@ -76,7 +76,7 @@ class AboutDialog(QDialog):
 
     def doLicense(self):
         """show the license"""
-        from .licensedialog import LicenseDialog
+        from mdaviz.licensedialog import LicenseDialog
 
         self.setStatus("opening License in new window")
 

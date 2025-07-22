@@ -16,7 +16,7 @@ import json
 from pathlib import Path
 from typing import Any, Optional
 from dataclasses import dataclass, asdict
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt6.QtCore import QObject, pyqtSignal
 
 
 @dataclass

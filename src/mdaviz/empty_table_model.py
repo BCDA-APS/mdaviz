@@ -1,5 +1,5 @@
-from PyQt5.QtCore import QVariant
-from PyQt5.QtCore import QAbstractTableModel
+from PyQt6.QtCore import QVariant
+from PyQt6.QtCore import QAbstractTableModel
 
 
 class EmptyTableModel(QAbstractTableModel):

@@ -66,11 +66,11 @@ import time
 from functools import partial
 from pathlib import Path
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import QItemSelectionModel, Qt, pyqtSignal
-from PyQt5.QtWidgets import QAbstractItemView, QWidget
+from PyQt6 import QtCore
+from PyQt6.QtCore import QItemSelectionModel, Qt, pyqtSignal
+from PyQt6.QtWidgets import QAbstractItemView, QWidget
 
-from . import utils
+from mdaviz import utils
 
 
 class MDA_MVC(QWidget):
@@ -100,10 +100,10 @@ class MDA_MVC(QWidget):
         self.setup()
 
     def setup(self):
-        from .user_settings import settings
-        from .mda_folder_table_view import MDAFolderTableView
-        from .mda_file_viz import MDAFileVisualization
-        from .mda_file import MDAFile
+        from mdaviz.user_settings import settings
+        from mdaviz.mda_folder_table_view import MDAFolderTableView
+        from mdaviz.mda_file_viz import MDAFileVisualization
+        from mdaviz.mda_file import MDAFile
 
         # Folders table view:
         self.mda_folder_tableview = MDAFolderTableView(self)
@@ -133,12 +133,12 @@ class MDA_MVC(QWidget):
             selection_model = self.mda_folder_tableview.tableView.selectionModel()
             self.setSelectionModel(selection_model)
         # Ensure focus policy and selection mode for keyboard navigation
-        self.mda_folder_tableview.tableView.setFocusPolicy(Qt.StrongFocus)
+        self.mda_folder_tableview.tableView.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.mda_folder_tableview.tableView.setSelectionMode(
-            QAbstractItemView.SingleSelection
+            QAbstractItemView.SelectionMode.SingleSelection
         )
         self.mda_folder_tableview.tableView.setSelectionBehavior(
-            QAbstractItemView.SelectRows
+            QAbstractItemView.SelectionBehavior.SelectRows
         )
 
         # Folder table view signal/slot connections:
@@ -487,7 +487,7 @@ class MDA_MVC(QWidget):
         - Exits with a status message if no file is selected or no detectors (Y) are selected for plotting.
         """
 
-        from .chartview import ChartView
+        from mdaviz.chartview import ChartView
 
         action = args[0]
         tableview = self.currentFileTableview()
@@ -521,6 +521,12 @@ class MDA_MVC(QWidget):
                 # Connect fit signals to main window
                 if hasattr(self.mainWindow, "connectToFitSignals"):
                     self.mainWindow.connectToFitSignals(widgetMpl)
+
+                # Apply stored log scale state to the new chart
+                if hasattr(self.mda_file_viz, "getLogScaleState"):
+                    stored_log_x, stored_log_y = self.mda_file_viz.getLogScaleState()
+                    widgetMpl.setLogScales(stored_log_x, stored_log_y)
+
             if action in ("replace"):
                 widgetMpl.curveManager.removeAllCurves()
             for i, (ds, ds_options) in zip(y_index, datasets):
@@ -597,11 +603,11 @@ class MDA_MVC(QWidget):
                         self.mda_folder_tableview.tableView.setFocus()
                         self.selectionModel().setCurrentIndex(
                             index,
-                            QItemSelectionModel.ClearAndSelect
-                            | QItemSelectionModel.Rows,
+                            QItemSelectionModel.SelectionFlag.ClearAndSelect
+                            | QItemSelectionModel.SelectionFlag.Rows,
                         )
                         self.mda_folder_tableview.tableView.scrollTo(
-                            index, QAbstractItemView.EnsureVisible
+                            index, QAbstractItemView.ScrollHint.EnsureVisible
                         )
 
                         # Reconnect the currentChanged signal
@@ -683,14 +689,16 @@ class MDA_MVC(QWidget):
         # Determine the appropriate scrollHint based on the row position:
         model = self.mda_folder_tableview.tableView.model()
         rowCount = model.rowCount()
-        scrollHint = QAbstractItemView.EnsureVisible
+        scrollHint = QAbstractItemView.ScrollHint.EnsureVisible
         if index.row() == 0:
-            scrollHint = QAbstractItemView.PositionAtTop
+            scrollHint = QAbstractItemView.ScrollHint.PositionAtTop
         elif index.row() == rowCount - 1:
-            scrollHint = QAbstractItemView.PositionAtBottom
+            scrollHint = QAbstractItemView.ScrollHint.PositionAtBottom
         # Select the row and ensure it's visible:
         self.selectionModel().setCurrentIndex(
-            index, QItemSelectionModel.ClearAndSelect | QItemSelectionModel.Rows
+            index,
+            QItemSelectionModel.SelectionFlag.ClearAndSelect
+            | QItemSelectionModel.SelectionFlag.Rows,
         )
         self.mda_folder_tableview.tableView.scrollTo(index, scrollHint)
         # Trigger actions associated with file selection
@@ -718,7 +726,7 @@ class MDA_MVC(QWidget):
         - If I0 is selected, Y data will be normalized as Y/I0.
         """
 
-        from .chartview import ChartView
+        from mdaviz.chartview import ChartView
 
         mode = self.mda_file.mode()
         tableview = self.currentFileTableview()
@@ -746,13 +754,12 @@ class MDA_MVC(QWidget):
             widgetMpl.curveManager.removeAllCurves()
             return
 
-        # If a DET is uncheked:
+        # Handle detector removal - emit signals but don't return early
         if det_removed:
             for y in det_removed:
                 tab_index = self.mda_file.tabWidget.currentIndex()
                 file_path = self.mda_file.tabIndex2Path(tab_index)
                 self.detRemoved.emit(file_path, y)
-                return
 
         # Get dataset for the positioner/detector selection:
         datasets, plot_options = tableview.data2Plot(selection)
@@ -762,6 +769,12 @@ class MDA_MVC(QWidget):
             # Connect fit signals to main window
             if hasattr(self.mainWindow, "connectToFitSignals"):
                 self.mainWindow.connectToFitSignals(widgetMpl)
+
+            # Apply stored log scale state to the new chart
+            if hasattr(self.mda_file_viz, "getLogScaleState"):
+                stored_log_x, stored_log_y = self.mda_file_viz.getLogScaleState()
+                widgetMpl.setLogScales(stored_log_x, stored_log_y)
+
         if mode in ("Auto-replace"):
             widgetMpl.curveManager.removeAllCurves()
         for row, (ds, ds_options) in zip(new_y_selection, datasets):
@@ -811,7 +824,7 @@ class MDA_MVC(QWidget):
         Parameters:
         - key (str): Identifier for the splitter being monitored '(hsplitter' or 'vsplitter')
         """
-        from .user_settings import settings
+        from mdaviz.user_settings import settings
 
         splitter = getattr(self, key)
         while time.time() < getattr(self, f"{key}_deadline"):

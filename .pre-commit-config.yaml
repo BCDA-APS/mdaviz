@@ -23,7 +23,7 @@ repos:
         additional_dependencies: [types-PyYAML]
         # Only check for import errors, do not require type annotations
         args: [--ignore-missing-imports]
-        # If you see 'No module named PyQt5', activate your conda environment: 'conda activate mdaviz'
+        # If you see 'No module named PyQt6', activate your conda environment: 'conda activate mdaviz'
 
   - repo: local
     hooks:

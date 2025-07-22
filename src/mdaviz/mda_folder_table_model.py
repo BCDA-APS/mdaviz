@@ -6,8 +6,8 @@ QAbstractTableModel of folder content.
     ~MDAFolderTableModel
 """
 
-from PyQt5.QtCore import QAbstractTableModel
-from .utils import HEADERS
+from PyQt6.QtCore import QAbstractTableModel, Qt
+from mdaviz.utils import HEADERS
 
 
 class MDAFolderTableModel(QAbstractTableModel):
@@ -47,12 +47,14 @@ class MDAFolderTableModel(QAbstractTableModel):
             value = file_info[label]
             return value
 
-    def headerData(self, section, orientation, role=0):  # 0 = Qt.DisplayRole
-        if role == 0:  # Qt.DisplayRole
-            if orientation == 1:  # Qt.Horizontal
+    def headerData(self, section, orientation, role):
+        """Return the header data for the given section and role."""
+        if role == Qt.ItemDataRole.DisplayRole:
+            if orientation == Qt.Orientation.Horizontal:
                 return self.columnLabels[section]
-            else:
-                return str(section + 1)  # may want to alter at some point
+            elif orientation == Qt.Orientation.Vertical:
+                return str(section + 1)
+        return None
 
     # # ------------ get & set methods
 

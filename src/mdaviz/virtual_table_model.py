@@ -12,8 +12,8 @@ efficiently by loading data on-demand and caching frequently accessed items.
 """
 
 from typing import Any, Optional
-from PyQt5.QtCore import QVariant
-from PyQt5.QtCore import QAbstractTableModel
+from PyQt6.QtCore import QVariant
+from PyQt6.QtCore import QAbstractTableModel
 
 
 class VirtualDataProvider:
@@ -161,7 +161,9 @@ class VirtualTableModel(QAbstractTableModel):
     def headerData(self, section, orientation, role=0):  # 0 = Qt.DisplayRole
         """Get header data for the table."""
         if role == 0:  # Qt.DisplayRole
-            if orientation == 1:  # Qt.Horizontal
+            from PyQt6.QtCore import Qt
+
+            if orientation == Qt.Orientation.Horizontal:
                 headers = self.data_provider.get_column_headers()
                 if 0 <= section < len(headers):
                     return headers[section]

@@ -74,7 +74,7 @@ autodoc_mock_imports = """
     matplotlib
     mda
     numpy
-    PyQt5
+    PyQt6
     yaml
     mdaviz.aboutdialog
     mdaviz.app
