@@ -149,9 +149,6 @@ class MDAFileTableView(QWidget):
             # ------ extract I0 data for normalization:
             i0_index = selections.get("I0")
             i0_data = scanDict[i0_index].get("data") if i0_index in scanDict else None
-            i0_name = (
-                scanDict[i0_index].get("name", "n/a") if i0_index in scanDict else ""
-            )
             # ------ extract y(s) data:
             y_index = selections.get("Y", [])
             y_first_unit = y_first_name = ""
@@ -170,8 +167,8 @@ class MDAFileTableView(QWidget):
                         1  # Replace zeros with 1 to avoid division by zero
                     )
                     y_data = np.array(y_data) / i0_data_safe
-                    # Display label always shows base detector name (for curve legend and combo box)
-                    y_label = f"{fileName}: {y_name}"
+                    # Display label shows base detector name with [norm] suffix for normalized data
+                    y_label = f"{fileName}: {y_name} [norm]"
                     y_unit = ""  # Normalized data typically has no units
                 else:
                     y_unit = f"({y_unit})" if y_unit else ""
@@ -181,7 +178,7 @@ class MDAFileTableView(QWidget):
                     y_first_unit = y_unit
                     # y_first_name is used for y-axis label and shows normalization status
                     y_first_name = (
-                        f"{y_name}/{i0_name}"
+                        f"{y_name} [norm]"
                         if i0_data is not None
                         else f"{y_name} {y_unit}"
                     )

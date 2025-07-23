@@ -171,7 +171,6 @@ class MainWindow(QMainWindow):
         from PyQt6.QtWidgets import (
             QDialog,
             QVBoxLayout,
-            QHBoxLayout,
             QLabel,
             QSpinBox,
             QDialogButtonBox,
