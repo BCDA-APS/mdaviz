@@ -142,6 +142,11 @@ class MDAFileTableModel(QAbstractTableModel):
         self.updateCheckboxes()
         self.highlightedRow = None
 
+    def isI0Selected(self):
+        """Check if I0 is selected in any row."""
+        plot_fields = self.plotFields()
+        return "I0" in plot_fields
+
     # ------------ methods required by Qt's view
 
     def rowCount(self, parent=None):
@@ -178,7 +183,11 @@ class MDAFileTableModel(QAbstractTableModel):
             return None
 
         elif role == Qt.ItemDataRole.BackgroundRole:
+            # Highlight row if it's the highlighted row
             if row == self.highlightedRow:
+                return QBrush(QColor(210, 226, 247))
+            # Highlight I0 column if I0 is selected
+            elif column == self.columnNumber("I0") and self.isI0Selected():
                 return QBrush(QColor(210, 226, 247))
 
         return None
@@ -240,6 +249,9 @@ class MDAFileTableModel(QAbstractTableModel):
         if changes:
             det_removed = self.updateCheckboxes(old_selection=old_selection)
             self.checkboxStateChanged.emit(self.plotFields(), det_removed)
+            # Refresh background highlighting for I0 column if I0 selection changed
+            if column_name == "I0" or prior == "I0":
+                self.layoutChanged.emit()
 
     def checkCheckBox(self, row, column_name):
         self.selections[row] = (
@@ -250,11 +262,16 @@ class MDAFileTableModel(QAbstractTableModel):
         self.dataChanged.emit(
             index, index, [Qt.ItemDataRole.CheckStateRole]
         )  # Update view with Qt.CheckStateRole
+        # Refresh background highlighting for I0 column if I0 selection changed
+        if column_name == "I0":
+            self.layoutChanged.emit()
 
     def uncheckCheckBox(self, row):
         if row in self.selections:
             # Get the column index of the checkbox being unchecked
             col = self.columnNumber(self.selections[row])
+            # Check if we're unchecking I0
+            was_i0 = self.selections[row] == "I0"
             # Remove the selection
             del self.selections[row]
             # Update view
@@ -264,6 +281,9 @@ class MDAFileTableModel(QAbstractTableModel):
             )  # Qt.CheckStateRole
             # Update the mda_mvc selection
             self.updateMdaMvcSelection(self.selections)
+            # Refresh background highlighting for I0 column if I0 selection changed
+            if was_i0:
+                self.layoutChanged.emit()
 
     def clearAllCheckboxes(self):
         """
@@ -272,6 +292,8 @@ class MDAFileTableModel(QAbstractTableModel):
         # Check if there are any selections to clear
         if not self.selections:
             return  # No selections to clear
+        # Check if I0 was selected before clearing
+        had_i0 = any(selection == "I0" for selection in self.selections.values())
         self.selections.clear()
         topLeftIndex = self.index(0, 0)
         bottomRightIndex = self.index(self.rowCount() - 1, self.columnCount() - 1)
@@ -283,6 +305,9 @@ class MDAFileTableModel(QAbstractTableModel):
         # Update the mda_mvc selection
         if self.mda_mvc is not None:
             self.mda_mvc.setSelectionField()
+        # Refresh background highlighting for I0 column if I0 selection changed
+        if had_i0:
+            self.layoutChanged.emit()
 
     def applySelectionRules(self, index, changes=False):
         """Apply selection rules 2-4."""
