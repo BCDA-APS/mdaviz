@@ -97,25 +97,35 @@ class MainWindow(QMainWindow):
 
         self.connect()
 
-        settings.restoreWindowGeometry(self, "mainwindow_geometry")
+        # Restore window geometry from settings
+        geometry_restored = settings.restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
 
-        # Ensure the window size is reasonable (not too large)
+        # Calculate screen size constraints
         screen = QApplication.primaryScreen().geometry()
-        max_width = min(screen.width() * 0.8, 1200)  # Max 80% of screen width or 1200px
-        max_height = min(
-            screen.height() * 0.8, 800
-        )  # Max 80% of screen height or 800px
+        max_width = screen.width() * 0.8  # Max 80% of screen width
+        max_height = screen.height() * 0.8  # Max 80% of screen height
 
-        if self.width() > max_width or self.height() > max_height:
-            self.resize(
-                int(min(self.width(), max_width)), int(min(self.height(), max_height))
-            )
-        elif self.width() < 400 or self.height() < 300:
-            self.resize(720, 400)  # Reasonable default size
+        # Only apply size constraints and centering if no geometry was previously saved
+        if not geometry_restored:
+            # Ensure the window size is reasonable (not too large)
+            if self.width() > max_width or self.height() > max_height:
+                self.resize(
+                    int(min(self.width(), max_width)),
+                    int(min(self.height(), max_height)),
+                )
+            elif self.width() < 400 or self.height() < 300:
+                self.resize(720, 400)  # Reasonable default size
 
-        # Center the window on the screen
-        self._center_window()
+            # Center the window on the screen only if no geometry was restored
+            self._center_window()
+        else:
+            # If geometry was restored, only apply size constraints if window is unreasonably large
+            if self.width() > max_width or self.height() > max_height:
+                self.resize(
+                    int(min(self.width(), max_width)),
+                    int(min(self.height(), max_height)),
+                )
 
         # Auto-load the first valid folder from recent folders
         self._auto_load_first_folder()
