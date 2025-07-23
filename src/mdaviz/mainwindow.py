@@ -9,7 +9,7 @@ Defines MainWindow class.
 from pathlib import Path
 from typing import Optional, List
 from PyQt6 import QtWidgets
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import QMainWindow, QSizePolicy, QApplication
 
 # QAction import removed - no longer needed
@@ -115,7 +115,7 @@ class MainWindow(QMainWindow):
                     int(min(self.height(), max_height)),
                 )
             elif self.width() < 400 or self.height() < 300:
-                self.resize(720, 400)  # Reasonable default size
+                self.resize(720, 500)  # Reasonable default size
 
             # Center the window on the screen only if no geometry was restored
             self._center_window()
@@ -127,8 +127,8 @@ class MainWindow(QMainWindow):
                     int(min(self.height(), max_height)),
                 )
 
-        # Auto-load the first valid folder from recent folders
-        self._auto_load_first_folder()
+        # Auto-load the first valid folder from recent folders (delayed to preserve startup message)
+        QTimer.singleShot(100, self._auto_load_first_folder)
 
     def connect(self):
         self.actionOpen.triggered.connect(self.doOpen)
@@ -412,7 +412,7 @@ class MainWindow(QMainWindow):
                 self.lazy_scanner.scan_folder_async(folder_path)
             else:
                 self.reset_mainwindow()
-                self.setStatus(f"\n{str(folder_path)!r} - Path does not exist.")
+                self.setStatus(f"{folder_name} does not exist or is not a directory")
 
     def onRefresh(self):
         """
