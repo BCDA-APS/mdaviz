@@ -17,7 +17,8 @@ Coverage | License | Python | Pre-commit
 - **Auto-Load Folders**: The application automatically loads the first valid folder from your recent folders list when it starts, providing a seamless experience without requiring manual folder selection.
 - **Lazy Loading**: Efficient folder scanning with progress indicators for large datasets.
 - **Interactive Plotting**: Real-time data visualization with matplotlib integration.
-- **Axis Selection**: Select X-axis (positioners), Y-axis (detectors), and I0 normalization using checkboxes.
+- **Axis Selection**: Select X-axis (positioners), Y-axis (detectors), I0 normalization, and curve unscaling using checkboxes.
+- **Curve Unscaling**: Rescale curves to match the range of other Y curves for better comparison.
 - **Log Scale Support**: Toggle between linear and logarithmic scales for both X and Y axes.
 - **Curve Management**: Add, remove, and style multiple data curves.
 - **Data Analysis**: Basic statistics, cursor measurements, and curve fitting.
@@ -77,6 +78,7 @@ $ mdaviz
    - **X**: Positioner for the x-axis (only one can be selected)
    - **Y**: Detectors for the y-axis (multiple can be selected)
    - **I0**: Normalization detector (only one can be selected)
+   - **Un**: Unscale curves to match the range of other Y curves (requires Y selection on same row)
 3. **Plot Data**: Data will automatically plot based on your selection mode
 
 ### Plot Controls
