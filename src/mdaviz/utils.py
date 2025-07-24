@@ -473,9 +473,16 @@ def mda2ftm(selection: dict | None) -> dict:
                 # Handle unique selections (X and I0)
                 ftm_selection[vals] = k
             else:
-                # Handle multiple selections (Y)
+                # Handle multiple selections (Y and Un)
                 for v in vals:
-                    ftm_selection[v] = k
+                    if v in ftm_selection:
+                        # If this row already has a selection, convert to multiple selection
+                        if isinstance(ftm_selection[v], list):
+                            ftm_selection[v].append(k)
+                        else:
+                            ftm_selection[v] = [ftm_selection[v], k]
+                    else:
+                        ftm_selection[v] = k
     else:
         ftm_selection = {}
     return ftm_selection
@@ -497,14 +504,27 @@ def ftm2mda(selection: dict | None) -> dict:
     mda_selection = {}
     if selection is not None:
         for key, value in selection.items():
-            if value in ["X", "I0"]:
-                # Directly assign the value for 'X' and 'I0' since they are always unique
-                mda_selection[value] = key
+            if isinstance(value, list):
+                # Handle multiple selections per row
+                for column_name in value:
+                    if column_name in ["X", "I0"]:
+                        # These should be unique, so we take the last one
+                        mda_selection[column_name] = key
+                    else:
+                        # For Y and Un, append to list
+                        if column_name not in mda_selection:
+                            mda_selection[column_name] = []
+                        mda_selection[column_name].append(key)
             else:
-                # Append to the list for 'Y'
-                if value not in mda_selection:
-                    mda_selection[value] = []
-                mda_selection[value].append(key)
+                # Handle single selection (backward compatibility)
+                if value in ["X", "I0"]:
+                    # Directly assign the value for 'X' and 'I0' since they are always unique
+                    mda_selection[value] = key
+                else:
+                    # Append to the list for 'Y'
+                    if value not in mda_selection:
+                        mda_selection[value] = []
+                    mda_selection[value].append(key)
     return mda_selection
 
 

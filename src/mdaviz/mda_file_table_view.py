@@ -17,13 +17,14 @@ from mdaviz.mda_file_table_model import FieldRuleType
 from mdaviz.mda_file_table_model import TableColumn
 from mdaviz.mda_file_table_model import TableField
 
-HEADERS = "Field", "X", "Y", "I0", "PV", "DESC", "Unit"
+HEADERS = "Field", "X", "Y", "I0", "Un", "PV", "DESC", "Unit"
 
 COLUMNS = [
     TableColumn("Field", ColumnDataType.text),
     TableColumn("X", ColumnDataType.checkbox, rule=FieldRuleType.unique),  # type: ignore[arg-type]
     TableColumn("Y", ColumnDataType.checkbox, rule=FieldRuleType.multiple),  # type: ignore[arg-type]
     TableColumn("I0", ColumnDataType.checkbox, rule=FieldRuleType.unique),  # type: ignore[arg-type]
+    TableColumn("Un", ColumnDataType.checkbox, rule=FieldRuleType.multiple),  # type: ignore[arg-type]
     TableColumn("PV", ColumnDataType.text),
     TableColumn("DESC", ColumnDataType.text),
     TableColumn("Unit", ColumnDataType.text),
