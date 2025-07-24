@@ -152,7 +152,39 @@ class MDAFileTableView(QWidget):
             i0_data = scanDict[i0_index].get("data") if i0_index in scanDict else None
             # ------ extract y(s) data:
             y_index = selections.get("Y", [])
+            un_index = selections.get("Un", [])
             y_first_unit = y_first_name = ""
+
+            # Identify rows that need unscaling (have both Y and Un selected)
+            unscaled_rows = set(y_index) & set(un_index)
+            regular_y_rows = set(y_index) - unscaled_rows
+
+            # Calculate global min/max for unscaling (from regular Y curves only)
+            global_min = float("inf")
+            global_max = float("-inf")
+            if unscaled_rows and regular_y_rows:
+                for y in regular_y_rows:
+                    if y in scanDict:
+                        y_data = scanDict[y].get("data")
+                        if y_data is not None:
+                            # Apply I0 normalization if I0 is selected
+                            if i0_data is not None:
+                                i0_data_safe = np.array(i0_data)
+                                i0_data_safe[i0_data_safe == 0] = 1
+                                y_data = np.array(y_data) / i0_data_safe
+                            else:
+                                y_data = np.array(y_data)
+                            global_min = min(global_min, np.min(y_data))
+                            global_max = max(global_max, np.max(y_data))
+
+            # If no regular Y curves to reference, use 0 to 1 scale for unscaling
+            if unscaled_rows and (
+                global_min == float("inf") or global_max == float("-inf")
+            ):
+                global_min = 0.0
+                global_max = 1.0
+
+            # Process all Y curves
             for i, y in enumerate(y_index):
                 if y not in scanDict:
                     continue
@@ -172,8 +204,26 @@ class MDAFileTableView(QWidget):
                     y_label = f"{fileName}: {y_name} [norm]"
                     y_unit = ""  # Normalized data typically has no units
                 else:
+                    y_data = np.array(y_data)
                     y_unit = f"({y_unit})" if y_unit else ""
                     y_label = f"{fileName}: {y_name} {y_unit}"
+
+                # Apply unscaling if this row has both Y and Un selected
+                if (
+                    y in unscaled_rows
+                    and global_min != float("inf")
+                    and global_max != float("-inf")
+                ):
+                    # Calculate min/max of this curve
+                    m1, M1 = np.min(y_data), np.max(y_data)
+                    # Apply unscaling formula: g(x) = ((f1(x) - m1) / (M1 - m1)) * (M23 - m23) + m23
+                    if M1 != m1:  # Avoid division by zero
+                        y_data = ((y_data - m1) / (M1 - m1)) * (
+                            global_max - global_min
+                        ) + global_min
+                        y_label = f"{fileName}: {y_name} [unscaled]"
+                        if i0_data is not None:
+                            y_label = f"{fileName}: {y_name} [norm, unscaled]"
 
                 if i == 0:
                     y_first_unit = y_unit
