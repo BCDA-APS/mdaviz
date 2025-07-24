@@ -190,6 +190,19 @@ class MDAFileTableModel(QAbstractTableModel):
             elif column == self.columnNumber("I0") and self.isI0Selected():
                 return QBrush(QColor(210, 226, 247))
 
+        elif role == Qt.ItemDataRole.ToolTipRole:
+            # Provide tooltips for checkbox columns
+            if column in self.checkboxColumns:
+                column_name = self.columnName(column)
+                if column_name == "X":
+                    return "Select this field as the X-axis (independent variable). Only one X selection allowed."
+                elif column_name == "Y":
+                    return "Select this field as a Y-axis (dependent variable). Multiple Y selections allowed."
+                elif column_name == "I0":
+                    return "Select this field for normalization (divide Y data by this field). Only one I0 selection allowed."
+                elif column_name == "Un":
+                    return "Unscale this curve to match the range of other Y curves. Requires Y selection on same row. Multiple Un selections allowed."
+
         return None
 
     def headerData(self, section, orientation, role):
