@@ -3,17 +3,9 @@ Search for mda files.
 """
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QStyledItemDelegate, QWidget, QHeaderView
+from PyQt6.QtWidgets import QWidget, QHeaderView
 from mdaviz import utils
 from mdaviz.mda_folder_table_model import HEADERS
-
-
-class _AlignCenterDelegate(QStyledItemDelegate):
-    """https://stackoverflow.com/a/61722299"""
-
-    def initStyleOption(self, option, index):
-        super().initStyleOption(option, index)
-        option.displayAlignment = Qt.AlignmentFlag.AlignCenter
 
 
 class MDAFolderTableView(QWidget):
@@ -47,17 +39,6 @@ class MDAFolderTableView(QWidget):
         if len(data) > 0:
             data_model = MDAFolderTableModel(data, self.mda_mvc)
             self.tableView.setModel(data_model)
-            labels = data_model.columnLabels
-
-            def centerColumn(label):
-                if label in labels:
-                    column = labels.index(label)
-                    delegate = _AlignCenterDelegate(self.tableView)
-                    self.tableView.setItemDelegateForColumn(column, delegate)
-
-            centerColumn("Scan #")
-            centerColumn("Points")
-            centerColumn("Dim")
         else:
             empty_model = EmptyTableModel(HEADERS)
             self.tableView.setModel(empty_model)
