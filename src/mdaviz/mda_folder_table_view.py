@@ -2,7 +2,6 @@
 Search for mda files.
 """
 
-from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QWidget, QHeaderView
 from mdaviz import utils
 from mdaviz.mda_folder_table_model import HEADERS
