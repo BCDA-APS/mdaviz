@@ -399,20 +399,20 @@ class MDAFileTableModel(QAbstractTableModel):
 
         # Handle "Un" column special rules
         if column_name == "Un":
-            print(f"DEBUG: applySelectionRules - handling Un column")
+            print("DEBUG: applySelectionRules - handling Un column")
             # Rule 1: Cannot be same as X
             if isinstance(
                 self.selections.get(row), list
             ) and "X" in self.selections.get(row, []):
                 if "Un" in self.selections.get(row, []):
                     print(
-                        f"DEBUG: applySelectionRules - removing Un because X is selected"
+                        "DEBUG: applySelectionRules - removing Un because X is selected"
                     )
                     self.selections[row].remove("Un")
                     changes = True
             elif self.selections.get(row) == "X":
                 if "Un" in self.selections.get(row, []):
-                    print(f"DEBUG: applySelectionRules - keeping only X, removing Un")
+                    print("DEBUG: applySelectionRules - keeping only X, removing Un")
                     self.selections[row] = "X"  # Keep only X
                     changes = True
             # Rule 2: Cannot be same as I0
@@ -421,13 +421,13 @@ class MDAFileTableModel(QAbstractTableModel):
             ) and "I0" in self.selections.get(row, []):
                 if "Un" in self.selections.get(row, []):
                     print(
-                        f"DEBUG: applySelectionRules - removing Un because I0 is selected"
+                        "DEBUG: applySelectionRules - removing Un because I0 is selected"
                     )
                     self.selections[row].remove("Un")
                     changes = True
             elif self.selections.get(row) == "I0":
                 if "Un" in self.selections.get(row, []):
-                    print(f"DEBUG: applySelectionRules - keeping only I0, removing Un")
+                    print("DEBUG: applySelectionRules - keeping only I0, removing Un")
                     self.selections[row] = "I0"  # Keep only I0
                     changes = True
             # Rule 3: Requires Y selection (handled in data2Plot)
@@ -466,14 +466,14 @@ class MDAFileTableModel(QAbstractTableModel):
                                 # Remove "Un" if "X" is also selected
                                 if "X" in v and "Un" in v:
                                     print(
-                                        f"DEBUG: applySelectionRules - removing Un because X is selected on same row"
+                                        "DEBUG: applySelectionRules - removing Un because X is selected on same row"
                                     )
                                     v.remove("Un")
                                     changes = True
                                 # Remove "Un" if "I0" is also selected
                                 if "I0" in v and "Un" in v:
                                     print(
-                                        f"DEBUG: applySelectionRules - removing Un because I0 is selected on same row"
+                                        "DEBUG: applySelectionRules - removing Un because I0 is selected on same row"
                                     )
                                     v.remove("Un")
                                     changes = True

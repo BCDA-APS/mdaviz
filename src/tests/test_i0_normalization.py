@@ -19,8 +19,6 @@ label generation, and integration with the data processing pipeline.
 
 import pytest
 import numpy as np
-from unittest.mock import Mock, patch
-from PyQt6.QtWidgets import QApplication
 
 
 def apply_i0_normalization(y_data, i0_data):
@@ -233,7 +231,6 @@ class TestI0Normalization:
         """Test that I0 normalization handles units correctly."""
         # Test that normalized data has no units (as per the code)
         y_unit = "counts"
-        i0_unit = "counts"
 
         # When I0 normalization is applied, units should be cleared
         normalized_unit = ""  # Normalized data typically has no units

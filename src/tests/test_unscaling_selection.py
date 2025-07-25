@@ -16,7 +16,7 @@ with X, Y, and I0 columns in the MDA file table model.
 """
 
 import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import Qt
 
@@ -55,7 +55,7 @@ def table_model(qapp: QApplication) -> MDAFileTableModel:
     ]
 
     # Empty selection field (no initial selections)
-    selection_field = {}
+    selection_field: dict = {}
 
     # Create mock parent
     mock_parent = Mock()

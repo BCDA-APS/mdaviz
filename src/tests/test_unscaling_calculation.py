@@ -14,9 +14,7 @@ by directly testing the calculation functions.
     ~test_unscaling_fallback_0_1
 """
 
-import pytest
 import numpy as np
-from unittest.mock import Mock, patch
 
 
 def apply_unscaling_formula(data, reference_min, reference_max):
@@ -110,14 +108,6 @@ class TestUnscalingCalculation:
         assert abs(np.max(unscaled_data) - 5.0) < 1e-10
 
         # Test with more varied I0 data that results in different normalized values
-        y_data2 = np.array([10, 20, 30, 40, 50])
-        i0_data2 = np.array([1, 2, 3, 4, 5])  # Different ratios
-
-        i0_safe2 = np.array(i0_data2)
-        i0_safe2[i0_safe2 == 0] = 1
-        normalized_data2 = y_data2 / i0_safe2
-
-        # normalized_data2 should be [10, 10, 10, 10, 10] (all same)
         # Let's use different data that actually has variation
         y_data3 = np.array([10, 20, 30, 40, 50])
         i0_data3 = np.array([1, 1, 1, 1, 1])  # Constant I0
