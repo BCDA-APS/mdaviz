@@ -1,8 +1,17 @@
 """
-Support functions for this demo project.
+Utility functions for MDA file processing and data manipulation.
+
+This module provides various utility functions for handling MDA files,
+data conversion, and general utility operations.
 
 .. autosummary::
+
+    ~get_file_info
+    ~get_scan
+    ~mda2ftm
+    ~ftm2mda
     ~byte2str
+    ~num2fstr
     ~getUiFileName
     ~human_readable_size
     ~iso2dt
@@ -19,7 +28,8 @@ import re
 import threading
 from datetime import datetime
 from typing import Any
-from mdaviz.synApps_mdalib.mda import readMDA, scanPositioner, skimMDA
+from PyQt6 import uic
+from mdaviz.synApps_mdalib.mda import scanPositioner, scanDetector, readMDA, skimMDA
 
 HEADERS = "Prefix", "Scan #", "Points", "Dim", "Date", "Size"
 
@@ -409,10 +419,16 @@ def get_scan(mda_file_data):
 
     datasets = {}
     for k, v in d.items():
+        # For time scans (no positioners), truncate detector data to match acquired points
+        if np == 0 and isinstance(v, scanDetector) and len(v.data) > npts:
+            data = v.data[:npts]
+        else:
+            data = v.data or []
+
         datasets[k] = {
             "object": v,
             "type": "POS" if isinstance(v, scanPositioner) else "DET",
-            "data": v.data or [],
+            "data": data,
             "unit": byte2str(v.unit) if v.unit else "",
             "name": byte2str(v.name) if v.name else "n/a",
             "desc": byte2str(v.desc) if v.desc else "",
@@ -576,7 +592,6 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
     inspired by:
     http://stackoverflow.com/questions/14892713/how-do-you-load-ui-files-onto-python-classes-with-pyside?lq=1
     """
-    from PyQt6 import uic
 
     from mdaviz import UI_DIR
 
