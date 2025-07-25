@@ -10,6 +10,7 @@ Version 1.1.2 (Latest)
 - **PyQt6 Migration**: Complete migration from PyQt5 to PyQt6 for future compatibility
 - **Python 3.13+ Support**: Ensured compatibility with Python 3.13 and future versions
 - **Advanced Curve Fitting**: Implemented 7 mathematical models (Gaussian, Lorentzian, Linear, Exponential, Quadratic, Cubic, Error Function)
+- **Curve Unscaling**: New "Un" column for rescaling curves to match the range of other Y curves
 - **Auto-Load Folders**: Application automatically loads the first valid folder from recent folders list
 - **Lazy Loading**: Efficient folder scanning with progress indicators for large datasets
 - **Recent Folders**: Remembers recently opened folders for quick access
@@ -21,6 +22,8 @@ Version 1.1.2 (Latest)
 - **Documentation**: Comprehensive Sphinx documentation with API reference
 - **Testing**: 130 tests passing with 46% coverage (improved from 36%), automated testing on multiple Python versions
 - **Performance**: Optimized memory management and data loading
+- **Multiple Selection Support**: Enhanced table model to support multiple selections per row for advanced data processing
+- **Tooltips**: Added helpful tooltips for all checkbox columns (X, Y, I0, Un) explaining their purpose and selection rules
 
 **Bug Fixes:**
 - Fixed matplotlib artist removal crashes

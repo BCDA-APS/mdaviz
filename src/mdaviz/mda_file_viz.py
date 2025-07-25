@@ -213,10 +213,16 @@ class MDAFileVisualization(QWidget):
         self.logYCheckBox.setEnabled(curve_selected)
 
     def setTableData(self, data):
-        self.data_table_view = DataTableView(data, self)
-        layout = self.dataPage.layout()
-        layout.addWidget(self.data_table_view)
-        self.data_table_view.displayTable()
+        # Reuse existing data table view if it exists
+        if hasattr(self, "data_table_view") and self.data_table_view:
+            self.data_table_view.setData(data)
+            self.data_table_view.displayTable()
+        else:
+            # Create new one only if it doesn't exist
+            self.data_table_view = DataTableView(data, self)
+            layout = self.dataPage.layout()
+            layout.addWidget(self.data_table_view)
+            self.data_table_view.displayTable()
 
     def setMetadata(self, text, *args, **kwargs):
         # tab=self.metadataPage

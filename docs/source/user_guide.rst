@@ -64,8 +64,17 @@ Data Visualization
 ^^^^^^^^^^^^^^^^^
 
 1. **Plot Mode**: Choose between Auto-replace, Auto-add, or Auto-off modes
-2. **Data Selection**: Check/uncheck detectors and positioners to control what's plotted
+2. **Data Selection**: Use the checkbox columns to control what's plotted:
+   - **X**: Select the independent variable (only one allowed)
+   - **Y**: Select dependent variables to plot (multiple allowed)
+   - **I0**: Select for normalization (divide Y data by this field, only one allowed)
+   - **Un**: Unscale curves to match the range of other Y curves (requires Y selection on same row)
 3. **Interactive Plot**: Use matplotlib's interactive features for zooming, panning, and data exploration
+
+**Data Processing Options:**
+- **I0 Normalization**: Divide Y data by the selected I0 field to normalize intensity
+- **Curve Unscaling**: Rescale selected curves to match the range of other Y curves
+- **Combined Processing**: Apply both I0 normalization and unscaling for complex data analysis
 
 Curve Fitting
 ^^^^^^^^^^^^
@@ -97,6 +106,32 @@ Cursor Utilities
 
 Advanced Features
 ----------------
+
+Curve Unscaling
+^^^^^^^^^^^^^^
+
+The "Un" column allows you to rescale curves to match the range of other Y curves:
+
+**How it works:**
+- Select both "Y" and "Un" on the same row to unscale that curve
+- The unscaling formula: `g(x) = ((f1(x) - m1) / (M1 - m1)) * (M23 - m23) + m23`
+  - `m1, M1`: min/max of the curve being unscaled
+  - `m23, M23`: global min/max of other Y curves (excluding unscaled ones)
+
+**Use cases:**
+- **Range Matching**: Scale curves with different ranges to the same scale for comparison
+- **All Curves Unscaled**: When all Y curves are selected for unscaling, they're scaled to 0-1 range
+- **Mixed Processing**: Combine with I0 normalization for complex data analysis
+
+**Selection Rules:**
+- "Un" requires "Y" selection on the same row
+- "Un" cannot be selected with "X" on the same row
+- "Un" cannot be selected with "I0" on the same row
+- Multiple "Un" selections allowed across different rows
+
+**Visual Indicators:**
+- Unscaled curves show `[unscaled]` in their labels
+- Combined I0 + unscaling shows `[norm, unscaled]` in labels
 
 Lazy Loading
 ^^^^^^^^^^^
