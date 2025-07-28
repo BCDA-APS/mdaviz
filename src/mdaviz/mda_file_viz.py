@@ -119,8 +119,8 @@ class MDAFileVisualization(QWidget):
         Parameters:
         - curve_selected: Whether a curve is currently selected
         """
-        self.fitButton.setEnabled(curve_selected)
-        self.clearFitsButton.setEnabled(curve_selected)
+        self.fitButton.setEnabled(curve_selected)  # type: ignore[attr-defined]
+        self.clearFitsButton.setEnabled(curve_selected)  # type: ignore[attr-defined]
         self.updateCurveStyleControls(curve_selected)
 
     def setupCurveStyleUI(self):
@@ -140,16 +140,16 @@ class MDAFileVisualization(QWidget):
 
         # Populate the combo box
         for style_name in self.curve_styles.keys():
-            self.curveStyle.addItem(style_name)
+            self.curveStyle.addItem(style_name)  # type: ignore[attr-defined]
 
         # Set default style
-        self.curveStyle.setCurrentText("Line")
+        self.curveStyle.setCurrentText("Line")  # type: ignore[attr-defined]
 
         # Connect the combo box signal
-        self.curveStyle.currentTextChanged.connect(self.onCurveStyleChanged)
+        self.curveStyle.currentTextChanged.connect(self.onCurveStyleChanged)  # type: ignore[attr-defined]
 
         # Initially disable until a curve is selected
-        self.curveStyle.setEnabled(False)
+        self.curveStyle.setEnabled(False)  # type: ignore[attr-defined]
 
         # Setup log scale controls
         self.setupLogScaleUI()
@@ -157,18 +157,18 @@ class MDAFileVisualization(QWidget):
     def setupLogScaleUI(self):
         """Setup the log scale UI components and connections."""
         # Connect log scale checkboxes
-        self.logXCheckBox.toggled.connect(self.onLogScaleChanged)
-        self.logYCheckBox.toggled.connect(self.onLogScaleChanged)
+        self.logXCheckBox.toggled.connect(self.onLogScaleChanged)  # type: ignore[attr-defined]
+        self.logYCheckBox.toggled.connect(self.onLogScaleChanged)  # type: ignore[attr-defined]
 
         # Initially disable until a curve is selected
-        self.logXCheckBox.setEnabled(False)
-        self.logYCheckBox.setEnabled(False)
+        self.logXCheckBox.setEnabled(False)  # type: ignore[attr-defined]
+        self.logYCheckBox.setEnabled(False)  # type: ignore[attr-defined]
 
     def onLogScaleChanged(self):
         """Handle log scale checkbox changes."""
         # Store the log scale state centrally
-        self._log_x_state = self.logXCheckBox.isChecked()
-        self._log_y_state = self.logYCheckBox.isChecked()
+        self._log_x_state = self.logXCheckBox.isChecked()  # type: ignore[attr-defined]
+        self._log_y_state = self.logYCheckBox.isChecked()  # type: ignore[attr-defined]
 
         # Apply to chart if available
         if hasattr(self, "chart_view") and self.chart_view:
@@ -184,8 +184,8 @@ class MDAFileVisualization(QWidget):
         self._log_y_state = log_y
 
         # Update checkbox states to match stored state
-        self.logXCheckBox.setChecked(log_x)
-        self.logYCheckBox.setChecked(log_y)
+        self.logXCheckBox.setChecked(log_x)  # type: ignore[attr-defined]
+        self.logYCheckBox.setChecked(log_y)  # type: ignore[attr-defined]
 
         # Apply to chart if available
         if hasattr(self, "chart_view") and self.chart_view:
@@ -193,8 +193,8 @@ class MDAFileVisualization(QWidget):
 
     def syncLogScaleCheckboxes(self):
         """Sync checkbox states with the stored log scale state."""
-        self.logXCheckBox.setChecked(self._log_x_state)
-        self.logYCheckBox.setChecked(self._log_y_state)
+        self.logXCheckBox.setChecked(self._log_x_state)  # type: ignore[attr-defined]
+        self.logYCheckBox.setChecked(self._log_y_state)  # type: ignore[attr-defined]
 
     def onCurveStyleChanged(self, style_name: str):
         """Handle curve style change."""
@@ -208,9 +208,9 @@ class MDAFileVisualization(QWidget):
         Parameters:
         - curve_selected: Whether a curve is currently selected
         """
-        self.curveStyle.setEnabled(curve_selected)
-        self.logXCheckBox.setEnabled(curve_selected)
-        self.logYCheckBox.setEnabled(curve_selected)
+        self.curveStyle.setEnabled(curve_selected)  # type: ignore[attr-defined]
+        self.logXCheckBox.setEnabled(curve_selected)  # type: ignore[attr-defined]
+        self.logYCheckBox.setEnabled(curve_selected)  # type: ignore[attr-defined]
 
     def setTableData(self, data):
         # Reuse existing data table view if it exists

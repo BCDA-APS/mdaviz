@@ -493,7 +493,7 @@ class MainWindow(QMainWindow):
         """
         if folder_list is None:
             folder_list = []
-        self.folder.clear()
+        self.folder.clear()  # type: ignore[attr-defined]
 
         # If no folders and auto-load is disabled, show "Please select a folder..."
         if not folder_list and not self.get_auto_load_setting():
@@ -503,10 +503,10 @@ class MainWindow(QMainWindow):
             if not self.get_auto_load_setting():
                 folder_list = ["Please select a folder..."] + folder_list
 
-        self.folder.addItems(folder_list)
-        self.folder.addItems(["Clear Recently Open..."])
-        count = self.folder.count()
-        self.folder.insertSeparator(count - 1)
+        self.folder.addItems(folder_list)  # type: ignore[attr-defined]
+        self.folder.addItems(["Clear Recently Open..."])  # type: ignore[attr-defined]
+        count = self.folder.count()  # type: ignore[attr-defined]
+        self.folder.insertSeparator(count - 1)  # type: ignore[attr-defined]
 
     def _on_scan_progress(self, current: int, total: int) -> None:
         """Handle scan progress updates."""
@@ -532,10 +532,10 @@ class MainWindow(QMainWindow):
                 self.setMdaInfoList(sorted_info)
                 self.setMdaFileList(sorted_files)
                 self._addToRecentFolders(str(folder_path))
-                self.info.setText(f"{len(sorted_files)} mda files")
+                self.info.setText(f"{len(sorted_files)} mda files")  # type: ignore[attr-defined]
 
                 # Create or update the folder view
-                layout = self.groupbox.layout()
+                layout = self.groupbox.layout()  # type: ignore[attr-defined]
                 if self.mvc_folder is None:
                     self.mvc_folder = MDA_MVC(self)
                     layout.addWidget(self.mvc_folder)
@@ -585,13 +585,13 @@ class MainWindow(QMainWindow):
                 )
             else:
                 error_msg = "Could not determine folder path from scan results"
-                self.info.setText("No mda files")
+                self.info.setText("No mda files")  # type: ignore[attr-defined]
                 self.doPopUp(error_msg)
                 self.reset_mainwindow()
                 self.setStatus(f"Scan failed: {error_msg}")
         else:
             error_msg = result.error_message or "No MDA files found"
-            self.info.setText("No mda files")
+            self.info.setText("No mda files")  # type: ignore[attr-defined]
             self.doPopUp(error_msg)
             self.reset_mainwindow()
             self.setStatus(f"Scan failed: {error_msg}")
