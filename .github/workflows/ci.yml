@@ -69,7 +69,6 @@ jobs:
             xvfb \
             x11-utils \
             qt6-base-dev \
-            qt6-qmake \
             libqt6gui6 \
             libqt6widgets6 \
             libqt6core6 \
