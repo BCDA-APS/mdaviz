@@ -6,9 +6,7 @@
 """
 
 from typing import Any, Optional
-from PyQt6.QtCore import QModelIndex, QObject
-from PyQt6.QtCore import QAbstractTableModel
-from PyQt6.QtCore import QVariant
+from PyQt6.QtCore import QModelIndex, QObject, Qt, QAbstractTableModel, QVariant
 
 
 class DataTableModel(QAbstractTableModel):
@@ -116,7 +114,7 @@ class DataTableModel(QAbstractTableModel):
         return QVariant()
 
     def headerData(
-        self, section: int, orientation: int, role: int = 0
+        self, section: int, orientation: Qt.Orientation, role: int = 0
     ) -> Any:  # 0 = Qt.DisplayRole
         """
         Provide horizontal header labels only, nothing for vertical headers (Index is always the first column).
@@ -129,7 +127,9 @@ class DataTableModel(QAbstractTableModel):
         Returns:
             Any: Header data or QVariant() if not found
         """
-        if role == 0 and orientation == 1:  # Qt.DisplayRole and Qt.Horizontal
+        if (
+            role == 0 and orientation == Qt.Orientation.Horizontal
+        ):  # Qt.DisplayRole and Qt.Horizontal
             return self.columnLabels()[section]
         return QVariant()
 

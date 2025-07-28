@@ -1,8 +1,17 @@
 """
-Support functions for this demo project.
+Utility functions for MDA file processing and data manipulation.
+
+This module provides various utility functions for handling MDA files,
+data conversion, and general utility operations.
 
 .. autosummary::
+
+    ~get_file_info
+    ~get_scan
+    ~mda2ftm
+    ~ftm2mda
     ~byte2str
+    ~num2fstr
     ~getUiFileName
     ~human_readable_size
     ~iso2dt
@@ -19,7 +28,8 @@ import re
 import threading
 from datetime import datetime
 from typing import Any
-from mdaviz.synApps_mdalib.mda import readMDA, scanPositioner, skimMDA
+from PyQt6 import uic
+from mdaviz.synApps_mdalib.mda import scanPositioner, scanDetector, readMDA, skimMDA
 
 HEADERS = "Prefix", "Scan #", "Points", "Dim", "Date", "Size"
 
@@ -409,10 +419,16 @@ def get_scan(mda_file_data):
 
     datasets = {}
     for k, v in d.items():
+        # For time scans (no positioners), truncate detector data to match acquired points
+        if np == 0 and isinstance(v, scanDetector) and len(v.data) > npts:
+            data = v.data[:npts]
+        else:
+            data = v.data or []
+
         datasets[k] = {
             "object": v,
             "type": "POS" if isinstance(v, scanPositioner) else "DET",
-            "data": v.data or [],
+            "data": data,
             "unit": byte2str(v.unit) if v.unit else "",
             "name": byte2str(v.name) if v.name else "n/a",
             "desc": byte2str(v.desc) if v.desc else "",
@@ -473,9 +489,16 @@ def mda2ftm(selection: dict | None) -> dict:
                 # Handle unique selections (X and I0)
                 ftm_selection[vals] = k
             else:
-                # Handle multiple selections (Y)
+                # Handle multiple selections (Y and Un)
                 for v in vals:
-                    ftm_selection[v] = k
+                    if v in ftm_selection:
+                        # If this row already has a selection, convert to multiple selection
+                        if isinstance(ftm_selection[v], list):
+                            ftm_selection[v].append(k)
+                        else:
+                            ftm_selection[v] = [ftm_selection[v], k]
+                    else:
+                        ftm_selection[v] = k
     else:
         ftm_selection = {}
     return ftm_selection
@@ -497,14 +520,27 @@ def ftm2mda(selection: dict | None) -> dict:
     mda_selection = {}
     if selection is not None:
         for key, value in selection.items():
-            if value in ["X", "I0"]:
-                # Directly assign the value for 'X' and 'I0' since they are always unique
-                mda_selection[value] = key
+            if isinstance(value, list):
+                # Handle multiple selections per row
+                for column_name in value:
+                    if column_name in ["X", "I0"]:
+                        # These should be unique, so we take the last one
+                        mda_selection[column_name] = key
+                    else:
+                        # For Y and Un, append to list
+                        if column_name not in mda_selection:
+                            mda_selection[column_name] = []
+                        mda_selection[column_name].append(key)
             else:
-                # Append to the list for 'Y'
-                if value not in mda_selection:
-                    mda_selection[value] = []
-                mda_selection[value].append(key)
+                # Handle single selection (backward compatibility)
+                if value in ["X", "I0"]:
+                    # Directly assign the value for 'X' and 'I0' since they are always unique
+                    mda_selection[value] = key
+                else:
+                    # Append to the list for 'Y'
+                    if value not in mda_selection:
+                        mda_selection[value] = []
+                    mda_selection[value].append(key)
     return mda_selection
 
 
@@ -556,7 +592,6 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
     inspired by:
     http://stackoverflow.com/questions/14892713/how-do-you-load-ui-files-onto-python-classes-with-pyside?lq=1
     """
-    from PyQt6 import uic
 
     from mdaviz import UI_DIR
 

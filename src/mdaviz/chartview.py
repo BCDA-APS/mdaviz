@@ -545,20 +545,7 @@ class ChartView(QWidget):
                     detector_name = combo_text.split(": ", 1)[1]
                 else:
                     detector_name = combo_text
-
-                # Check if I0 is toggled on by looking at the plot_options y-label
-                curve_data = self.curveManager.getCurveData(curveID)
-                plot_options = curve_data.get("plot_options", {})
-                y_label = plot_options.get("y", "")
-
-                # Check if I0 normalization is active by looking for "/" in the y_label
-                # But we need to check if this y_label corresponds to the current curve's detector
-                if "/" in y_label and detector_name in y_label:
-                    # This curve has I0 normalization, use the y_label
-                    self.setYlabel(y_label)
-                else:
-                    # No I0 normalization or wrong y_label, use just the detector name
-                    self.setYlabel(detector_name)
+                self.setYlabel(detector_name)
             else:
                 self.setYlabel("")
         else:

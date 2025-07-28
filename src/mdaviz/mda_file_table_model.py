@@ -142,6 +142,11 @@ class MDAFileTableModel(QAbstractTableModel):
         self.updateCheckboxes()
         self.highlightedRow = None
 
+    def isI0Selected(self):
+        """Check if I0 is selected in any row."""
+        plot_fields = self.plotFields()
+        return "I0" in plot_fields
+
     # ------------ methods required by Qt's view
 
     def rowCount(self, parent=None):
@@ -178,8 +183,25 @@ class MDAFileTableModel(QAbstractTableModel):
             return None
 
         elif role == Qt.ItemDataRole.BackgroundRole:
+            # Highlight row if it's the highlighted row
             if row == self.highlightedRow:
                 return QBrush(QColor(210, 226, 247))
+            # Highlight I0 column if I0 is selected
+            elif column == self.columnNumber("I0") and self.isI0Selected():
+                return QBrush(QColor(210, 226, 247))
+
+        elif role == Qt.ItemDataRole.ToolTipRole:
+            # Provide tooltips for checkbox columns
+            if column in self.checkboxColumns:
+                column_name = self.columnName(column)
+                if column_name == "X":
+                    return "Select this field as the X-axis (independent variable). Only one X selection allowed."
+                elif column_name == "Y":
+                    return "Select this field as a Y-axis (dependent variable). Multiple Y selections allowed."
+                elif column_name == "I0":
+                    return "Select this field for normalization (divide Y data by this field). Only one I0 selection allowed."
+                elif column_name == "Un":
+                    return "Unscale this curve to match the range of other Y curves. Requires Y selection on same row. Multiple Un selections allowed."
 
         return None
 
@@ -225,7 +247,12 @@ class MDAFileTableModel(QAbstractTableModel):
         """Return the checkbox state for a given cell: (row, column) = (index.row(), index.column())."""
         nm = self.columnName(index.column())  # selection name of THIS column
         selection = self.selections.get(index.row())  # user selection
-        return Qt.CheckState.Checked if selection == nm else Qt.CheckState.Unchecked
+
+        # Handle both single selections (str) and multiple selections (list)
+        if isinstance(selection, list):
+            return Qt.CheckState.Checked if nm in selection else Qt.CheckState.Unchecked
+        else:
+            return Qt.CheckState.Checked if selection == nm else Qt.CheckState.Unchecked
 
     def setCheckbox(self, index, state):
         """Set the checkbox state."""
@@ -234,12 +261,62 @@ class MDAFileTableModel(QAbstractTableModel):
         column_name = self.columnName(column)
         checked = state == Qt.CheckState.Checked
         prior = self.selections.get(row)  # value if row exist as a key, None otherwise
-        self.selections[row] = column_name if checked else None  # Rule 1
-        changes = self.selections[row] != prior
+
+        print(
+            f"DEBUG: setCheckbox - row={row}, column_name={column_name}, checked={checked}"
+        )
+        print(f"DEBUG: setCheckbox - prior={prior}")
+
+        # Handle multiple selections per row
+        if isinstance(prior, list):
+            new_selection = prior.copy() if prior else []
+            if checked and column_name not in new_selection:
+                new_selection.append(column_name)
+            elif not checked and column_name in new_selection:
+                new_selection.remove(column_name)
+                if not new_selection:  # If the list is now empty, set to None
+                    new_selection = None
+            self.selections[row] = new_selection
+            changes = new_selection != prior
+            print(
+                f"DEBUG: setCheckbox - multiple selection: new_selection={new_selection}, changes={changes}"
+            )
+        else:
+            # Handle single selection (backward compatibility)
+            if checked:
+                # If we're adding any column to a row that already has a selection, convert to multiple selection
+                if prior is not None:
+                    new_selection = [prior, column_name]
+                    self.selections[row] = new_selection
+                    changes = True
+                    print(
+                        f"DEBUG: setCheckbox - converting to multiple selection: new_selection={new_selection}"
+                    )
+                else:
+                    # Normal single selection replacement
+                    new_selection = column_name
+                    self.selections[row] = new_selection
+                    changes = new_selection != prior
+                    print(
+                        f"DEBUG: setCheckbox - single selection replacement: new_selection={new_selection}, changes={changes}"
+                    )
+            else:
+                # Unchecking - just clear the selection
+                new_selection = None
+                self.selections[row] = new_selection
+                changes = new_selection != prior
+                print(
+                    f"DEBUG: setCheckbox - unchecking: new_selection={new_selection}, changes={changes}"
+                )
+
         changes = self.applySelectionRules(index, changes)
+        print(f"DEBUG: setCheckbox - after applySelectionRules: changes={changes}")
         if changes:
             det_removed = self.updateCheckboxes(old_selection=old_selection)
             self.checkboxStateChanged.emit(self.plotFields(), det_removed)
+            # Refresh background highlighting for I0 column if I0 selection changed
+            if column_name == "I0" or prior == "I0":
+                self.layoutChanged.emit()
 
     def checkCheckBox(self, row, column_name):
         self.selections[row] = (
@@ -250,20 +327,42 @@ class MDAFileTableModel(QAbstractTableModel):
         self.dataChanged.emit(
             index, index, [Qt.ItemDataRole.CheckStateRole]
         )  # Update view with Qt.CheckStateRole
+        # Refresh background highlighting for I0 column if I0 selection changed
+        if column_name == "I0":
+            self.layoutChanged.emit()
 
     def uncheckCheckBox(self, row):
         if row in self.selections:
             # Get the column index of the checkbox being unchecked
-            col = self.columnNumber(self.selections[row])
-            # Remove the selection
-            del self.selections[row]
-            # Update view
-            index = self.index(row, col)
-            self.dataChanged.emit(
-                index, index, [Qt.ItemDataRole.CheckStateRole]
-            )  # Qt.CheckStateRole
+            selection = self.selections[row]
+            if isinstance(selection, list):
+                # For multiple selections, we need to determine which column to update
+                # This method is called from chartview when a curve is removed,
+                # so we'll just clear all selections for this row
+                was_i0 = "I0" in selection
+                del self.selections[row]
+                # Update all checkbox columns for this row
+                for col in self.checkboxColumns:
+                    index = self.index(row, col)
+                    self.dataChanged.emit(
+                        index, index, [Qt.ItemDataRole.CheckStateRole]
+                    )  # Qt.CheckStateRole
+            else:
+                # Handle single selection (backward compatibility)
+                col = self.columnNumber(selection)
+                was_i0 = selection == "I0"
+                del self.selections[row]
+                # Update view
+                index = self.index(row, col)
+                self.dataChanged.emit(
+                    index, index, [Qt.ItemDataRole.CheckStateRole]
+                )  # Qt.CheckStateRole
+
             # Update the mda_mvc selection
             self.updateMdaMvcSelection(self.selections)
+            # Refresh background highlighting for I0 column if I0 selection changed
+            if was_i0:
+                self.layoutChanged.emit()
 
     def clearAllCheckboxes(self):
         """
@@ -272,6 +371,8 @@ class MDAFileTableModel(QAbstractTableModel):
         # Check if there are any selections to clear
         if not self.selections:
             return  # No selections to clear
+        # Check if I0 was selected before clearing
+        had_i0 = any(selection == "I0" for selection in self.selections.values())
         self.selections.clear()
         topLeftIndex = self.index(0, 0)
         bottomRightIndex = self.index(self.rowCount() - 1, self.columnCount() - 1)
@@ -283,6 +384,9 @@ class MDAFileTableModel(QAbstractTableModel):
         # Update the mda_mvc selection
         if self.mda_mvc is not None:
             self.mda_mvc.setSelectionField()
+        # Refresh background highlighting for I0 column if I0 selection changed
+        if had_i0:
+            self.layoutChanged.emit()
 
     def applySelectionRules(self, index, changes=False):
         """Apply selection rules 2-4."""
@@ -290,17 +394,106 @@ class MDAFileTableModel(QAbstractTableModel):
         column_name = self.columnName(index.column())
         current_column_number = self.columnNumber(column_name)
 
-        for r, v in sorted(self.selections.items()):
-            if v is not None:
-                v_column_number = self.columnNumber(v)
-                # Only apply rules between unique selection columns
-                if (
-                    v_column_number in self.uniqueSelectionColumns
-                    and current_column_number in self.uniqueSelectionColumns
-                ):
-                    if r != row and column_name == v:
-                        self.selections[r] = None
-                        changes = True
+        print(f"DEBUG: applySelectionRules - row={row}, column_name={column_name}")
+        print(f"DEBUG: applySelectionRules - current selections={self.selections}")
+
+        # Handle "Un" column special rules
+        if column_name == "Un":
+            print("DEBUG: applySelectionRules - handling Un column")
+            # Rule 1: Cannot be same as X
+            if isinstance(
+                self.selections.get(row), list
+            ) and "X" in self.selections.get(row, []):
+                if "Un" in self.selections.get(row, []):
+                    print(
+                        "DEBUG: applySelectionRules - removing Un because X is selected"
+                    )
+                    self.selections[row].remove("Un")
+                    changes = True
+            elif self.selections.get(row) == "X":
+                if "Un" in self.selections.get(row, []):
+                    print("DEBUG: applySelectionRules - keeping only X, removing Un")
+                    self.selections[row] = "X"  # Keep only X
+                    changes = True
+            # Rule 2: Cannot be same as I0
+            if isinstance(
+                self.selections.get(row), list
+            ) and "I0" in self.selections.get(row, []):
+                if "Un" in self.selections.get(row, []):
+                    print(
+                        "DEBUG: applySelectionRules - removing Un because I0 is selected"
+                    )
+                    self.selections[row].remove("Un")
+                    changes = True
+            elif self.selections.get(row) == "I0":
+                if "Un" in self.selections.get(row, []):
+                    print("DEBUG: applySelectionRules - keeping only I0, removing Un")
+                    self.selections[row] = "I0"  # Keep only I0
+                    changes = True
+            # Rule 3: Requires Y selection (handled in data2Plot)
+            # Rule 4: Multiple allowed (no special handling needed)
+        else:
+            # Handle unique selection columns (X, I0)
+            if current_column_number in self.uniqueSelectionColumns:
+                for r, v in sorted(self.selections.items()):
+                    if v is not None:
+                        # Handle both single selection (string) and multiple selection (list)
+                        if isinstance(v, list):
+                            # For multiple selections, check if any of them conflict
+                            for single_v in v:
+                                if single_v in ["X", "I0"]:
+                                    v_column_number = self.columnNumber(single_v)
+                                    if (
+                                        v_column_number in self.uniqueSelectionColumns
+                                        and current_column_number
+                                        in self.uniqueSelectionColumns
+                                        and single_v
+                                        == column_name  # Only conflict if same column type
+                                    ):
+                                        if r != row:
+                                            print(
+                                                f"DEBUG: applySelectionRules - removing {single_v} from row {r} because {column_name} selected"
+                                            )
+                                            # Remove the conflicting selection from the list
+                                            v.remove(single_v)
+                                            if not v:  # If list is empty, set to None
+                                                self.selections[r] = None
+                                            else:
+                                                self.selections[r] = v
+                                            changes = True
+                            # Also check for conflicts within the same row (e.g., X and Un, I0 and Un)
+                            if r == row and isinstance(v, list):
+                                # Remove "Un" if "X" is also selected
+                                if "X" in v and "Un" in v:
+                                    print(
+                                        "DEBUG: applySelectionRules - removing Un because X is selected on same row"
+                                    )
+                                    v.remove("Un")
+                                    changes = True
+                                # Remove "Un" if "I0" is also selected
+                                if "I0" in v and "Un" in v:
+                                    print(
+                                        "DEBUG: applySelectionRules - removing Un because I0 is selected on same row"
+                                    )
+                                    v.remove("Un")
+                                    changes = True
+                        else:
+                            # Handle single selection (backward compatibility)
+                            v_column_number = self.columnNumber(v)
+                            if (
+                                v_column_number in self.uniqueSelectionColumns
+                                and current_column_number in self.uniqueSelectionColumns
+                            ):
+                                if r != row and column_name == v:
+                                    print(
+                                        f"DEBUG: applySelectionRules - removing {v} from row {r} because {column_name} selected"
+                                    )
+                                    self.selections[r] = None
+                                    changes = True
+
+        print(
+            f"DEBUG: applySelectionRules - final selections={self.selections}, changes={changes}"
+        )
         return changes
 
     def updateCheckboxes(
@@ -433,13 +626,26 @@ class MDAFileTableModel(QAbstractTableModel):
 
         key=column_name, value= row_number(s) or fieldName(s)
         """
-        choices = dict(Y=[])
-        for row, column_name in self.selections.items():
-            column_number = self.columnNumber(column_name)
-            if column_number in self.uniqueSelectionColumns:
-                choices[column_name] = row
-            elif column_number in self.multipleSelectionColumns:
-                choices[column_name].append(row)
+        choices = dict(Y=[], Un=[])
+        for row, selection in self.selections.items():
+            if selection is None:
+                continue
+
+            # Handle both single selections (str) and multiple selections (list)
+            if isinstance(selection, list):
+                for column_name in selection:
+                    column_number = self.columnNumber(column_name)
+                    if column_number in self.uniqueSelectionColumns:
+                        choices[column_name] = row
+                    elif column_number in self.multipleSelectionColumns:
+                        choices[column_name].append(row)
+            else:
+                # Handle single selection (backward compatibility)
+                column_number = self.columnNumber(selection)
+                if column_number in self.uniqueSelectionColumns:
+                    choices[selection] = row
+                elif column_number in self.multipleSelectionColumns:
+                    choices[selection].append(row)
         return choices
 
     def setStatus(self, text):

@@ -14,14 +14,14 @@ Coverage | License | Python | Pre-commit
 
 ## Features
 
-- **Auto-Load Folders**: The application automatically loads the first valid folder from your recent folders list when it starts, providing a seamless experience without requiring manual folder selection.
-- **Lazy Loading**: Efficient folder scanning with progress indicators for large datasets.
-- **Interactive Plotting**: Real-time data visualization with matplotlib integration.
-- **Axis Selection**: Select X-axis (positioners), Y-axis (detectors), and I0 normalization using checkboxes.
-- **Log Scale Support**: Toggle between linear and logarithmic scales for both X and Y axes.
-- **Curve Management**: Add, remove, and style multiple data curves.
-- **Data Analysis**: Basic statistics, cursor measurements, and curve fitting.
+- **Auto-Load Folders**: The application automatically loads the first valid folder from your recent folders list when it starts, providing a seamless experience without requiring manual folder selection. You can toggle this feature on/off from the preferences window.
 - **Recent Folders**: Remembers your recently opened folders for quick access.
+- **Lazy Loading**: Efficient folder scanning with progress indicators for large datasets.
+- **Curve Management**: Add, remove, and style multiple data curves.
+- **Axis Selection**: Select X-axis (positioners), Y-axis (detectors), I0 normalization, and curve unscaling using checkboxes. Axis selection is saved from one file to the next.
+- **Curve Unscaling**: Rescale curves to match the range of other Y curves for better comparison.
+- **Log Scale**: Toggle between linear and logarithmic scales for both X and Y axes.
+- **Data Analysis**: Basic statistics, cursor measurements, and curve fitting.
 - **PyQt6 Migration**: Complete migration to PyQt6 for future compatibility with Python 3.13+.
 
 ## Quickstart
@@ -77,6 +77,7 @@ $ mdaviz
    - **X**: Positioner for the x-axis (only one can be selected)
    - **Y**: Detectors for the y-axis (multiple can be selected)
    - **I0**: Normalization detector (only one can be selected)
+   - **Un**: Unscale curves to match the range of other Y curves (requires Y selection on same row)
 3. **Plot Data**: Data will automatically plot based on your selection mode
 
 ### Plot Controls
@@ -84,7 +85,7 @@ $ mdaviz
 - **Log Scale**: Use the "LogX" and "LogY" checkboxes to switch between linear and logarithmic scales
 - **Curve Styling**: Select different line styles and markers for your curves
 - **Data Manipulation**: Apply offset and scaling factors to individual curves
-- **Cursors**: Use mouse clicks to place measurement cursors on the plot
+- **Data Analysis**: Basic statistics, cursor measurements, and curve fitting.
 
 ### Plotting Modes
 

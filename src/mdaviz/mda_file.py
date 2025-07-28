@@ -371,11 +371,24 @@ class MDAFile(QWidget):
         self.displayData(tabledata)
         selection_field = self.defaultSelection(first_pos, first_det, selection_field)
         # Update tab widget:
+        mode = self.mode()
         if self.tabManager.getTabData(file_path):
-            tab_index = self.tabPath2Index(file_path)
-            self.tabWidget.setCurrentIndex(tab_index)
+            # File already exists in tab manager
+            if mode in ("Auto-replace"):
+                # In auto-replace mode, clear all tabs and recreate this one
+                while self.tabWidget.count() > 0:
+                    self.tabWidget.removeTab(0)
+                self.tabManager.removeAllTabs()
+                # Add this tab to the UI:
+                self.createNewTab(file_name, file_path, selection_field)
+                # Add new tab to tabManager:
+                self.tabManager.addTab(file_path, metadata, tabledata)
+            else:
+                # In auto-add/auto-off mode, just switch to existing tab
+                tab_index = self.tabPath2Index(file_path)
+                self.tabWidget.setCurrentIndex(tab_index)
         else:
-            mode = self.mode()
+            # File is new
             if mode in ("Auto-add", "Auto-off"):
                 # Add this tab to the UI:
                 self.createNewTab(file_name, file_path, selection_field)

@@ -46,6 +46,12 @@ class MDAFolderTableModel(QAbstractTableModel):
             file_info = self.fileInfoList()[index.row()]
             value = file_info[label]
             return value
+        elif role == Qt.ItemDataRole.TextAlignmentRole:
+            # Center align specific columns
+            label = self.columnLabels[index.column()]
+            if label in ["Scan #", "Points", "Dim"]:
+                return Qt.AlignmentFlag.AlignCenter
+        return None
 
     def headerData(self, section, orientation, role):
         """Return the header data for the given section and role."""

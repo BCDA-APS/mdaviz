@@ -9,9 +9,10 @@ Defines MainWindow class.
 from pathlib import Path
 from typing import Optional, List
 from PyQt6 import QtWidgets
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import QMainWindow, QSizePolicy, QApplication
-from PyQt6.QtGui import QAction
+
+# QAction import removed - no longer needed
 
 from mdaviz import APP_TITLE
 from mdaviz.mda_folder import MDA_MVC
@@ -96,28 +97,38 @@ class MainWindow(QMainWindow):
 
         self.connect()
 
-        settings.restoreWindowGeometry(self, "mainwindow_geometry")
+        # Restore window geometry from settings
+        geometry_restored = settings.restoreWindowGeometry(self, "mainwindow_geometry")
         print("Settings are saved in:", settings.fileName())
 
-        # Ensure the window size is reasonable (not too large)
+        # Calculate screen size constraints
         screen = QApplication.primaryScreen().geometry()
-        max_width = min(screen.width() * 0.8, 1200)  # Max 80% of screen width or 1200px
-        max_height = min(
-            screen.height() * 0.8, 800
-        )  # Max 80% of screen height or 800px
+        max_width = screen.width() * 0.8  # Max 80% of screen width
+        max_height = screen.height() * 0.8  # Max 80% of screen height
 
-        if self.width() > max_width or self.height() > max_height:
-            self.resize(
-                int(min(self.width(), max_width)), int(min(self.height(), max_height))
-            )
-        elif self.width() < 400 or self.height() < 300:
-            self.resize(720, 400)  # Reasonable default size
+        # Only apply size constraints and centering if no geometry was previously saved
+        if not geometry_restored:
+            # Ensure the window size is reasonable (not too large)
+            if self.width() > max_width or self.height() > max_height:
+                self.resize(
+                    int(min(self.width(), max_width)),
+                    int(min(self.height(), max_height)),
+                )
+            elif self.width() < 400 or self.height() < 300:
+                self.resize(720, 500)  # Reasonable default size
 
-        # Center the window on the screen
-        self._center_window()
+            # Center the window on the screen only if no geometry was restored
+            self._center_window()
+        else:
+            # If geometry was restored, only apply size constraints if window is unreasonably large
+            if self.width() > max_width or self.height() > max_height:
+                self.resize(
+                    int(min(self.width(), max_width)),
+                    int(min(self.height(), max_height)),
+                )
 
-        # Auto-load the first valid folder from recent folders
-        self._auto_load_first_folder()
+        # Auto-load the first valid folder from recent folders (delayed to preserve startup message)
+        QTimer.singleShot(100, self._auto_load_first_folder)
 
     def connect(self):
         self.actionOpen.triggered.connect(self.doOpen)
@@ -128,31 +139,12 @@ class MainWindow(QMainWindow):
         utils.reconnect(self.refresh.released, self.onRefresh)
         self.folder.currentTextChanged.connect(self.onFolderSelected)
 
-        # Add auto-load toggle action to File menu
-        self._setup_auto_load_menu()
+        # Auto-load menu removed - now handled in preferences dialog
 
         # Create tab widget and fit data components if they don't exist
         self._setup_fit_data_tab()
 
-    def _setup_auto_load_menu(self):
-        """Set up the auto-load toggle menu action."""
-        # Create the auto-load toggle action
-        self.actionToggleAutoLoad = QAction("Toggle Auto-Load", self)
-        self.actionToggleAutoLoad.setStatusTip(
-            "Toggle automatic folder loading on startup"
-        )
-        self.actionToggleAutoLoad.setCheckable(True)
-        self.actionToggleAutoLoad.setChecked(self.get_auto_load_setting())
-        self.actionToggleAutoLoad.triggered.connect(self._on_toggle_auto_load)
-
-        # Add to File menu
-        self.menuFile.addSeparator()
-        self.menuFile.addAction(self.actionToggleAutoLoad)
-
-    def _on_toggle_auto_load(self):
-        """Handle auto-load toggle menu action."""
-        new_setting = self.toggle_auto_load()
-        self.actionToggleAutoLoad.setChecked(new_setting)
+    # Auto-load menu methods removed - now handled in preferences dialog
 
     @property
     def status(self):
@@ -179,10 +171,10 @@ class MainWindow(QMainWindow):
         from PyQt6.QtWidgets import (
             QDialog,
             QVBoxLayout,
-            QHBoxLayout,
             QLabel,
             QSpinBox,
             QDialogButtonBox,
+            QCheckBox,
         )
 
         # Create preferences dialog
@@ -193,8 +185,20 @@ class MainWindow(QMainWindow):
 
         layout = QVBoxLayout(dialog)
 
-        # Plot height setting
-        plot_layout = QHBoxLayout()
+        # Auto-load setting (first)
+        auto_load_checkbox = QCheckBox("Auto-load first folder on startup")
+        auto_load_val = settings.getKey("auto_load_folder")
+        if auto_load_val is None:
+            auto_load_val = True
+        elif isinstance(auto_load_val, str):
+            auto_load_val = auto_load_val.lower() in ("true", "1", "yes", "on")
+        auto_load_checkbox.setChecked(bool(auto_load_val))
+        layout.addWidget(auto_load_checkbox)
+
+        # Add some spacing
+        layout.addStretch()
+
+        # Plot height setting (second)
         plot_label = QLabel("Maximum Plot Height (pixels):")
         plot_spinbox = QSpinBox()
         plot_spinbox.setRange(200, 2000)
@@ -206,24 +210,37 @@ class MainWindow(QMainWindow):
             plot_height_val = 800
         plot_spinbox.setValue(plot_height_val)
         plot_spinbox.setSuffix(" px")
-        plot_layout.addWidget(plot_label)
-        plot_layout.addWidget(plot_spinbox)
-        layout.addLayout(plot_layout)
+        layout.addWidget(plot_label)
+        layout.addWidget(plot_spinbox)
+
+        # Add helpful caption for plot height setting
+        plot_caption = QLabel(
+            "Use this setting if plot areas expand vertically unexpectedly due to UI bugs."
+        )
+        plot_caption.setWordWrap(True)
+        plot_caption.setStyleSheet("color: gray; font-size: 10px;")
+        layout.addWidget(plot_caption)
 
         # Add some spacing
         layout.addStretch()
 
         # Buttons
-        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        button_box = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+        )
         button_box.accepted.connect(dialog.accept)
         button_box.rejected.connect(dialog.reject)
         layout.addWidget(button_box)
 
         # Show dialog
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.DialogCode.Accepted:
             # Save the new plot height setting
             new_height = plot_spinbox.value()
             settings.setKey("plot_max_height", new_height)
+
+            # Save the new auto-load setting
+            new_auto_load = auto_load_checkbox.isChecked()
+            settings.setKey("auto_load_folder", new_auto_load)
 
             # Update any existing ChartView widgets
             if hasattr(self, "mvc_folder") and self.mvc_folder:
@@ -245,7 +262,9 @@ class MainWindow(QMainWindow):
                     ):
                         self.mvc_folder.mda_file_viz._updateTabWidgetMaxHeight()
 
-            self.setStatus(f"Plot height setting updated to {new_height} pixels")
+            self.setStatus(
+                f"Settings updated: plot height {new_height}px, auto-load {'enabled' if new_auto_load else 'disabled'}"
+            )
 
     def closeEvent(self, event):
         """
@@ -309,8 +328,8 @@ class MainWindow(QMainWindow):
                     folder_list.insert(0, str(folder_path))
                     self.setFolderList(folder_list)
 
-                    # The folder will be loaded automatically when the combo box changes
-                    # No need to call onFolderSelected manually
+                    # Set the combobox selection to the new folder
+                    self.folder.setCurrentText(str(folder_path))
 
     def doPopUp(self, message):
         """
@@ -378,7 +397,7 @@ class MainWindow(QMainWindow):
 
     def onFolderSelected(self, folder_name):
         """A folder was selected (from the open dialog or pull down menu)."""
-        if folder_name in [".", "", "Select a folder..."]:
+        if folder_name in [".", "", "Select a folder...", "Please select a folder..."]:
             pass
         elif folder_name == "Clear Recently Open...":
             settings.setKey(DIR_SETTINGS_KEY, "")
@@ -392,7 +411,7 @@ class MainWindow(QMainWindow):
                 self.lazy_scanner.scan_folder_async(folder_path)
             else:
                 self.reset_mainwindow()
-                self.setStatus(f"\n{str(folder_path)!r} - Path does not exist.")
+                self.setStatus(f"{folder_name} does not exist or is not a directory")
 
     def onRefresh(self):
         """
@@ -474,13 +493,20 @@ class MainWindow(QMainWindow):
         """
         if folder_list is None:
             folder_list = []
-        self.folder.clear()
-        if not folder_list:
-            folder_list = ["Select a folder..."]
-        self.folder.addItems(folder_list)
-        self.folder.addItems(["Clear Recently Open..."])
-        count = self.folder.count()
-        self.folder.insertSeparator(count - 1)
+        self.folder.clear()  # type: ignore[attr-defined]
+
+        # If no folders and auto-load is disabled, show "Please select a folder..."
+        if not folder_list and not self.get_auto_load_setting():
+            folder_list = ["Please select a folder..."]
+        else:
+            # If we have folders and auto-load is disabled, add "Please select a folder..." at the beginning
+            if not self.get_auto_load_setting():
+                folder_list = ["Please select a folder..."] + folder_list
+
+        self.folder.addItems(folder_list)  # type: ignore[attr-defined]
+        self.folder.addItems(["Clear Recently Open..."])  # type: ignore[attr-defined]
+        count = self.folder.count()  # type: ignore[attr-defined]
+        self.folder.insertSeparator(count - 1)  # type: ignore[attr-defined]
 
     def _on_scan_progress(self, current: int, total: int) -> None:
         """Handle scan progress updates."""
@@ -506,10 +532,10 @@ class MainWindow(QMainWindow):
                 self.setMdaInfoList(sorted_info)
                 self.setMdaFileList(sorted_files)
                 self._addToRecentFolders(str(folder_path))
-                self.info.setText(f"{len(sorted_files)} mda files")
+                self.info.setText(f"{len(sorted_files)} mda files")  # type: ignore[attr-defined]
 
                 # Create or update the folder view
-                layout = self.groupbox.layout()
+                layout = self.groupbox.layout()  # type: ignore[attr-defined]
                 if self.mvc_folder is None:
                     self.mvc_folder = MDA_MVC(self)
                     layout.addWidget(self.mvc_folder)
@@ -559,13 +585,13 @@ class MainWindow(QMainWindow):
                 )
             else:
                 error_msg = "Could not determine folder path from scan results"
-                self.info.setText("No mda files")
+                self.info.setText("No mda files")  # type: ignore[attr-defined]
                 self.doPopUp(error_msg)
                 self.reset_mainwindow()
                 self.setStatus(f"Scan failed: {error_msg}")
         else:
             error_msg = result.error_message or "No MDA files found"
-            self.info.setText("No mda files")
+            self.info.setText("No mda files")  # type: ignore[attr-defined]
             self.doPopUp(error_msg)
             self.reset_mainwindow()
             self.setStatus(f"Scan failed: {error_msg}")
@@ -623,12 +649,8 @@ class MainWindow(QMainWindow):
 
         The auto-loading can be disabled by setting the 'auto_load_folder' setting to False.
         """
-        # Check if auto-loading is enabled (default to True)
-        auto_load_enabled = settings.getKey("auto_load_folder")
-        if auto_load_enabled is None:
-            # Default to True if not set
-            auto_load_enabled = True
-            settings.setKey("auto_load_folder", True)
+        # Check if auto-loading is enabled using the proper boolean conversion
+        auto_load_enabled = self.get_auto_load_setting()
 
         if not auto_load_enabled:
             self.setStatus("Auto-loading disabled by user preference")
