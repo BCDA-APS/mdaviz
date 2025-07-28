@@ -1,0 +1,730 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Fit Functionality &#8212; mdaviz 1.1</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=38e23084"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'fit_functionality';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation Guide" href="install.html" />
+    <link rel="prev" title="User Guide" href="user_guide.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mdaviz 1.1</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Fit Functionality
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="changes.html">
+    Changes
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="license.html">
+    License
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Fit Functionality
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="changes.html">
+    Changes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="license.html">
+    License
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"></div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Fit Functionality</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="fit-functionality">
+<h1>Fit Functionality<a class="headerlink" href="#fit-functionality" title="Link to this heading">#</a></h1>
+<p>This document describes the curve fitting functionality implemented in mdaviz.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<p>The fit functionality allows users to perform mathematical curve fitting on plotted data curves. It provides a comprehensive set of fit models and tools for analyzing experimental data.</p>
+</section>
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading">#</a></h2>
+<section id="available-fit-models">
+<h3>Available Fit Models<a class="headerlink" href="#available-fit-models" title="Link to this heading">#</a></h3>
+<p>The following fit models are available:</p>
+<ol class="arabic simple">
+<li><p><strong>Gaussian</strong> - Fits a Gaussian (normal) distribution
+- Parameters: amplitude, center, sigma, offset
+- Useful for: Peak analysis, spectroscopy data</p></li>
+<li><p><strong>Lorentzian</strong> - Fits a Lorentzian (Cauchy) distribution
+- Parameters: amplitude, center, gamma, offset
+- Useful for: Resonance peaks, spectral lines</p></li>
+<li><p><strong>Linear</strong> - Fits a straight line
+- Parameters: slope, intercept
+- Useful for: Trend analysis, calibration curves</p></li>
+<li><p><strong>Exponential</strong> - Fits an exponential decay/growth
+- Parameters: amplitude, decay, offset
+- Useful for: Decay processes, growth curves</p></li>
+<li><p><strong>Quadratic</strong> - Fits a second-degree polynomial
+- Parameters: coeff_0, coeff_1, coeff_2
+- Useful for: Curved trends, parabolic data</p></li>
+<li><p><strong>Cubic</strong> - Fits a third-degree polynomial
+- Parameters: coeff_0, coeff_1, coeff_2, coeff_3
+- Useful for: Complex curved trends</p></li>
+<li><p><strong>Error Function</strong> - Fits an error function (erf) with scaling and offset
+- Parameters: amplitude, center, sigma, offset
+- Useful for: Step functions, cumulative distributions, edge detection</p></li>
+</ol>
+</section>
+<section id="fit-range-selection">
+<h3>Fit Range Selection<a class="headerlink" href="#fit-range-selection" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Full Range</strong>: Fit to all data points in the curve</p></li>
+<li><p><strong>Cursor Range</strong>: Use cursor positions to define a specific x-range for fitting
+- Set cursor 1 (middle click) and cursor 2 (right click) to define range
+- Check “Use cursor range” option before fitting</p></li>
+</ul>
+</section>
+<section id="fit-results">
+<h3>Fit Results<a class="headerlink" href="#fit-results" title="Link to this heading">#</a></h3>
+<p>For each fit, the following information is provided:</p>
+<ul class="simple">
+<li><p><strong>Fit Parameters</strong>: Best-fit values with uncertainties</p></li>
+<li><p><strong>Quality Metrics</strong>:
+- R-squared (R²): Goodness of fit (0-1, higher is better)
+- Chi-squared (χ²): Sum of squared residuals
+- Reduced Chi-squared: χ² normalized by degrees of freedom</p></li>
+</ul>
+</section>
+</section>
+<section id="how-to-use">
+<h2>How to Use<a class="headerlink" href="#how-to-use" title="Link to this heading">#</a></h2>
+<section id="basic-fitting">
+<h3>Basic Fitting<a class="headerlink" href="#basic-fitting" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Load Data</strong>: Open an MDA file and plot the desired curves</p></li>
+<li><p><strong>Select Curve</strong>: Choose the curve to fit from the curve dropdown</p></li>
+<li><p><strong>Choose Model</strong>: Select a fit model from the “Fit Model” dropdown</p></li>
+<li><p><strong>Set Range</strong> (optional): Check “Use cursor range” if you want to fit only a portion of the data</p></li>
+<li><p><strong>Perform Fit</strong>: Click the “Fit” button</p></li>
+<li><p><strong>View Results</strong>: The fit results will appear in the “Fit Results” section</p></li>
+</ol>
+</section>
+<section id="multiple-fits">
+<h3>Multiple Fits<a class="headerlink" href="#multiple-fits" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>You can perform multiple fits on the same curve</p></li>
+<li><p>Each fit will be listed in the fit list</p></li>
+<li><p>Click on a fit in the list to view its detailed results</p></li>
+<li><p>Fit curves are displayed as dashed lines on the plot</p></li>
+</ul>
+</section>
+<section id="managing-fits">
+<h3>Managing Fits<a class="headerlink" href="#managing-fits" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>View Fit Details</strong>: Select a fit from the list to see parameters and quality metrics</p></li>
+<li><p><strong>Clear Individual Fits</strong>: Remove specific fits (future enhancement)</p></li>
+<li><p><strong>Clear All Fits</strong>: Click “Clear All” to remove all fits from the current curve</p></li>
+</ul>
+</section>
+</section>
+<section id="technical-details">
+<h2>Technical Details<a class="headerlink" href="#technical-details" title="Link to this heading">#</a></h2>
+<section id="fit-implementation">
+<h3>Fit Implementation<a class="headerlink" href="#fit-implementation" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Uses <cite>scipy.optimize.curve_fit</cite> for robust curve fitting</p></li>
+<li><p>Automatic initial parameter estimation based on data characteristics</p></li>
+<li><p>Support for parameter bounds and initial guesses (future enhancement)</p></li>
+<li><p>Handles NaN and infinite values gracefully</p></li>
+</ul>
+</section>
+<section id="data-processing">
+<h3>Data Processing<a class="headerlink" href="#data-processing" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Applies current offset and factor settings to data before fitting</p></li>
+<li><p>Supports x-range selection for focused fitting</p></li>
+<li><p>Automatic data cleaning (removes invalid values)</p></li>
+</ul>
+</section>
+<section id="quality-assessment">
+<h3>Quality Assessment<a class="headerlink" href="#quality-assessment" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>R-squared calculation for goodness of fit</p></li>
+<li><p>Chi-squared analysis for fit quality</p></li>
+<li><p>Parameter uncertainties from covariance matrix</p></li>
+<li><p>Reduced chi-squared for model comparison</p></li>
+</ul>
+</section>
+</section>
+<section id="best-practices">
+<h2>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading">#</a></h2>
+<section id="choosing-a-fit-model">
+<h3>Choosing a Fit Model<a class="headerlink" href="#choosing-a-fit-model" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Examine the Data</strong>: Look at the shape and characteristics of your data</p></li>
+<li><p><strong>Consider Physics</strong>: Choose models that match the underlying physical process</p></li>
+<li><p><strong>Start Simple</strong>: Begin with simpler models (linear, Gaussian) before trying complex ones</p></li>
+<li><p><strong>Check Quality</strong>: Use R-squared and reduced chi-squared to assess fit quality</p></li>
+</ol>
+</section>
+<section id="range-selection">
+<h3>Range Selection<a class="headerlink" href="#range-selection" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Use cursor range when you want to focus on a specific region</p></li>
+<li><p>Ensure sufficient data points in the selected range</p></li>
+<li><p>Consider the physical meaning of the selected range</p></li>
+</ul>
+</section>
+<section id="interpreting-results">
+<h3>Interpreting Results<a class="headerlink" href="#interpreting-results" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>R-squared &gt; 0.9</strong>: Excellent fit</p></li>
+<li><p><strong>R-squared 0.7-0.9</strong>: Good fit</p></li>
+<li><p><strong>R-squared &lt; 0.7</strong>: Poor fit, consider different model</p></li>
+<li><p><strong>Reduced χ² ≈ 1</strong>: Good fit with appropriate uncertainties</p></li>
+<li><p><strong>Reduced χ² &gt;&gt; 1</strong>: Poor fit or underestimated uncertainties</p></li>
+</ul>
+</section>
+</section>
+<section id="future-enhancements">
+<h2>Future Enhancements<a class="headerlink" href="#future-enhancements" title="Link to this heading">#</a></h2>
+<p>Planned improvements include:</p>
+<ul class="simple">
+<li><p><strong>Advanced Parameter Control</strong>: Manual initial guesses and bounds</p></li>
+<li><p><strong>Fit Comparison</strong>: Side-by-side comparison of different fits</p></li>
+<li><p><strong>Residual Analysis</strong>: Plot and analyze fit residuals</p></li>
+<li><p><strong>Export Functionality</strong>: Save fit results to files</p></li>
+<li><p><strong>Custom Models</strong>: User-defined fit functions</p></li>
+<li><p><strong>Batch Fitting</strong>: Fit multiple curves simultaneously</p></li>
+</ul>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">#</a></h2>
+<section id="common-issues">
+<h3>Common Issues<a class="headerlink" href="#common-issues" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Fit Fails</strong>:
+- Check that you have enough data points
+- Try a different fit model
+- Ensure data doesn’t contain too many invalid values</p></li>
+<li><p><strong>Poor Fit Quality</strong>:
+- Examine the data shape and choose appropriate model
+- Consider using a range selection to focus on relevant data
+- Check for systematic errors in the data</p></li>
+<li><p><strong>Unreasonable Parameters</strong>:
+- Verify the fit model is appropriate for your data
+- Check units and scaling of your data
+- Consider using parameter bounds (future feature)</p></li>
+</ol>
+</section>
+<section id="error-messages">
+<h3>Error Messages<a class="headerlink" href="#error-messages" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>“Not enough data points”</strong>: Increase the number of data points or reduce the number of fit parameters</p></li>
+<li><p><strong>“Fit failed”</strong>: The optimization algorithm couldn’t converge, try different initial conditions or model</p></li>
+<li><p><strong>“Model not available”</strong>: Check that the selected model is properly loaded</p></li>
+</ul>
+</section>
+</section>
+<section id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">#</a></h2>
+<p>For developers, the fit functionality is implemented in the following modules:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="api/fit_models.html#module-mdaviz.fit_models" title="mdaviz.fit_models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mdaviz.fit_models</span></code></a>: Fit model definitions and implementations</p></li>
+<li><p><a class="reference internal" href="api/fit_manager.html#module-mdaviz.fit_manager" title="mdaviz.fit_manager"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mdaviz.fit_manager</span></code></a>: Fit management and coordination</p></li>
+<li><p><a class="reference internal" href="api/chartview.html#module-mdaviz.chartview" title="mdaviz.chartview"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mdaviz.chartview</span></code></a>: Integration with plotting system</p></li>
+<li><p><a class="reference internal" href="api/mda_file_viz.html#module-mdaviz.mda_file_viz" title="mdaviz.mda_file_viz"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mdaviz.mda_file_viz</span></code></a>: UI integration</p></li>
+</ul>
+<p>Key classes:
+- <code class="xref py py-class docutils literal notranslate"><span class="pre">mdaviz.fit_models.FitModel</span></code>: Base class for fit models
+- <code class="xref py py-class docutils literal notranslate"><span class="pre">mdaviz.fit_manager.FitResult</span></code>: Container for fit results
+- <code class="xref py py-class docutils literal notranslate"><span class="pre">mdaviz.fit_manager.FitManager</span></code>: Manages fit operations and state
+- <code class="xref py py-class docutils literal notranslate"><span class="pre">mdaviz.fit_manager.FitData</span></code>: Stores fit information and metadata</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="user_guide.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">User Guide</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="install.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Installation Guide</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#features">Features</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#available-fit-models">Available Fit Models</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fit-range-selection">Fit Range Selection</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fit-results">Fit Results</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-use">How to Use</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-fitting">Basic Fitting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multiple-fits">Multiple Fits</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#managing-fits">Managing Fits</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#technical-details">Technical Details</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fit-implementation">Fit Implementation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-processing">Data Processing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#quality-assessment">Quality Assessment</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#best-practices">Best Practices</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-a-fit-model">Choosing a Fit Model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#range-selection">Range Selection</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interpreting-results">Interpreting Results</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#future-enhancements">Future Enhancements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#troubleshooting">Troubleshooting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#common-issues">Common Issues</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#error-messages">Error Messages</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#api-reference">API Reference</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/fit_functionality.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
