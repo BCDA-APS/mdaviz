@@ -26,47 +26,46 @@ Coverage | License | Python | Pre-commit
 
 ## Quickstart
 
-### Conda environment
-It is strongly recommended to use the provided conda environment for development and running the application. This ensures all dependencies (including PyQt6) are available and compatible.
+### Option 1: Install from PyPI (Recommended for users)
+
+Mdaviz is available on PyPI. We recommend creating a dedicated environment:
 
 ```bash
+# Create a simple conda environment
+conda create -n mdaviz
+conda activate mdaviz
+
+# Install mdaviz
+pip install mdaviz
+```
+
+Once installed, you can run the application at any time using:
+```bash
+conda activate mdaviz
+mdaviz
+```
+
+### Option 2: Development setup with conda environment
+
+For development and contributing, it is strongly recommended to use the provided conda environment. This ensures all dependencies (including PyQt6) are available and compatible.
+
+```bash
+# Clone the repo first
+git clone https://github.com/BCDA-APS/mdaviz.git
+cd mdaviz
+
+# Create and activate conda environment
 conda env create -f env.yml
 conda activate mdaviz
 pip install PyQt6 Qt6
+
+# Install in development mode
+pip install -e .
 ```
 
 Always activate the environment before running, testing, or using pre-commit hooks.
 
 **Note**: PyQt6 and Qt6 are installed via pip as they are not available in conda-forge for all platforms.
-
-### Install & run the application
-
-Mdaviz is available on PyPI:
-```bash
-$ conda activate mdaviz
-$ pip install mdaviz
-```
-
-Once installed, you can run the application at any time using:
-```bash
-$ conda activate mdaviz
-$ mdaviz
-```
-
-### Run the application in developer mode
-
-```bash
-# Clone the repo
-$ git clone https://github.com/BCDA-APS/mdaviz.git
-$ cd mdaviz
-
-# Install with development dependencies
-$ conda activate mdaviz
-$ pip install -e .
-
-# Run the application
-$ mdaviz
-```
 
 ## Usage
 
@@ -103,10 +102,9 @@ pytest src/tests
 ```
 
 Current test status:
-- **130 tests passing** with 46% coverage
-- **26 failed tests** (mostly GUI tests needing fixes)
-- **54 skipped tests** (GUI tests in headless environment)
-- **5 test errors** (import and setup issues)
+- **223 tests passing** with 54% coverage
+- **48 skipped tests** (GUI tests in headless environment)
+- **0 failed tests** (all tests are now passing!)
 
 ### Code Quality
 
