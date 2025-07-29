@@ -55,6 +55,47 @@ class MDAFileTableView(QWidget):
         header = self.tableView.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
+        # Setup 2D controls
+        self.setup2DControls()
+
+    def setup2DControls(self):
+        """Setup 2D data controls (X2 selection)."""
+        # Connect X2 spinbox to update function
+        self.x2SpinBox.valueChanged.connect(self.onX2ValueChanged)
+
+        # Initially hide 2D controls
+        self.dimensionControls.setVisible(False)
+
+    def update2DControls(self, is_multidimensional=False, dimensions=None):
+        """
+        Update 2D controls visibility and settings based on data dimensions.
+
+        Parameters:
+            is_multidimensional (bool): Whether the data is multidimensional
+            dimensions (list): List of dimensions [X1_points, X2_points, ...]
+        """
+        if is_multidimensional and dimensions and len(dimensions) >= 2:
+            # Show 2D controls
+            self.dimensionControls.setVisible(True)
+
+            # Update X2 spinbox range
+            x2_max = dimensions[1] - 1 if len(dimensions) > 1 else 0
+            self.x2SpinBox.setMaximum(max(0, x2_max))
+            self.x2SpinBox.setValue(0)  # Start at first X2 position
+        else:
+            # Hide 2D controls for 1D data
+            self.dimensionControls.setVisible(False)
+
+    def onX2ValueChanged(self, value):
+        """Handle X2 spinbox value changes."""
+        # Emit signal to update 1D plot with new X2 slice
+        if hasattr(self.mda_file, "x2ValueChanged"):
+            self.mda_file.x2ValueChanged.emit(value)
+
+    def getX2Value(self):
+        """Get current X2 selection value."""
+        return self.x2SpinBox.value()
+
     def data(self):
         """Return the data from the table view:
         self.data=  {"fileInfo": fileInfo, "fields": fields}

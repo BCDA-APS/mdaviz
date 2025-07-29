@@ -40,6 +40,8 @@ class MDAFile(QWidget):
     buttonPushed = pyqtSignal(str)
     # Emit the new tab index (int), file path (str), data (dict) and selection field (dict):
     tabChanged = pyqtSignal(int, str, dict, dict)
+    # Emit X2 value changes for 2D data:
+    x2ValueChanged = pyqtSignal(int)
 
     def __init__(self, parent):
         """
@@ -189,6 +191,12 @@ class MDAFile(QWidget):
                 "firstDet": cached_data.first_det,
                 "pvList": cached_data.pv_list,
                 "index": index,
+                # Add 2D data support
+                "scanDict2D": cached_data.scan_dict_2d,
+                "isMultidimensional": cached_data.is_multidimensional,
+                "rank": cached_data.rank,
+                "dimensions": cached_data.dimensions,
+                "acquiredDimensions": cached_data.acquired_dimensions,
             }
         else:
             # Fallback to direct loading if cache fails
@@ -206,16 +214,36 @@ class MDAFile(QWidget):
                     "firstDet": 1,
                     "pvList": [],
                     "index": index,
+                    # Add 2D data support
+                    "scanDict2D": {},
+                    "isMultidimensional": False,
+                    "rank": 1,
+                    "dimensions": [],
+                    "acquiredDimensions": [],
                 }
                 return
 
             file_metadata, file_data_dim1, *_ = result
-            if file_metadata["rank"] > 1:
-                self.setStatus(
-                    "WARNING: Multidimensional data not supported - ignoring ranks > 1."
-                )
+            rank = file_metadata.get("rank", 1)
+            dimensions = file_metadata.get("dimensions", [])
+            acquired_dimensions = file_metadata.get("acquired_dimensions", [])
+
             scanDict, first_pos, first_det = utils.get_scan(file_data_dim1)
             pvList = [v["name"] for v in scanDict.values()]
+
+            # Initialize 2D data fields
+            scanDict2D = {}
+            is_multidimensional = rank > 1
+
+            # Process 2D data if available
+            if rank >= 2 and len(result) > 2:
+                try:
+                    file_data_dim2 = result[2]
+                    scanDict2D, _, _ = utils.get_scan_2d(file_data_dim1, file_data_dim2)
+                except Exception as e:
+                    print(f"Warning: Could not process 2D data: {e}")
+                    scanDict2D = {}
+
             self._data = {
                 "fileName": file_path.stem,  # file_name.rsplit(".mda", 1)[0]
                 "filePath": str(file_path),
@@ -226,7 +254,24 @@ class MDAFile(QWidget):
                 "firstDet": first_det,
                 "pvList": pvList,
                 "index": index,
+                # Add 2D data support
+                "scanDict2D": scanDict2D,
+                "isMultidimensional": is_multidimensional,
+                "rank": rank,
+                "dimensions": dimensions,
+                "acquiredDimensions": acquired_dimensions,
             }
+
+    def handle2DMode(self):
+        """Handle 2D data setup - update controls but don't change mode."""
+        if self._data.get("isMultidimensional", False):
+            # Update 2D controls in table view
+            table_view = self.tabIndex2Tableview(self.tabWidget.currentIndex())
+            if table_view:
+                table_view.update2DControls(
+                    is_multidimensional=self._data.get("isMultidimensional", False),
+                    dimensions=self._data.get("dimensions", []),
+                )
 
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
@@ -401,6 +446,12 @@ class MDAFile(QWidget):
                 self.createNewTab(file_name, file_path, selection_field)
             # Add new tab to tabManager:
             self.tabManager.addTab(file_path, metadata, tabledata)
+
+        # Handle mode switching for 2D data AFTER tab management is complete
+        if self._data.get("isMultidimensional", False):
+            self.handle2DMode()
+            # Set 2D data in visualization
+            self.mda_mvc.mda_file_viz.set2DData(self._data)
 
     def createNewTab(self, file_name, file_path, selection_field):
         """

@@ -438,6 +438,100 @@ def get_scan(mda_file_data):
     return datasets, first_pos_index, first_det_index
 
 
+def get_scan_2d(mda_file_data_dim1, mda_file_data_dim2):
+    """
+    Extracts scan positioners and detectors from 2D MDA file data objects and prepares datasets.
+
+    Processes two mda.scanDim objects (outer and inner dimensions) to extract scanPositioner
+    and scanDetector instances, organizing them into a dictionary with additional metadata.
+    For 2D data, the structure is typically:
+    - dim1 (outer): X2 positioner + detectors
+    - dim2 (inner): X1 positioner + detectors
+
+    Parameters:
+        - mda_file_data_dim1: An instance of an mda.scanDim object for the outer dimension
+        - mda_file_data_dim2: An instance of an mda.scanDim object for the inner dimension
+
+    Returns:
+        - A tuple containing:
+            - A dictionary keyed by index, each mapping to a sub-dictionary containing
+              the scan object ('object') along with its 'data', 'unit', 'name' and 'type'.
+              For 2D data, detectors have 2D arrays: data[X2_index][X1_index]
+            - The index (first_pos) of the first positioner in the returned dictionary
+            - The index (first_det) of the first detector in the returned dictionary
+    """
+    from mdaviz.synApps_mdalib.mda import scanPositioner, scanDetector
+
+    d = {}
+
+    # Process outer dimension (dim1) - typically X2 positioner + detectors
+    p_list_dim1 = mda_file_data_dim1.p
+    d_list_dim1 = mda_file_data_dim1.d
+    np_dim1 = mda_file_data_dim1.np
+    npts_dim1 = mda_file_data_dim1.curr_pt
+
+    # Process inner dimension (dim2) - typically X1 positioner + detectors
+    p_list_dim2 = mda_file_data_dim2.p
+    d_list_dim2 = mda_file_data_dim2.d
+    np_dim2 = mda_file_data_dim2.np
+    npts_dim2 = mda_file_data_dim2.curr_pt
+
+    # Create X2 positioner (outer dimension)
+    if np_dim1 > 0:
+        x2_pos = p_list_dim1[0]  # First positioner from outer dimension
+        d[0] = x2_pos
+        first_pos_index = 0
+    else:
+        # Create default X2 positioner if none exists
+        x2_pos = scanPositioner()
+        x2_pos.number = 0
+        x2_pos.fieldName, x2_pos.name, x2_pos.desc = "X2", "X2", "X2 Position"
+        x2_pos.step_mode, x2_pos.unit = "", ""
+        x2_pos.readback_name, x2_pos.readback_desc, x2_pos.readback_unit = "", "", ""
+        x2_pos.data = list(range(npts_dim1))
+        d[0] = x2_pos
+        first_pos_index = 0
+
+    # Create X1 positioner (inner dimension)
+    if np_dim2 > 0:
+        x1_pos = p_list_dim2[0]  # First positioner from inner dimension
+        d[1] = x1_pos
+        first_pos_index = 0
+    else:
+        # Create default X1 positioner if none exists
+        x1_pos = scanPositioner()
+        x1_pos.number = 1
+        x1_pos.fieldName, x1_pos.name, x1_pos.desc = "X1", "X1", "X1 Position"
+        x1_pos.step_mode, x1_pos.unit = "", ""
+        x1_pos.readback_name, x1_pos.readback_desc, x1_pos.readback_unit = "", "", ""
+        x1_pos.data = list(range(npts_dim2))
+        d[1] = x1_pos
+
+    # Add detectors from inner dimension (these are the Y values)
+    detector_index = 2
+    for e, det in enumerate(d_list_dim2):
+        d[detector_index] = det
+        detector_index += 1
+
+    first_det_index = 2
+
+    datasets = {}
+    for k, v in d.items():
+        data = v.data or []
+
+        datasets[k] = {
+            "object": v,
+            "type": "POS" if isinstance(v, scanPositioner) else "DET",
+            "data": data,
+            "unit": byte2str(v.unit) if v.unit else "",
+            "name": byte2str(v.name) if v.name else "n/a",
+            "desc": byte2str(v.desc) if v.desc else "",
+            "fieldName": byte2str(v.fieldName),
+        }
+
+    return datasets, first_pos_index, first_det_index
+
+
 def get_md(mda_file_metadata: dict) -> dict:
     """Process MDA file metadata to convert bytes to strings and clean up structure.
 

@@ -75,6 +75,77 @@ class MDAFileVisualization(QWidget):
         # Setup search functionality for metadata
         self.setupSearchFunctionality()
 
+        # Setup 2D functionality
+        self.setup2DFunctionality()
+
+    def setup2DFunctionality(self):
+        """Setup 2D plotting functionality."""
+        # Initially hide 2D tab
+        self.update2DTabVisibility(False)
+
+        # Connect tab change signal
+        self.tabWidget.currentChanged.connect(self.onTabChanged)
+
+    def update2DTabVisibility(self, show_2d_tab=False):
+        """
+        Update 2D tab visibility based on data dimensions.
+
+        Parameters:
+            show_2d_tab (bool): Whether to show the 2D tab
+        """
+        # Find the 2D tab index (should be index 1 after 1D tab)
+        tab_count = self.tabWidget.count()
+        if tab_count >= 2:
+            # Hide/show 2D tab
+            self.tabWidget.setTabVisible(1, show_2d_tab)
+
+            # If hiding 2D tab and it's currently selected, switch to 1D tab
+            if not show_2d_tab and self.tabWidget.currentIndex() == 1:
+                self.tabWidget.setCurrentIndex(0)
+
+    def set2DData(self, data):
+        """
+        Set 2D data for plotting.
+
+        Parameters:
+            data (dict): 2D data dictionary with scanDict2D and metadata
+        """
+        if not data or not data.get("isMultidimensional", False):
+            self.update2DTabVisibility(False)
+            return
+
+        # Show 2D tab for multidimensional data
+        self.update2DTabVisibility(True)
+
+        # Store 2D data for plotting
+        self._2d_data = data
+
+        # Update 2D plot if tab is visible
+        if self.tabWidget.currentIndex() == 1:  # 2D tab
+            self.update2DPlot()
+
+    def update2DPlot(self):
+        """Update the 2D plot with current data."""
+        if not hasattr(self, "_2d_data") or not self._2d_data:
+            return
+
+        # TODO: Implement 2D plotting
+        # This will be implemented when we add 2D plotting to chartview
+        print("2D plotting not yet implemented")
+
+    def onTabChanged(self, index):
+        """
+        Handle tab changes.
+
+        Parameters:
+            index (int): Index of the newly selected tab
+        """
+        if index == 1:  # 2D tab
+            self.update2DPlot()
+        elif index == 0:  # 1D tab
+            # Update 1D plot if needed
+            pass
+
     def setupFitUI(self):
         """Setup the fit UI components and connections."""
         # Populate fit model combo box in the desired order
