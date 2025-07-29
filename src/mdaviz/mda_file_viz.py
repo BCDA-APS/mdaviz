@@ -1,4 +1,4 @@
-from PyQt6 import QtWidgets, QtCore
+from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtGui import QFont, QKeySequence
 from PyQt6.QtWidgets import QWidget, QDialog, QSizePolicy
 from PyQt6.QtGui import QShortcut
@@ -93,14 +93,14 @@ class MDAFileVisualization(QWidget):
         Parameters:
             show_2d_tab (bool): Whether to show the 2D tab
         """
-        # Find the 2D tab index (should be index 1 after 1D tab)
+        # Find the 2D tab index (should be index 3 after Metadata tab)
         tab_count = self.tabWidget.count()
-        if tab_count >= 2:
+        if tab_count >= 4:
             # Hide/show 2D tab
-            self.tabWidget.setTabVisible(1, show_2d_tab)
+            self.tabWidget.setTabVisible(3, show_2d_tab)
 
             # If hiding 2D tab and it's currently selected, switch to 1D tab
-            if not show_2d_tab and self.tabWidget.currentIndex() == 1:
+            if not show_2d_tab and self.tabWidget.currentIndex() == 3:
                 self.tabWidget.setCurrentIndex(0)
 
     def set2DData(self, data):
@@ -108,10 +108,13 @@ class MDAFileVisualization(QWidget):
         Set 2D data for plotting.
 
         Parameters:
-            data (dict): 2D data dictionary with scanDict2D and metadata
+            data (dict or None): 2D data dictionary with scanDict2D and metadata, or None to clear
         """
         if not data or not data.get("isMultidimensional", False):
             self.update2DTabVisibility(False)
+            # Clear 2D data
+            if hasattr(self, "_2d_data"):
+                delattr(self, "_2d_data")
             return
 
         # Show 2D tab for multidimensional data
@@ -140,8 +143,12 @@ class MDAFileVisualization(QWidget):
         Parameters:
             index (int): Index of the newly selected tab
         """
+        # Get current tab structure
+        tab_count = self.tabWidget.count()
+        is_2d_visible = tab_count >= 4 and self.tabWidget.isTabVisible(3)
+
         # Handle 2D plotting
-        if index == 1:  # 2D tab
+        if is_2d_visible and index == 3:  # 2D tab
             self.update2DPlot()
         elif index == 0:  # 1D tab
             # Update 1D plot if needed
@@ -149,10 +156,20 @@ class MDAFileVisualization(QWidget):
 
         # Handle search functionality
         # Enable search only when metadata tab is active
-        # The metadata tab is at index 3 (0=1D, 1=2D, 2=Data, 3=Metadata)
-        is_metadata_tab = index == 3
+        # Tab indices: 0=1D, 1=Data, 2=Metadata, 3=2D(if visible)
+        # Metadata is always at index 2
+        is_metadata_tab = index == 2
+
+        # Debug: Print tab information
+        print(f"Tab changed to index {index}")
+        print(f"Tab count: {tab_count}")
+        print(f"2D visible: {is_2d_visible}")
+        print(f"Metadata index: 2 (fixed)")
+        print(f"Is metadata tab: {is_metadata_tab}")
+
         if hasattr(self, "search_shortcut"):
             self.search_shortcut.setEnabled(is_metadata_tab)
+            print(f"Search shortcut enabled: {self.search_shortcut.isEnabled()}")
 
         # Close search dialog if switching away from metadata tab
         if (
@@ -491,7 +508,7 @@ class MetadataSearchDialog(QDialog):
         if not found:
             # If not found, start from beginning
             cursor = self.text_widget.textCursor()
-            cursor.movePosition(cursor.Start)
+            cursor.movePosition(cursor.MoveOperation.Start)
             self.text_widget.setTextCursor(cursor)
             found = self.text_widget.find(search_text)
 
@@ -505,14 +522,16 @@ class MetadataSearchDialog(QDialog):
             return
 
         # Use QTextBrowser's find method with backward search
-        found = self.text_widget.find(search_text, QtWidgets.QTextDocument.FindBackward)
+        found = self.text_widget.find(
+            search_text, QtGui.QTextDocument.FindFlag.FindBackward
+        )
         if not found:
             # If not found, start from end
             cursor = self.text_widget.textCursor()
-            cursor.movePosition(cursor.End)
+            cursor.movePosition(cursor.MoveOperation.End)
             self.text_widget.setTextCursor(cursor)
             found = self.text_widget.find(
-                search_text, QtWidgets.QTextDocument.FindBackward
+                search_text, QtGui.QTextDocument.FindFlag.FindBackward
             )
 
         if found:

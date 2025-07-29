@@ -452,6 +452,9 @@ class MDAFile(QWidget):
             self.handle2DMode()
             # Set 2D data in visualization
             self.mda_mvc.mda_file_viz.set2DData(self._data)
+        else:
+            # Clear 2D data for 1D files
+            self.mda_mvc.mda_file_viz.set2DData(None)
 
     def createNewTab(self, file_name, file_path, selection_field):
         """
