@@ -160,16 +160,8 @@ class MDAFileVisualization(QWidget):
         # Metadata is always at index 2
         is_metadata_tab = index == 2
 
-        # Debug: Print tab information
-        print(f"Tab changed to index {index}")
-        print(f"Tab count: {tab_count}")
-        print(f"2D visible: {is_2d_visible}")
-        print(f"Metadata index: 2 (fixed)")
-        print(f"Is metadata tab: {is_metadata_tab}")
-
         if hasattr(self, "search_shortcut"):
             self.search_shortcut.setEnabled(is_metadata_tab)
-            print(f"Search shortcut enabled: {self.search_shortcut.isEnabled()}")
 
         # Close search dialog if switching away from metadata tab
         if (
