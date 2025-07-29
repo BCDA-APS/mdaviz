@@ -140,11 +140,28 @@ class MDAFileVisualization(QWidget):
         Parameters:
             index (int): Index of the newly selected tab
         """
+        # Handle 2D plotting
         if index == 1:  # 2D tab
             self.update2DPlot()
         elif index == 0:  # 1D tab
             # Update 1D plot if needed
             pass
+
+        # Handle search functionality
+        # Enable search only when metadata tab is active
+        # The metadata tab is at index 3 (0=1D, 1=2D, 2=Data, 3=Metadata)
+        is_metadata_tab = index == 3
+        if hasattr(self, "search_shortcut"):
+            self.search_shortcut.setEnabled(is_metadata_tab)
+
+        # Close search dialog if switching away from metadata tab
+        if (
+            hasattr(self, "search_dialog")
+            and not is_metadata_tab
+            and self.search_dialog
+            and self.search_dialog.isVisible()
+        ):
+            self.search_dialog.close()
 
     def setupFitUI(self):
         """Setup the fit UI components and connections."""
@@ -409,21 +426,6 @@ class MDAFileVisualization(QWidget):
         self.search_dialog.show()
         self.search_dialog.raise_()
         self.search_dialog.activateWindow()
-
-    def onTabChanged(self, index):
-        """Handle tab changes to enable/disable search functionality."""
-        # Enable search only when metadata tab is active
-        # The metadata tab is at index 2 (0=Plot, 1=Data, 2=Metadata)
-        is_metadata_tab = index == 2
-        self.search_shortcut.setEnabled(is_metadata_tab)
-
-        # Close search dialog if switching away from metadata tab
-        if (
-            not is_metadata_tab
-            and self.search_dialog
-            and self.search_dialog.isVisible()
-        ):
-            self.search_dialog.close()
 
 
 class MetadataSearchDialog(QDialog):

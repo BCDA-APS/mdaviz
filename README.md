@@ -66,7 +66,7 @@ pip install -e .
 Always activate the environment before running, testing, or using pre-commit hooks.
 
 
-**Note**: 
+**Note**:
 * PyQt6 and Qt6 are installed via pip as they are not available in conda-forge for all platforms.
 * Att the APS: PyQt6 requires to install the following library:
 ```bash

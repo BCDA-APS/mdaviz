@@ -460,13 +460,12 @@ def get_scan_2d(mda_file_data_dim1, mda_file_data_dim2):
             - The index (first_pos) of the first positioner in the returned dictionary
             - The index (first_det) of the first detector in the returned dictionary
     """
-    from mdaviz.synApps_mdalib.mda import scanPositioner, scanDetector
+    from mdaviz.synApps_mdalib.mda import scanPositioner
 
     d = {}
 
     # Process outer dimension (dim1) - typically X2 positioner + detectors
     p_list_dim1 = mda_file_data_dim1.p
-    d_list_dim1 = mda_file_data_dim1.d
     np_dim1 = mda_file_data_dim1.np
     npts_dim1 = mda_file_data_dim1.curr_pt
 
