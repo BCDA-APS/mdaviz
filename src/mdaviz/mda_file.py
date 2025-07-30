@@ -193,6 +193,7 @@ class MDAFile(QWidget):
                 "index": index,
                 # Add 2D data support
                 "scanDict2D": cached_data.scan_dict_2d,
+                "scanDictInner": cached_data.scan_dict_inner,
                 "isMultidimensional": cached_data.is_multidimensional,
                 "rank": cached_data.rank,
                 "dimensions": cached_data.dimensions,
@@ -216,6 +217,7 @@ class MDAFile(QWidget):
                     "index": index,
                     # Add 2D data support
                     "scanDict2D": {},
+                    "scanDictInner": {},
                     "isMultidimensional": False,
                     "rank": 1,
                     "dimensions": [],
@@ -233,6 +235,7 @@ class MDAFile(QWidget):
 
             # Initialize 2D data fields
             scanDict2D = {}
+            scan_dict_inner = {}
             is_multidimensional = rank > 1
 
             # Process 2D data if available
@@ -240,9 +243,12 @@ class MDAFile(QWidget):
                 try:
                     file_data_dim2 = result[2]
                     scanDict2D, _, _ = utils.get_scan_2d(file_data_dim1, file_data_dim2)
+                    # Also store inner dimension data for 1D plotting
+                    scan_dict_inner, _, _ = utils.get_scan(file_data_dim2)
                 except Exception as e:
                     print(f"Warning: Could not process 2D data: {e}")
                     scanDict2D = {}
+                    scan_dict_inner = {}
 
             self._data = {
                 "fileName": file_path.stem,  # file_name.rsplit(".mda", 1)[0]
@@ -256,6 +262,7 @@ class MDAFile(QWidget):
                 "index": index,
                 # Add 2D data support
                 "scanDict2D": scanDict2D,
+                "scanDictInner": scan_dict_inner,
                 "isMultidimensional": is_multidimensional,
                 "rank": rank,
                 "dimensions": dimensions,
@@ -268,9 +275,39 @@ class MDAFile(QWidget):
             # Update 2D controls in table view
             table_view = self.tabIndex2Tableview(self.tabWidget.currentIndex())
             if table_view:
+                dimensions = self._data.get("dimensions", [])
+                print(f"DEBUG: handle2DMode - dimensions: {dimensions}")
+
+                # Extract X2 positioner information from scanDict2D
+                x2_positioner_info = None
+                scan_dict_2d = self._data.get("scanDict2D", {})
+                print(
+                    f"DEBUG: handle2DMode - scanDict2D keys: {list(scan_dict_2d.keys())}"
+                )
+                if scan_dict_2d:
+                    # Find the X2 positioner (first positioner in 2D data)
+                    # In 2D data, the first positioner (index 0) is typically X2
+                    for key, value in scan_dict_2d.items():
+                        print(
+                            f"DEBUG: handle2DMode - Field {key}: type={value.get('type')}, name={value.get('name')}"
+                        )
+                        if (
+                            value.get("type") == "POS" and key == 0
+                        ):  # First positioner is X2
+                            x2_positioner_info = {
+                                "name": value.get("name", "X2"),
+                                "unit": value.get("unit", ""),
+                                "data": value.get("data", []),
+                            }
+                            print(
+                                f"DEBUG: handle2DMode - X2 positioner found: {x2_positioner_info['name']}"
+                            )
+                            break
+
                 table_view.update2DControls(
                     is_multidimensional=self._data.get("isMultidimensional", False),
-                    dimensions=self._data.get("dimensions", []),
+                    dimensions=dimensions,
+                    x2_positioner_info=x2_positioner_info,
                 )
 
     def setStatus(self, text):

@@ -39,6 +39,9 @@ class CachedFileData:
     size_bytes: int = 0
     # New fields for 2D+ data support
     scan_dict_2d: dict[str, Any] = field(default_factory=dict)
+    scan_dict_inner: dict[str, Any] = field(
+        default_factory=dict
+    )  # Inner dimension data for 1D plotting
     is_multidimensional: bool = False
     rank: int = 1
     dimensions: list[int] = field(default_factory=list)
@@ -253,6 +256,7 @@ class DataCache(QObject):
 
             # Initialize 2D data fields
             scan_dict_2d = {}
+            scan_dict_inner = {}
             is_multidimensional = rank > 1
 
             # Process 2D data if available
@@ -260,9 +264,12 @@ class DataCache(QObject):
                 try:
                     file_data_dim2 = result[2]
                     scan_dict_2d, _, _ = get_scan_2d(file_data_dim1, file_data_dim2)
+                    # Also store inner dimension data for 1D plotting
+                    scan_dict_inner, _, _ = get_scan(file_data_dim2)
                 except Exception as e:
                     print(f"Warning: Could not process 2D data: {e}")
                     scan_dict_2d = {}
+                    scan_dict_inner = {}
 
             # Create cached data
             cached_data = CachedFileData(
@@ -276,6 +283,7 @@ class DataCache(QObject):
                 folder_path=str(path_obj.parent),
                 size_bytes=path_obj.stat().st_size,
                 scan_dict_2d=scan_dict_2d,
+                scan_dict_inner=scan_dict_inner,
                 is_multidimensional=is_multidimensional,
                 rank=rank,
                 dimensions=dimensions,
@@ -315,6 +323,7 @@ class DataCache(QObject):
 
             # Initialize 2D data fields
             scan_dict_2d = {}
+            scan_dict_inner = {}
             is_multidimensional = rank > 1
 
             # Process 2D data if available
@@ -322,9 +331,12 @@ class DataCache(QObject):
                 try:
                     file_data_dim2 = result[2]
                     scan_dict_2d, _, _ = get_scan_2d(file_data_dim1, file_data_dim2)
+                    # Also store inner dimension data for 1D plotting
+                    scan_dict_inner, _, _ = get_scan(file_data_dim2)
                 except Exception as e:
                     print(f"Warning: Could not process 2D data: {e}")
                     scan_dict_2d = {}
+                    scan_dict_inner = {}
 
             return CachedFileData(
                 file_path=str(path_obj),
@@ -337,6 +349,7 @@ class DataCache(QObject):
                 folder_path=str(path_obj.parent),
                 size_bytes=path_obj.stat().st_size,
                 scan_dict_2d=scan_dict_2d,
+                scan_dict_inner=scan_dict_inner,
                 is_multidimensional=is_multidimensional,
                 rank=rank,
                 dimensions=dimensions,

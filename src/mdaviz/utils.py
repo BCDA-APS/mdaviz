@@ -495,7 +495,6 @@ def get_scan_2d(mda_file_data_dim1, mda_file_data_dim2):
     if np_dim2 > 0:
         x1_pos = p_list_dim2[0]  # First positioner from inner dimension
         d[1] = x1_pos
-        first_pos_index = 0
     else:
         # Create default X1 positioner if none exists
         x1_pos = scanPositioner()
@@ -513,6 +512,17 @@ def get_scan_2d(mda_file_data_dim1, mda_file_data_dim2):
         detector_index += 1
 
     first_det_index = 2
+
+    # Add P0 index field at the end (so it doesn't break existing indices)
+    p0 = scanPositioner()
+    p0.number = detector_index
+    p0.fieldName, p0.name, p0.desc = "P0", "Index", "Index"
+    p0.step_mode, p0.unit = "", ""
+    p0.readback_name, p0.readback_desc, p0.readback_unit = "", "", ""
+    # For 2D data, use the total number of points (X2 * X1)
+    total_points = npts_dim1 * npts_dim2
+    p0.data = list(range(total_points))
+    d[detector_index] = p0
 
     datasets = {}
     for k, v in d.items():

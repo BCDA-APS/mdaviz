@@ -66,34 +66,92 @@ class MDAFileTableView(QWidget):
         # Initially hide 2D controls
         self.dimensionControls.setVisible(False)
 
-    def update2DControls(self, is_multidimensional=False, dimensions=None):
+    def update2DControls(
+        self, is_multidimensional=False, dimensions=None, x2_positioner_info=None
+    ):
         """
         Update 2D controls visibility and settings based on data dimensions.
 
         Parameters:
             is_multidimensional (bool): Whether the data is multidimensional
-            dimensions (list): List of dimensions [X1_points, X2_points, ...]
+            dimensions (list): List of dimensions [X2_points, X1_points, ...]
+            x2_positioner_info (dict): Information about the X2 positioner (name, unit, data)
         """
+        print(
+            f"DEBUG: update2DControls - is_multidimensional: {is_multidimensional}, dimensions: {dimensions}"
+        )
+        print(f"DEBUG: update2DControls - x2_positioner_info: {x2_positioner_info}")
         if is_multidimensional and dimensions and len(dimensions) >= 2:
             # Show 2D controls
             self.dimensionControls.setVisible(True)
 
             # Update X2 spinbox range
-            x2_max = dimensions[1] - 1 if len(dimensions) > 1 else 0
+            # dimensions[0] is X2 dimension, dimensions[1] is X1 dimension
+            x2_max = dimensions[0] - 1 if len(dimensions) > 0 else 0
+            print(f"DEBUG: update2DControls - x2_max: {x2_max}")
             self.x2SpinBox.setMaximum(max(0, x2_max))
             self.x2SpinBox.setValue(0)  # Start at first X2 position
+
+            # Store X2 positioner info for later use
+            self._x2_positioner_info = x2_positioner_info
+
+            # Update X2 label with PV name
+            if x2_positioner_info:
+                pv_name = x2_positioner_info.get("name", "X2")
+                self.x2Label.setText(f"X2 ({pv_name}):")
+                self._updateX2ValueLabel(0, x2_positioner_info)
+            else:
+                self.x2Label.setText("X2:")
+                self.x2ValueLabel.setText("--")
         else:
             # Hide 2D controls for 1D data
             self.dimensionControls.setVisible(False)
+            # Clear X2 value label
+            self.x2ValueLabel.setText("--")
+            # Clear stored X2 positioner info
+            if hasattr(self, "_x2_positioner_info"):
+                delattr(self, "_x2_positioner_info")
 
     def onX2ValueChanged(self, value):
         """Handle X2 spinbox value changes."""
+        # Update the X2 value label if we have X2 positioner info
+        if hasattr(self, "_x2_positioner_info") and self._x2_positioner_info:
+            self._updateX2ValueLabel(value, self._x2_positioner_info)
+
         # Emit signal to update 1D plot with new X2 slice
         if hasattr(self.mda_file, "x2ValueChanged"):
             self.mda_file.x2ValueChanged.emit(value)
 
+    def _updateX2ValueLabel(self, x2_index, x2_positioner_info):
+        """
+        Update the X2 value label with the current positioner value.
+
+        Parameters:
+            x2_index (int): The current X2 index
+            x2_positioner_info (dict): Information about the X2 positioner
+        """
+        try:
+            # Get the positioner value at the current index
+            positioner_data = x2_positioner_info.get("data", [])
+            if x2_index < len(positioner_data):
+                value = positioner_data[x2_index]
+                unit = x2_positioner_info.get("unit", "")
+
+                # Format the value with unit
+                if unit:
+                    label_text = f"{value:.3f} {unit}"
+                else:
+                    label_text = f"{value:.3f}"
+
+                self.x2ValueLabel.setText(label_text)
+            else:
+                self.x2ValueLabel.setText("--")
+        except (IndexError, TypeError, ValueError):
+            # Fallback if there's an error
+            self.x2ValueLabel.setText("--")
+
     def getX2Value(self):
-        """Get current X2 selection value."""
+        """Get the current X2 value from the spinbox."""
         return self.x2SpinBox.value()
 
     def data(self):
@@ -125,7 +183,30 @@ class MDAFileTableView(QWidget):
         self._data = {}
         if self.mda_file.data() != {}:
             fileInfo = self.mda_file.data()
-            scanDict = self.mda_file.data()["scanDict"]
+
+            # For table display, use inner dimension data for 2D files, 1D data for 1D files
+            print(
+                f"DEBUG: isMultidimensional: {fileInfo.get('isMultidimensional', False)}"
+            )
+            print(f"DEBUG: scanDictInner exists: {'scanDictInner' in fileInfo}")
+            if fileInfo.get("isMultidimensional", False) and fileInfo.get(
+                "scanDictInner"
+            ):
+                scanDict = fileInfo["scanDictInner"]
+                print(
+                    f"DEBUG: Using scanDictInner for 2D data, keys: {list(scanDict.keys())}"
+                )
+                # Debug: Print the actual field data
+                for key, value in scanDict.items():
+                    print(
+                        f"DEBUG: Field {key}: fieldName='{value.get('fieldName', 'N/A')}', name='{value.get('name', 'N/A')}', desc='{value.get('desc', 'N/A')}'"
+                    )
+            else:
+                scanDict = fileInfo["scanDict"]
+                print(
+                    f"DEBUG: Using scanDict for 1D data, keys: {list(scanDict.keys())}"
+                )
+
             fields = [
                 TableField(
                     v["fieldName"],
@@ -182,15 +263,67 @@ class MDAFileTableView(QWidget):
 
         if self.data() is not None:
             # ------ extract scan info:
-            fileName = self.data()["fileInfo"]["fileName"]
-            filePath = self.data()["fileInfo"]["filePath"]
-            scanDict = self.data()["fileInfo"]["scanDict"]
+            fileInfo = self.data()["fileInfo"]
+            fileName = fileInfo["fileName"]
+            filePath = fileInfo["filePath"]
+
+            # For 2D data, we need to use the inner dimension data for 1D plotting
+            # For 1D data, use scanDict as usual
+            if fileInfo.get("isMultidimensional", False) and fileInfo.get(
+                "scanDictInner"
+            ):
+                # Use inner dimension data for 1D plotting (matches table display)
+                scanDict = fileInfo["scanDictInner"]
+                x2_slice = 0  # Not needed since we're using 1D data
+
+                # Debug: Print field mappings
+                print(
+                    f"DEBUG: Using scanDictInner for 2D plotting, keys: {list(scanDict.keys())}"
+                )
+                print(f"DEBUG: selections: {selections}")
+
+                # Debug: Print data shapes for first few fields
+                for i in range(min(3, len(scanDict))):
+                    if i in scanDict:
+                        data = scanDict[i].get("data")
+                        print(
+                            f"DEBUG: Field {i} data shape: {np.array(data).shape if data else 'None'}"
+                        )
+            else:
+                # Use 1D data structure
+                scanDict = fileInfo["scanDict"]
+                x2_slice = 0
+
             # ------ extract x data:
             x_index = selections.get("X")
             x_data = scanDict[x_index].get("data") if x_index in scanDict else None
+            print(
+                f"DEBUG: X index: {x_index}, X data shape: {np.array(x_data).shape if x_data else 'None'}"
+            )
+
+            # For 2D data in scanDictInner, slice to get 1D data
+            if x_data is not None and len(np.array(x_data).shape) > 1:
+                x2_slice = self.getX2Value()  # Get current X2 value from spinbox
+                x_data = x_data[x2_slice]  # Take the selected X2 slice
+                print(
+                    f"DEBUG: X data after slicing with X2={x2_slice}: {np.array(x_data).shape}"
+                )
+
             # ------ extract I0 data for normalization:
             i0_index = selections.get("I0")
             i0_data = scanDict[i0_index].get("data") if i0_index in scanDict else None
+            print(
+                f"DEBUG: I0 index: {i0_index}, I0 data shape: {np.array(i0_data).shape if i0_data else 'None'}"
+            )
+
+            # For 2D data in scanDictInner, slice to get 1D data
+            if i0_data is not None and len(np.array(i0_data).shape) > 1:
+                x2_slice = self.getX2Value()  # Get current X2 value from spinbox
+                i0_data = i0_data[x2_slice]  # Take the selected X2 slice
+                print(
+                    f"DEBUG: I0 data after slicing with X2={x2_slice}: {np.array(i0_data).shape}"
+                )
+
             # ------ extract y(s) data:
             y_index = selections.get("Y", [])
             un_index = selections.get("Un", [])
@@ -229,9 +362,21 @@ class MDAFileTableView(QWidget):
             for i, y in enumerate(y_index):
                 if y not in scanDict:
                     continue
+
                 y_data = scanDict[y].get("data")
                 y_name = scanDict[y].get("name", "n/a")
                 y_unit = scanDict[y].get("unit", "")
+                print(
+                    f"DEBUG: Y index: {y}, Y data shape: {np.array(y_data).shape if y_data else 'None'}"
+                )
+
+                # For 2D data in scanDictInner, slice to get 1D data
+                if y_data is not None and len(np.array(y_data).shape) > 1:
+                    x2_slice = self.getX2Value()  # Get current X2 value from spinbox
+                    y_data = y_data[x2_slice]  # Take the selected X2 slice
+                    print(
+                        f"DEBUG: Y data after slicing with X2={x2_slice}: {np.array(y_data).shape}"
+                    )
 
                 # Apply I0 normalization if I0 is selected
                 if i0_data is not None:

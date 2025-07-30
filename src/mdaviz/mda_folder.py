@@ -157,6 +157,9 @@ class MDA_MVC(QWidget):
         # MDAFile Push buttons connection:
         utils.reconnect(self.mda_file.buttonPushed, self.doPlot)
 
+        # MDAFile X2 value changes connection:
+        utils.reconnect(self.mda_file.x2ValueChanged, self.doPlot)
+
         # Debug signals:
         # self.mda_folder_tableview.tableView.doubleClicked.connect(utils.debug_signal)
         # self.mda_folder_tableview.firstButton.clicked.connect(utils.debug_signal)
@@ -478,18 +481,28 @@ class MDA_MVC(QWidget):
         - Uses a ChartView widget for plotting within a specified layout.
 
         Parameters:
-        - args[0] (str): The plotting action to be taken ('add', 'replace', or 'clear').
+        - args[0] (str or int): The plotting action to be taken ('add', 'replace', or 'clear'),
+          or an integer representing the X2 value change.
         - kwargs (dict): Additional options for plotting, if any.
 
         Behavior:
         - 'clear': Removes all tabs and clears the visualization.
         - 'add'/'replace': Plots new data according to the current selection, adding to existing plots or replacing them.
+        - X2 value change: Replots the current selection with the new X2 slice.
         - Exits with a status message if no file is selected or no detectors (Y) are selected for plotting.
         """
 
         from mdaviz.chartview import ChartView
 
-        action = args[0]
+        # Handle X2 value changes
+        if isinstance(args[0], int):
+            # This is an X2 value change, treat as 'replace' action
+            action = "replace"
+            print(f"\ndoPlot called for X2 value change: X2={args[0]}")
+        else:
+            action = args[0]
+            print(f"\ndoPlot called: action={action}")
+
         tableview = self.currentFileTableview()
         selection = self.selectionField()
 

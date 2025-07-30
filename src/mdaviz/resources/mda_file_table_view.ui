@@ -71,7 +71,7 @@
       <item>
        <widget class="QLabel" name="x2Label">
         <property name="text">
-         <string>X2 Index:</string>
+         <string>X2:</string>
         </property>
        </widget>
       </item>
@@ -85,6 +85,19 @@
         </property>
         <property name="value">
          <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="x2ValueLabel">
+        <property name="text">
+         <string>X2: --</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel {
+    color: rgb(100, 100, 100);
+    font-style: italic;
+}</string>
         </property>
        </widget>
       </item>
