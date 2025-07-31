@@ -394,6 +394,11 @@ class MDAFileTableView(QWidget):
                     y_unit = f"({y_unit})" if y_unit else ""
                     y_label = f"{fileName}: {y_name} {y_unit}"
 
+                # Add X2 index to label for 2D data
+                if fileInfo.get("isMultidimensional", False):
+                    x2_index = self.getX2Value()
+                    y_label = f"{y_label} [{x2_index}]"
+
                 # Apply unscaling if this row has both Y and Un selected
                 if (
                     y in unscaled_rows
@@ -410,6 +415,11 @@ class MDAFileTableView(QWidget):
                         y_label = f"{fileName}: {y_name} [unscaled]"
                         if i0_data is not None:
                             y_label = f"{fileName}: {y_name} [norm, unscaled]"
+
+                        # Add X2 index to unscaled label for 2D data
+                        if fileInfo.get("isMultidimensional", False):
+                            x2_index = self.getX2Value()
+                            y_label = f"{y_label} [{x2_index}]"
 
                 if i == 0:
                     y_first_unit = y_unit
@@ -438,5 +448,14 @@ class MDAFileTableView(QWidget):
                 "filePath": filePath,
                 "fileName": fileName,
             }
+
+            # Add X2 index to plot options for 2D data
+            if fileInfo.get("isMultidimensional", False):
+                plot_options["x2_index"] = self.getX2Value()
+                print(
+                    f"DEBUG: data2Plot - Added x2_index to plot_options: {plot_options['x2_index']}"
+                )
+            else:
+                print("DEBUG: data2Plot - Not multidimensional, x2_index not added")
 
         return datasets, plot_options

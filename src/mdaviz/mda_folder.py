@@ -528,6 +528,7 @@ class MDA_MVC(QWidget):
         if action in ("replace", "add"):
             # Get dataset for the positioner/detector selection:
             datasets, plot_options = tableview.data2Plot(selection)
+            print(f"DEBUG: doPlot - Received plot_options: {plot_options}")
             y_index = selection.get("Y", [])
             if not isinstance(widgetMpl, ChartView):  # Make a blank chart.
                 widgetMpl = ChartView(self, **plot_options)
@@ -547,6 +548,14 @@ class MDA_MVC(QWidget):
                 # ds_options: {"label":y_label} (for legend)
                 # plot_options: {"x" (label), "x_unit", "y" (label), "y_unit", "title", "folderPath"}
                 options = {"ds_options": ds_options, "plot_options": plot_options}
+                # Add X2 index to options if available
+                if "x2_index" in plot_options:
+                    options["x2_index"] = plot_options["x2_index"]
+                    print(
+                        f"DEBUG: doPlot - Passing x2_index: {plot_options['x2_index']}"
+                    )
+                else:
+                    print("DEBUG: doPlot - No x2_index in plot_options")
                 widgetMpl.plot(i, *ds, **options)
             self.mda_file_viz.setPlot(widgetMpl)
 
@@ -776,6 +785,7 @@ class MDA_MVC(QWidget):
 
         # Get dataset for the positioner/detector selection:
         datasets, plot_options = tableview.data2Plot(selection)
+        print(f"DEBUG: doPlot - Received plot_options: {plot_options}")
 
         if not isinstance(widgetMpl, ChartView):
             widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
@@ -794,6 +804,12 @@ class MDA_MVC(QWidget):
             # ds_options: label (for legend)
             # plot_options: xlabel, ylabel, title
             options = {"ds_options": ds_options, "plot_options": plot_options}
+            # Add X2 index to options if available
+            if "x2_index" in plot_options:
+                options["x2_index"] = plot_options["x2_index"]
+                print(f"DEBUG: doPlot - Passing x2_index: {plot_options['x2_index']}")
+            else:
+                print("DEBUG: doPlot - No x2_index in plot_options")
             widgetMpl.plot(row, *ds, **options)
         self.mda_file_viz.setPlot(widgetMpl)
 

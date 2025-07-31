@@ -1175,12 +1175,16 @@ class ChartView(QWidget):
             )
             curve_data["style"] = format_string
             # Save to persistent storage
-            persistent_key = (curve_data["file_path"], curve_data["row"])
+            persistent_key = (
+                curve_data["file_path"],
+                curve_data["row"],
+                curve_data.get("x2_index"),
+            )
             if persistent_key not in self.curveManager._persistent_properties:
                 self.curveManager._persistent_properties[persistent_key] = {}
-            self.curveManager._persistent_properties[persistent_key]["style"] = (
-                format_string
-            )
+            self.curveManager._persistent_properties[persistent_key][
+                "style"
+            ] = format_string
             print(
                 f"DEBUG: Saved style to persistent storage: {persistent_key} -> {format_string}"
             )
@@ -1271,7 +1275,9 @@ class CurveManager(QObject):
         super().__init__(parent)
         self._curves = {}  # Store curves with a unique identifier as the key
         # Persistent storage for curve properties across manager clears
-        self._persistent_properties = {}  # key: (file_path, row), value: {style, offset, factor}
+        self._persistent_properties = (
+            {}
+        )  # key: (file_path, row), value: {style, offset, factor}
 
     def addCurve(self, row, *ds, **options):
         """Add a new curve to the manager if not already present on the graph."""
@@ -1280,8 +1286,10 @@ class CurveManager(QObject):
         ds_options = options.get("ds_options", {})
         label = ds_options.get("label", "unknown label")
         file_path = plot_options.get("filePath", "unknown path")
+        x2_index = options.get("x2_index")  # Extract X2 index from options
+        print(f"DEBUG: addCurve - Received x2_index: {x2_index}")
         # Generate unique curve ID & update options:
-        curveID = self.generateCurveID(label, file_path, row)
+        curveID = self.generateCurveID(label, file_path, row, x2_index)
         ds_options["label"] = label  # Keep the original label for display purposes
         print(
             f"DEBUG: Adding curve with ID: {curveID}, label: {label}, file_path: {file_path}"
@@ -1341,6 +1349,7 @@ class CurveManager(QObject):
                         "file_name": plot_options.get("fileName", ""),  # without ext
                         "plot_options": plot_options,
                         "ds_options": ds_options,
+                        "x2_index": x2_index,  # Store X2 index for 2D data
                     }
                     # Remove the old curve entry
                     del self._curves[existing_curve_id]
@@ -1349,7 +1358,7 @@ class CurveManager(QObject):
                     return
         # Add new curve if not already present on the graph:
         # Check for persistent properties first
-        persistent_key = (file_path, row)
+        persistent_key = (file_path, row, x2_index)
         persistent_props = self._persistent_properties.get(persistent_key, {})
 
         self._curves[curveID] = {
@@ -1362,6 +1371,7 @@ class CurveManager(QObject):
             "file_name": plot_options.get("fileName", ""),  # without ext
             "plot_options": plot_options,
             "ds_options": ds_options,
+            "x2_index": x2_index,  # Store X2 index for 2D data
         }
         print(
             f"DEBUG: Created curve {curveID} with persistent properties: {persistent_props}"
@@ -1413,7 +1423,11 @@ class CurveManager(QObject):
                 )
                 curve_data["offset"] = new_offset
                 # Save to persistent storage
-                persistent_key = (curve_data["file_path"], curve_data["row"])
+                persistent_key = (
+                    curve_data["file_path"],
+                    curve_data["row"],
+                    curve_data.get("x2_index"),
+                )
                 if persistent_key not in self._persistent_properties:
                     self._persistent_properties[persistent_key] = {}
                 self._persistent_properties[persistent_key]["offset"] = new_offset
@@ -1432,7 +1446,11 @@ class CurveManager(QObject):
                 )
                 curve_data["factor"] = new_factor
                 # Save to persistent storage
-                persistent_key = (curve_data["file_path"], curve_data["row"])
+                persistent_key = (
+                    curve_data["file_path"],
+                    curve_data["row"],
+                    curve_data.get("x2_index"),
+                )
                 if persistent_key not in self._persistent_properties:
                     self._persistent_properties[persistent_key] = {}
                 self._persistent_properties[persistent_key]["factor"] = new_factor
@@ -1441,21 +1459,29 @@ class CurveManager(QObject):
                 )
                 self.updateCurve(curveID, curve_data, recompute_y=True)
 
-    def generateCurveID(self, label, file_path, row):
+    def generateCurveID(self, label, file_path, row, x2_index=None):
         """
-        Generates a unique curve ID based on file_path and row, ensuring the same detector
+        Generates a unique curve ID based on file_path, row, and X2 index, ensuring the same detector
         always gets the same curve ID regardless of I0 normalization.
 
         Parameters:
         - label (str): The original label for the curve (used for display purposes)
         - file_path (str): The file path associated with the curve
         - row (int): The row number in the file tableview associated with the curve
+        - x2_index (int, optional): The X2 slice index for 2D data
 
         Returns:
-        - str: A unique curve ID based on file_path and row
+        - str: A unique curve ID based on file_path, row, and X2 index
         """
-        # Generate curve ID based on file_path and row
-        curve_id = f"{file_path}_{row}"
+        # Generate curve ID based on file_path, row, and X2 index
+        if x2_index is not None:
+            curve_id = f"{file_path}_{row}_x2_{x2_index}"
+        else:
+            curve_id = f"{file_path}_{row}"
+
+        print(
+            f"DEBUG: generateCurveID - x2_index={x2_index}, generated curve_id={curve_id}"
+        )
 
         # Check if this curve ID already exists
         if curve_id in self._curves:
@@ -1464,18 +1490,23 @@ class CurveManager(QObject):
         else:
             return curve_id
 
-    def findCurveID(self, file_path, row):
+    def findCurveID(self, file_path, row, x2_index=None):
         """
-        Find the curveID based on the file path and row number.
+        Find the curveID based on the file path, row number, and X2 index.
 
         Parameters:
         - file_path (str): The path of the file associated with the curve.
         - row (int): The row number in the file tableview associated with the curve.
+        - x2_index (int, optional): The X2 slice index for 2D data.
 
         Returns:
         - str: The curveID if a matching curve is found; otherwise, None.
         """
         for curveID, curveData in self._curves.items():
-            if curveData["file_path"] == file_path and curveData["row"] == row:
+            if (
+                curveData["file_path"] == file_path
+                and curveData["row"] == row
+                and curveData.get("x2_index") == x2_index
+            ):
                 return curveID
         return None
