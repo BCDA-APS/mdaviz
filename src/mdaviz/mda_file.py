@@ -231,7 +231,6 @@ class MDAFile(QWidget):
             acquired_dimensions = file_metadata.get("acquired_dimensions", [])
 
             scanDict, first_pos, first_det = utils.get_scan(file_data_dim1)
-            pvList = [v["name"] for v in scanDict.values()]
 
             # Initialize 2D data fields
             scanDict2D = {}
@@ -249,6 +248,14 @@ class MDAFile(QWidget):
                     print(f"Warning: Could not process 2D data: {e}")
                     scanDict2D = {}
                     scan_dict_inner = {}
+
+            # Construct pvList from appropriate data source
+            # For 2D+ data, use scan_dict_inner (inner dimension PVs like P1, D1, etc.)
+            # For 1D data, use scanDict (outer dimension PVs)
+            if is_multidimensional and scan_dict_inner:
+                pvList = [v["name"] for v in scan_dict_inner.values()]
+            else:
+                pvList = [v["name"] for v in scanDict.values()]
 
             self._data = {
                 "fileName": file_path.stem,  # file_name.rsplit(".mda", 1)[0]

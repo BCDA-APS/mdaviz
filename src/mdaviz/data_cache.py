@@ -252,7 +252,6 @@ class DataCache(QObject):
 
             # Process 1D data (always available)
             scan_dict, first_pos, first_det = get_scan(file_data_dim1)
-            pv_list = [v["name"] for v in scan_dict.values()]
 
             # Initialize 2D data fields
             scan_dict_2d = {}
@@ -270,6 +269,14 @@ class DataCache(QObject):
                     print(f"Warning: Could not process 2D data: {e}")
                     scan_dict_2d = {}
                     scan_dict_inner = {}
+
+            # Construct pv_list from appropriate data source
+            # For 2D+ data, use scan_dict_inner (inner dimension PVs like P1, D1, etc.)
+            # For 1D data, use scan_dict (outer dimension PVs)
+            if is_multidimensional and scan_dict_inner:
+                pv_list = [v["name"] for v in scan_dict_inner.values()]
+            else:
+                pv_list = [v["name"] for v in scan_dict.values()]
 
             # Create cached data
             cached_data = CachedFileData(
