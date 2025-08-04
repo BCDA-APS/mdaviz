@@ -496,9 +496,15 @@ class MDA_MVC(QWidget):
 
         # Handle X2 value changes
         if isinstance(args[0], int):
-            # This is an X2 value change, treat as 'replace' action
-            action = "replace"
-            print(f"\ndoPlot called for X2 value change: X2={args[0]}")
+            # This is an X2 value change, respect the current mode
+            mode = self.mda_file.mode()
+            if mode == "Auto-add":
+                action = "add"
+            else:
+                action = "replace"  # Default for Auto-replace and Auto-off
+            print(
+                f"\ndoPlot called for X2 value change: X2={args[0]}, mode={mode}, action={action}"
+            )
         else:
             action = args[0]
             print(f"\ndoPlot called: action={action}")

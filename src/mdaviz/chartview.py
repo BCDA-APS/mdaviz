@@ -458,12 +458,44 @@ class ChartView(QWidget):
             curve_obj = self.plotObjects[curveID]
             curve_obj.remove()
             del self.plotObjects[curveID]
-        # Remove checkbox from corresponding tableview
+
+        # Check if we should uncheck the checkbox
         row = curveData["row"]
         file_path = curveData["file_path"]
         tableview = self.mda_mvc.mda_file.tabPath2Tableview(file_path)
+
         if tableview and tableview.tableView.model():
-            tableview.tableView.model().uncheckCheckBox(row)
+            # Get file info to check if this is 2D data
+            file_info = tableview.mda_file.data()
+            is_2d_data = file_info.get("isMultidimensional", False)
+
+            if is_2d_data:
+                # For 2D data, check if there are still other curves with the same file_path and row
+                remaining_curves_for_det = 0
+                for (
+                    existing_curve_id,
+                    existing_data,
+                ) in self.curveManager.curves().items():
+                    if (
+                        existing_data["file_path"] == file_path
+                        and existing_data["row"] == row
+                    ):
+                        remaining_curves_for_det += 1
+
+                # Only uncheck if no curves remain for this detector
+                if remaining_curves_for_det == 0:
+                    tableview.tableView.model().uncheckCheckBox(row)
+                    print(
+                        f"DEBUG: Unchecked DET {row} - no curves remaining for this detector"
+                    )
+                else:
+                    print(
+                        f"DEBUG: Kept DET {row} checked - {remaining_curves_for_det} curves still exist for this detector"
+                    )
+            else:
+                # For 1D data, always uncheck (original behavior)
+                tableview.tableView.model().uncheckCheckBox(row)
+
         # Remove curve from comboBox
         self.removeItemCurveBox(curveID)
         # Update plot labels, legend and title
@@ -1326,14 +1358,15 @@ class CurveManager(QObject):
         else:
             print(f"DEBUG: Curve {curveID} does NOT exist, creating new curve")
             # Check if this might be a re-creation after removeAllCurves was called
-            # Look for any existing curve with the same file_path and row
+            # Look for any existing curve with the same file_path, row, and x2_index
             for existing_curve_id, existing_data in self._curves.items():
                 if (
                     existing_data["file_path"] == file_path
                     and existing_data["row"] == row
+                    and existing_data.get("x2_index") == x2_index
                 ):
                     print(
-                        f"DEBUG: Found existing curve with same file_path and row: {existing_curve_id}"
+                        f"DEBUG: Found existing curve with same file_path, row, and x2_index: {existing_curve_id}"
                     )
                     print(
                         f"DEBUG: Transferring properties: style={existing_data.get('style')}, offset={existing_data.get('offset')}, factor={existing_data.get('factor')}"
