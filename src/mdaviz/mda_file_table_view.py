@@ -428,7 +428,7 @@ class MDAFileTableView(QWidget):
                         "y_unit": y_unit,
                         "x2": x2_name,
                         "x2_unit": x2_unit,
-                        "title": f"{fileName}: {y_name} vs {x_name} vs {x2_name}",
+                        "title": f"{fileName}: {y_name} ({y_unit})",
                         "filePath": filePath,
                         "fileName": fileName,
                         "folderPath": fileInfo.get("folderPath", ""),

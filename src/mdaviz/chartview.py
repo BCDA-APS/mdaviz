@@ -1541,3 +1541,157 @@ class CurveManager(QObject):
             ):
                 return curveID
         return None
+
+
+class ChartView2D(ChartView):
+    """
+    2D plotting widget for heatmaps and contours.
+    Extends ChartView to add 2D plotting capabilities.
+    """
+
+    def __init__(self, parent=None, **kwargs):
+        super().__init__(parent, **kwargs)
+        self._2d_data = None
+        self._plot_type = "heatmap"  # "heatmap" or "contour"
+        self._current_colorbar = None  # Store reference to current colorbar
+
+        print("DEBUG: ChartView2D.__init__ - Initialized ChartView2D")
+        print(f"  Parent: {parent}")
+        print(f"  Canvas exists: {hasattr(self, 'canvas')}")
+        print(f"  Main axes exists: {hasattr(self, 'main_axes')}")
+        print(f"  Widget visible: {self.isVisible()}")
+        print(f"  Widget size: {self.size()}")
+
+    def plot2D(self, y_data, x_data, x2_data, plot_options=None):
+        """
+        Plot 2D data as heatmap or contour.
+
+        Parameters:
+        - y_data: 2D numpy array (detector data)
+        - x_data: 1D numpy array (X positioner data)
+        - x2_data: 1D numpy array (X2 positioner data)
+        - plot_options: dict with plotting options
+        """
+        if plot_options is None:
+            plot_options = {}
+
+        print("DEBUG: ChartView2D.plot2D - Plotting 2D data")
+        print(f"  Y data shape: {y_data.shape}")
+        print(f"  X data shape: {x_data.shape}")
+        print(f"  X2 data shape: {x2_data.shape}")
+        print(f"  Plot type: {self._plot_type}")
+        print(f"  Canvas exists: {hasattr(self, 'canvas')}")
+        print(f"  Main axes exists: {hasattr(self, 'main_axes')}")
+
+        # Clear existing plot and colorbar
+        self.main_axes.clear()
+
+        # Remove existing colorbar if it exists
+        if self._current_colorbar is not None:
+            try:
+                self._current_colorbar.remove()
+            except (AttributeError, TypeError):
+                # Colorbar might already be removed or invalid
+                pass
+            self._current_colorbar = None
+
+        # Reset the figure completely to prevent layout issues
+        self.figure.clear()
+        self.main_axes = self.figure.add_subplot(111)
+        # Reset to default subplot parameters
+        self.figure.subplots_adjust(bottom=0.1, top=0.9, right=0.92)
+
+        # Create the 2D plot
+        if self._plot_type == "heatmap":
+            self._plot_heatmap(y_data, x_data, x2_data, plot_options)
+        elif self._plot_type == "contour":
+            self._plot_contour(y_data, x_data, x2_data, plot_options)
+        else:
+            print(f"ERROR: Unknown plot type: {self._plot_type}")
+            return
+
+        # Set labels and title
+        self._set_2d_labels(plot_options)
+
+        # Update the plot
+        print("DEBUG: ChartView2D.plot2D - Drawing canvas")
+        self.canvas.draw()
+        print("DEBUG: ChartView2D.plot2D - Canvas drawn")
+
+        # Force a repaint
+        self.canvas.flush_events()
+        print("DEBUG: ChartView2D.plot2D - Events flushed")
+
+    def _plot_heatmap(self, y_data, x_data, x2_data, plot_options):
+        """Plot 2D data as heatmap using imshow."""
+        # Create meshgrid for proper axis scaling
+        X, Y = numpy.meshgrid(x_data, x2_data)
+
+        # Plot heatmap
+        im = self.main_axes.imshow(
+            y_data,
+            extent=[x_data.min(), x_data.max(), x2_data.min(), x2_data.max()],
+            aspect="auto",
+            origin="lower",
+            cmap="viridis",
+        )
+
+        # Add colorbar
+        self._current_colorbar = self.figure.colorbar(
+            im, ax=self.main_axes, label=plot_options.get("y_unit", "")
+        )
+
+        print("DEBUG: ChartView2D._plot_heatmap - Heatmap created")
+
+    def _plot_contour(self, y_data, x_data, x2_data, plot_options):
+        """Plot 2D data as contour plot."""
+        # Create meshgrid for contour plotting
+        X, Y = numpy.meshgrid(x_data, x2_data)
+
+        # Plot contour
+        contour = self.main_axes.contourf(X, Y, y_data, levels=20, cmap="viridis")
+
+        # Add colorbar
+        self._current_colorbar = self.figure.colorbar(
+            contour, ax=self.main_axes, label=plot_options.get("y_unit", "")
+        )
+
+        print("DEBUG: ChartView2D._plot_contour - Contour plot created")
+
+    def _set_2d_labels(self, plot_options):
+        """Set axis labels and title for 2D plot."""
+        # Set axis labels
+        x_label = plot_options.get("x", "X")
+        x_unit = plot_options.get("x_unit", "")
+        x2_label = plot_options.get("x2", "X2")
+        x2_unit = plot_options.get("x2_unit", "")
+
+        if x_unit:
+            self.main_axes.set_xlabel(f"{x_label} ({x_unit})")
+        else:
+            self.main_axes.set_xlabel(x_label)
+
+        if x2_unit:
+            self.main_axes.set_ylabel(f"{x2_label} ({x2_unit})")
+        else:
+            self.main_axes.set_ylabel(x2_label)
+
+        # Set title
+        title = plot_options.get("title", "2D Plot")
+        self.main_axes.set_title(title)
+
+        print("DEBUG: ChartView2D._set_2d_labels - Labels set")
+
+    def set_plot_type(self, plot_type):
+        """Set the type of 2D plot (heatmap or contour)."""
+        if plot_type in ["heatmap", "contour"]:
+            self._plot_type = plot_type
+            print(f"DEBUG: ChartView2D.set_plot_type - Plot type set to: {plot_type}")
+        else:
+            print(
+                f"ERROR: Invalid plot type: {plot_type}. Must be 'heatmap' or 'contour'"
+            )
+
+    def get_plot_type(self):
+        """Get the current plot type."""
+        return self._plot_type

@@ -7,6 +7,7 @@ from mdaviz import utils
 from mdaviz.chartview import ChartView
 from mdaviz.data_table_view import DataTableView
 from mdaviz.fit_models import get_available_models
+from mdaviz.chartview import ChartView2D
 
 MD_FONT = "Arial"
 MD_FONT_SIZE = 12
@@ -161,18 +162,70 @@ class MDAFileVisualization(QWidget):
 
         print(f"DEBUG: update2DPlot - Calling data2Plot2D with selections: {selection}")
 
-        # Call our data2Plot2D function to test the 2D data extraction
+        # Call our data2Plot2D function to extract 2D data
         datasets, plot_options = tableview.data2Plot2D(selection)
 
         print("DEBUG: update2DPlot - data2Plot2D returned:")
         print(f"  datasets count: {len(datasets)}")
         print(f"  plot_options: {plot_options}")
 
-        # TODO: Implement actual 2D plotting using the extracted data
-        # For now, just print that we have the data
+        # Create and display 2D plot if we have data
         if datasets:
-            print("DEBUG: update2DPlot - 2D data extracted successfully!")
-            print("DEBUG: update2DPlot - Ready for 2D plotting implementation")
+            print("DEBUG: update2DPlot - Creating 2D plot")
+
+            # Get the 2D plot widget from the 2D tab layout
+            layoutMpl2D = self.plotPage2D.layout()
+            if layoutMpl2D.count() != 1:
+                print("DEBUG: update2DPlot - Expected exactly one widget in 2D layout")
+                return
+
+            widgetMpl2D = layoutMpl2D.itemAt(0).widget()
+
+            # Create ChartView2D if needed
+            if not isinstance(widgetMpl2D, ChartView2D):
+                print(
+                    "DEBUG: update2DPlot - Creating new ChartView2D widget for 2D tab"
+                )
+
+                # Remove the existing widget from the layout
+                layoutMpl2D.removeWidget(widgetMpl2D)
+                widgetMpl2D.deleteLater()
+
+                # Create new ChartView2D widget with correct parent (MDA_MVC)
+                widgetMpl2D = ChartView2D(
+                    parent, **plot_options
+                )  # Use parent (MDA_MVC) as parent
+
+                # Make the widget visible
+                widgetMpl2D.setVisible(True)
+                print(
+                    f"DEBUG: update2DPlot - Set 2D widget visible: {widgetMpl2D.isVisible()}"
+                )
+
+                # Add the widget to the 2D layout
+                layoutMpl2D.addWidget(widgetMpl2D)
+                print("DEBUG: update2DPlot - Added ChartView2D to 2D layout")
+
+                # Apply stored log scale state to the new chart
+                if hasattr(self, "getLogScaleState"):
+                    stored_log_x, stored_log_y = self.getLogScaleState()
+                    widgetMpl2D.setLogScales(stored_log_x, stored_log_y)
+
+            # Plot the 2D data
+            for dataset in datasets:
+                y_data, dataset_options = dataset
+                x_data = dataset_options.get("x_data")
+                x2_data = dataset_options.get("x2_data")
+
+                if x_data is not None and x2_data is not None:
+                    print("DEBUG: update2DPlot - Plotting 2D data in 2D tab")
+                    widgetMpl2D.plot2D(y_data, x_data, x2_data, plot_options)
+                else:
+                    print("DEBUG: update2DPlot - Missing X or X2 data for 2D plotting")
+
+            # Store reference to 2D chart view
+            self.chart_view_2d = widgetMpl2D
+
         else:
             print("DEBUG: update2DPlot - No 2D datasets extracted")
 
@@ -387,6 +440,22 @@ class MDAFileVisualization(QWidget):
 
         # Update tab widget max height to match the chart view
         self._updateTabWidgetMaxHeight()
+
+        # Debug output for 2D plotting
+        if hasattr(plot_widget, "_plot_type"):
+            print("DEBUG: setPlot - Added ChartView2D widget to layout")
+            print(f"  Widget type: {type(plot_widget)}")
+            print(f"  Widget visible: {plot_widget.isVisible()}")
+            print(f"  Widget size: {plot_widget.size()}")
+            print(f"  Layout count: {layout.count()}")
+            print(f"  Layout item widget: {layout.itemAt(0).widget()}")
+        else:
+            print("DEBUG: setPlot - Added regular ChartView widget to layout")
+            print(f"  Widget type: {type(plot_widget)}")
+            print(f"  Widget visible: {plot_widget.isVisible()}")
+            print(f"  Widget size: {plot_widget.size()}")
+            print(f"  Layout count: {layout.count()}")
+            print(f"  Layout item widget: {layout.itemAt(0).widget()}")
 
     def _updateTabWidgetMaxHeight(self):
         """Update the tab widget's maximum height to match the plot height setting."""
