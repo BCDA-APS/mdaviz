@@ -500,8 +500,14 @@ class MDA_MVC(QWidget):
             mode = self.mda_file.mode()
             if mode == "Auto-add":
                 action = "add"
+            elif mode == "Auto-off":
+                # Do nothing in auto-off mode - user must manually add/replace
+                print(
+                    f"\ndoPlot called for X2 value change: X2={args[0]}, mode={mode}, action=ignore"
+                )
+                return
             else:
-                action = "replace"  # Default for Auto-replace and Auto-off
+                action = "replace"  # Default for Auto-replace
             print(
                 f"\ndoPlot called for X2 value change: X2={args[0]}, mode={mode}, action={action}"
             )
