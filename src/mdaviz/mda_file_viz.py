@@ -132,9 +132,49 @@ class MDAFileVisualization(QWidget):
         if not hasattr(self, "_2d_data") or not self._2d_data:
             return
 
-        # TODO: Implement 2D plotting
-        # This will be implemented when we add 2D plotting to chartview
-        print("2D plotting not yet implemented")
+        # Get the current table view by traversing up the parent chain to find MDA_MVC
+        parent = self.parent()
+        while parent and not hasattr(parent, "currentFileTableview"):
+            parent = parent.parent()
+
+        if not parent:
+            print(
+                "DEBUG: update2DPlot - Could not find parent with currentFileTableview method"
+            )
+            return
+
+        print(
+            f"DEBUG: update2DPlot - Found parent with currentFileTableview: {type(parent)}"
+        )
+
+        tableview = parent.currentFileTableview()
+        if not tableview:
+            print("DEBUG: update2DPlot - No current table view")
+            return
+
+        # Get current selections from the table view
+        if hasattr(tableview, "tableView") and tableview.tableView.model():
+            selection = tableview.tableView.model().plotFields()
+        else:
+            print("DEBUG: update2DPlot - No table model or plot fields")
+            return
+
+        print(f"DEBUG: update2DPlot - Calling data2Plot2D with selections: {selection}")
+
+        # Call our data2Plot2D function to test the 2D data extraction
+        datasets, plot_options = tableview.data2Plot2D(selection)
+
+        print("DEBUG: update2DPlot - data2Plot2D returned:")
+        print(f"  datasets count: {len(datasets)}")
+        print(f"  plot_options: {plot_options}")
+
+        # TODO: Implement actual 2D plotting using the extracted data
+        # For now, just print that we have the data
+        if datasets:
+            print("DEBUG: update2DPlot - 2D data extracted successfully!")
+            print("DEBUG: update2DPlot - Ready for 2D plotting implementation")
+        else:
+            print("DEBUG: update2DPlot - No 2D datasets extracted")
 
     def onTabChanged(self, index):
         """

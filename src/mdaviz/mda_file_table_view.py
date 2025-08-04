@@ -245,6 +245,207 @@ class MDAFileTableView(QWidget):
         self.tableView.model().clearAllCheckboxes()
         self.tableView.setModel(None)
 
+    def data2Plot2D(self, selections):
+        """
+        Extracts 2D datasets for plotting from scanDict2D based on user selections.
+
+        Parameters:
+            - selections: A dictionary with keys "X", "Y", where "X" is the index for the x-axis data,
+              "Y" is a list of indices for the y-axis data.
+
+        Returns:
+            - A tuple of (datasets, plot_options), where datasets contains 2D data arrays,
+              and plot_options contains overall plotting configurations.
+
+        """
+        datasets, plot_options = [], {}
+
+        if self.data() is not None:
+            # ------ extract scan info:
+            fileInfo = self.data()["fileInfo"]
+            fileName = fileInfo["fileName"]
+            filePath = fileInfo["filePath"]
+
+            # Check if this is 2D data
+            if not fileInfo.get("isMultidimensional", False):
+                print("DEBUG: data2Plot2D - Not 2D data, returning empty")
+                return datasets, plot_options
+
+            # Use scanDict2D for 2D plotting
+            scanDict2D = fileInfo.get("scanDict2D", {})
+            scanDictInner = fileInfo.get("scanDictInner", {})
+
+            print(f"DEBUG: data2Plot2D - scanDict2D keys: {list(scanDict2D.keys())}")
+            print(
+                f"DEBUG: data2Plot2D - scanDictInner keys: {list(scanDictInner.keys())}"
+            )
+            print(f"DEBUG: data2Plot2D - selections: {selections}")
+
+            # ------ extract x data (from scanDictInner - this is the X positioner):
+            x_index = selections.get("X")
+            if x_index is not None and x_index in scanDictInner:
+                x_data_2d = scanDictInner[x_index].get("data")
+                x_name = scanDictInner[x_index].get("name", f"P{x_index}")
+                x_unit = scanDictInner[x_index].get("unit", "")
+
+                # For 2D plotting, we need 1D X data - take the first row
+                if x_data_2d is not None and len(np.array(x_data_2d).shape) == 2:
+                    x_data = np.array(x_data_2d)[0, :]  # Take first row for 1D X data
+                else:
+                    x_data = x_data_2d
+
+                print(
+                    f"DEBUG: data2Plot2D - X data shape: {np.array(x_data).shape if x_data is not None else 'None'}"
+                )
+            else:
+                x_data = None
+                x_name = "X"
+                x_unit = ""
+
+            # ------ extract y data (detector data from scanDict2D):
+            y_index = selections.get("Y", [])
+            if y_index and len(y_index) > 0:
+                y_idx = y_index[0]  # Take first selected detector for 2D plot
+                if y_idx in scanDict2D:
+                    y_data = scanDict2D[y_idx].get("data")
+                    y_name = scanDict2D[y_idx].get("name", f"D{y_idx}")
+                    y_unit = scanDict2D[y_idx].get("unit", "")
+                    print(
+                        f"DEBUG: data2Plot2D - Y data shape: {np.array(y_data).shape if y_data else 'None'}"
+                    )
+                else:
+                    y_data = None
+                    y_name = "Y"
+                    y_unit = ""
+            else:
+                y_data = None
+                y_name = "Y"
+                y_unit = ""
+
+            # ------ extract x2 data (from scanDict2D - this is the X2 positioner):
+            x2_data = None
+            x2_name = "X2"
+            x2_unit = ""
+            if scanDict2D:
+                # Find X2 positioner (typically index 0 in scanDict2D)
+                for key, value in scanDict2D.items():
+                    if value.get("type") == "POS" and key == 0:
+                        x2_data = value.get("data")
+                        x2_name = value.get("name", "X2")
+                        x2_unit = value.get("unit", "")
+                        print(
+                            f"DEBUG: data2Plot2D - X2 data shape: {np.array(x2_data).shape if x2_data else 'None'}"
+                        )
+                        break
+
+            # Create 2D dataset if we have all required data
+            if x_data is not None and y_data is not None and x2_data is not None:
+                # Validate data shapes and dimensions
+                x_array = np.array(x_data)
+                y_array = np.array(y_data)
+                x2_array = np.array(x2_data)
+
+                print("DEBUG: data2Plot2D - Validation:")
+                print(f"  X array shape: {x_array.shape}")
+                print(f"  Y array shape: {y_array.shape}")
+                print(f"  X2 array shape: {x2_array.shape}")
+
+                # Check for edge cases
+                validation_errors = []
+
+                # Check if Y data is 2D
+                if len(y_array.shape) != 2:
+                    validation_errors.append(f"Y data is not 2D: shape {y_array.shape}")
+
+                # Check if X data is 1D
+                if len(x_array.shape) != 1:
+                    validation_errors.append(f"X data is not 1D: shape {x_array.shape}")
+
+                # Check if X2 data is 1D
+                if len(x2_array.shape) != 1:
+                    validation_errors.append(
+                        f"X2 data is not 1D: shape {x2_array.shape}"
+                    )
+
+                # Check dimension compatibility
+                if len(validation_errors) == 0:
+                    if y_array.shape[0] != x2_array.shape[0]:
+                        validation_errors.append(
+                            f"Y rows ({y_array.shape[0]}) != X2 length ({x2_array.shape[0]})"
+                        )
+
+                    if y_array.shape[1] != x_array.shape[0]:
+                        validation_errors.append(
+                            f"Y cols ({y_array.shape[1]}) != X length ({x_array.shape[0]})"
+                        )
+
+                # Check for empty or single-point data
+                if len(validation_errors) == 0:
+                    if y_array.size == 0:
+                        validation_errors.append("Y data is empty")
+                    elif y_array.size == 1:
+                        validation_errors.append("Y data has only one point")
+
+                    if x_array.size == 0:
+                        validation_errors.append("X data is empty")
+                    elif x_array.size == 1:
+                        validation_errors.append("X data has only one point")
+
+                    if x2_array.size == 0:
+                        validation_errors.append("X2 data is empty")
+                    elif x2_array.size == 1:
+                        validation_errors.append("X2 data has only one point")
+
+                # Check for NaN or infinite values
+                if len(validation_errors) == 0:
+                    if np.any(np.isnan(y_array)):
+                        validation_errors.append("Y data contains NaN values")
+                    if np.any(np.isinf(y_array)):
+                        validation_errors.append("Y data contains infinite values")
+
+                # If validation passes, create the dataset
+                if len(validation_errors) == 0:
+                    print("DEBUG: data2Plot2D - Validation passed")
+                    datasets.append(
+                        (
+                            y_array,
+                            {
+                                "label": f"{y_name} ({y_unit})",
+                                "x_data": x_array,
+                                "x2_data": x2_array,
+                                "x_name": x_name,
+                                "x2_name": x2_name,
+                                "x_unit": x_unit,
+                                "x2_unit": x2_unit,
+                            },
+                        )
+                    )
+
+                    plot_options = {
+                        "x": x_name,
+                        "x_unit": x_unit,
+                        "y": y_name,
+                        "y_unit": y_unit,
+                        "x2": x2_name,
+                        "x2_unit": x2_unit,
+                        "title": f"{fileName}: {y_name} vs {x_name} vs {x2_name}",
+                        "filePath": filePath,
+                        "fileName": fileName,
+                        "folderPath": fileInfo.get("folderPath", ""),
+                    }
+                else:
+                    print("DEBUG: data2Plot2D - Validation failed:")
+                    for error in validation_errors:
+                        print(f"  ❌ {error}")
+                    return datasets, plot_options
+            else:
+                print("DEBUG: data2Plot2D - Missing required data:")
+                print(f"  X data: {'✅' if x_data is not None else '❌'}")
+                print(f"  Y data: {'✅' if y_data is not None else '❌'}")
+                print(f"  X2 data: {'✅' if x2_data is not None else '❌'}")
+
+        return datasets, plot_options
+
     def data2Plot(self, selections):
         """
         Extracts selected datasets for plotting from scanDict based on user selections.
