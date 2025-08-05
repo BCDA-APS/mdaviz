@@ -86,10 +86,32 @@ class MDAFileTableView(QWidget):
         self.yDetComboBox.currentIndexChanged.connect(self.onYDetSelectionChanged)
         self.i0ComboBox.currentIndexChanged.connect(self.onI0SelectionChanged)
         self.plotTypeComboBox.currentIndexChanged.connect(self.onPlotTypeChanged)
+        self.colorPaletteComboBox.currentIndexChanged.connect(
+            self.onColorPaletteChanged
+        )
         self.plotButton.clicked.connect(self.onPlotButtonClicked)
 
         # Populate plot type combobox
         self.plotTypeComboBox.addItems(["Heatmap", "Contour"])
+
+        # Populate color palette combobox
+        self.colorPaletteComboBox.addItems(
+            [
+                "viridis",
+                "plasma",
+                "inferno",
+                "magma",
+                "cividis",
+                "coolwarm",
+                "RdBu",
+                "RdYlBu",
+                "Spectral",
+                "jet",
+                "hot",
+                "cool",
+                "terrain",
+            ]
+        )
 
         # Initially hide Y DET controls
         self.yDetControls.setVisible(False)
@@ -393,6 +415,12 @@ class MDAFileTableView(QWidget):
         print(f"DEBUG: onPlotTypeChanged - plot_type: {plot_type}")
         self._trigger2DPlot()
 
+    def onColorPaletteChanged(self, index):
+        """Handle color palette selection change."""
+        palette_name = self.colorPaletteComboBox.currentText()
+        print(f"DEBUG: onColorPaletteChanged - palette_name: {palette_name}")
+        self._trigger2DPlot()
+
     def onPlotButtonClicked(self):
         """Handle plot button click."""
         print("DEBUG: onPlotButtonClicked - Plot button clicked")
@@ -439,6 +467,14 @@ class MDAFileTableView(QWidget):
 
     def get2DSelections(self):
         """Get current 2D plotting selections."""
+        # Get color palette with validation
+        color_palette = self.colorPaletteComboBox.currentText()
+        if not color_palette or color_palette.strip() == "":
+            color_palette = "viridis"
+            print(
+                f"DEBUG: get2DSelections - Empty color palette, using default: {color_palette}"
+            )
+
         selections = {
             "X1": self.x1ComboBox.currentData(),
             "X2": self.x2ComboBox.currentData(),
@@ -449,6 +485,7 @@ class MDAFileTableView(QWidget):
             ),
             "I0": self.i0ComboBox.currentData(),
             "plot_type": self.plotTypeComboBox.currentText().lower(),
+            "color_palette": color_palette,
         }
         print(f"DEBUG: get2DSelections - {selections}")
         return selections

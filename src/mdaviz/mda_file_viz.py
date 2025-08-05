@@ -231,6 +231,21 @@ class MDAFileVisualization(QWidget):
                     widgetMpl2D.set_plot_type(plot_type)
                     print(f"DEBUG: update2DPlot - Set plot type to: {plot_type}")
 
+                    # Add color palette to plot options
+                    color_palette = selection.get("color_palette", "viridis")
+
+                    # Validate color palette - ensure it's not empty
+                    if not color_palette or color_palette.strip() == "":
+                        color_palette = "viridis"
+                        print(
+                            f"DEBUG: update2DPlot - Empty color palette, using default: {color_palette}"
+                        )
+
+                    plot_options["color_palette"] = color_palette
+                    print(
+                        f"DEBUG: update2DPlot - Set color palette to: {color_palette}"
+                    )
+
                     widgetMpl2D.plot2D(y_data, x_data, x2_data, plot_options)
                 else:
                     print("DEBUG: update2DPlot - Missing X or X2 data for 2D plotting")

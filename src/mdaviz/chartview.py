@@ -1565,10 +1565,10 @@ class ChartView2D(ChartView):
         Plot 2D data as heatmap or contour.
 
         Parameters:
-        - y_data: 2D numpy array (detector data)
-        - x_data: 1D numpy array (X positioner data)
-        - x2_data: 1D numpy array (X2 positioner data)
-        - plot_options: dict with plotting options
+            y_data: 2D array of detector data
+            x_data: 1D array of X positioner data
+            x2_data: 1D array of X2 positioner data
+            plot_options: Dictionary containing plot options including color_palette
         """
         if plot_options is None:
             plot_options = {}
@@ -1578,32 +1578,32 @@ class ChartView2D(ChartView):
         print(f"  X data shape: {x_data.shape}")
         print(f"  X2 data shape: {x2_data.shape}")
         print(f"  Plot type: {self._plot_type}")
-        print(f"  Canvas exists: {hasattr(self, 'canvas')}")
-        print(f"  Main axes exists: {hasattr(self, 'main_axes')}")
+        print(f"  Canvas exists: {self.canvas is not None}")
+        print(f"  Main axes exists: {self.main_axes is not None}")
 
-        # Clear existing plot and colorbar
-        self.main_axes.clear()
-
-        # Remove existing colorbar if it exists
-        if self._current_colorbar is not None:
-            try:
-                self._current_colorbar.remove()
-            except (AttributeError, TypeError):
-                # Colorbar might already be removed or invalid
-                pass
-            self._current_colorbar = None
-
-        # Reset the figure completely to prevent layout issues
+        # Clear the previous plot
         self.figure.clear()
         self.main_axes = self.figure.add_subplot(111)
         # Reset to default subplot parameters
         self.figure.subplots_adjust(bottom=0.1, top=0.9, right=0.92)
 
+        # Get color palette from plot options
+        color_palette = plot_options.get("color_palette", "viridis")
+
+        # Validate color palette - ensure it's not empty and is a valid colormap
+        if not color_palette or color_palette.strip() == "":
+            color_palette = "viridis"
+            print(
+                f"DEBUG: ChartView2D.plot2D - Empty color palette, using default: {color_palette}"
+            )
+
+        print(f"DEBUG: ChartView2D.plot2D - Using color palette: {color_palette}")
+
         # Create the 2D plot
         if self._plot_type == "heatmap":
-            self._plot_heatmap(y_data, x_data, x2_data, plot_options)
+            self._plot_heatmap(y_data, x_data, x2_data, plot_options, color_palette)
         elif self._plot_type == "contour":
-            self._plot_contour(y_data, x_data, x2_data, plot_options)
+            self._plot_contour(y_data, x_data, x2_data, plot_options, color_palette)
         else:
             print(f"ERROR: Unknown plot type: {self._plot_type}")
             return
@@ -1620,7 +1620,7 @@ class ChartView2D(ChartView):
         self.canvas.flush_events()
         print("DEBUG: ChartView2D.plot2D - Events flushed")
 
-    def _plot_heatmap(self, y_data, x_data, x2_data, plot_options):
+    def _plot_heatmap(self, y_data, x_data, x2_data, plot_options, color_palette):
         """Plot 2D data as heatmap using imshow."""
         # Create meshgrid for proper axis scaling
         X, Y = numpy.meshgrid(x_data, x2_data)
@@ -1631,7 +1631,7 @@ class ChartView2D(ChartView):
             extent=[x_data.min(), x_data.max(), x2_data.min(), x2_data.max()],
             aspect="auto",
             origin="lower",
-            cmap="viridis",
+            cmap=color_palette,
         )
 
         # Add colorbar
@@ -1641,13 +1641,13 @@ class ChartView2D(ChartView):
 
         print("DEBUG: ChartView2D._plot_heatmap - Heatmap created")
 
-    def _plot_contour(self, y_data, x_data, x2_data, plot_options):
+    def _plot_contour(self, y_data, x_data, x2_data, plot_options, color_palette):
         """Plot 2D data as contour plot."""
         # Create meshgrid for contour plotting
         X, Y = numpy.meshgrid(x_data, x2_data)
 
         # Plot contour
-        contour = self.main_axes.contourf(X, Y, y_data, levels=20, cmap="viridis")
+        contour = self.main_axes.contourf(X, Y, y_data, levels=20, cmap=color_palette)
 
         # Add colorbar
         self._current_colorbar = self.figure.colorbar(
