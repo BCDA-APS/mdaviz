@@ -225,6 +225,12 @@ class MDAFileVisualization(QWidget):
 
                 if x_data is not None and x2_data is not None:
                     print("DEBUG: update2DPlot - Plotting 2D data in 2D tab")
+
+                    # Set the plot type from current selections
+                    plot_type = selection.get("plot_type", "heatmap")
+                    widgetMpl2D.set_plot_type(plot_type)
+                    print(f"DEBUG: update2DPlot - Set plot type to: {plot_type}")
+
                     widgetMpl2D.plot2D(y_data, x_data, x2_data, plot_options)
                 else:
                     print("DEBUG: update2DPlot - Missing X or X2 data for 2D plotting")

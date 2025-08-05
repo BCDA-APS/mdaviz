@@ -621,6 +621,15 @@ class MDA_MVC(QWidget):
             # Update the 2D plot in the 2D tab
             self.mda_file_viz.update2DPlot()
 
+            # Set the plot type in the 2D chart view
+            plot_type = selection.get("plot_type", "heatmap")
+            if (
+                hasattr(self.mda_file_viz, "widgetMpl2D")
+                and self.mda_file_viz.widgetMpl2D
+            ):
+                self.mda_file_viz.widgetMpl2D.set_plot_type(plot_type)
+                print(f"DEBUG: _doPlot2D - Set plot type to: {plot_type}")
+
         except Exception as e:
             print(f"DEBUG: _doPlot2D - Error: {e}")
             self.setStatus(f"Error plotting 2D data: {e}")
