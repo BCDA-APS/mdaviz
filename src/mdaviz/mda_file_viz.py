@@ -111,6 +111,9 @@ class MDAFileVisualization(QWidget):
         Parameters:
             data (dict or None): 2D data dictionary with scanDict2D and metadata, or None to clear
         """
+        # Force switch to 1D tab when switching files (for both 2D and 1D files)
+        self.tabWidget.setCurrentIndex(0)
+
         if not data or not data.get("isMultidimensional", False):
             self.update2DTabVisibility(False)
             # Clear 2D data
