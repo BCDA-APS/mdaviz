@@ -266,6 +266,8 @@ class MDAFileVisualization(QWidget):
         Parameters:
             index (int): Index of the newly selected tab
         """
+        print(f"DEBUG: onTabChanged - Tab changed to index: {index}")
+
         # Get current tab structure
         tab_count = self.tabWidget.count()
         is_2d_visible = tab_count >= 4 and self.tabWidget.isTabVisible(3)
@@ -275,8 +277,12 @@ class MDAFileVisualization(QWidget):
 
         # Handle 2D plotting
         if is_2d_visible and index == 3:  # 2D tab
+            print("DEBUG: onTabChanged - Switching to 2D tab, calling update2DPlot")
+            # Force auto-replace mode when switching to 2D tab
+            self.forceAutoReplaceMode()
             self.update2DPlot()
         elif index == 0:  # 1D tab
+            print("DEBUG: onTabChanged - Switching to 1D tab")
             # Update 1D plot if needed
             pass
 
@@ -297,6 +303,37 @@ class MDAFileVisualization(QWidget):
             and self.search_dialog.isVisible()
         ):
             self.search_dialog.close()
+
+    def forceAutoReplaceMode(self):
+        """Force auto-replace mode and clear other tabs when switching to 2D tab."""
+        try:
+            # Get the parent MDA_MVC widget
+            parent = self.parent()
+            while parent and not hasattr(parent, "mda_file"):
+                parent = parent.parent()
+
+            if parent and hasattr(parent, "mda_file"):
+                # Found the MDA_MVC, now access the mda_file widget
+                mda_file_widget = parent.mda_file
+
+                # Set mode to auto-replace
+                mda_file_widget.autoBox.setCurrentText("Auto-replace")
+
+                # Get current file path from the current tab
+                current_file_path = parent.getCurrentFilePath()
+                if current_file_path:
+                    # Clear all tabs except the current one
+                    parent.clearOtherTabs(current_file_path)
+
+                print(
+                    "DEBUG: forceAutoReplaceMode - Set to auto-replace and cleared other tabs"
+                )
+            else:
+                print(
+                    "DEBUG: forceAutoReplaceMode - Could not find MDA_MVC with mda_file"
+                )
+        except Exception as e:
+            print(f"DEBUG: forceAutoReplaceMode - Error: {e}")
 
     def updateControlVisibility(self, tab_index):
         """

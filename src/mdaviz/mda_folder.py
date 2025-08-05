@@ -941,7 +941,65 @@ class MDA_MVC(QWidget):
     # # ------------ Status method
 
     def setStatus(self, text):
-        """
-        Updates the application's status bar with the provided message.
-        """
+        """Set status text."""
         self.mainWindow.setStatus(text)
+
+    def getCurrentFilePath(self):
+        """Get the file path of the currently active tab."""
+        try:
+            # Get the current tab index
+            current_index = self.mda_file.tabWidget.currentIndex()
+            print(f"DEBUG: getCurrentFilePath - Current tab index: {current_index}")
+
+            if current_index >= 0:
+                # Get the file path directly from the tab manager using the current tab
+                # We can get this from the current file tableview's data
+                current_tableview = self.currentFileTableview()
+                if current_tableview and hasattr(current_tableview, "data"):
+                    file_info = current_tableview.data().get("fileInfo", {})
+                    file_path = file_info.get("filePath")
+                    if file_path:
+                        print(
+                            f"DEBUG: getCurrentFilePath - Found file path: {file_path}"
+                        )
+                        return file_path
+
+                print(
+                    "DEBUG: getCurrentFilePath - No file path found in current tableview"
+                )
+            return None
+        except Exception as e:
+            print(f"DEBUG: getCurrentFilePath - Error: {e}")
+            return None
+
+    def clearOtherTabs(self, keep_file_path):
+        """Clear all tabs except the one with the specified file path."""
+        try:
+            print(
+                f"DEBUG: clearOtherTabs - Starting with keep_file_path: {keep_file_path}"
+            )
+
+            # Get all file paths from tab manager
+            all_file_paths = list(self.mda_file.tabManager.tabs().keys())
+            print(f"DEBUG: clearOtherTabs - All file paths: {all_file_paths}")
+
+            tabs_to_remove = []
+
+            # Find file paths to remove (all except keep_file_path)
+            for file_path in all_file_paths:
+                if file_path != keep_file_path:
+                    tabs_to_remove.append(file_path)
+                    print(f"DEBUG: clearOtherTabs - Will remove: {file_path}")
+
+            print(f"DEBUG: clearOtherTabs - Tabs to remove: {tabs_to_remove}")
+
+            # Remove tabs using the tab manager
+            for file_path in tabs_to_remove:
+                print(f"DEBUG: clearOtherTabs - Removing tab: {file_path}")
+                self.mda_file.tabManager.removeTab(file_path)
+
+            print(
+                f"DEBUG: clearOtherTabs - Removed {len(tabs_to_remove)} tabs, kept: {keep_file_path}"
+            )
+        except Exception as e:
+            print(f"DEBUG: clearOtherTabs - Error: {e}")
