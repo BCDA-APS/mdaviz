@@ -240,6 +240,9 @@ class MDAFileVisualization(QWidget):
         tab_count = self.tabWidget.count()
         is_2d_visible = tab_count >= 4 and self.tabWidget.isTabVisible(3)
 
+        # Handle control visibility based on tab
+        self.updateControlVisibility(index)
+
         # Handle 2D plotting
         if is_2d_visible and index == 3:  # 2D tab
             self.update2DPlot()
@@ -264,6 +267,118 @@ class MDAFileVisualization(QWidget):
             and self.search_dialog.isVisible()
         ):
             self.search_dialog.close()
+
+    def updateControlVisibility(self, tab_index):
+        """
+        Update control visibility based on the selected tab.
+
+        Parameters:
+            tab_index (int): Index of the selected tab
+        """
+        print(f"DEBUG: updateControlVisibility - Tab index: {tab_index}")
+
+        # Get the current file table view
+        current_tableview = self.getCurrentFileTableview()
+        if not current_tableview:
+            print("DEBUG: updateControlVisibility - No current tableview found")
+            return
+
+        # Tab indices: 0=1D, 1=Data, 2=Metadata, 3=2D(if visible)
+        if tab_index == 0:  # 1D tab
+            # Show table view and X2 controls, hide Y DET controls
+            print("DEBUG: updateControlVisibility - Switching to 1D mode")
+            current_tableview.tableView.setVisible(True)
+            current_tableview.dimensionControls.setVisible(True)
+            current_tableview.yDetControls.setVisible(False)
+
+            # Show mode controls and clear button
+            self.showModeControls(True)
+        elif tab_index == 3:  # 2D tab
+            # Hide table view and X2 controls, show Y DET controls
+            print("DEBUG: updateControlVisibility - Switching to 2D mode")
+            current_tableview.tableView.setVisible(False)
+            current_tableview.dimensionControls.setVisible(False)
+            current_tableview.yDetControls.setVisible(True)
+
+            # Hide mode controls and clear button
+            self.showModeControls(False)
+        else:
+            # For other tabs (Data, Metadata), keep current state
+            print(
+                f"DEBUG: updateControlVisibility - Other tab ({tab_index}), keeping current state"
+            )
+
+    def showModeControls(self, show: bool):
+        """Show or hide mode controls and clear button."""
+        try:
+            # Get the parent MDA_MVC widget
+            parent = self.parent()
+            while parent and not hasattr(parent, "mda_file"):
+                parent = parent.parent()
+
+            if parent and hasattr(parent, "mda_file"):
+                # Found the MDA_MVC, now access the mda_file widget
+                mda_file_widget = parent.mda_file
+                mda_file_widget.autoBox.setVisible(show)
+                mda_file_widget.clearButton.setVisible(show)
+                mda_file_widget.clearGraphButton.setVisible(show)
+                print(
+                    f"DEBUG: showModeControls - Mode controls visibility set to: {show}"
+                )
+            else:
+                print("DEBUG: showModeControls - Could not find MDA_MVC with mda_file")
+                # Try alternative approach - look for controls in the main window
+                main_window = self.window()
+                if hasattr(main_window, "autoBox"):
+                    main_window.autoBox.setVisible(show)
+                    main_window.clearButton.setVisible(show)
+                    print(
+                        f"DEBUG: showModeControls - Found controls in main window, visibility set to: {show}"
+                    )
+                else:
+                    print(
+                        "DEBUG: showModeControls - Could not find mode controls in main window either"
+                    )
+                    # Try one more approach - look for MDAFile in the widget tree
+                    current = self
+                    print(
+                        f"DEBUG: showModeControls - Starting widget tree search from: {type(current).__name__}"
+                    )
+                    while current:
+                        print(
+                            f"DEBUG: showModeControls - Checking widget: {type(current).__name__}, has autoBox: {hasattr(current, 'autoBox')}"
+                        )
+                        if hasattr(current, "autoBox"):
+                            current.autoBox.setVisible(show)
+                            current.clearButton.setVisible(show)
+                            print(
+                                f"DEBUG: showModeControls - Found controls in widget tree, visibility set to: {show}"
+                            )
+                            break
+                        current = current.parent()
+                    else:
+                        print(
+                            "DEBUG: showModeControls - Could not find mode controls anywhere in widget tree"
+                        )
+        except Exception as e:
+            print(f"DEBUG: showModeControls - Error: {e}")
+
+    def getCurrentFileTableview(self):
+        """Get the current file table view from the parent."""
+        try:
+            # Traverse up to find MDA_MVC
+            parent = self.parent()
+            while parent and not hasattr(parent, "currentFileTableview"):
+                parent = parent.parent()
+
+            if parent and hasattr(parent, "currentFileTableview"):
+                return parent.currentFileTableview()
+            else:
+                print("DEBUG: getCurrentFileTableview - No MDA_MVC found")
+                return None
+        except Exception as e:
+            print(f"DEBUG: getCurrentFileTableview - Error: {e}")
+            return None
 
     def setupFitUI(self):
         """Setup the fit UI components and connections."""

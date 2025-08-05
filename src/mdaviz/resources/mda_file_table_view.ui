@@ -31,6 +31,24 @@
    </property>
    <item>
     <widget class="QLabel" name="filePath">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>25</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>40</height>
+      </size>
+     </property>
      <property name="styleSheet">
       <string notr="true">QLabel {
     background-color: rgb(248, 248, 248);
@@ -189,6 +207,12 @@
             <height>0</height>
            </size>
           </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>16777215</height>
+           </size>
+          </property>
          </widget>
         </item>
         <item row="1" column="0">
@@ -216,6 +240,12 @@
            <size>
             <width>200</width>
             <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>16777215</height>
            </size>
           </property>
          </widget>
@@ -247,6 +277,12 @@
             <height>0</height>
            </size>
           </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>16777215</height>
+           </size>
+          </property>
          </widget>
         </item>
         <item row="3" column="0">
@@ -274,6 +310,12 @@
            <size>
             <width>200</width>
             <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>16777215</height>
            </size>
           </property>
          </widget>

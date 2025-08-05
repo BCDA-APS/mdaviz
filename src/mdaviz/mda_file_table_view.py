@@ -58,6 +58,9 @@ class MDAFileTableView(QWidget):
         # Setup 2D controls
         self.setup2DControls()
 
+        # Setup Y DET controls after UI is fully loaded
+        self.setupYDetControls()
+
     def setup2DControls(self):
         """Setup 2D data controls (X2 selection)."""
         # Connect X2 spinbox to update function
@@ -65,6 +68,221 @@ class MDAFileTableView(QWidget):
 
         # Initially hide 2D controls
         self.dimensionControls.setVisible(False)
+
+    def setupYDetControls(self):
+        """Setup Y DET selection controls for 2D plotting."""
+        print("DEBUG: setupYDetControls - Starting setup")
+
+        # Use QTimer to ensure UI is fully loaded
+        from PyQt6.QtCore import QTimer
+
+        QTimer.singleShot(100, self._setupYDetControlsDelayed)
+
+    def _setupYDetControlsDelayed(self):
+        """Setup Y DET controls after UI is fully loaded."""
+        print("DEBUG: _setupYDetControlsDelayed - Starting delayed setup")
+
+        # Check if controls exist
+        print(
+            f"DEBUG: _setupYDetControlsDelayed - yDetControls exists: {hasattr(self, 'yDetControls')}"
+        )
+        print(
+            f"DEBUG: _setupYDetControlsDelayed - x1ComboBox exists: {hasattr(self, 'x1ComboBox')}"
+        )
+        print(
+            f"DEBUG: _setupYDetControlsDelayed - yDetComboBox exists: {hasattr(self, 'yDetComboBox')}"
+        )
+
+        if not hasattr(self, "yDetControls"):
+            print("ERROR: _setupYDetControlsDelayed - yDetControls not found!")
+            return
+
+        if not hasattr(self, "x1ComboBox"):
+            print("ERROR: _setupYDetControlsDelayed - x1ComboBox not found!")
+            return
+
+        # Connect combobox signals
+        try:
+            self.x1ComboBox.currentIndexChanged.connect(self.onX1SelectionChanged)
+            self.x2ComboBox.currentIndexChanged.connect(self.onX2SelectionChanged)
+            self.yDetComboBox.currentIndexChanged.connect(self.onYDetSelectionChanged)
+            self.i0ComboBox.currentIndexChanged.connect(self.onI0SelectionChanged)
+            self.plotTypeComboBox.currentIndexChanged.connect(self.onPlotTypeChanged)
+            self.plotButton.clicked.connect(self.onPlotButtonClicked)
+            print(
+                "DEBUG: _setupYDetControlsDelayed - All signals connected successfully"
+            )
+        except Exception as e:
+            print(f"ERROR: _setupYDetControlsDelayed - Failed to connect signals: {e}")
+            return
+
+        # Populate plot type combobox
+        self.plotTypeComboBox.addItems(["Heatmap", "Contour"])
+
+        # Initially hide Y DET controls
+        self.yDetControls.setVisible(False)
+        print("DEBUG: _setupYDetControlsDelayed - Y DET controls setup complete")
+
+    def populateX1ComboBox(self):
+        """Populate X1 combobox with available positioners from scanDictInner."""
+        print("DEBUG: populateX1ComboBox - Starting")
+
+        if not hasattr(self, "data") or self.data() is None:
+            print("DEBUG: populateX1ComboBox - No data available")
+            return
+
+        fileInfo = self.data().get("fileInfo", {})
+        print(f"DEBUG: populateX1ComboBox - fileInfo keys: {list(fileInfo.keys())}")
+
+        if not fileInfo.get("isMultidimensional", False):
+            print("DEBUG: populateX1ComboBox - Not multidimensional")
+            return
+
+        scanDictInner = fileInfo.get("scanDictInner", {})
+        print(
+            f"DEBUG: populateX1ComboBox - scanDictInner keys: {list(scanDictInner.keys())}"
+        )
+
+        self.x1ComboBox.clear()
+
+        # Add positioners (fieldName starts with "P")
+        for key, value in scanDictInner.items():
+            fieldName = value.get("fieldName", "")
+            if fieldName.startswith("P"):  # Only positioners
+                name = value.get("name", f"PV_{key}")
+                unit = value.get("unit", "")
+                display_text = f"{name} ({unit})" if unit else name
+                self.x1ComboBox.addItem(display_text, key)
+                print(
+                    f"DEBUG: populateX1ComboBox - Added positioner {display_text} (key: {key}, fieldName: {fieldName})"
+                )
+
+        print(
+            f"DEBUG: populateX1ComboBox - Added {self.x1ComboBox.count()} X1 positioners"
+        )
+
+        # Set P1 as default (key 1) if available
+        if self.x1ComboBox.count() > 0:
+            # Find P1 (key 1) and set as default
+            for i in range(self.x1ComboBox.count()):
+                if self.x1ComboBox.itemData(i) == 1:  # P1 key
+                    self.x1ComboBox.setCurrentIndex(i)
+                    print(f"DEBUG: populateX1ComboBox - Set P1 as default (index: {i})")
+                    break
+
+    def populateX2ComboBox(self):
+        """Populate X2 combobox with available positioners from scanDict (outer dimension)."""
+        if not hasattr(self, "data") or self.data() is None:
+            return
+
+        fileInfo = self.data().get("fileInfo", {})
+        if not fileInfo.get("isMultidimensional", False):
+            return
+
+        scanDict = fileInfo.get("scanDict", {})
+        self.x2ComboBox.clear()
+
+        # Add positioners from scanDict (outer dimension)
+        for key, value in scanDict.items():
+            fieldName = value.get("fieldName", "")
+            if fieldName.startswith("P"):  # Only positioners
+                name = value.get("name", f"PV_{key}")
+                unit = value.get("unit", "")
+                display_text = f"{name} ({unit})" if unit else name
+                self.x2ComboBox.addItem(display_text, key)
+                print(
+                    f"DEBUG: populateX2ComboBox - Added positioner {display_text} (key: {key}, fieldName: {fieldName})"
+                )
+
+        print(
+            f"DEBUG: populateX2ComboBox - Added {self.x2ComboBox.count()} X2 positioners"
+        )
+
+        # Set P1 as default (key 1) if available
+        if self.x2ComboBox.count() > 0:
+            # Find P1 (key 1) and set as default
+            for i in range(self.x2ComboBox.count()):
+                if self.x2ComboBox.itemData(i) == 1:  # P1 key
+                    self.x2ComboBox.setCurrentIndex(i)
+                    print(f"DEBUG: populateX2ComboBox - Set P1 as default (index: {i})")
+                    break
+
+    def populateYDetComboBox(self):
+        """Populate Y detector combobox with available detectors from scanDict2D."""
+        if not hasattr(self, "data") or self.data() is None:
+            return
+
+        fileInfo = self.data().get("fileInfo", {})
+        if not fileInfo.get("isMultidimensional", False):
+            return
+
+        scanDict2D = fileInfo.get("scanDict2D", {})
+        scanDictInner = fileInfo.get("scanDictInner", {})
+        self.yDetComboBox.clear()
+
+        # Add detectors (fieldName starts with "D")
+        for key, value in scanDict2D.items():
+            # Find corresponding detector info from scanDictInner
+            detector_info = scanDictInner.get(key, {})
+            fieldName = detector_info.get("fieldName", "")
+            if fieldName.startswith("D"):  # Only detectors
+                name = detector_info.get("name", f"Detector_{key}")
+                unit = detector_info.get("unit", "")
+                display_text = f"{name} ({unit})" if unit else name
+                self.yDetComboBox.addItem(display_text, key)
+                print(
+                    f"DEBUG: populateYDetComboBox - Added detector {display_text} (key: {key}, fieldName: {fieldName})"
+                )
+
+        print(
+            f"DEBUG: populateYDetComboBox - Added {self.yDetComboBox.count()} Y detectors"
+        )
+
+    def populateI0ComboBox(self):
+        """Populate I0 detector combobox with available detectors from scanDict2D."""
+        if not hasattr(self, "data") or self.data() is None:
+            return
+
+        fileInfo = self.data().get("fileInfo", {})
+        if not fileInfo.get("isMultidimensional", False):
+            return
+
+        scanDict2D = fileInfo.get("scanDict2D", {})
+        scanDictInner = fileInfo.get("scanDictInner", {})
+        self.i0ComboBox.clear()
+
+        # Add "None" option for no normalization
+        self.i0ComboBox.addItem("None", None)
+
+        # Add detectors (fieldName starts with "D")
+        for key, value in scanDict2D.items():
+            # Find corresponding detector info from scanDictInner
+            detector_info = scanDictInner.get(key, {})
+            fieldName = detector_info.get("fieldName", "")
+            if fieldName.startswith("D"):  # Only detectors
+                name = detector_info.get("name", f"Detector_{key}")
+                unit = detector_info.get("unit", "")
+                display_text = f"{name} ({unit})" if unit else name
+                self.i0ComboBox.addItem(display_text, key)
+                print(
+                    f"DEBUG: populateI0ComboBox - Added detector {display_text} (key: {key}, fieldName: {fieldName})"
+                )
+
+        print(
+            f"DEBUG: populateI0ComboBox - Added {self.i0ComboBox.count()} I0 detectors"
+        )
+
+    def populate2DControls(self):
+        """Populate all 2D control comboboxes with data from current file."""
+        print("DEBUG: populate2DControls - Starting population of 2D controls")
+
+        # Populate all comboboxes
+        self.populateX1ComboBox()
+        self.populateX2ComboBox()
+        self.populateYDetComboBox()
+        self.populateI0ComboBox()
+
+        print("DEBUG: populate2DControls - All 2D controls populated")
 
     def update2DControls(
         self, is_multidimensional=False, dimensions=None, x2_positioner_info=None
@@ -103,6 +321,9 @@ class MDAFileTableView(QWidget):
             else:
                 self.x2Label.setText("X2:")
                 self.x2ValueLabel.setText("--")
+
+            # Populate 2D control comboboxes
+            self.populate2DControls()
         else:
             # Hide 2D controls for 1D data
             self.dimensionControls.setVisible(False)
@@ -153,6 +374,54 @@ class MDAFileTableView(QWidget):
     def getX2Value(self):
         """Get the current X2 value from the spinbox."""
         return self.x2SpinBox.value()
+
+    # Y DET Controls Signal Handlers
+    def onX1SelectionChanged(self, index):
+        """Handle X1 positioner selection change."""
+        print(f"DEBUG: onX1SelectionChanged - index: {index}")
+        # TODO: Update 2D plot when X1 selection changes
+
+    def onX2SelectionChanged(self, index):
+        """Handle X2 positioner selection change."""
+        print(f"DEBUG: onX2SelectionChanged - index: {index}")
+        # TODO: Update 2D plot when X2 selection changes
+
+    def onYDetSelectionChanged(self, index):
+        """Handle Y detector selection change."""
+        print(f"DEBUG: onYDetSelectionChanged - index: {index}")
+        # TODO: Update 2D plot when Y detector selection changes
+
+    def onI0SelectionChanged(self, index):
+        """Handle I0 detector selection change."""
+        print(f"DEBUG: onI0SelectionChanged - index: {index}")
+        # TODO: Update 2D plot when I0 detector selection changes
+
+    def onPlotTypeChanged(self, index):
+        """Handle plot type selection change."""
+        plot_type = self.plotTypeComboBox.currentText().lower()
+        print(f"DEBUG: onPlotTypeChanged - plot_type: {plot_type}")
+        # TODO: Update 2D plot type
+
+    def onPlotButtonClicked(self):
+        """Handle plot button click."""
+        print("DEBUG: onPlotButtonClicked - Plot button clicked")
+        # TODO: Trigger 2D plotting with current selections
+
+    def get2DSelections(self):
+        """Get current 2D plotting selections."""
+        selections = {
+            "X1": self.x1ComboBox.currentData(),
+            "X2": self.x2ComboBox.currentData(),
+            "Y": (
+                [self.yDetComboBox.currentData()]
+                if self.yDetComboBox.currentData() is not None
+                else []
+            ),
+            "I0": self.i0ComboBox.currentData(),
+            "plot_type": self.plotTypeComboBox.currentText().lower(),
+        }
+        print(f"DEBUG: get2DSelections - {selections}")
+        return selections
 
     def data(self):
         """Return the data from the table view:
