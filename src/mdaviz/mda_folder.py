@@ -516,6 +516,24 @@ class MDA_MVC(QWidget):
             print(f"\ndoPlot called: action={action}")
 
         tableview = self.currentFileTableview()
+
+        # Check if this is a 2D selection (has X1, X2 keys)
+        is_2d_selection = (
+            len(args) > 1
+            and isinstance(args[1], dict)
+            and "X1" in args[1]
+            and "X2" in args[1]
+        )
+        print(f"DEBUG: doPlot - is_2d_selection: {is_2d_selection}")
+
+        if is_2d_selection:
+            # Handle 2D plotting - use the passed selection
+            selection = args[1]
+            print("DEBUG: doPlot - Handling 2D plotting")
+            self._doPlot2D(action, selection)
+            return
+
+        # For 1D plotting, use the selection from the table view
         selection = self.selectionField()
 
         # Clear all content from the file table view & viz panel:
@@ -531,6 +549,7 @@ class MDA_MVC(QWidget):
 
         print(f"\ndoPlot called: {action=}, {selection=}")
 
+        # Handle 1D plotting (existing logic)
         # Get the matplotlib chartview widget, if exists:
         layoutMpl = self.mda_file_viz.plotPageMpl.layout()
         if layoutMpl.count() != 1:  # in case something changes ...
@@ -570,6 +589,41 @@ class MDA_MVC(QWidget):
                     print("DEBUG: doPlot - No x2_index in plot_options")
                 widgetMpl.plot(i, *ds, **options)
             self.mda_file_viz.setPlot(widgetMpl)
+
+    def _doPlot2D(self, action, selection):
+        """
+        Handle 2D plotting with the given selection.
+
+        Parameters:
+            action (str): 'add' or 'replace'
+            selection (dict): 2D selection with X1, X2, Y, I0, plot_type keys
+        """
+        print(f"DEBUG: _doPlot2D - action: {action}, selection: {selection}")
+
+        tableview = self.currentFileTableview()
+        if not tableview:
+            print("DEBUG: _doPlot2D - No tableview available")
+            return
+
+        # Convert 2D selection to 1D format for data2Plot2D
+        # data2Plot2D expects: {'X': x_index, 'Y': [y_indices]}
+        converted_selection = {"X": selection.get("X1"), "Y": selection.get("Y", [])}
+
+        print(f"DEBUG: _doPlot2D - Converted selection: {converted_selection}")
+
+        # Get 2D data and plot options
+        try:
+            datasets, plot_options = tableview.data2Plot2D(converted_selection)
+            print(
+                f"DEBUG: _doPlot2D - Got datasets: {len(datasets)}, plot_options: {plot_options}"
+            )
+
+            # Update the 2D plot in the 2D tab
+            self.mda_file_viz.update2DPlot()
+
+        except Exception as e:
+            print(f"DEBUG: _doPlot2D - Error: {e}")
+            self.setStatus(f"Error plotting 2D data: {e}")
 
     def onTabChanged(self, index, file_path, file_data, selection_field):
         """

@@ -125,7 +125,7 @@ class MDAFileVisualization(QWidget):
         self._2d_data = data
 
         # Update 2D plot if tab is visible
-        if self.tabWidget.currentIndex() == 1:  # 2D tab
+        if self.tabWidget.currentIndex() == 3:  # 2D tab
             self.update2DPlot()
 
     def update2DPlot(self):
@@ -153,17 +153,23 @@ class MDAFileVisualization(QWidget):
             print("DEBUG: update2DPlot - No current table view")
             return
 
-        # Get current selections from the table view
-        if hasattr(tableview, "tableView") and tableview.tableView.model():
-            selection = tableview.tableView.model().plotFields()
+        # Get 2D selections from comboboxes instead of 1D selections from table view
+        if hasattr(tableview, "get2DSelections"):
+            selection = tableview.get2DSelections()
+            print(
+                f"DEBUG: update2DPlot - Using 2D selections from comboboxes: {selection}"
+            )
         else:
-            print("DEBUG: update2DPlot - No table model or plot fields")
+            print("DEBUG: update2DPlot - No get2DSelections method available")
             return
 
-        print(f"DEBUG: update2DPlot - Calling data2Plot2D with selections: {selection}")
+        # Convert 2D selection to 1D format for data2Plot2D
+        # data2Plot2D expects: {'X': x_index, 'Y': [y_indices]}
+        converted_selection = {"X": selection.get("X1"), "Y": selection.get("Y", [])}
+        print(f"DEBUG: update2DPlot - Converted to 1D format: {converted_selection}")
 
         # Call our data2Plot2D function to extract 2D data
-        datasets, plot_options = tableview.data2Plot2D(selection)
+        datasets, plot_options = tableview.data2Plot2D(converted_selection)
 
         print("DEBUG: update2DPlot - data2Plot2D returned:")
         print(f"  datasets count: {len(datasets)}")
@@ -275,8 +281,6 @@ class MDAFileVisualization(QWidget):
         Parameters:
             tab_index (int): Index of the selected tab
         """
-        print(f"DEBUG: updateControlVisibility - Tab index: {tab_index}")
-
         # Get the current file table view
         current_tableview = self.getCurrentFileTableview()
         if not current_tableview:
@@ -286,7 +290,6 @@ class MDAFileVisualization(QWidget):
         # Tab indices: 0=1D, 1=Data, 2=Metadata, 3=2D(if visible)
         if tab_index == 0:  # 1D tab
             # Show table view and X2 controls, hide Y DET controls
-            print("DEBUG: updateControlVisibility - Switching to 1D mode")
             current_tableview.tableView.setVisible(True)
             current_tableview.dimensionControls.setVisible(True)
             current_tableview.yDetControls.setVisible(False)
@@ -295,18 +298,12 @@ class MDAFileVisualization(QWidget):
             self.showModeControls(True)
         elif tab_index == 3:  # 2D tab
             # Hide table view and X2 controls, show Y DET controls
-            print("DEBUG: updateControlVisibility - Switching to 2D mode")
             current_tableview.tableView.setVisible(False)
             current_tableview.dimensionControls.setVisible(False)
             current_tableview.yDetControls.setVisible(True)
 
             # Hide mode controls and clear button
             self.showModeControls(False)
-        else:
-            # For other tabs (Data, Metadata), keep current state
-            print(
-                f"DEBUG: updateControlVisibility - Other tab ({tab_index}), keeping current state"
-            )
 
     def showModeControls(self, show: bool):
         """Show or hide mode controls and clear button."""

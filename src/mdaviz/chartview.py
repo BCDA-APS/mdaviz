@@ -1510,9 +1510,7 @@ class CurveManager(QObject):
         else:
             curve_id = f"{file_path}_{row}"
 
-        print(
-            f"DEBUG: generateCurveID - x2_index={x2_index}, generated curve_id={curve_id}"
-        )
+        print(f"DEBUG: generateCurveID - curve_id={curve_id}")
 
         # Check if this curve ID already exists
         if curve_id in self._curves:
