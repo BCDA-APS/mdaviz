@@ -1624,6 +1624,11 @@ class ChartView2D(ChartView):
 
     def _plot_heatmap(self, y_data, x_data, x2_data, plot_options, color_palette):
         """Plot 2D data as heatmap using imshow."""
+        # Check if X2 data is in descending order (reverse scan direction)
+        # If so, flip the Y data vertically to match the expected orientation
+        if len(x2_data) > 1 and x2_data[0] > x2_data[-1]:
+            y_data = y_data[::-1, :]  # Flip vertically
+
         # Create meshgrid for proper axis scaling
         X, Y = numpy.meshgrid(x_data, x2_data)
 
