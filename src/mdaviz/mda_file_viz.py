@@ -451,11 +451,19 @@ class MDAFileVisualization(QWidget):
                     f"DEBUG: show1DControls - curves widget visibility set to: {show}"
                 )
 
-            # Hide/show fit tab in graphInfo (separate from curves widget)
+            # Hide/show graphInfo panel
             if hasattr(self, "graphInfo"):
-                # The fit tab is at index 1 (advancedTab)
-                self.graphInfo.setTabVisible(1, show)
-                print(f"DEBUG: show1DControls - Fit tab visibility set to: {show}")
+                self.graphInfo.setVisible(show)
+                print(
+                    f"DEBUG: show1DControls - graphInfo panel visibility set to: {show}"
+                )
+
+            # Hide/show cursorInfo panel for 2D tab
+            if hasattr(self, "cursorInfo"):
+                self.cursorInfo.setVisible(show)
+                print(
+                    f"DEBUG: show1DControls - cursorInfo panel visibility set to: {show}"
+                )
 
         except Exception as e:
             print(f"DEBUG: show1DControls - Error: {e}")
