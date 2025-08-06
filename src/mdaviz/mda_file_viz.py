@@ -167,8 +167,12 @@ class MDAFileVisualization(QWidget):
             return
 
         # Convert 2D selection to 1D format for data2Plot2D
-        # data2Plot2D expects: {'X': x_index, 'Y': [y_indices]}
-        converted_selection = {"X": selection.get("X1"), "Y": selection.get("Y", [])}
+        # data2Plot2D expects: {'X': x_index, 'Y': [y_indices], 'I0': i0_index}
+        converted_selection = {
+            "X": selection.get("X1"),
+            "Y": selection.get("Y", []),
+            "I0": selection.get("I0"),
+        }
         print(f"DEBUG: update2DPlot - Converted to 1D format: {converted_selection}")
 
         # Call our data2Plot2D function to extract 2D data

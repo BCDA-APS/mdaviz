@@ -653,6 +653,47 @@ class MDAFileTableView(QWidget):
                 y_name = "Y"
                 y_unit = ""
 
+            # ------ extract I0 data for normalization (from scanDict2D):
+            i0_index = selections.get("I0")
+            i0_data = None
+            i0_name = None
+            is_normalized = False
+
+            if i0_index is not None and i0_index in scanDict2D:
+                i0_data = scanDict2D[i0_index].get("data")
+                i0_name = scanDict2D[i0_index].get("name", f"D{i0_index}")
+                print(
+                    f"DEBUG: data2Plot2D - I0 data shape: {np.array(i0_data).shape if i0_data else 'None'}"
+                )
+
+                # Perform normalization if both Y and I0 data are available
+                if y_data is not None and i0_data is not None:
+                    y_array = np.array(y_data)
+                    i0_array = np.array(i0_data)
+
+                    # Check if shapes are compatible
+                    if y_array.shape == i0_array.shape:
+                        # Handle division by zero (same logic as 1D normalization)
+                        # Replace zeros in I0 with 1 to avoid division by zero
+                        i0_safe = np.where(i0_array == 0, 1, i0_array)
+
+                        # Perform normalization
+                        y_data = y_array / i0_safe
+                        is_normalized = True
+                        print(
+                            f"DEBUG: data2Plot2D - Normalized Y data by I0: {i0_name}"
+                        )
+                    else:
+                        print(
+                            f"DEBUG: data2Plot2D - I0 shape {i0_array.shape} incompatible with Y shape {y_array.shape}"
+                        )
+                        i0_data = None
+                        i0_name = None
+            else:
+                print(
+                    f"DEBUG: data2Plot2D - No I0 normalization (I0 index: {i0_index})"
+                )
+
             # ------ extract x2 data (from scanDict - this is the X2 positioner):
             x2_data = None
             x2_name = "X2"
@@ -801,6 +842,12 @@ class MDAFileTableView(QWidget):
                         "fileName": fileName,
                         "folderPath": fileInfo.get("folderPath", ""),
                     }
+
+                    # Update title and add normalization info if normalized
+                    if is_normalized and i0_name:
+                        plot_options["title"] = f"{fileName}: {y_name} [norm]"
+                        plot_options["i0_name"] = i0_name
+                        plot_options["is_normalized"] = True
                 else:
                     print("DEBUG: data2Plot2D - Validation failed:")
                     for error in validation_errors:
