@@ -91,6 +91,9 @@ class MDAFileTableView(QWidget):
         )
         self.plotButton.clicked.connect(self.onPlotButtonClicked)
 
+        # Connect log scale controls
+        self.logYCheckBox.toggled.connect(self.onLogScaleChanged)
+
         # Populate plot type combobox
         self.plotTypeComboBox.addItems(["Heatmap", "Contour"])
 
@@ -421,6 +424,13 @@ class MDAFileTableView(QWidget):
         print(f"DEBUG: onColorPaletteChanged - palette_name: {palette_name}")
         self._trigger2DPlot()
 
+    def onLogScaleChanged(self, checked):
+        """Handle log scale checkbox changes."""
+        sender = self.sender()
+        if sender == self.logYCheckBox:
+            print(f"DEBUG: onLogScaleChanged - LogY: {checked}")
+        self._trigger2DPlot()
+
     def onPlotButtonClicked(self):
         """Handle plot button click."""
         print("DEBUG: onPlotButtonClicked - Plot button clicked")
@@ -486,6 +496,7 @@ class MDAFileTableView(QWidget):
             "I0": self.i0ComboBox.currentData(),
             "plot_type": self.plotTypeComboBox.currentText().lower(),
             "color_palette": color_palette,
+            "log_y": self.logYCheckBox.isChecked(),
         }
         print(f"DEBUG: get2DSelections - {selections}")
         return selections
@@ -841,6 +852,7 @@ class MDAFileTableView(QWidget):
                         "filePath": filePath,
                         "fileName": fileName,
                         "folderPath": fileInfo.get("folderPath", ""),
+                        "log_y": selections.get("log_y", False),
                     }
 
                     # Update title and add normalization info if normalized

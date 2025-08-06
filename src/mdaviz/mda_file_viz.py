@@ -172,6 +172,7 @@ class MDAFileVisualization(QWidget):
             "X": selection.get("X1"),
             "Y": selection.get("Y", []),
             "I0": selection.get("I0"),
+            "log_y": selection.get("log_y", False),
         }
         print(f"DEBUG: update2DPlot - Converted to 1D format: {converted_selection}")
 
@@ -223,6 +224,15 @@ class MDAFileVisualization(QWidget):
                 if hasattr(self, "getLogScaleState"):
                     stored_log_x, stored_log_y = self.getLogScaleState()
                     widgetMpl2D.setLogScales(stored_log_x, stored_log_y)
+
+                # Apply 2D log scale state from current selections
+                log_y = selection.get("log_y", False)
+                widgetMpl2D.setLogScales2D(log_y)
+
+            # Apply 2D log scale state from current selections (for both new and existing widgets)
+            log_y = selection.get("log_y", False)
+            widgetMpl2D.setLogScales2D(log_y)
+            print(f"DEBUG: update2DPlot - Applied log scale: {log_y}")
 
             # Plot the 2D data
             for dataset in datasets:
@@ -361,6 +371,9 @@ class MDAFileVisualization(QWidget):
 
             # Show mode controls and clear button
             self.showModeControls(True)
+
+            # Show 1D-specific controls
+            self.show1DControls(True)
         elif tab_index == 3:  # 2D tab
             # Hide table view and X2 controls, show Y DET controls
             current_tableview.tableView.setVisible(False)
@@ -369,6 +382,9 @@ class MDAFileVisualization(QWidget):
 
             # Hide mode controls and clear button
             self.showModeControls(False)
+
+            # Hide 1D-specific controls
+            self.show1DControls(False)
 
     def showModeControls(self, show: bool):
         """Show or hide mode controls and clear button."""
@@ -424,6 +440,25 @@ class MDAFileVisualization(QWidget):
                         )
         except Exception as e:
             print(f"DEBUG: showModeControls - Error: {e}")
+
+    def show1DControls(self, show: bool):
+        """Show or hide 1D-specific controls by hiding/showing the entire curves widget."""
+        try:
+            # Hide/show the entire curves widget (contains curveBox, curveRemove, curveStyle, clearAll, etc.)
+            if hasattr(self, "curves"):
+                self.curves.setVisible(show)
+                print(
+                    f"DEBUG: show1DControls - curves widget visibility set to: {show}"
+                )
+
+            # Hide/show fit tab in graphInfo (separate from curves widget)
+            if hasattr(self, "graphInfo"):
+                # The fit tab is at index 1 (advancedTab)
+                self.graphInfo.setTabVisible(1, show)
+                print(f"DEBUG: show1DControls - Fit tab visibility set to: {show}")
+
+        except Exception as e:
+            print(f"DEBUG: show1DControls - Error: {e}")
 
     def getCurrentFileTableview(self):
         """Get the current file table view from the parent."""

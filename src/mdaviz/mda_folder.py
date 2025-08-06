@@ -611,6 +611,7 @@ class MDA_MVC(QWidget):
             "X": selection.get("X1"),
             "Y": selection.get("Y", []),
             "I0": selection.get("I0"),
+            "log_y": selection.get("log_y", False),
         }
 
         print(f"DEBUG: _doPlot2D - Converted selection: {converted_selection}")

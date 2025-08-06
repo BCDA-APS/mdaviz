@@ -1214,9 +1214,9 @@ class ChartView(QWidget):
             )
             if persistent_key not in self.curveManager._persistent_properties:
                 self.curveManager._persistent_properties[persistent_key] = {}
-            self.curveManager._persistent_properties[persistent_key]["style"] = (
-                format_string
-            )
+            self.curveManager._persistent_properties[persistent_key][
+                "style"
+            ] = format_string
             print(
                 f"DEBUG: Saved style to persistent storage: {persistent_key} -> {format_string}"
             )
@@ -1307,7 +1307,9 @@ class CurveManager(QObject):
         super().__init__(parent)
         self._curves = {}  # Store curves with a unique identifier as the key
         # Persistent storage for curve properties across manager clears
-        self._persistent_properties = {}  # key: (file_path, row), value: {style, offset, factor}
+        self._persistent_properties = (
+            {}
+        )  # key: (file_path, row), value: {style, offset, factor}
 
     def addCurve(self, row, *ds, **options):
         """Add a new curve to the manager if not already present on the graph."""
@@ -1625,6 +1627,15 @@ class ChartView2D(ChartView):
         # Create meshgrid for proper axis scaling
         X, Y = numpy.meshgrid(x_data, x2_data)
 
+        # Apply log scale normalization if enabled
+        norm = None
+        if hasattr(self, "_log_y_2d") and self._log_y_2d:
+            from matplotlib.colors import LogNorm
+
+            # Use LogNorm for proper log color scaling
+            norm = LogNorm(vmin=y_data.min(), vmax=y_data.max())
+            print("DEBUG: ChartView2D._plot_heatmap - Applied log normalization")
+
         # Plot heatmap
         im = self.main_axes.imshow(
             y_data,
@@ -1632,6 +1643,7 @@ class ChartView2D(ChartView):
             aspect="auto",
             origin="lower",
             cmap=color_palette,
+            norm=norm,
         )
 
         # Add colorbar
@@ -1646,8 +1658,26 @@ class ChartView2D(ChartView):
         # Create meshgrid for contour plotting
         X, Y = numpy.meshgrid(x_data, x2_data)
 
+        # Apply log scale normalization if enabled
+        norm = None
+        levels = 20
+        if hasattr(self, "_log_y_2d") and self._log_y_2d:
+            # For contour plots with log scale, use LogNorm for color normalization
+            vmin, vmax = y_data.min(), y_data.max()
+            if vmin > 0:  # Only apply log if all values are positive
+                from matplotlib.colors import LogNorm
+
+                norm = LogNorm(vmin=vmin, vmax=vmax)
+                print("DEBUG: ChartView2D._plot_contour - Applied log normalization")
+            else:
+                print(
+                    "DEBUG: ChartView2D._plot_contour - Cannot apply log scale to data with non-positive values"
+                )
+
         # Plot contour
-        contour = self.main_axes.contourf(X, Y, y_data, levels=20, cmap=color_palette)
+        contour = self.main_axes.contourf(
+            X, Y, y_data, levels=levels, cmap=color_palette, norm=norm
+        )
 
         # Add colorbar
         self._current_colorbar = self.figure.colorbar(
@@ -1693,3 +1723,28 @@ class ChartView2D(ChartView):
     def get_plot_type(self):
         """Get the current plot type."""
         return self._plot_type
+
+    def setLogScales2D(self, log_y: bool):
+        """
+        Set logarithmic scale for 2D plots (Y-axis color scale).
+
+        Parameters:
+        - log_y (bool): Whether to use logarithmic scale for Y-axis (color scale)
+        """
+        try:
+            # Store the log scale state
+            self._log_y_2d = log_y
+
+            # For 2D plots, log_y affects the color scale normalization
+            # This would need to be handled in the plotting methods
+            # For now, we'll store the state for potential future use
+            self._log_y_2d = log_y
+
+            # Redraw the canvas to apply changes
+            self.canvas.draw()
+            print(f"DEBUG: ChartView2D.setLogScales2D - LogY: {log_y}")
+        except Exception as exc:
+            print(f"Error setting 2D log scales: {exc}")
+            # If setting log scale fails (e.g., negative values), revert to linear
+            self._log_y_2d = False
+            self.canvas.draw()
