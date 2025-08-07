@@ -1006,6 +1006,15 @@ class MDAFileTableView(QWidget):
                 # For 2D data in scanDictInner, slice to get 1D data
                 if y_data is not None and len(np.array(y_data).shape) > 1:
                     x2_slice = self.getX2Value()  # Get current X2 value from spinbox
+
+                    # Add bounds checking to prevent IndexError
+                    y_data_array = np.array(y_data)
+                    if x2_slice >= y_data_array.shape[0]:
+                        print(
+                            f"DEBUG: data2Plot - X2 slice {x2_slice} out of bounds for data shape {y_data_array.shape}, using last available slice"
+                        )
+                        x2_slice = y_data_array.shape[0] - 1  # Use last available slice
+
                     y_data = y_data[x2_slice]  # Take the selected X2 slice
 
                 # Apply I0 normalization if I0 is selected

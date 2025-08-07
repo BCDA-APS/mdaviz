@@ -1753,3 +1753,41 @@ class ChartView2D(ChartView):
             # If setting log scale fails (e.g., negative values), revert to linear
             self._log_y_2d = False
             self.canvas.draw()
+
+    def showMessage(self, message: str):
+        """
+        Display a message in the 2D plot area when there's nothing to plot.
+
+        Parameters:
+            message (str): The message to display
+        """
+        # Clear the previous plot
+        self.figure.clear()
+        self.main_axes = self.figure.add_subplot(111)
+
+        # Remove all axes elements and show only the message
+        self.main_axes.set_xticks([])
+        self.main_axes.set_yticks([])
+        self.main_axes.set_frame_on(False)
+
+        # Add the message text
+        self.main_axes.text(
+            0.5,
+            0.5,
+            message,
+            horizontalalignment="center",
+            verticalalignment="center",
+            transform=self.main_axes.transAxes,
+            fontsize=16,
+            color="#666666",
+            bbox=dict(
+                boxstyle="round,pad=0.5",
+                facecolor="#f5f5f5",
+                edgecolor="#cccccc",
+                alpha=0.8,
+            ),
+        )
+
+        # Update the plot
+        self.canvas.draw()
+        print(f"DEBUG: ChartView2D.showMessage - Displayed message: {message}")

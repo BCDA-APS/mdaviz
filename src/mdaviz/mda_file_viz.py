@@ -271,7 +271,51 @@ class MDAFileVisualization(QWidget):
             self.chart_view_2d = widgetMpl2D
 
         else:
-            print("DEBUG: update2DPlot - No 2D datasets extracted")
+            print("DEBUG: update2DPlot - No 2D datasets extracted, showing message")
+
+            # Show "Nothing to plot" message when no datasets are available
+            # This happens when validation fails (e.g., only 1 point for X2)
+            layoutMpl2D = self.plotPage2D.layout()
+            if layoutMpl2D.count() != 1:
+                print("DEBUG: update2DPlot - Expected exactly one widget in 2D layout")
+                return
+
+            widgetMpl2D = layoutMpl2D.itemAt(0).widget()
+
+            # Use the showMessage method if the widget supports it
+            if hasattr(widgetMpl2D, "showMessage"):
+                widgetMpl2D.showMessage("Nothing to plot")
+                self.chart_view_2d = widgetMpl2D
+            else:
+                # Create a simple message widget if needed
+                # Remove the existing widget from the layout
+                layoutMpl2D.removeWidget(widgetMpl2D)
+                widgetMpl2D.deleteLater()
+
+                # Create a simple QLabel widget to show the message
+                from PyQt6.QtWidgets import QLabel
+                from PyQt6.QtCore import Qt
+
+                message_widget = QLabel("Nothing to plot")
+                message_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                message_widget.setStyleSheet(
+                    """
+                    QLabel {
+                        font-size: 16px;
+                        color: #666666;
+                        background-color: #f5f5f5;
+                        border: 1px solid #cccccc;
+                        border-radius: 5px;
+                        padding: 20px;
+                    }
+                """
+                )
+
+                # Add the message widget to the 2D layout
+                layoutMpl2D.addWidget(message_widget)
+
+                # Store reference to message widget
+                self.chart_view_2d = message_widget
 
     def onTabChanged(self, index):
         """
