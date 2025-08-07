@@ -457,6 +457,7 @@ def get_scan_2d(mda_file_data_dim1, mda_file_data_dim2):
             - A dictionary keyed by index, each mapping to a sub-dictionary containing
               the scan object ('object') along with its 'data', 'unit', 'name' and 'type'.
               For 2D data, detectors have 2D arrays: data[X2_index][X1_index]
+              For positioners, includes 'all_positioners' list and 'np' count for full positioner information.
             - The index (first_pos) of the first positioner in the returned dictionary
             - The index (first_det) of the first detector in the returned dictionary
     """
@@ -537,6 +538,15 @@ def get_scan_2d(mda_file_data_dim1, mda_file_data_dim2):
             "desc": byte2str(v.desc) if v.desc else "",
             "fieldName": byte2str(v.fieldName),
         }
+
+        # Add full positioner information for positioners
+        if isinstance(v, scanPositioner) and k in [0, 1]:
+            if k == 0:  # Outer dimension (X2)
+                datasets[k]["all_positioners"] = p_list_dim1
+                datasets[k]["np"] = np_dim1
+            elif k == 1:  # Inner dimension (X1)
+                datasets[k]["all_positioners"] = p_list_dim2
+                datasets[k]["np"] = np_dim2
 
     return datasets, first_pos_index, first_det_index
 
