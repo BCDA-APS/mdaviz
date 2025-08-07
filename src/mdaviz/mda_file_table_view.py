@@ -356,6 +356,26 @@ class MDAFileTableView(QWidget):
         """Helper method to trigger 2D plotting with current selections."""
         print("DEBUG: _trigger2DPlot - Triggering 2D plot")
 
+        # Check if we're on the 2D tab - only trigger 2D plotting when on 2D tab
+        try:
+            parent = self.parent()
+            while parent and not hasattr(parent, "mda_file_viz"):
+                parent = parent.parent()
+
+            if parent and hasattr(parent, "mda_file_viz"):
+                # Check which tab is currently active
+                current_tab_index = parent.mda_file_viz.tabWidget.currentIndex()
+                if (
+                    current_tab_index != 3
+                ):  # 1D tab is index 0, Data tab is index 1, Metadata tab is index 2, 2D tab is index 3
+                    print(
+                        f"DEBUG: _trigger2DPlot - Not on 2D tab (current tab: {current_tab_index}), skipping 2D plot trigger"
+                    )
+                    return
+        except Exception as e:
+            print(f"DEBUG: _trigger2DPlot - Error checking tab: {e}")
+            return
+
         # Get current selections
         selections = self.get2DSelections()
 
