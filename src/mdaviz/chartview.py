@@ -806,6 +806,10 @@ class ChartView(QWidget):
         # Update basic math info:
         self.updateBasicMathInfo(curveID)
 
+        # Update plot controls
+        has_curve = curveID in self.curveManager.curves()
+        self.mda_mvc.mda_file_viz.updatePlotControls(has_curve)
+
         # Update fit UI
         self.updateFitUI(curveID)
 
@@ -821,7 +825,6 @@ class ChartView(QWidget):
         """
         # Update fit controls state
         has_curve = curveID in self.curveManager.curves()
-        self.mda_mvc.mda_file_viz.updateFitControls(has_curve)
 
         # Update fit list
         self.updateFitList(curveID)

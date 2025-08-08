@@ -142,26 +142,15 @@ class MDAFileVisualization(QWidget):
             parent = parent.parent()
 
         if not parent:
-            print(
-                "DEBUG: update2DPlot - Could not find parent with currentFileTableview method"
-            )
             return
-
-        print(
-            f"DEBUG: update2DPlot - Found parent with currentFileTableview: {type(parent)}"
-        )
 
         tableview = parent.currentFileTableview()
         if not tableview:
-            print("DEBUG: update2DPlot - No current table view")
             return
 
         # Get 2D selections from comboboxes instead of 1D selections from table view
         if hasattr(tableview, "get2DSelections"):
             selection = tableview.get2DSelections()
-            print(
-                f"DEBUG: update2DPlot - Using 2D selections from comboboxes: {selection}"
-            )
         else:
             print("DEBUG: update2DPlot - No get2DSelections method available")
             return
@@ -179,10 +168,6 @@ class MDAFileVisualization(QWidget):
         # Call our data2Plot2D function to extract 2D data
         datasets, plot_options = tableview.data2Plot2D(converted_selection)
 
-        print("DEBUG: update2DPlot - data2Plot2D returned:")
-        print(f"  datasets count: {len(datasets)}")
-        print(f"  plot_options: {plot_options}")
-
         # Create and display 2D plot if we have data
         if datasets:
             print("DEBUG: update2DPlot - Creating 2D plot")
@@ -190,7 +175,6 @@ class MDAFileVisualization(QWidget):
             # Get the 2D plot widget from the 2D tab layout
             layoutMpl2D = self.plotPage2D.layout()
             if layoutMpl2D.count() != 1:
-                print("DEBUG: update2DPlot - Expected exactly one widget in 2D layout")
                 return
 
             widgetMpl2D = layoutMpl2D.itemAt(0).widget()
@@ -416,7 +400,7 @@ class MDAFileVisualization(QWidget):
             # Show mode controls and clear button
             self.showModeControls(True)
 
-            # Show 1D-specific controls
+            # Show 1D-specific controls (curves, graphInfo, cursorInfo)
             self.show1DControls(True)
         elif tab_index == 3:  # 2D tab
             # Hide table view and X2 controls, show Y DET controls
@@ -447,11 +431,7 @@ class MDAFileVisualization(QWidget):
                     mda_file.clearButton.setVisible(show)
                 if hasattr(mda_file, "clearGraphButton"):
                     mda_file.clearGraphButton.setVisible(show)
-                print(
-                    f"DEBUG: showModeControls - Found controls in MDA_MVC, visibility set to: {show}"
-                )
             else:
-                print("DEBUG: showModeControls - Could not find MDA_MVC with mda_file")
                 # Try alternative approach - look for controls in the main window
                 main_window = self.window()
                 if main_window and hasattr(main_window, "autoBox"):
@@ -460,35 +440,16 @@ class MDAFileVisualization(QWidget):
                         main_window.clearButton.setVisible(show)
                     if hasattr(main_window, "clearGraphButton"):
                         main_window.clearGraphButton.setVisible(show)
-                    print(
-                        f"DEBUG: showModeControls - Found controls in main window, visibility set to: {show}"
-                    )
                 else:
-                    print(
-                        "DEBUG: showModeControls - Could not find mode controls in main window either"
-                    )
                     # Try one more approach - look for MDAFile in the widget tree
                     current: QWidget | None = self
-                    print(
-                        f"DEBUG: showModeControls - Starting widget tree search from: {type(current).__name__}"
-                    )
                     while current:
-                        print(
-                            f"DEBUG: showModeControls - Checking widget: {type(current).__name__}, has autoBox: {hasattr(current, 'autoBox')}"
-                        )
                         if hasattr(current, "autoBox"):
                             current.autoBox.setVisible(show)
                             if hasattr(current, "clearButton"):
                                 current.clearButton.setVisible(show)
-                            print(
-                                f"DEBUG: showModeControls - Found controls in widget tree, visibility set to: {show}"
-                            )
                             break
                         current = current.parent()  # type: ignore[assignment]
-                    else:
-                        print(
-                            "DEBUG: showModeControls - Could not find mode controls anywhere in widget tree"
-                        )
         except Exception as e:
             print(f"DEBUG: showModeControls - Error: {e}")
 
@@ -498,23 +459,14 @@ class MDAFileVisualization(QWidget):
             # Hide/show the entire curves widget (contains curveBox, curveRemove, curveStyle, clearAll, etc.)
             if hasattr(self, "curves"):
                 self.curves.setVisible(show)
-                print(
-                    f"DEBUG: show1DControls - curves widget visibility set to: {show}"
-                )
 
             # Hide/show graphInfo panel
             if hasattr(self, "graphInfo"):
                 self.graphInfo.setVisible(show)
-                print(
-                    f"DEBUG: show1DControls - graphInfo panel visibility set to: {show}"
-                )
 
             # Hide/show cursorInfo panel for 2D tab
             if hasattr(self, "cursorInfo"):
                 self.cursorInfo.setVisible(show)
-                print(
-                    f"DEBUG: show1DControls - cursorInfo panel visibility set to: {show}"
-                )
 
         except Exception as e:
             print(f"DEBUG: show1DControls - Error: {e}")
@@ -573,16 +525,18 @@ class MDAFileVisualization(QWidget):
         if hasattr(self, "chart_view") and self.chart_view:
             self.chart_view.clearAllFits()
 
-    def updateFitControls(self, curve_selected: bool):
+    def updatePlotControls(self, curve_selected: bool):
         """
-        Update fit control states based on curve selection.
+        Update plot control states based on curve selection.
 
         Parameters:
         - curve_selected: Whether a curve is currently selected
         """
         self.fitButton.setEnabled(curve_selected)  # type: ignore[attr-defined]
         self.clearFitsButton.setEnabled(curve_selected)  # type: ignore[attr-defined]
-        self.updateCurveStyleControls(curve_selected)
+        self.curveStyle.setEnabled(curve_selected)  # type: ignore[attr-defined]
+        self.logXCheckBox.setEnabled(curve_selected)  # type: ignore[attr-defined]
+        self.logYCheckBox.setEnabled(curve_selected)  # type: ignore[attr-defined]
 
     def setupCurveStyleUI(self):
         """Setup the curve style UI components and connections."""
@@ -662,18 +616,13 @@ class MDAFileVisualization(QWidget):
         if hasattr(self, "chart_view") and self.chart_view:
             self.chart_view.updateCurveStyle(style_name)
 
-    def updateCurveStyleControls(self, curve_selected: bool):
+    def setTableData(self, data):
         """
-        Update curve style control states based on curve selection.
+        Set data for the data table view.
 
         Parameters:
-        - curve_selected: Whether a curve is currently selected
+            data: Data to display in the table
         """
-        self.curveStyle.setEnabled(curve_selected)  # type: ignore[attr-defined]
-        self.logXCheckBox.setEnabled(curve_selected)  # type: ignore[attr-defined]
-        self.logYCheckBox.setEnabled(curve_selected)  # type: ignore[attr-defined]
-
-    def setTableData(self, data):
         # Reuse existing data table view if it exists
         if hasattr(self, "data_table_view") and self.data_table_view:
             self.data_table_view.setData(data)
@@ -686,10 +635,22 @@ class MDAFileVisualization(QWidget):
             self.data_table_view.displayTable()
 
     def setMetadata(self, text, *args, **kwargs):
+        """
+        Set text content for the metadata display.
+
+        Parameters:
+            text (str): Text content to display
+        """
         # tab=self.metadataPage
         self.metadata.setText(text)
 
     def setPlot(self, plot_widget):
+        """
+        Set the plot widget for the visualization tab.
+
+        Parameters:
+            plot_widget: The plot widget to add to the layout
+        """
         layout = self.plotPageMpl.layout()
         utils.removeAllLayoutWidgets(layout)
 
@@ -712,21 +673,21 @@ class MDAFileVisualization(QWidget):
         # Update tab widget max height to match the chart view
         self._updateTabWidgetMaxHeight()
 
-        # Debug output for 2D plotting
-        if hasattr(plot_widget, "_plot_type"):
-            print("DEBUG: setPlot - Added ChartView2D widget to layout")
-            print(f"  Widget type: {type(plot_widget)}")
-            print(f"  Widget visible: {plot_widget.isVisible()}")
-            print(f"  Widget size: {plot_widget.size()}")
-            print(f"  Layout count: {layout.count()}")
-            print(f"  Layout item widget: {layout.itemAt(0).widget()}")
-        else:
-            print("DEBUG: setPlot - Added regular ChartView widget to layout")
-            print(f"  Widget type: {type(plot_widget)}")
-            print(f"  Widget visible: {plot_widget.isVisible()}")
-            print(f"  Widget size: {plot_widget.size()}")
-            print(f"  Layout count: {layout.count()}")
-            print(f"  Layout item widget: {layout.itemAt(0).widget()}")
+        # # Debug output for 2D plotting
+        # if hasattr(plot_widget, "_plot_type"):
+        #     print("DEBUG: setPlot - Added ChartView2D widget to layout")
+        #     print(f"  Widget type: {type(plot_widget)}")
+        #     print(f"  Widget visible: {plot_widget.isVisible()}")
+        #     print(f"  Widget size: {plot_widget.size()}")
+        #     print(f"  Layout count: {layout.count()}")
+        #     print(f"  Layout item widget: {layout.itemAt(0).widget()}")
+        # else:
+        #     print("DEBUG: setPlot - Added regular ChartView widget to layout")
+        #     print(f"  Widget type: {type(plot_widget)}")
+        #     print(f"  Widget visible: {plot_widget.isVisible()}")
+        #     print(f"  Widget size: {plot_widget.size()}")
+        #     print(f"  Layout count: {layout.count()}")
+        #     print(f"  Layout item widget: {layout.itemAt(0).widget()}")
 
     def _updateTabWidgetMaxHeight(self):
         """Update the tab widget's maximum height to match the plot height setting."""
@@ -749,16 +710,14 @@ class MDAFileVisualization(QWidget):
         )  # Add padding for tab content
 
     def isPlotBlank(self):
+        """Check if the plot area is blank (no data displayed)."""
         layout = self.plotPageMpl.layout()
         if layout.count() == 0:
-            print("NO LAYOUT: blank")
             return True
         plot_widget = layout.itemAt(0).widget()
         # Check if the plot widget is an instance of chartView and has data items
         if isinstance(plot_widget, ChartView):
-            print("HAS DATA ITEM")
             return not plot_widget.hasDataItems()
-        print("NOT A CHARTVIEW INSTANCE")
         return True  # If not a chartView instance, consider it as blank
 
     def clearContents(self, plot=True, data=True, metadata=True):
@@ -789,6 +748,12 @@ class MDAFileVisualization(QWidget):
                 pass  # data_table_view does not exist, so do nothing
 
     def setStatus(self, text):
+        """
+        Set the status bar text.
+
+        Parameters:
+            text (str): Status message to display
+        """
         self.mda_mvc.setStatus(text)
 
     def setupSearchFunctionality(self):

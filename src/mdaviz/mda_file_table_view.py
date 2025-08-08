@@ -371,7 +371,6 @@ class MDAFileTableView(QWidget):
     # Y DET Controls Signal Handlers
     def _trigger2DPlot(self):
         """Helper method to trigger 2D plotting with current selections."""
-        print("DEBUG: _trigger2DPlot - Triggering 2D plot")
 
         # Check if we're on the 2D tab - only trigger 2D plotting when on 2D tab
         try:
@@ -385,9 +384,6 @@ class MDAFileTableView(QWidget):
                 if (
                     current_tab_index != 3
                 ):  # 1D tab is index 0, Data tab is index 1, Metadata tab is index 2, 2D tab is index 3
-                    print(
-                        f"DEBUG: _trigger2DPlot - Not on 2D tab (current tab: {current_tab_index}), skipping 2D plot trigger"
-                    )
                     return
         except Exception as e:
             print(f"DEBUG: _trigger2DPlot - Error checking tab: {e}")
@@ -398,15 +394,12 @@ class MDAFileTableView(QWidget):
 
         # Validate selections
         if selections["Y"] is None or len(selections["Y"]) == 0:
-            print("DEBUG: _trigger2DPlot - No Y detector selected")
             return
 
         if selections["X1"] is None:
-            print("DEBUG: _trigger2DPlot - No X1 positioner selected")
             return
 
         if selections["X2"] is None:
-            print("DEBUG: _trigger2DPlot - No X2 positioner selected")
             return
 
         # Trigger 2D plotting
@@ -417,11 +410,7 @@ class MDAFileTableView(QWidget):
                 parent = parent.parent()
 
             if parent and hasattr(parent, "doPlot"):
-                print(
-                    f"DEBUG: _trigger2DPlot - Calling parent.doPlot with selections: {selections}"
-                )
                 parent.doPlot("replace", selections)
-                print("DEBUG: _trigger2DPlot - doPlot call completed")
             else:
                 print(
                     "DEBUG: _trigger2DPlot - Could not find parent with doPlot method"
