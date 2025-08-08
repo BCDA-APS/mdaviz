@@ -1,11 +1,28 @@
 """
-Select data fields for plotting: QTableView.
+MDA file table view for data field selection and 2D plotting controls.
 
-Uses :class:`mda_file_table_model.MDAFileTableModel`.
+This module provides the MDAFileTableView widget which displays a table of MDA file
+data fields with checkboxes for selection. It supports both 1D and 2D data visualization
+with specialized controls for 2D plotting including X2 slice selection, X1/X2 positioner
+selection, Y detector selection, and I0 normalization.
+
+For 1D data, users can select X, Y, I0, and Unscaled fields for plotting.
+For 2D data, additional controls are available for:
+- X2 slice selection (spinbox)
+- X1/X2 positioner selection (comboboxes)
+- Y detector selection (combobox)
+- I0 normalization (combobox)
+- Plot type selection (Heatmap/Contour)
+- Color palette selection
+- Log scale options
+
+Uses :class:`mda_file_table_model.MDAFileTableModel` for data display.
 
 .. autosummary::
 
     ~MDAFileTableView
+    ~HEADERS
+    ~COLUMNS
 """
 
 from PyQt6.QtWidgets import QWidget, QHeaderView
