@@ -7,7 +7,6 @@ This module tests the multi-dimensional data table model that can handle
 
 import numpy as np
 import pytest
-from unittest.mock import Mock
 
 from mdaviz.multidimensional_data_table_model import MultiDimensionalDataTableModel
 
@@ -17,7 +16,6 @@ class TestMultiDimensionalDataTableModel:
 
     def test_2d_data_creation(self):
         """Test creating a 2D data model."""
-        from PyQt6.QtCore import Qt
 
         # Create test scan data (simulating get_scan_2d() output)
         scan_data = {
@@ -238,13 +236,13 @@ class TestMultiDimensionalDataTableModel:
 
                 file_metadata, file_data_dim1, *additional_dims = result
 
-                print(f"\n=== Real MDA File Analysis ===")
+                print("\n=== Real MDA File Analysis ===")
                 print(f"File: {mda_file}")
                 print(f"Rank: {file_metadata.get('rank', 'unknown')}")
                 print(f"Dimensions: {file_metadata.get('dimensions', [])}")
 
                 # Analyze outer dimension (dim1)
-                print(f"\nOuter Dimension (dim1):")
+                print("\nOuter Dimension (dim1):")
                 print(f"  np_dim1: {file_data_dim1.np}")
                 print(f"  npts_dim1: {file_data_dim1.npts}")
                 print(f"  curr_pt_dim1: {file_data_dim1.curr_pt}")
@@ -257,7 +255,7 @@ class TestMultiDimensionalDataTableModel:
                 # Analyze inner dimension (dim2) if it exists
                 if len(additional_dims) > 0:
                     file_data_dim2 = additional_dims[0]
-                    print(f"\nInner Dimension (dim2):")
+                    print("\nInner Dimension (dim2):")
                     print(f"  np_dim2: {file_data_dim2.np}")
                     print(f"  npts_dim2: {file_data_dim2.npts}")
                     print(f"  curr_pt_dim2: {file_data_dim2.curr_pt}")
@@ -280,9 +278,7 @@ class TestMultiDimensionalDataTableModel:
     def test_specific_2d_file_positioner_structure(self):
         """Test to examine the specific 2D file to understand positioner structure."""
         from mdaviz.synApps_mdalib.mda import readMDA
-        import glob
         import mdaviz.utils as utils
-        from mdaviz.utils import byte2str
 
         mda_file = "src/tests/data/mda 2D plus/mda_0006.mda"
 
@@ -293,13 +289,13 @@ class TestMultiDimensionalDataTableModel:
 
             file_metadata, file_data_dim1, *additional_dims = result
 
-            print(f"\n=== 2D MDA File Analysis ===")
+            print("\n=== 2D MDA File Analysis ===")
             print(f"File: {mda_file}")
             print(f"Rank: {file_metadata.get('rank', 'unknown')}")
             print(f"Dimensions: {file_metadata.get('dimensions', [])}")
 
             # Analyze outer dimension (dim1)
-            print(f"\nOuter Dimension (dim1):")
+            print("\nOuter Dimension (dim1):")
             print(f"  np_dim1: {file_data_dim1.np}")
             print(f"  npts_dim1: {file_data_dim1.npts}")
             print(f"  curr_pt_dim1: {file_data_dim1.curr_pt}")
@@ -312,7 +308,7 @@ class TestMultiDimensionalDataTableModel:
             # Analyze inner dimension (dim2) if it exists
             if len(additional_dims) > 0:
                 file_data_dim2 = additional_dims[0]
-                print(f"\nInner Dimension (dim2):")
+                print("\nInner Dimension (dim2):")
                 print(f"  np_dim2: {file_data_dim2.np}")
                 print(f"  npts_dim2: {file_data_dim2.npts}")
                 print(f"  curr_pt_dim2: {file_data_dim2.curr_pt}")
@@ -327,7 +323,7 @@ class TestMultiDimensionalDataTableModel:
                 file_data_dim1, file_data_dim2
             )
 
-            print(f"\nProcessed Scan Data (from utils.get_scan_2d()):")
+            print("\nProcessed Scan Data (from utils.get_scan_2d()):")
             print(f"  first_pos: {first_pos}")
             print(f"  first_det: {first_det}")
 
@@ -363,7 +359,7 @@ class TestMultiDimensionalDataTableModel:
                 file_data_dim1, file_data_dim2
             )
 
-            print(f"\n=== Scan Data Keys ===")
+            print("\n=== Scan Data Keys ===")
             for key, value in scan_data.items():
                 print(
                     f"Key '{key}': type={value.get('type')}, name='{value.get('name')}'"
@@ -376,7 +372,7 @@ class TestMultiDimensionalDataTableModel:
             flattened_data = model.get_flattened_data()
             headers = model.get_column_headers()
 
-            print(f"\n=== Real 2D Data Model Test ===")
+            print("\n=== Real 2D Data Model Test ===")
             print(f"Headers: {headers}")
             print(f"Number of rows: {len(flattened_data)}")
             print(
@@ -407,7 +403,6 @@ class TestMultiDimensionalDataTableModel:
         """Demonstrate the structure returned by get_scan_2d()."""
         from mdaviz.synApps_mdalib.mda import readMDA
         import mdaviz.utils as utils
-        from mdaviz.utils import byte2str
 
         mda_file = "src/tests/data/mda 2D plus/mda_0006.mda"
 
@@ -423,11 +418,11 @@ class TestMultiDimensionalDataTableModel:
                 file_data_dim1, file_data_dim2
             )
 
-            print(f"\n=== get_scan_2d() Structure Example ===")
+            print("\n=== get_scan_2d() Structure Example ===")
             print(
                 f"Return values: scan_data, first_pos={first_pos}, first_det={first_det}"
             )
-            print(f"\nscan_data structure:")
+            print("\nscan_data structure:")
 
             for key, value in scan_data.items():
                 print(f"  Key {key}:")

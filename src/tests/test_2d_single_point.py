@@ -7,7 +7,6 @@ when there's only 1 point for X2 in 2D data.
 
 import numpy as np
 import pytest
-from unittest.mock import Mock, patch
 
 
 class Test2DSinglePoint:

@@ -431,29 +431,35 @@ class MDAFileVisualization(QWidget):
             self.show1DControls(False)
 
     def showModeControls(self, show: bool):
-        """Show or hide mode controls and clear button."""
+        """Show or hide mode controls (autoBox, clearButton, etc.)."""
         try:
-            # Get the parent MDA_MVC widget
+            # Try to find MDA_MVC first
             parent = self.parent()
             while parent and not hasattr(parent, "mda_file"):
                 parent = parent.parent()
 
             if parent and hasattr(parent, "mda_file"):
-                # Found the MDA_MVC, now access the mda_file widget
-                mda_file_widget = parent.mda_file
-                mda_file_widget.autoBox.setVisible(show)
-                mda_file_widget.clearButton.setVisible(show)
-                mda_file_widget.clearGraphButton.setVisible(show)
+                # Found MDA_MVC, access controls through mda_file
+                mda_file = parent.mda_file
+                if hasattr(mda_file, "autoBox"):
+                    mda_file.autoBox.setVisible(show)
+                if hasattr(mda_file, "clearButton"):
+                    mda_file.clearButton.setVisible(show)
+                if hasattr(mda_file, "clearGraphButton"):
+                    mda_file.clearGraphButton.setVisible(show)
                 print(
-                    f"DEBUG: showModeControls - Mode controls visibility set to: {show}"
+                    f"DEBUG: showModeControls - Found controls in MDA_MVC, visibility set to: {show}"
                 )
             else:
                 print("DEBUG: showModeControls - Could not find MDA_MVC with mda_file")
                 # Try alternative approach - look for controls in the main window
                 main_window = self.window()
-                if hasattr(main_window, "autoBox"):
+                if main_window and hasattr(main_window, "autoBox"):
                     main_window.autoBox.setVisible(show)
-                    main_window.clearButton.setVisible(show)
+                    if hasattr(main_window, "clearButton"):
+                        main_window.clearButton.setVisible(show)
+                    if hasattr(main_window, "clearGraphButton"):
+                        main_window.clearGraphButton.setVisible(show)
                     print(
                         f"DEBUG: showModeControls - Found controls in main window, visibility set to: {show}"
                     )
@@ -462,7 +468,7 @@ class MDAFileVisualization(QWidget):
                         "DEBUG: showModeControls - Could not find mode controls in main window either"
                     )
                     # Try one more approach - look for MDAFile in the widget tree
-                    current = self
+                    current: QWidget | None = self
                     print(
                         f"DEBUG: showModeControls - Starting widget tree search from: {type(current).__name__}"
                     )
@@ -472,12 +478,13 @@ class MDAFileVisualization(QWidget):
                         )
                         if hasattr(current, "autoBox"):
                             current.autoBox.setVisible(show)
-                            current.clearButton.setVisible(show)
+                            if hasattr(current, "clearButton"):
+                                current.clearButton.setVisible(show)
                             print(
                                 f"DEBUG: showModeControls - Found controls in widget tree, visibility set to: {show}"
                             )
                             break
-                        current = current.parent()
+                        current = current.parent()  # type: ignore[assignment]
                     else:
                         print(
                             "DEBUG: showModeControls - Could not find mode controls anywhere in widget tree"

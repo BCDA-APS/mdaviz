@@ -9,14 +9,10 @@ in a 2D table format, showing positioner values and detector data in an intuitiv
     ~MultiDimensionalDataTableModel
 """
 
-from typing import Any, Optional, Dict, List, Tuple
 import numpy as np
 from PyQt6.QtCore import (
-    QModelIndex,
-    QObject,
     Qt,
     QAbstractTableModel,
-    QVariant,
 )
 
 
