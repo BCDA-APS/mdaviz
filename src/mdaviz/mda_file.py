@@ -368,7 +368,8 @@ class MDAFile(QWidget):
         """Display pos(s) & det(s) values as a tableview in the vizualization panel."""
         if not self.data():
             return
-        self.mda_mvc.mda_file_viz.setTableData(tabledata)
+        # Pass full data structure instead of just scanDict for 2D support
+        self.mda_mvc.mda_file_viz.setTableData(self.data())
 
     def defaultSelection(self, first_pos, first_det, selection_field):
         """

@@ -33,10 +33,30 @@ class DataTableView(QWidget):
     def displayTable(self):
         from mdaviz.data_table_model import DataTableModel
         from mdaviz.empty_table_model import EmptyTableModel
+        from mdaviz.multidimensional_data_table_model import (
+            MultiDimensionalDataTableModel,
+        )
 
         data = self.data()
         if len(data) > 0:
-            data_model = DataTableModel(data)
+            # Check if it's 2D data
+            if data.get("isMultidimensional", False) and data.get("scanDict2D"):
+                # Use MultiDimensionalDataTableModel for 2D data
+                scan_data = data.get("scanDict2D", {})
+                dimensions = data.get("dimensions", [])
+                if len(dimensions) >= 2:
+                    x2_points, x1_points = dimensions[0], dimensions[1]
+                    data_model = MultiDimensionalDataTableModel(
+                        scan_data, x2_points, x1_points
+                    )
+                else:
+                    # Fallback to regular DataTableModel with scanDict
+                    scanDict = data.get("scanDict", {})
+                    data_model = DataTableModel(scanDict)
+            else:
+                # Use regular DataTableModel for 1D data with scanDict
+                scanDict = data.get("scanDict", {})
+                data_model = DataTableModel(scanDict)
             self.mda_viz.tableView.setModel(data_model)
         else:
             empty_model = EmptyTableModel(HEADERS)
