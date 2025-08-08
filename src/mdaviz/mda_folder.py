@@ -677,7 +677,20 @@ class MDA_MVC(QWidget):
         if file_data:
             print(f"Displaying data and metadata for {Path(file_path).name}.")
             self.mda_file.displayMetadata(file_data.get("metadata", None))
-            self.mda_file.displayData(file_data.get("tabledata", None))
+            # Reconstruct full data structure for 2D support by setting data again
+            # This ensures we have scanDict, scanDict2D, isMultidimensional, etc.
+            if file_path:
+                # Find the file index in the current folder
+                try:
+                    file_name = Path(file_path).name
+                    file_index = self.mdaFileList().index(file_name)
+                    # Set the data again to get the full structure
+                    self.mda_file.setData(file_index)
+                    # Now display the full data structure
+                    self.mda_file.displayData(self.mda_file.data())
+                except ValueError:
+                    # File not found in current folder, use fallback
+                    self.mda_file.displayData(file_data)
 
         # Highlight the corresponding file in the folder table view if it belongs to the current folder
         if file_path:
