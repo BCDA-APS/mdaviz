@@ -1,5 +1,36 @@
 """
-Charting widget
+Charting and visualization module for MDA data analysis.
+
+.. Summary::
+    This module provides comprehensive plotting capabilities for 1D and 2D scientific data
+    from MDA files. It includes interactive plotting widgets,
+    curve management, fitting capabilities, and cursor-based analysis tools.
+
+Classes:
+    ChartView: Main 1D plotting widget with interactive features
+    CurveManager: Manages curve data, properties, and persistence
+    ChartView2D: 2D plotting widget for heatmaps and contour plots
+
+Key Features:
+    - Interactive 1D and 2D plotting with Matplotlib backend
+    - Curve management with persistent properties (style, offset, factor)
+    - Real-time data fitting with multiple model support
+    - Interactive cursors for data analysis
+    - Logarithmic scale support for both 1D and 2D plots
+    - Legend management and curve selection
+    - Integration with MDA file data structures
+
+Dependencies:
+    - PyQt6: GUI framework
+    - Matplotlib: Plotting backend
+    - NumPy: Numerical computations
+    - mdaviz.fit_manager: Curve fitting functionality
+    - mdaviz.user_settings: User preferences management
+
+Usage:
+    The ChartView widgets are typically instantiated by the main application
+    and integrated into the MDA data visualization workflow. They handle
+    the display and interaction with scientific data plots.
 """
 
 import datetime
@@ -58,7 +89,40 @@ def auto_symbol():
 
 
 class ChartView(QWidget):
-    """TODO: docstrings"""
+    """
+    Main 1D plotting widget for MDA data visualization.
+
+    This widget provides interactive plotting capabilities for 1D MDA data
+    with features including curve management, data fitting, cursor analysis,
+    and real-time data manipulation.
+
+    Attributes:
+        mda_mvc: Reference to the parent MDA MVC object
+        figure: Matplotlib Figure object
+        canvas: Matplotlib canvas for Qt integration
+        main_axes: Primary matplotlib axes for plotting
+        toolbar: Navigation toolbar for plot interactions
+        plotObjects: Dictionary mapping curve IDs to plot objects
+        fitObjects: Dictionary mapping curve IDs to fit plot objects
+        curveManager: CurveManager instance for data management
+        fitManager: FitManager instance for curve fitting
+        cursors: Dictionary storing cursor positions and information
+
+    Signals:
+        fitAdded: Emitted when a fit is added (curveID, fitID)
+        fitUpdated: Emitted when a fit is updated (curveID, fitID)
+        fitRemoved: Emitted when a fit is removed (curveID, fitID)
+
+    Key Features:
+        - Interactive plotting with Matplotlib backend
+        - Curve selection and management via combo box
+        - Real-time offset and factor adjustments
+        - Interactive cursors for data analysis
+        - Logarithmic scale support
+        - Curve style customization
+        - Integration with MDA file data structures
+        - Persistent curve properties across sessions
+    """
 
     # Fit signals for main window connection
     fitAdded = pyqtSignal(str, str)  # curveID, fitID
@@ -143,11 +207,6 @@ class ChartView(QWidget):
         self.fitManager.fitUpdated.connect(self.onFitUpdated)
         self.fitManager.fitRemoved.connect(self.onFitRemoved)
         self.fitManager.fitVisibilityChanged.connect(self.onFitVisibilityChanged)
-        # # Debug signals:
-        # self.curveManager.curveAdded.connect(utils.debug_signal)
-        # self.curveManager.curveRemoved.connect(utils.debug_signal)
-        # self.curveManager.curveUpdated.connect(utils.debug_signal)
-        # self.curveManager.allCurvesRemoved.connect(utils.debug_signal)
 
         # Remove buttons definitions:
         self.clearAll = self.mda_mvc.mda_file_viz.clearAll
@@ -164,7 +223,6 @@ class ChartView(QWidget):
         # File tableview & graph synchronization:
         self.mda_mvc.mda_file.tabManager.tabRemoved.connect(self.onTabRemoved)
         self.mda_mvc.detRemoved.connect(self.onDetRemoved)
-        # self.mda_mvc.detRemoved.connect(utils.debug_signal)
 
         # Connect offset & factor QLineEdit:
         self.offset_value = self.mda_mvc.mda_file_viz.offset_value
@@ -238,6 +296,25 @@ class ChartView(QWidget):
         self._ylabel = txt
 
     def getSelectedCurveID(self):
+        """
+        Get the ID of the currently selected curve from the combo box.
+
+        This method retrieves the curve ID that corresponds to the currently
+        selected item in the curve selection combo box. It uses the UserRole
+        data stored with each combo box item rather than parsing the display text,
+        ensuring reliable curve identification even when display labels change.
+
+        Returns:
+            str or None: The curve ID of the selected curve if valid, None otherwise.
+                        Returns None if no item is selected or if the selected
+                        curve ID is not found in the curve manager.
+
+        Note:
+            The curve ID is a unique identifier generated from the file path,
+            row number, and X2 index (for 2D data). This method validates that
+            the retrieved curve ID actually exists in the curve manager before
+            returning it, ensuring data consistency.
+        """
         # Get the curve ID from the item data instead of display text
         current_index = self.curveBox.currentIndex()
         if current_index >= 0:
@@ -313,6 +390,42 @@ class ChartView(QWidget):
     ########################################## Slot methods:
 
     def onCurveAdded(self, curveID):
+        """
+        Handle the addition of a new curve to the plot.
+
+        This slot method is called when a new curve is added to the curve manager.
+        It performs the complete setup for displaying a curve on the plot, including
+        data processing, styling, plotting, and UI updates.
+
+        Parameters:
+            curveID (str): The unique identifier of the curve to be added.
+
+        Process:
+            1. Retrieves curve data from the curve manager
+            2. Applies curve styling (line style, markers) based on stored preferences
+            3. Applies offset and factor transformations to the data
+            4. Creates the matplotlib plot object and stores it for later reference
+            5. Updates the plot display (axes, legend, title)
+            6. Adds the curve to the combo box for user selection
+            7. Sets up the first curve as selected if it's the only curve
+            8. Updates existing combo box items to maintain consistency
+
+        Styling Support:
+            - Line styles: "-", "--", ":", "-."
+            - Markers: "o" (circles), "s" (squares), "^" (triangles), "D" (diamonds), "." (points)
+            - Combined styles: "o-" (line with circles), "s--" (dashed line with squares), etc.
+
+        Data Transformations:
+            - Applies factor multiplication: y_new = y * factor
+            - Applies offset addition: y_new = y + offset
+            - These transformations are applied before plotting
+
+        UI Integration:
+            - Adds curve to combo box with display label and tooltip
+            - Stores curve ID as UserRole data for reliable identification
+            - Automatically selects the first curve added
+            - Updates plot title and legend
+        """
         # Add to graph
         curveData = self.curveManager.getCurveData(curveID)
         ds = curveData["ds"]
@@ -379,6 +492,14 @@ class ChartView(QWidget):
         self.updateComboBoxCurveIDs()
 
     def onCurveUpdated(self, curveID, recompute_y=False, update_x=False):
+        """
+        Handle updates to an existing curve on the plot.
+
+        Parameters:
+            curveID (str): The unique identifier of the curve to be updated.
+            recompute_y (bool): If True, update Y-data with current offset/factor.
+            update_x (bool): If True, recreate plot object for X-data changes.
+        """
         print(
             f"DEBUG: onCurveUpdated called for {curveID}, recompute_y={recompute_y}, update_x={update_x}"
         )
@@ -442,9 +563,13 @@ class ChartView(QWidget):
         self.updatePlot(update_title=False)
 
     def onRemoveButtonClicked(self):
+        """
+        Handle the remove button click event.
+
+        Removes the currently selected curve from the plot. If it's the last curve,
+        removes all curves and clears checkboxes.
+        """
         curveID = self.getSelectedCurveID()
-        if curveID in self.curveManager.curves():
-            curveID = self.getSelectedCurveID()
         if curveID in self.curveManager.curves():
             if len(self.curveManager.curves()) == 1:
                 self.curveManager.removeAllCurves(doNotClearCheckboxes=False)
@@ -452,18 +577,80 @@ class ChartView(QWidget):
                 self.curveManager.removeCurve(curveID)
 
     def onCurveRemoved(self, *arg):
+        """
+        Handle the removal of a curve from the plot.
+
+        This slot method is called when a curve is removed from the curve manager.
+        It performs cleanup operations including plot object removal, UI updates,
+        and checkbox management based on data type.
+
+        Parameters:
+            *arg: Tuple containing (curveID, curveData, count)
+                - curveID (str): The unique identifier of the removed curve
+                - curveData (dict): The curve data dictionary
+                - count (int): Number of curves remaining for the file
+
+        Process:
+            1. Removes the plot object from the matplotlib axes
+            2. Manages checkbox state based on data type (1D vs 2D)
+            3. Removes curve from the combo box selection
+            4. Updates plot display (labels, legend)
+            5. Removes file tab if no curves remain (Auto-add mode)
+
+        Checkbox Logic:
+            - 1D data: Always uncheck the detector checkbox
+            - 2D data: Only uncheck if no curves remain for that detector
+                       (allows multiple curves per detector for 2D data)
+
+        UI Synchronization:
+            - Updates combo box to remove the curve option
+            - Updates plot labels and legend
+            - Removes file tab if it was the last curve for that file
+        """
         curveID, curveData, count = arg
         # Remove curve from graph & plotObject dict
         if curveID in self.plotObjects:
             curve_obj = self.plotObjects[curveID]
             curve_obj.remove()
             del self.plotObjects[curveID]
-        # Remove checkbox from corresponding tableview
+
+        # Check if we should uncheck the checkbox
         row = curveData["row"]
         file_path = curveData["file_path"]
         tableview = self.mda_mvc.mda_file.tabPath2Tableview(file_path)
+
         if tableview and tableview.tableView.model():
-            tableview.tableView.model().uncheckCheckBox(row)
+            # Get file info to check if this is 2D data
+            file_info = tableview.mda_file.data()
+            is_2d_data = file_info.get("isMultidimensional", False)
+
+            if is_2d_data:
+                # For 2D data, check if there are still other curves with the same file_path and row
+                remaining_curves_for_det = 0
+                for (
+                    existing_curve_id,
+                    existing_data,
+                ) in self.curveManager.curves().items():
+                    if (
+                        existing_data["file_path"] == file_path
+                        and existing_data["row"] == row
+                    ):
+                        remaining_curves_for_det += 1
+
+                # Only uncheck if no curves remain for this detector
+                if remaining_curves_for_det == 0:
+                    tableview.tableView.model().uncheckCheckBox(row)
+                    print(
+                        f"DEBUG: Unchecked DET {row} - no curves remaining for this detector"
+                    )
+                else:
+                    print(
+                        f"DEBUG: Kept DET {row} checked - {remaining_curves_for_det} curves still exist for this detector"
+                    )
+            else:
+                # For 1D data, always uncheck (original behavior)
+                tableview.tableView.model().uncheckCheckBox(row)
+
         # Remove curve from comboBox
         self.removeItemCurveBox(curveID)
         # Update plot labels, legend and title
@@ -620,6 +807,10 @@ class ChartView(QWidget):
         # Update basic math info:
         self.updateBasicMathInfo(curveID)
 
+        # Update plot controls
+        has_curve = curveID in self.curveManager.curves()
+        self.mda_mvc.mda_file_viz.updatePlotControls(has_curve)
+
         # Update fit UI
         self.updateFitUI(curveID)
 
@@ -635,7 +826,6 @@ class ChartView(QWidget):
         """
         # Update fit controls state
         has_curve = curveID in self.curveManager.curves()
-        self.mda_mvc.mda_file_viz.updateFitControls(has_curve)
 
         # Update fit list
         self.updateFitList(curveID)
@@ -1169,20 +1359,17 @@ class ChartView(QWidget):
         # Update the curve data with the new style
         curve_data = self.curveManager.getCurveData(curveID)
         if curve_data:
-            old_style = curve_data.get("style", "-")
-            print(
-                f"DEBUG: Updating style for curve {curveID}: {old_style} -> {format_string}"
-            )
             curve_data["style"] = format_string
             # Save to persistent storage
-            persistent_key = (curve_data["file_path"], curve_data["row"])
+            persistent_key = (
+                curve_data["file_path"],
+                curve_data["row"],
+                curve_data.get("x2_index"),
+            )
             if persistent_key not in self.curveManager._persistent_properties:
                 self.curveManager._persistent_properties[persistent_key] = {}
             self.curveManager._persistent_properties[persistent_key]["style"] = (
                 format_string
-            )
-            print(
-                f"DEBUG: Saved style to persistent storage: {persistent_key} -> {format_string}"
             )
             self.curveManager.updateCurve(curveID, curve_data)
 
@@ -1256,6 +1443,32 @@ class ChartView(QWidget):
 
 
 class CurveManager(QObject):
+    """
+    Manages curve data, properties, and persistence for ChartView.
+
+    This class handles the storage and management of curve data including
+    plotting properties, persistent settings, and curve identification.
+    It provides signals for curve lifecycle events and maintains
+    persistent properties across plotting sessions.
+
+    Attributes:
+        _curves: Dictionary storing curve data with curve IDs as keys
+        _persistent_properties: Dictionary for storing curve properties across sessions
+
+    Signals:
+        curveAdded: Emitted when a curve is added (curveID)
+        curveRemoved: Emitted when a curve is removed (curveID, curveData, count)
+        curveUpdated: Emitted when a curve is updated (curveID, recompute_y, update_x)
+        allCurvesRemoved: Emitted when all curves are removed (doNotClearCheckboxes)
+
+    Key Features:
+        - Unique curve ID generation based on file path, row, and X2 index
+        - Persistent storage of curve properties (style, offset, factor)
+        - Curve data management with automatic property restoration
+        - Integration with MDA file data structures
+        - Support for 2D data with X2 index tracking
+    """
+
     curveAdded = pyqtSignal(str)  # Emit curveID when a curve is added
     curveRemoved = pyqtSignal(str, dict, int)
     # Emit curveID & its corresponding data when a curve is removed, plus the
@@ -1280,8 +1493,10 @@ class CurveManager(QObject):
         ds_options = options.get("ds_options", {})
         label = ds_options.get("label", "unknown label")
         file_path = plot_options.get("filePath", "unknown path")
+        x2_index = options.get("x2_index")  # Extract X2 index from options
+        print(f"DEBUG: addCurve - Received x2_index: {x2_index}")
         # Generate unique curve ID & update options:
-        curveID = self.generateCurveID(label, file_path, row)
+        curveID = self.generateCurveID(label, file_path, row, x2_index)
         ds_options["label"] = label  # Keep the original label for display purposes
         print(
             f"DEBUG: Adding curve with ID: {curveID}, label: {label}, file_path: {file_path}"
@@ -1306,9 +1521,6 @@ class CurveManager(QObject):
                 # x_data is different or label has changed, update the curve:
                 # Get existing curve data and preserve all properties
                 existing_curve_data = self._curves[curveID]
-                print(
-                    f"DEBUG: Existing style: {existing_curve_data.get('style')}, offset: {existing_curve_data.get('offset')}, factor: {existing_curve_data.get('factor')}"
-                )
                 existing_curve_data["ds"] = ds
                 existing_curve_data["plot_options"] = plot_options
                 existing_curve_data["ds_options"] = ds_options  # Update the label
@@ -1318,18 +1530,13 @@ class CurveManager(QObject):
         else:
             print(f"DEBUG: Curve {curveID} does NOT exist, creating new curve")
             # Check if this might be a re-creation after removeAllCurves was called
-            # Look for any existing curve with the same file_path and row
+            # Look for any existing curve with the same file_path, row, and x2_index
             for existing_curve_id, existing_data in self._curves.items():
                 if (
                     existing_data["file_path"] == file_path
                     and existing_data["row"] == row
+                    and existing_data.get("x2_index") == x2_index
                 ):
-                    print(
-                        f"DEBUG: Found existing curve with same file_path and row: {existing_curve_id}"
-                    )
-                    print(
-                        f"DEBUG: Transferring properties: style={existing_data.get('style')}, offset={existing_data.get('offset')}, factor={existing_data.get('factor')}"
-                    )
                     # Transfer properties from existing curve
                     self._curves[curveID] = {
                         "ds": ds,  # ds = [x_data, y_data]
@@ -1341,6 +1548,7 @@ class CurveManager(QObject):
                         "file_name": plot_options.get("fileName", ""),  # without ext
                         "plot_options": plot_options,
                         "ds_options": ds_options,
+                        "x2_index": x2_index,  # Store X2 index for 2D data
                     }
                     # Remove the old curve entry
                     del self._curves[existing_curve_id]
@@ -1349,7 +1557,7 @@ class CurveManager(QObject):
                     return
         # Add new curve if not already present on the graph:
         # Check for persistent properties first
-        persistent_key = (file_path, row)
+        persistent_key = (file_path, row, x2_index)
         persistent_props = self._persistent_properties.get(persistent_key, {})
 
         self._curves[curveID] = {
@@ -1362,6 +1570,7 @@ class CurveManager(QObject):
             "file_name": plot_options.get("fileName", ""),  # without ext
             "plot_options": plot_options,
             "ds_options": ds_options,
+            "x2_index": x2_index,  # Store X2 index for 2D data
         }
         print(
             f"DEBUG: Created curve {curveID} with persistent properties: {persistent_props}"
@@ -1413,7 +1622,11 @@ class CurveManager(QObject):
                 )
                 curve_data["offset"] = new_offset
                 # Save to persistent storage
-                persistent_key = (curve_data["file_path"], curve_data["row"])
+                persistent_key = (
+                    curve_data["file_path"],
+                    curve_data["row"],
+                    curve_data.get("x2_index"),
+                )
                 if persistent_key not in self._persistent_properties:
                     self._persistent_properties[persistent_key] = {}
                 self._persistent_properties[persistent_key]["offset"] = new_offset
@@ -1432,7 +1645,11 @@ class CurveManager(QObject):
                 )
                 curve_data["factor"] = new_factor
                 # Save to persistent storage
-                persistent_key = (curve_data["file_path"], curve_data["row"])
+                persistent_key = (
+                    curve_data["file_path"],
+                    curve_data["row"],
+                    curve_data.get("x2_index"),
+                )
                 if persistent_key not in self._persistent_properties:
                     self._persistent_properties[persistent_key] = {}
                 self._persistent_properties[persistent_key]["factor"] = new_factor
@@ -1441,21 +1658,27 @@ class CurveManager(QObject):
                 )
                 self.updateCurve(curveID, curve_data, recompute_y=True)
 
-    def generateCurveID(self, label, file_path, row):
+    def generateCurveID(self, label, file_path, row, x2_index=None):
         """
-        Generates a unique curve ID based on file_path and row, ensuring the same detector
+        Generates a unique curve ID based on file_path, row, and X2 index, ensuring the same detector
         always gets the same curve ID regardless of I0 normalization.
 
         Parameters:
         - label (str): The original label for the curve (used for display purposes)
         - file_path (str): The file path associated with the curve
         - row (int): The row number in the file tableview associated with the curve
+        - x2_index (int, optional): The X2 slice index for 2D data
 
         Returns:
-        - str: A unique curve ID based on file_path and row
+        - str: A unique curve ID based on file_path, row, and X2 index
         """
-        # Generate curve ID based on file_path and row
-        curve_id = f"{file_path}_{row}"
+        # Generate curve ID based on file_path, row, and X2 index
+        if x2_index is not None:
+            curve_id = f"{file_path}_{row}_x2_{x2_index}"
+        else:
+            curve_id = f"{file_path}_{row}"
+
+        print(f"DEBUG: generateCurveID - curve_id={curve_id}")
 
         # Check if this curve ID already exists
         if curve_id in self._curves:
@@ -1464,18 +1687,269 @@ class CurveManager(QObject):
         else:
             return curve_id
 
-    def findCurveID(self, file_path, row):
+    def findCurveID(self, file_path, row, x2_index=None):
         """
-        Find the curveID based on the file path and row number.
+        Find the curveID based on the file path, row number, and X2 index.
 
         Parameters:
         - file_path (str): The path of the file associated with the curve.
         - row (int): The row number in the file tableview associated with the curve.
+        - x2_index (int, optional): The X2 slice index for 2D data.
 
         Returns:
         - str: The curveID if a matching curve is found; otherwise, None.
         """
         for curveID, curveData in self._curves.items():
-            if curveData["file_path"] == file_path and curveData["row"] == row:
+            if (
+                curveData["file_path"] == file_path
+                and curveData["row"] == row
+                and curveData.get("x2_index") == x2_index
+            ):
                 return curveID
         return None
+
+
+class ChartView2D(ChartView):
+    """
+    2D plotting widget for heatmaps and contour plots.
+
+    Extends ChartView to provide 2D visualization capabilities for MDA data.
+    Supports both heatmap and contour plot types with interactive features
+    and color scale management.
+
+    Attributes:
+        _2d_data: Storage for 2D data arrays
+        _plot_type: Current plot type ("heatmap" or "contour")
+        _current_colorbar: Reference to the current colorbar object
+        _log_y_2d: Boolean flag for logarithmic color scale
+
+    Key Features:
+        - Heatmap visualization using imshow
+        - Contour plot visualization with customizable levels
+        - Logarithmic color scale support
+        - Automatic axis scaling and labeling
+        - Color palette customization
+        - Integration with MDA 2D data structures
+        - Message display for empty plots
+
+    Plot Types:
+        - heatmap: 2D data displayed as a color-coded image
+        - contour: 2D data displayed as filled contour lines
+    """
+
+    def __init__(self, parent=None, **kwargs):
+        super().__init__(parent, **kwargs)
+        self._2d_data = None
+        self._plot_type = "heatmap"  # "heatmap" or "contour"
+        self._current_colorbar = None  # Store reference to current colorbar
+
+    def plot2D(self, y_data, x_data, x2_data, plot_options=None):
+        """
+        Plot 2D data as heatmap or contour.
+
+        Parameters:
+            y_data: 2D array of detector data
+            x_data: 1D array of X positioner data
+            x2_data: 1D array of X2 positioner data
+            plot_options: Dictionary containing plot options including color_palette
+        """
+        if plot_options is None:
+            plot_options = {}
+
+        print("DEBUG: ChartView2D.plot2D - Plotting 2D data")
+        print(f"  Y data shape: {y_data.shape}")
+        print(f"  X data shape: {x_data.shape}")
+        print(f"  X2 data shape: {x2_data.shape}")
+        print(f"  Plot type: {self._plot_type}")
+        print(f"  Canvas exists: {self.canvas is not None}")
+        print(f"  Main axes exists: {self.main_axes is not None}")
+
+        # Clear the previous plot
+        self.figure.clear()
+        self.main_axes = self.figure.add_subplot(111)
+        # Reset to default subplot parameters
+        self.figure.subplots_adjust(bottom=0.1, top=0.9, right=0.92)
+
+        # Get color palette from plot options
+        color_palette = plot_options.get("color_palette", "viridis")
+
+        # Validate color palette - ensure it's not empty and is a valid colormap
+        if not color_palette or color_palette.strip() == "":
+            color_palette = "viridis"
+
+        # Create the 2D plot
+        if self._plot_type == "heatmap":
+            self._plot_heatmap(y_data, x_data, x2_data, plot_options, color_palette)
+        elif self._plot_type == "contour":
+            self._plot_contour(y_data, x_data, x2_data, plot_options, color_palette)
+        else:
+            print(f"ERROR: Unknown plot type: {self._plot_type}")
+            return
+
+        # Set labels and title
+        self._set_2d_labels(plot_options)
+
+        # Update the plot
+
+        self.canvas.draw()
+
+        # Force a repaint
+        self.canvas.flush_events()
+
+    def _plot_heatmap(self, y_data, x_data, x2_data, plot_options, color_palette):
+        """Plot 2D data as heatmap using imshow."""
+        # Check if X2 data is in descending order (reverse scan direction)
+        # If so, flip the Y data vertically to match the expected orientation
+        if len(x2_data) > 1 and x2_data[0] > x2_data[-1]:
+            y_data = y_data[::-1, :]  # Flip vertically
+
+        # Create meshgrid for proper axis scaling
+        X, Y = numpy.meshgrid(x_data, x2_data)
+
+        # Apply log scale normalization if enabled
+        norm = None
+        if hasattr(self, "_log_y_2d") and self._log_y_2d:
+            from matplotlib.colors import LogNorm
+
+            # Use LogNorm for proper log color scaling
+            norm = LogNorm(vmin=y_data.min(), vmax=y_data.max())
+
+        # Plot heatmap
+        im = self.main_axes.imshow(
+            y_data,
+            extent=[x_data.min(), x_data.max(), x2_data.min(), x2_data.max()],
+            aspect="auto",
+            origin="lower",
+            cmap=color_palette,
+            norm=norm,
+        )
+
+        # Add colorbar
+        self._current_colorbar = self.figure.colorbar(
+            im, ax=self.main_axes, label=plot_options.get("y_unit", "")
+        )
+
+    def _plot_contour(self, y_data, x_data, x2_data, plot_options, color_palette):
+        """Plot 2D data as contour plot."""
+        # Create meshgrid for contour plotting
+        X, Y = numpy.meshgrid(x_data, x2_data)
+
+        # Apply log scale normalization if enabled
+        norm = None
+        levels = 20
+        if hasattr(self, "_log_y_2d") and self._log_y_2d:
+            # For contour plots with log scale, use LogNorm for color normalization
+            vmin, vmax = y_data.min(), y_data.max()
+            if vmin > 0:  # Only apply log if all values are positive
+                from matplotlib.colors import LogNorm
+
+                norm = LogNorm(vmin=vmin, vmax=vmax)
+
+        # Plot contour
+        contour = self.main_axes.contourf(
+            X, Y, y_data, levels=levels, cmap=color_palette, norm=norm
+        )
+
+        # Add colorbar
+        self._current_colorbar = self.figure.colorbar(
+            contour, ax=self.main_axes, label=plot_options.get("y_unit", "")
+        )
+
+    def _set_2d_labels(self, plot_options):
+        """Set axis labels and title for 2D plot."""
+        # Set axis labels
+        x_label = plot_options.get("x", "X")
+        x_unit = plot_options.get("x_unit", "")
+        x2_label = plot_options.get("x2", "X2")
+        x2_unit = plot_options.get("x2_unit", "")
+
+        if x_unit:
+            self.main_axes.set_xlabel(f"{x_label} ({x_unit})")
+        else:
+            self.main_axes.set_xlabel(x_label)
+
+        if x2_unit:
+            self.main_axes.set_ylabel(f"{x2_label} ({x2_unit})")
+        else:
+            self.main_axes.set_ylabel(x2_label)
+
+        # Set title
+        title = plot_options.get("title", "2D Plot")
+        self.main_axes.set_title(title)
+
+    def set_plot_type(self, plot_type):
+        """Set the type of 2D plot (heatmap or contour)."""
+        if plot_type in ["heatmap", "contour"]:
+            self._plot_type = plot_type
+
+        else:
+            print(
+                f"ERROR: Invalid plot type: {plot_type}. Must be 'heatmap' or 'contour'"
+            )
+
+    def get_plot_type(self):
+        """Get the current plot type."""
+        return self._plot_type
+
+    def setLogScales2D(self, log_y: bool):
+        """
+        Set logarithmic scale for 2D plots (Y-axis color scale).
+
+        Parameters:
+        - log_y (bool): Whether to use logarithmic scale for Y-axis (color scale)
+        """
+        try:
+            # Store the log scale state
+            self._log_y_2d = log_y
+
+            # For 2D plots, log_y affects the color scale normalization
+            # This would need to be handled in the plotting methods
+            # For now, we'll store the state for potential future use
+            self._log_y_2d = log_y
+
+            # Redraw the canvas to apply changes
+            self.canvas.draw()
+
+        except Exception as exc:
+            print(f"Error setting 2D log scales: {exc}")
+            # If setting log scale fails (e.g., negative values), revert to linear
+            self._log_y_2d = False
+            self.canvas.draw()
+
+    def showMessage(self, message: str):
+        """
+        Display a message in the 2D plot area when there's nothing to plot.
+
+        Parameters:
+            message (str): The message to display
+        """
+        # Clear the previous plot
+        self.figure.clear()
+        self.main_axes = self.figure.add_subplot(111)
+
+        # Remove all axes elements and show only the message
+        self.main_axes.set_xticks([])
+        self.main_axes.set_yticks([])
+        self.main_axes.set_frame_on(False)
+
+        # Add the message text
+        self.main_axes.text(
+            0.5,
+            0.5,
+            message,
+            horizontalalignment="center",
+            verticalalignment="center",
+            transform=self.main_axes.transAxes,
+            fontsize=16,
+            color="#666666",
+            bbox=dict(
+                boxstyle="round,pad=0.5",
+                facecolor="#f5f5f5",
+                edgecolor="#cccccc",
+                alpha=0.8,
+            ),
+        )
+
+        # Update the plot
+        self.canvas.draw()
+        print(f"DEBUG: ChartView2D.showMessage - Displayed message: {message}")

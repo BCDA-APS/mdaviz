@@ -40,6 +40,8 @@ class MDAFile(QWidget):
     buttonPushed = pyqtSignal(str)
     # Emit the new tab index (int), file path (str), data (dict) and selection field (dict):
     tabChanged = pyqtSignal(int, str, dict, dict)
+    # Emit X2 value changes for 2D data:
+    x2ValueChanged = pyqtSignal(int)
 
     def __init__(self, parent):
         """
@@ -189,6 +191,13 @@ class MDAFile(QWidget):
                 "firstDet": cached_data.first_det,
                 "pvList": cached_data.pv_list,
                 "index": index,
+                # Add 2D data support
+                "scanDict2D": cached_data.scan_dict_2d,
+                "scanDictInner": cached_data.scan_dict_inner,
+                "isMultidimensional": cached_data.is_multidimensional,
+                "rank": cached_data.rank,
+                "dimensions": cached_data.dimensions,
+                "acquiredDimensions": cached_data.acquired_dimensions,
             }
         else:
             # Fallback to direct loading if cache fails
@@ -206,16 +215,48 @@ class MDAFile(QWidget):
                     "firstDet": 1,
                     "pvList": [],
                     "index": index,
+                    # Add 2D data support
+                    "scanDict2D": {},
+                    "scanDictInner": {},
+                    "isMultidimensional": False,
+                    "rank": 1,
+                    "dimensions": [],
+                    "acquiredDimensions": [],
                 }
                 return
 
             file_metadata, file_data_dim1, *_ = result
-            if file_metadata["rank"] > 1:
-                self.setStatus(
-                    "WARNING: Multidimensional data not supported - ignoring ranks > 1."
-                )
+            rank = file_metadata.get("rank", 1)
+            dimensions = file_metadata.get("dimensions", [])
+            acquired_dimensions = file_metadata.get("acquired_dimensions", [])
+
             scanDict, first_pos, first_det = utils.get_scan(file_data_dim1)
-            pvList = [v["name"] for v in scanDict.values()]
+
+            # Initialize 2D data fields
+            scanDict2D = {}
+            scan_dict_inner = {}
+            is_multidimensional = rank > 1
+
+            # Process 2D data if available
+            if rank >= 2 and len(result) > 2:
+                try:
+                    file_data_dim2 = result[2]
+                    scanDict2D, _, _ = utils.get_scan_2d(file_data_dim1, file_data_dim2)
+                    # Also store inner dimension data for 1D plotting
+                    scan_dict_inner, _, _ = utils.get_scan(file_data_dim2)
+                except Exception as e:
+                    print(f"Warning: Could not process 2D data: {e}")
+                    scanDict2D = {}
+                    scan_dict_inner = {}
+
+            # Construct pvList from appropriate data source
+            # For 2D+ data, use scan_dict_inner (inner dimension PVs like P1, D1, etc.)
+            # For 1D data, use scanDict (outer dimension PVs)
+            if is_multidimensional and scan_dict_inner:
+                pvList = [v["name"] for v in scan_dict_inner.values()]
+            else:
+                pvList = [v["name"] for v in scanDict.values()]
+
             self._data = {
                 "fileName": file_path.stem,  # file_name.rsplit(".mda", 1)[0]
                 "filePath": str(file_path),
@@ -226,7 +267,55 @@ class MDAFile(QWidget):
                 "firstDet": first_det,
                 "pvList": pvList,
                 "index": index,
+                # Add 2D data support
+                "scanDict2D": scanDict2D,
+                "scanDictInner": scan_dict_inner,
+                "isMultidimensional": is_multidimensional,
+                "rank": rank,
+                "dimensions": dimensions,
+                "acquiredDimensions": acquired_dimensions,
             }
+
+    def handle2DMode(self):
+        """Handle 2D data setup - update controls but don't change mode."""
+        if self._data.get("isMultidimensional", False):
+            # Update 2D controls in table view
+            table_view = self.tabIndex2Tableview(self.tabWidget.currentIndex())
+            if table_view:
+                dimensions = self._data.get("dimensions", [])
+                print(f"DEBUG: handle2DMode - dimensions: {dimensions}")
+
+                # Extract X2 positioner information from scanDict2D
+                x2_positioner_info = None
+                scan_dict_2d = self._data.get("scanDict2D", {})
+                print(
+                    f"DEBUG: handle2DMode - scanDict2D keys: {list(scan_dict_2d.keys())}"
+                )
+                if scan_dict_2d:
+                    # Find the X2 positioner (first positioner in 2D data)
+                    # In 2D data, the first positioner (index 0) is typically X2
+                    for key, value in scan_dict_2d.items():
+                        print(
+                            f"DEBUG: handle2DMode - Field {key}: type={value.get('type')}, name={value.get('name')}"
+                        )
+                        if (
+                            value.get("type") == "POS" and key == 0
+                        ):  # First positioner is X2
+                            x2_positioner_info = {
+                                "name": value.get("name", "X2"),
+                                "unit": value.get("unit", ""),
+                                "data": value.get("data", []),
+                            }
+                            print(
+                                f"DEBUG: handle2DMode - X2 positioner found: {x2_positioner_info['name']}"
+                            )
+                            break
+
+                table_view.update2DControls(
+                    is_multidimensional=self._data.get("isMultidimensional", False),
+                    dimensions=dimensions,
+                    x2_positioner_info=x2_positioner_info,
+                )
 
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
@@ -279,7 +368,8 @@ class MDAFile(QWidget):
         """Display pos(s) & det(s) values as a tableview in the vizualization panel."""
         if not self.data():
             return
-        self.mda_mvc.mda_file_viz.setTableData(tabledata)
+        # Pass full data structure instead of just scanDict for 2D support
+        self.mda_mvc.mda_file_viz.setTableData(self.data())
 
     def defaultSelection(self, first_pos, first_det, selection_field):
         """
@@ -401,6 +491,15 @@ class MDAFile(QWidget):
                 self.createNewTab(file_name, file_path, selection_field)
             # Add new tab to tabManager:
             self.tabManager.addTab(file_path, metadata, tabledata)
+
+        # Handle mode switching for 2D data AFTER tab management is complete
+        if self._data.get("isMultidimensional", False):
+            self.handle2DMode()
+            # Set 2D data in visualization
+            self.mda_mvc.mda_file_viz.set2DData(self._data)
+        else:
+            # Clear 2D data for 1D files
+            self.mda_mvc.mda_file_viz.set2DData(None)
 
     def createNewTab(self, file_name, file_path, selection_field):
         """

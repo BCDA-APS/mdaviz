@@ -1,4 +1,41 @@
-from PyQt6 import QtWidgets, QtCore
+"""
+MDA File Visualization Module
+
+.. Summary::
+    This module provides the main visualization interface for MDA (Multi-dimensional Array)
+    data files. It manages the display of data tables, metadata, 1D plots, and 2D plots in a
+    tabbed interface with integrated controls for data analysis and manipulation.
+
+Classes:
+    MDAFileVisualization: Main widget for displaying MDA file contents with tabbed interface
+    MetadataSearchDialog: Dialog for searching within metadata text
+
+Key Features:
+    - Tabbed interface for Data, Plot, Metadata, and 2D visualization
+    - Integrated 1D and 2D plotting with ChartView and ChartView2D
+    - Interactive controls for curve fitting, styling, and log scales
+    - Metadata search functionality
+    - Dynamic tab visibility based on data dimensionality
+    - Persistent UI state management
+
+Dependencies:
+    - PyQt6: GUI framework
+    - mdaviz.chartview: 1D and 2D plotting widgets
+    - mdaviz.data_table_view: Data table display
+    - mdaviz.fit_models: Curve fitting functionality
+    - mdaviz.utils: Utility functions for UI loading
+
+Usage:
+    The MDAFileVisualization widget is typically instantiated as part of the main
+    application window and receives MDA file data through:
+    - setTableData(): Sets the data table content from MDA file
+    - setMetadata(): Sets the metadata text content
+    - setPlot(): Sets the 1D plotting widget (ChartView) with data from user selections
+    - set2DData(): Sets 2D data for multi-dimensional arrays
+    - update2DPlot(): Updates 2D plots based on user selections in 2D controls
+"""
+
+from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtGui import QFont, QKeySequence
 from PyQt6.QtWidgets import QWidget, QDialog, QSizePolicy
 from PyQt6.QtGui import QShortcut
@@ -7,6 +44,7 @@ from mdaviz import utils
 from mdaviz.chartview import ChartView
 from mdaviz.data_table_view import DataTableView
 from mdaviz.fit_models import get_available_models
+from mdaviz.chartview import ChartView2D
 
 MD_FONT = "Arial"
 MD_FONT_SIZE = 12
@@ -75,6 +113,418 @@ class MDAFileVisualization(QWidget):
         # Setup search functionality for metadata
         self.setupSearchFunctionality()
 
+        # Setup 2D functionality
+        self.setup2DFunctionality()
+
+    def setup2DFunctionality(self):
+        """Setup 2D plotting functionality."""
+        # Initially hide 2D tab
+        self.update2DTabVisibility(False)
+
+        # Connect tab change signal
+        self.tabWidget.currentChanged.connect(self.onTabChanged)
+
+    def update2DTabVisibility(self, show_2d_tab=False):
+        """
+        Update 2D tab visibility based on data dimensions.
+
+        Parameters:
+            show_2d_tab (bool): Whether to show the 2D tab
+        """
+        # Find the 2D tab index (should be index 3 after Metadata tab)
+        tab_count = self.tabWidget.count()
+        if tab_count >= 4:
+            # Hide/show 2D tab
+            self.tabWidget.setTabVisible(3, show_2d_tab)
+
+            # If hiding 2D tab and it's currently selected, switch to 1D tab
+            if not show_2d_tab and self.tabWidget.currentIndex() == 3:
+                self.tabWidget.setCurrentIndex(0)
+
+    def set2DData(self, data):
+        """
+        Set 2D data for plotting.
+
+        Parameters:
+            data (dict or None): 2D data dictionary with scanDict2D and metadata, or None to clear
+        """
+        # Force switch to 1D tab when switching files (for both 2D and 1D files)
+        self.tabWidget.setCurrentIndex(0)
+
+        if not data or not data.get("isMultidimensional", False):
+            self.update2DTabVisibility(False)
+            # Clear 2D data
+            if hasattr(self, "_2d_data"):
+                delattr(self, "_2d_data")
+            return
+
+        # Show 2D tab for multidimensional data
+        self.update2DTabVisibility(True)
+
+        # Store 2D data for plotting
+        self._2d_data = data
+
+        # Update 2D plot if tab is visible
+        if self.tabWidget.currentIndex() == 3:  # 2D tab
+            self.update2DPlot()
+
+    def update2DPlot(self):
+        """Update the 2D plot with current data."""
+        if not hasattr(self, "_2d_data") or not self._2d_data:
+            return
+
+        # Get the current table view by traversing up the parent chain to find MDA_MVC
+        parent = self.parent()
+        while parent and not hasattr(parent, "currentFileTableview"):
+            parent = parent.parent()
+
+        if not parent:
+            return
+
+        tableview = parent.currentFileTableview()
+        if not tableview:
+            return
+
+        # Get 2D selections from comboboxes instead of 1D selections from table view
+        if hasattr(tableview, "get2DSelections"):
+            selection = tableview.get2DSelections()
+        else:
+            print("DEBUG: update2DPlot - No get2DSelections method available")
+            return
+
+        # Convert 2D selection to 1D format for data2Plot2D
+        # data2Plot2D expects: {'X': x_index, 'Y': [y_indices], 'I0': i0_index}
+        converted_selection = {
+            "X": selection.get("X1"),
+            "Y": selection.get("Y", []),
+            "I0": selection.get("I0"),
+            "log_y": selection.get("log_y", False),
+        }
+        print(f"DEBUG: update2DPlot - Converted to 1D format: {converted_selection}")
+
+        # Call our data2Plot2D function to extract 2D data
+        datasets, plot_options = tableview.data2Plot2D(converted_selection)
+
+        # Create and display 2D plot if we have data
+        if datasets:
+            print("DEBUG: update2DPlot - Creating 2D plot")
+
+            # Get the 2D plot widget from the 2D tab layout
+            layoutMpl2D = self.plotPage2D.layout()
+            if layoutMpl2D.count() != 1:
+                return
+
+            widgetMpl2D = layoutMpl2D.itemAt(0).widget()
+
+            # Create ChartView2D if needed
+            if not isinstance(widgetMpl2D, ChartView2D):
+                print(
+                    "DEBUG: update2DPlot - Creating new ChartView2D widget for 2D tab"
+                )
+
+                # Remove the existing widget from the layout
+                layoutMpl2D.removeWidget(widgetMpl2D)
+                widgetMpl2D.deleteLater()
+
+                # Create new ChartView2D widget with correct parent (MDA_MVC)
+                widgetMpl2D = ChartView2D(
+                    parent, **plot_options
+                )  # Use parent (MDA_MVC) as parent
+
+                # Make the widget visible
+                widgetMpl2D.setVisible(True)
+                print(
+                    f"DEBUG: update2DPlot - Set 2D widget visible: {widgetMpl2D.isVisible()}"
+                )
+
+                # Add the widget to the 2D layout
+                layoutMpl2D.addWidget(widgetMpl2D)
+                print("DEBUG: update2DPlot - Added ChartView2D to 2D layout")
+
+                # Apply stored log scale state to the new chart
+                if hasattr(self, "getLogScaleState"):
+                    stored_log_x, stored_log_y = self.getLogScaleState()
+                    widgetMpl2D.setLogScales(stored_log_x, stored_log_y)
+
+                # Apply 2D log scale state from current selections
+                log_y = selection.get("log_y", False)
+                widgetMpl2D.setLogScales2D(log_y)
+
+            # Apply 2D log scale state from current selections (for both new and existing widgets)
+            log_y = selection.get("log_y", False)
+            widgetMpl2D.setLogScales2D(log_y)
+            print(f"DEBUG: update2DPlot - Applied log scale: {log_y}")
+
+            # Plot the 2D data
+            for dataset in datasets:
+                y_data, dataset_options = dataset
+                x_data = dataset_options.get("x_data")
+                x2_data = dataset_options.get("x2_data")
+
+                if x_data is not None and x2_data is not None:
+                    print("DEBUG: update2DPlot - Plotting 2D data in 2D tab")
+
+                    # Set the plot type from current selections
+                    plot_type = selection.get("plot_type", "heatmap")
+                    widgetMpl2D.set_plot_type(plot_type)
+                    print(f"DEBUG: update2DPlot - Set plot type to: {plot_type}")
+
+                    # Add color palette to plot options
+                    color_palette = selection.get("color_palette", "viridis")
+
+                    # Validate color palette - ensure it's not empty
+                    if not color_palette or color_palette.strip() == "":
+                        color_palette = "viridis"
+                        print(
+                            f"DEBUG: update2DPlot - Empty color palette, using default: {color_palette}"
+                        )
+
+                    plot_options["color_palette"] = color_palette
+                    print(
+                        f"DEBUG: update2DPlot - Set color palette to: {color_palette}"
+                    )
+
+                    widgetMpl2D.plot2D(y_data, x_data, x2_data, plot_options)
+                else:
+                    print("DEBUG: update2DPlot - Missing X or X2 data for 2D plotting")
+
+            # Store reference to 2D chart view
+            self.chart_view_2d = widgetMpl2D
+
+        else:
+            print("DEBUG: update2DPlot - No 2D datasets extracted, showing message")
+
+            # Show "Nothing to plot" message when no datasets are available
+            # This happens when validation fails (e.g., only 1 point for X2)
+            layoutMpl2D = self.plotPage2D.layout()
+            if layoutMpl2D.count() != 1:
+                print("DEBUG: update2DPlot - Expected exactly one widget in 2D layout")
+                return
+
+            widgetMpl2D = layoutMpl2D.itemAt(0).widget()
+
+            # Use the showMessage method if the widget supports it
+            if hasattr(widgetMpl2D, "showMessage"):
+                widgetMpl2D.showMessage("Nothing to plot")
+                self.chart_view_2d = widgetMpl2D
+            else:
+                # Create a simple message widget if needed
+                # Remove the existing widget from the layout
+                layoutMpl2D.removeWidget(widgetMpl2D)
+                widgetMpl2D.deleteLater()
+
+                # Create a simple QLabel widget to show the message
+                from PyQt6.QtWidgets import QLabel
+                from PyQt6.QtCore import Qt
+
+                message_widget = QLabel("Nothing to plot")
+                message_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                message_widget.setStyleSheet(
+                    """
+                    QLabel {
+                        font-size: 16px;
+                        color: #666666;
+                        background-color: #f5f5f5;
+                        border: 1px solid #cccccc;
+                        border-radius: 5px;
+                        padding: 20px;
+                    }
+                """
+                )
+
+                # Add the message widget to the 2D layout
+                layoutMpl2D.addWidget(message_widget)
+
+                # Store reference to message widget
+                self.chart_view_2d = message_widget
+
+    def onTabChanged(self, index):
+        """
+        Handle tab changes.
+
+        Parameters:
+            index (int): Index of the newly selected tab
+        """
+        print(f"DEBUG: onTabChanged - Tab changed to index: {index}")
+
+        # Get current tab structure
+        tab_count = self.tabWidget.count()
+        is_2d_visible = tab_count >= 4 and self.tabWidget.isTabVisible(3)
+
+        # Handle control visibility based on tab
+        self.updateControlVisibility(index)
+
+        # Handle 2D plotting
+        if is_2d_visible and index == 3:  # 2D tab
+            print("DEBUG: onTabChanged - Switching to 2D tab, calling update2DPlot")
+            # Force auto-replace mode when switching to 2D tab
+            self.forceAutoReplaceMode()
+            self.update2DPlot()
+        elif index == 0:  # 1D tab
+            print("DEBUG: onTabChanged - Switching to 1D tab")
+            # Update 1D plot if needed
+            pass
+
+        # Handle search functionality
+        # Enable search only when metadata tab is active
+        # Tab indices: 0=1D, 1=Data, 2=Metadata, 3=2D(if visible)
+        # Metadata is always at index 2
+        is_metadata_tab = index == 2
+
+        if hasattr(self, "search_shortcut"):
+            self.search_shortcut.setEnabled(is_metadata_tab)
+
+        # Close search dialog if switching away from metadata tab
+        if (
+            hasattr(self, "search_dialog")
+            and not is_metadata_tab
+            and self.search_dialog
+            and self.search_dialog.isVisible()
+        ):
+            self.search_dialog.close()
+
+    def forceAutoReplaceMode(self):
+        """Force auto-replace mode and clear other tabs when switching to 2D tab."""
+        try:
+            # Get the parent MDA_MVC widget
+            parent = self.parent()
+            while parent and not hasattr(parent, "mda_file"):
+                parent = parent.parent()
+
+            if parent and hasattr(parent, "mda_file"):
+                # Found the MDA_MVC, now access the mda_file widget
+                mda_file_widget = parent.mda_file
+
+                # Set mode to auto-replace
+                mda_file_widget.autoBox.setCurrentText("Auto-replace")
+
+                # Get current file path from the current tab
+                current_file_path = parent.getCurrentFilePath()
+                if current_file_path:
+                    # Clear all tabs except the current one
+                    parent.clearOtherTabs(current_file_path)
+
+                print(
+                    "DEBUG: forceAutoReplaceMode - Set to auto-replace and cleared other tabs"
+                )
+            else:
+                print(
+                    "DEBUG: forceAutoReplaceMode - Could not find MDA_MVC with mda_file"
+                )
+        except Exception as e:
+            print(f"DEBUG: forceAutoReplaceMode - Error: {e}")
+
+    def updateControlVisibility(self, tab_index):
+        """
+        Update control visibility based on the selected tab.
+
+        Parameters:
+            tab_index (int): Index of the selected tab
+        """
+        # Get the current file table view
+        current_tableview = self.getCurrentFileTableview()
+        if not current_tableview:
+            print("DEBUG: updateControlVisibility - No current tableview found")
+            return
+
+        # Tab indices: 0=1D, 1=Data, 2=Metadata, 3=2D(if visible)
+        if tab_index == 0:  # 1D tab
+            # Show table view and X2 controls, hide Y DET controls
+            current_tableview.tableView.setVisible(True)
+            current_tableview.dimensionControls.setVisible(True)
+            current_tableview.yDetControls.setVisible(False)
+
+            # Show mode controls and clear button
+            self.showModeControls(True)
+
+            # Show 1D-specific controls (curves, graphInfo, cursorInfo)
+            self.show1DControls(True)
+        elif tab_index == 3:  # 2D tab
+            # Hide table view and X2 controls, show Y DET controls
+            current_tableview.tableView.setVisible(False)
+            current_tableview.dimensionControls.setVisible(False)
+            current_tableview.yDetControls.setVisible(True)
+
+            # Hide mode controls and clear button
+            self.showModeControls(False)
+
+            # Hide 1D-specific controls
+            self.show1DControls(False)
+
+    def showModeControls(self, show: bool):
+        """Show or hide mode controls (autoBox, clearButton, etc.)."""
+        try:
+            # Try to find MDA_MVC first
+            parent = self.parent()
+            while parent and not hasattr(parent, "mda_file"):
+                parent = parent.parent()
+
+            if parent and hasattr(parent, "mda_file"):
+                # Found MDA_MVC, access controls through mda_file
+                mda_file = parent.mda_file
+                if hasattr(mda_file, "autoBox"):
+                    mda_file.autoBox.setVisible(show)
+                if hasattr(mda_file, "clearButton"):
+                    mda_file.clearButton.setVisible(show)
+                if hasattr(mda_file, "clearGraphButton"):
+                    mda_file.clearGraphButton.setVisible(show)
+            else:
+                # Try alternative approach - look for controls in the main window
+                main_window = self.window()
+                if main_window and hasattr(main_window, "autoBox"):
+                    main_window.autoBox.setVisible(show)
+                    if hasattr(main_window, "clearButton"):
+                        main_window.clearButton.setVisible(show)
+                    if hasattr(main_window, "clearGraphButton"):
+                        main_window.clearGraphButton.setVisible(show)
+                else:
+                    # Try one more approach - look for MDAFile in the widget tree
+                    current: QWidget | None = self
+                    while current:
+                        if hasattr(current, "autoBox"):
+                            current.autoBox.setVisible(show)
+                            if hasattr(current, "clearButton"):
+                                current.clearButton.setVisible(show)
+                            break
+                        current = current.parent()  # type: ignore[assignment]
+        except Exception as e:
+            print(f"DEBUG: showModeControls - Error: {e}")
+
+    def show1DControls(self, show: bool):
+        """Show or hide 1D-specific controls by hiding/showing the entire curves widget."""
+        try:
+            # Hide/show the entire curves widget (contains curveBox, curveRemove, curveStyle, clearAll, etc.)
+            if hasattr(self, "curves"):
+                self.curves.setVisible(show)
+
+            # Hide/show graphInfo panel
+            if hasattr(self, "graphInfo"):
+                self.graphInfo.setVisible(show)
+
+            # Hide/show cursorInfo panel for 2D tab
+            if hasattr(self, "cursorInfo"):
+                self.cursorInfo.setVisible(show)
+
+        except Exception as e:
+            print(f"DEBUG: show1DControls - Error: {e}")
+
+    def getCurrentFileTableview(self):
+        """Get the current file table view from the parent."""
+        try:
+            # Traverse up to find MDA_MVC
+            parent = self.parent()
+            while parent and not hasattr(parent, "currentFileTableview"):
+                parent = parent.parent()
+
+            if parent and hasattr(parent, "currentFileTableview"):
+                return parent.currentFileTableview()
+            else:
+                print("DEBUG: getCurrentFileTableview - No MDA_MVC found")
+                return None
+        except Exception as e:
+            print(f"DEBUG: getCurrentFileTableview - Error: {e}")
+            return None
+
     def setupFitUI(self):
         """Setup the fit UI components and connections."""
         # Populate fit model combo box in the desired order
@@ -112,16 +562,18 @@ class MDAFileVisualization(QWidget):
         if hasattr(self, "chart_view") and self.chart_view:
             self.chart_view.clearAllFits()
 
-    def updateFitControls(self, curve_selected: bool):
+    def updatePlotControls(self, curve_selected: bool):
         """
-        Update fit control states based on curve selection.
+        Update plot control states based on curve selection.
 
         Parameters:
         - curve_selected: Whether a curve is currently selected
         """
         self.fitButton.setEnabled(curve_selected)  # type: ignore[attr-defined]
         self.clearFitsButton.setEnabled(curve_selected)  # type: ignore[attr-defined]
-        self.updateCurveStyleControls(curve_selected)
+        self.curveStyle.setEnabled(curve_selected)  # type: ignore[attr-defined]
+        self.logXCheckBox.setEnabled(curve_selected)  # type: ignore[attr-defined]
+        self.logYCheckBox.setEnabled(curve_selected)  # type: ignore[attr-defined]
 
     def setupCurveStyleUI(self):
         """Setup the curve style UI components and connections."""
@@ -201,18 +653,13 @@ class MDAFileVisualization(QWidget):
         if hasattr(self, "chart_view") and self.chart_view:
             self.chart_view.updateCurveStyle(style_name)
 
-    def updateCurveStyleControls(self, curve_selected: bool):
+    def setTableData(self, data):
         """
-        Update curve style control states based on curve selection.
+        Set data for the data table view.
 
         Parameters:
-        - curve_selected: Whether a curve is currently selected
+            data: Data to display in the table
         """
-        self.curveStyle.setEnabled(curve_selected)  # type: ignore[attr-defined]
-        self.logXCheckBox.setEnabled(curve_selected)  # type: ignore[attr-defined]
-        self.logYCheckBox.setEnabled(curve_selected)  # type: ignore[attr-defined]
-
-    def setTableData(self, data):
         # Reuse existing data table view if it exists
         if hasattr(self, "data_table_view") and self.data_table_view:
             self.data_table_view.setData(data)
@@ -225,10 +672,22 @@ class MDAFileVisualization(QWidget):
             self.data_table_view.displayTable()
 
     def setMetadata(self, text, *args, **kwargs):
+        """
+        Set text content for the metadata display.
+
+        Parameters:
+            text (str): Text content to display
+        """
         # tab=self.metadataPage
         self.metadata.setText(text)
 
     def setPlot(self, plot_widget):
+        """
+        Set the plot widget for the visualization tab.
+
+        Parameters:
+            plot_widget: The plot widget to add to the layout
+        """
         layout = self.plotPageMpl.layout()
         utils.removeAllLayoutWidgets(layout)
 
@@ -251,6 +710,22 @@ class MDAFileVisualization(QWidget):
         # Update tab widget max height to match the chart view
         self._updateTabWidgetMaxHeight()
 
+        # # Debug output for 2D plotting
+        # if hasattr(plot_widget, "_plot_type"):
+        #     print("DEBUG: setPlot - Added ChartView2D widget to layout")
+        #     print(f"  Widget type: {type(plot_widget)}")
+        #     print(f"  Widget visible: {plot_widget.isVisible()}")
+        #     print(f"  Widget size: {plot_widget.size()}")
+        #     print(f"  Layout count: {layout.count()}")
+        #     print(f"  Layout item widget: {layout.itemAt(0).widget()}")
+        # else:
+        #     print("DEBUG: setPlot - Added regular ChartView widget to layout")
+        #     print(f"  Widget type: {type(plot_widget)}")
+        #     print(f"  Widget visible: {plot_widget.isVisible()}")
+        #     print(f"  Widget size: {plot_widget.size()}")
+        #     print(f"  Layout count: {layout.count()}")
+        #     print(f"  Layout item widget: {layout.itemAt(0).widget()}")
+
     def _updateTabWidgetMaxHeight(self):
         """Update the tab widget's maximum height to match the plot height setting."""
         from mdaviz.user_settings import settings
@@ -272,16 +747,14 @@ class MDAFileVisualization(QWidget):
         )  # Add padding for tab content
 
     def isPlotBlank(self):
+        """Check if the plot area is blank (no data displayed)."""
         layout = self.plotPageMpl.layout()
         if layout.count() == 0:
-            print("NO LAYOUT: blank")
             return True
         plot_widget = layout.itemAt(0).widget()
         # Check if the plot widget is an instance of chartView and has data items
         if isinstance(plot_widget, ChartView):
-            print("HAS DATA ITEM")
             return not plot_widget.hasDataItems()
-        print("NOT A CHARTVIEW INSTANCE")
         return True  # If not a chartView instance, consider it as blank
 
     def clearContents(self, plot=True, data=True, metadata=True):
@@ -312,6 +785,12 @@ class MDAFileVisualization(QWidget):
                 pass  # data_table_view does not exist, so do nothing
 
     def setStatus(self, text):
+        """
+        Set the status bar text.
+
+        Parameters:
+            text (str): Status message to display
+        """
         self.mda_mvc.setStatus(text)
 
     def setupSearchFunctionality(self):
@@ -338,21 +817,6 @@ class MDAFileVisualization(QWidget):
         self.search_dialog.show()
         self.search_dialog.raise_()
         self.search_dialog.activateWindow()
-
-    def onTabChanged(self, index):
-        """Handle tab changes to enable/disable search functionality."""
-        # Enable search only when metadata tab is active
-        # The metadata tab is at index 2 (0=Plot, 1=Data, 2=Metadata)
-        is_metadata_tab = index == 2
-        self.search_shortcut.setEnabled(is_metadata_tab)
-
-        # Close search dialog if switching away from metadata tab
-        if (
-            not is_metadata_tab
-            and self.search_dialog
-            and self.search_dialog.isVisible()
-        ):
-            self.search_dialog.close()
 
 
 class MetadataSearchDialog(QDialog):
@@ -418,7 +882,7 @@ class MetadataSearchDialog(QDialog):
         if not found:
             # If not found, start from beginning
             cursor = self.text_widget.textCursor()
-            cursor.movePosition(cursor.Start)
+            cursor.movePosition(cursor.MoveOperation.Start)
             self.text_widget.setTextCursor(cursor)
             found = self.text_widget.find(search_text)
 
@@ -432,14 +896,16 @@ class MetadataSearchDialog(QDialog):
             return
 
         # Use QTextBrowser's find method with backward search
-        found = self.text_widget.find(search_text, QtWidgets.QTextDocument.FindBackward)
+        found = self.text_widget.find(
+            search_text, QtGui.QTextDocument.FindFlag.FindBackward
+        )
         if not found:
             # If not found, start from end
             cursor = self.text_widget.textCursor()
-            cursor.movePosition(cursor.End)
+            cursor.movePosition(cursor.MoveOperation.End)
             self.text_widget.setTextCursor(cursor)
             found = self.text_widget.find(
-                search_text, QtWidgets.QTextDocument.FindBackward
+                search_text, QtGui.QTextDocument.FindFlag.FindBackward
             )
 
         if found:

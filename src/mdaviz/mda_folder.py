@@ -157,6 +157,9 @@ class MDA_MVC(QWidget):
         # MDAFile Push buttons connection:
         utils.reconnect(self.mda_file.buttonPushed, self.doPlot)
 
+        # MDAFile X2 value changes connection:
+        utils.reconnect(self.mda_file.x2ValueChanged, self.doPlot)
+
         # Debug signals:
         # self.mda_folder_tableview.tableView.doubleClicked.connect(utils.debug_signal)
         # self.mda_folder_tableview.firstButton.clicked.connect(utils.debug_signal)
@@ -478,19 +481,59 @@ class MDA_MVC(QWidget):
         - Uses a ChartView widget for plotting within a specified layout.
 
         Parameters:
-        - args[0] (str): The plotting action to be taken ('add', 'replace', or 'clear').
+        - args[0] (str or int): The plotting action to be taken ('add', 'replace', or 'clear'),
+          or an integer representing the X2 value change.
         - kwargs (dict): Additional options for plotting, if any.
 
         Behavior:
         - 'clear': Removes all tabs and clears the visualization.
         - 'add'/'replace': Plots new data according to the current selection, adding to existing plots or replacing them.
+        - X2 value change: Replots the current selection with the new X2 slice.
         - Exits with a status message if no file is selected or no detectors (Y) are selected for plotting.
         """
 
         from mdaviz.chartview import ChartView
 
-        action = args[0]
+        # Handle X2 value changes
+        if isinstance(args[0], int):
+            # This is an X2 value change, respect the current mode
+            mode = self.mda_file.mode()
+            if mode == "Auto-add":
+                action = "add"
+            elif mode == "Auto-off":
+                # Do nothing in auto-off mode - user must manually add/replace
+                print(
+                    f"\ndoPlot called for X2 value change: X2={args[0]}, mode={mode}, action=ignore"
+                )
+                return
+            else:
+                action = "replace"  # Default for Auto-replace
+            print(
+                f"\ndoPlot called for X2 value change: X2={args[0]}, mode={mode}, action={action}"
+            )
+        else:
+            action = args[0]
+            print(f"\ndoPlot called: action={action}")
+
         tableview = self.currentFileTableview()
+
+        # Check if this is a 2D selection (has X1, X2 keys)
+        is_2d_selection = (
+            len(args) > 1
+            and isinstance(args[1], dict)
+            and "X1" in args[1]
+            and "X2" in args[1]
+        )
+        print(f"DEBUG: doPlot - is_2d_selection: {is_2d_selection}")
+
+        if is_2d_selection:
+            # Handle 2D plotting - use the passed selection
+            selection = args[1]
+            print("DEBUG: doPlot - Handling 2D plotting")
+            self._doPlot2D(action, selection)
+            return
+
+        # For 1D plotting, use the selection from the table view
         selection = self.selectionField()
 
         # Clear all content from the file table view & viz panel:
@@ -506,6 +549,7 @@ class MDA_MVC(QWidget):
 
         print(f"\ndoPlot called: {action=}, {selection=}")
 
+        # Handle 1D plotting (existing logic)
         # Get the matplotlib chartview widget, if exists:
         layoutMpl = self.mda_file_viz.plotPageMpl.layout()
         if layoutMpl.count() != 1:  # in case something changes ...
@@ -515,6 +559,7 @@ class MDA_MVC(QWidget):
         if action in ("replace", "add"):
             # Get dataset for the positioner/detector selection:
             datasets, plot_options = tableview.data2Plot(selection)
+            print(f"DEBUG: doPlot - Received plot_options: {plot_options}")
             y_index = selection.get("Y", [])
             if not isinstance(widgetMpl, ChartView):  # Make a blank chart.
                 widgetMpl = ChartView(self, **plot_options)
@@ -534,8 +579,65 @@ class MDA_MVC(QWidget):
                 # ds_options: {"label":y_label} (for legend)
                 # plot_options: {"x" (label), "x_unit", "y" (label), "y_unit", "title", "folderPath"}
                 options = {"ds_options": ds_options, "plot_options": plot_options}
+                # Add X2 index to options if available
+                if "x2_index" in plot_options:
+                    options["x2_index"] = plot_options["x2_index"]
+                    print(
+                        f"DEBUG: doPlot - Passing x2_index: {plot_options['x2_index']}"
+                    )
+                else:
+                    print("DEBUG: doPlot - No x2_index in plot_options")
                 widgetMpl.plot(i, *ds, **options)
             self.mda_file_viz.setPlot(widgetMpl)
+
+    def _doPlot2D(self, action, selection):
+        """
+        Handle 2D plotting with the given selection.
+
+        Parameters:
+            action (str): 'add' or 'replace'
+            selection (dict): 2D selection with X1, X2, Y, I0, plot_type keys
+        """
+        print(f"DEBUG: _doPlot2D - action: {action}, selection: {selection}")
+
+        tableview = self.currentFileTableview()
+        if not tableview:
+            print("DEBUG: _doPlot2D - No tableview available")
+            return
+
+        # Convert 2D selection to 1D format for data2Plot2D
+        # data2Plot2D expects: {'X': x_index, 'Y': [y_indices], 'I0': i0_index}
+        converted_selection = {
+            "X": selection.get("X1"),
+            "Y": selection.get("Y", []),
+            "I0": selection.get("I0"),
+            "log_y": selection.get("log_y", False),
+        }
+
+        print(f"DEBUG: _doPlot2D - Converted selection: {converted_selection}")
+
+        # Get 2D data and plot options
+        try:
+            datasets, plot_options = tableview.data2Plot2D(converted_selection)
+            print(
+                f"DEBUG: _doPlot2D - Got datasets: {len(datasets)}, plot_options: {plot_options}"
+            )
+
+            # Update the 2D plot in the 2D tab
+            self.mda_file_viz.update2DPlot()
+
+            # Set the plot type in the 2D chart view
+            plot_type = selection.get("plot_type", "heatmap")
+            if (
+                hasattr(self.mda_file_viz, "widgetMpl2D")
+                and self.mda_file_viz.widgetMpl2D
+            ):
+                self.mda_file_viz.widgetMpl2D.set_plot_type(plot_type)
+                print(f"DEBUG: _doPlot2D - Set plot type to: {plot_type}")
+
+        except Exception as e:
+            print(f"DEBUG: _doPlot2D - Error: {e}")
+            self.setStatus(f"Error plotting 2D data: {e}")
 
     def onTabChanged(self, index, file_path, file_data, selection_field):
         """
@@ -575,7 +677,20 @@ class MDA_MVC(QWidget):
         if file_data:
             print(f"Displaying data and metadata for {Path(file_path).name}.")
             self.mda_file.displayMetadata(file_data.get("metadata", None))
-            self.mda_file.displayData(file_data.get("tabledata", None))
+            # Reconstruct full data structure for 2D support by setting data again
+            # This ensures we have scanDict, scanDict2D, isMultidimensional, etc.
+            if file_path:
+                # Find the file index in the current folder
+                try:
+                    file_name = Path(file_path).name
+                    file_index = self.mdaFileList().index(file_name)
+                    # Set the data again to get the full structure
+                    self.mda_file.setData(file_index)
+                    # Now display the full data structure
+                    self.mda_file.displayData(self.mda_file.data())
+                except ValueError:
+                    # File not found in current folder, use fallback
+                    self.mda_file.displayData(file_data)
 
         # Highlight the corresponding file in the folder table view if it belongs to the current folder
         if file_path:
@@ -763,6 +878,7 @@ class MDA_MVC(QWidget):
 
         # Get dataset for the positioner/detector selection:
         datasets, plot_options = tableview.data2Plot(selection)
+        print(f"DEBUG: doPlot - Received plot_options: {plot_options}")
 
         if not isinstance(widgetMpl, ChartView):
             widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
@@ -781,6 +897,12 @@ class MDA_MVC(QWidget):
             # ds_options: label (for legend)
             # plot_options: xlabel, ylabel, title
             options = {"ds_options": ds_options, "plot_options": plot_options}
+            # Add X2 index to options if available
+            if "x2_index" in plot_options:
+                options["x2_index"] = plot_options["x2_index"]
+                print(f"DEBUG: doPlot - Passing x2_index: {plot_options['x2_index']}")
+            else:
+                print("DEBUG: doPlot - No x2_index in plot_options")
             widgetMpl.plot(row, *ds, **options)
         self.mda_file_viz.setPlot(widgetMpl)
 
@@ -837,7 +959,65 @@ class MDA_MVC(QWidget):
     # # ------------ Status method
 
     def setStatus(self, text):
-        """
-        Updates the application's status bar with the provided message.
-        """
+        """Set status text."""
         self.mainWindow.setStatus(text)
+
+    def getCurrentFilePath(self):
+        """Get the file path of the currently active tab."""
+        try:
+            # Get the current tab index
+            current_index = self.mda_file.tabWidget.currentIndex()
+            print(f"DEBUG: getCurrentFilePath - Current tab index: {current_index}")
+
+            if current_index >= 0:
+                # Get the file path directly from the tab manager using the current tab
+                # We can get this from the current file tableview's data
+                current_tableview = self.currentFileTableview()
+                if current_tableview and hasattr(current_tableview, "data"):
+                    file_info = current_tableview.data().get("fileInfo", {})
+                    file_path = file_info.get("filePath")
+                    if file_path:
+                        print(
+                            f"DEBUG: getCurrentFilePath - Found file path: {file_path}"
+                        )
+                        return file_path
+
+                print(
+                    "DEBUG: getCurrentFilePath - No file path found in current tableview"
+                )
+            return None
+        except Exception as e:
+            print(f"DEBUG: getCurrentFilePath - Error: {e}")
+            return None
+
+    def clearOtherTabs(self, keep_file_path):
+        """Clear all tabs except the one with the specified file path."""
+        try:
+            print(
+                f"DEBUG: clearOtherTabs - Starting with keep_file_path: {keep_file_path}"
+            )
+
+            # Get all file paths from tab manager
+            all_file_paths = list(self.mda_file.tabManager.tabs().keys())
+            print(f"DEBUG: clearOtherTabs - All file paths: {all_file_paths}")
+
+            tabs_to_remove = []
+
+            # Find file paths to remove (all except keep_file_path)
+            for file_path in all_file_paths:
+                if file_path != keep_file_path:
+                    tabs_to_remove.append(file_path)
+                    print(f"DEBUG: clearOtherTabs - Will remove: {file_path}")
+
+            print(f"DEBUG: clearOtherTabs - Tabs to remove: {tabs_to_remove}")
+
+            # Remove tabs using the tab manager
+            for file_path in tabs_to_remove:
+                print(f"DEBUG: clearOtherTabs - Removing tab: {file_path}")
+                self.mda_file.tabManager.removeTab(file_path)
+
+            print(
+                f"DEBUG: clearOtherTabs - Removed {len(tabs_to_remove)} tabs, kept: {keep_file_path}"
+            )
+        except Exception as e:
+            print(f"DEBUG: clearOtherTabs - Error: {e}")

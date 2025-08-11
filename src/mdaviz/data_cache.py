@@ -20,7 +20,7 @@ from dataclasses import dataclass, field
 from collections import OrderedDict
 from PyQt6.QtCore import QObject, pyqtSignal
 from mdaviz.synApps_mdalib.mda import readMDA
-from mdaviz.utils import get_scan
+from mdaviz.utils import get_scan, get_scan_2d
 
 
 @dataclass
@@ -37,6 +37,15 @@ class CachedFileData:
     folder_path: str
     access_time: float = field(default_factory=time.time)
     size_bytes: int = 0
+    # New fields for 2D+ data support
+    scan_dict_2d: dict[str, Any] = field(default_factory=dict)
+    scan_dict_inner: dict[str, Any] = field(
+        default_factory=dict
+    )  # Inner dimension data for 1D plotting
+    is_multidimensional: bool = False
+    rank: int = 1
+    dimensions: list[int] = field(default_factory=list)
+    acquired_dimensions: list[int] = field(default_factory=list)
 
     def update_access_time(self) -> None:
         """Update the last access time."""
@@ -237,14 +246,37 @@ class DataCache(QObject):
                 return None
 
             file_metadata, file_data_dim1, *_ = result
+            rank = file_metadata.get("rank", 1)
+            dimensions = file_metadata.get("dimensions", [])
+            acquired_dimensions = file_metadata.get("acquired_dimensions", [])
 
-            if file_metadata["rank"] > 1:
-                print(
-                    "WARNING: Multidimensional data not supported - ignoring ranks > 1."
-                )
-
+            # Process 1D data (always available)
             scan_dict, first_pos, first_det = get_scan(file_data_dim1)
-            pv_list = [v["name"] for v in scan_dict.values()]
+
+            # Initialize 2D data fields
+            scan_dict_2d = {}
+            scan_dict_inner = {}
+            is_multidimensional = rank > 1
+
+            # Process 2D data if available
+            if rank >= 2 and len(result) > 2:
+                try:
+                    file_data_dim2 = result[2]
+                    scan_dict_2d, _, _ = get_scan_2d(file_data_dim1, file_data_dim2)
+                    # Also store inner dimension data for 1D plotting
+                    scan_dict_inner, _, _ = get_scan(file_data_dim2)
+                except Exception as e:
+                    print(f"Warning: Could not process 2D data: {e}")
+                    scan_dict_2d = {}
+                    scan_dict_inner = {}
+
+            # Construct pv_list from appropriate data source
+            # For 2D+ data, use scan_dict_inner (inner dimension PVs like P1, D1, etc.)
+            # For 1D data, use scan_dict (outer dimension PVs)
+            if is_multidimensional and scan_dict_inner:
+                pv_list = [v["name"] for v in scan_dict_inner.values()]
+            else:
+                pv_list = [v["name"] for v in scan_dict.values()]
 
             # Create cached data
             cached_data = CachedFileData(
@@ -257,6 +289,12 @@ class DataCache(QObject):
                 file_name=path_obj.stem,
                 folder_path=str(path_obj.parent),
                 size_bytes=path_obj.stat().st_size,
+                scan_dict_2d=scan_dict_2d,
+                scan_dict_inner=scan_dict_inner,
+                is_multidimensional=is_multidimensional,
+                rank=rank,
+                dimensions=dimensions,
+                acquired_dimensions=acquired_dimensions,
             )
 
             # Cache the data
@@ -283,8 +321,29 @@ class DataCache(QObject):
                 return None
 
             file_metadata, file_data_dim1, *_ = result
+            rank = file_metadata.get("rank", 1)
+            dimensions = file_metadata.get("dimensions", [])
+            acquired_dimensions = file_metadata.get("acquired_dimensions", [])
+
             scan_dict, first_pos, first_det = get_scan(file_data_dim1)
             pv_list = [v["name"] for v in scan_dict.values()]
+
+            # Initialize 2D data fields
+            scan_dict_2d = {}
+            scan_dict_inner = {}
+            is_multidimensional = rank > 1
+
+            # Process 2D data if available
+            if rank >= 2 and len(result) > 2:
+                try:
+                    file_data_dim2 = result[2]
+                    scan_dict_2d, _, _ = get_scan_2d(file_data_dim1, file_data_dim2)
+                    # Also store inner dimension data for 1D plotting
+                    scan_dict_inner, _, _ = get_scan(file_data_dim2)
+                except Exception as e:
+                    print(f"Warning: Could not process 2D data: {e}")
+                    scan_dict_2d = {}
+                    scan_dict_inner = {}
 
             return CachedFileData(
                 file_path=str(path_obj),
@@ -296,6 +355,12 @@ class DataCache(QObject):
                 file_name=path_obj.stem,
                 folder_path=str(path_obj.parent),
                 size_bytes=path_obj.stat().st_size,
+                scan_dict_2d=scan_dict_2d,
+                scan_dict_inner=scan_dict_inner,
+                is_multidimensional=is_multidimensional,
+                rank=rank,
+                dimensions=dimensions,
+                acquired_dimensions=acquired_dimensions,
             )
         except Exception as e:
             print(f"Error loading file without caching {path_obj}: {e}")
@@ -366,9 +431,11 @@ class DataCache(QObject):
             "current_size_mb": self._current_size_mb,
             "max_size_mb": self.max_size_mb,
             "max_entries": self.max_entries,
-            "utilization_percent": (self._current_size_mb / self.max_size_mb) * 100
-            if self.max_size_mb > 0
-            else 0,
+            "utilization_percent": (
+                (self._current_size_mb / self.max_size_mb) * 100
+                if self.max_size_mb > 0
+                else 0
+            ),
         }
 
     def set_max_size_mb(self, max_size_mb: float) -> None:

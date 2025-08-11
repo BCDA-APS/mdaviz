@@ -69,7 +69,7 @@
          </property>
          <widget class="QWidget" name="plotPageMpl">
           <attribute name="title">
-           <string>Plot</string>
+           <string>1D</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <property name="leftMargin">
@@ -144,6 +144,28 @@
               <enum>QFrame::NoFrame</enum>
              </property>
             </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="plotPage2D">
+          <attribute name="title">
+           <string>2D</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_2d">
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>6</number>
+           </property>
+           <property name="bottomMargin">
+            <number>6</number>
+           </property>
+           <item>
+            <widget class="QWidget" name="plotMPL2D" native="true"/>
            </item>
           </layout>
          </widget>
