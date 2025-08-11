@@ -1,3 +1,40 @@
+"""
+MDA File Visualization Module
+
+.. Summary::
+    This module provides the main visualization interface for MDA (Multi-dimensional Array)
+    data files. It manages the display of data tables, metadata, 1D plots, and 2D plots in a
+    tabbed interface with integrated controls for data analysis and manipulation.
+
+Classes:
+    MDAFileVisualization: Main widget for displaying MDA file contents with tabbed interface
+    MetadataSearchDialog: Dialog for searching within metadata text
+
+Key Features:
+    - Tabbed interface for Data, Plot, Metadata, and 2D visualization
+    - Integrated 1D and 2D plotting with ChartView and ChartView2D
+    - Interactive controls for curve fitting, styling, and log scales
+    - Metadata search functionality
+    - Dynamic tab visibility based on data dimensionality
+    - Persistent UI state management
+
+Dependencies:
+    - PyQt6: GUI framework
+    - mdaviz.chartview: 1D and 2D plotting widgets
+    - mdaviz.data_table_view: Data table display
+    - mdaviz.fit_models: Curve fitting functionality
+    - mdaviz.utils: Utility functions for UI loading
+
+Usage:
+    The MDAFileVisualization widget is typically instantiated as part of the main
+    application window and receives MDA file data through:
+    - setTableData(): Sets the data table content from MDA file
+    - setMetadata(): Sets the metadata text content
+    - setPlot(): Sets the 1D plotting widget (ChartView) with data from user selections
+    - set2DData(): Sets 2D data for multi-dimensional arrays
+    - update2DPlot(): Updates 2D plots based on user selections in 2D controls
+"""
+
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtGui import QFont, QKeySequence
 from PyQt6.QtWidgets import QWidget, QDialog, QSizePolicy

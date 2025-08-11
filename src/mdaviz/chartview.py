@@ -1,9 +1,10 @@
 """
 Charting and visualization module for MDA data analysis.
 
-This module provides comprehensive plotting capabilities for 1D and 2D scientific data
-from MDA files. It includes interactive plotting widgets,
-curve management, fitting capabilities, and cursor-based analysis tools.
+.. Summary::
+    This module provides comprehensive plotting capabilities for 1D and 2D scientific data
+    from MDA files. It includes interactive plotting widgets,
+    curve management, fitting capabilities, and cursor-based analysis tools.
 
 Classes:
     ChartView: Main 1D plotting widget with interactive features
@@ -1358,7 +1359,6 @@ class ChartView(QWidget):
         # Update the curve data with the new style
         curve_data = self.curveManager.getCurveData(curveID)
         if curve_data:
-            old_style = curve_data.get("style", "-")
             curve_data["style"] = format_string
             # Save to persistent storage
             persistent_key = (
