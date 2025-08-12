@@ -22,17 +22,29 @@ Documentation
 
 .. grid:: 3
 
-    .. grid-item-card:: 📋 User Guide
+    .. grid-item-card:: |material_summarize| User Guide
       :link: user_guide
       :link-type: doc
 
-    .. grid-item-card:: 💻 Installation
+    .. grid-item-card:: |material_install| Installation
       :link: install
       :link-type: doc
 
-    .. grid-item-card:: 🔗 API
+    .. grid-item-card:: |material_api| API
       :link: api
       :link-type: doc
+
+.. |material_summarize| raw:: html
+
+   <span class="material-icons" style="font-size: 4em; vertical-align: middle;">summarize</span>
+
+.. |material_install| raw:: html
+
+   <span class="material-icons" style="font-size: 4em; vertical-align: middle;">install_desktop</span>
+
+.. |material_api| raw:: html
+
+   <span class="material-icons" style="font-size: 4em; vertical-align: middle;">api</span>
 
 
 .. figure:: _static/mda1D.jpg

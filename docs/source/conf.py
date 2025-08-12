@@ -69,6 +69,22 @@ html_static_path = ["_static"]
 html_theme = "pydata_sphinx_theme"
 html_title = f"{project} {doc_version}"
 
+# Add Material Icons support
+html_theme_options = {
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": github_url,
+            "icon": "fab fa-github-square",
+        },
+    ],
+}
+
+# Include Material Icons CSS
+html_css_files = [
+    "https://fonts.googleapis.com/icon?family=Material+Icons",
+]
+
 # https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autodoc_mock_imports
 autodoc_mock_imports = """
     matplotlib
