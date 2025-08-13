@@ -12,56 +12,52 @@ User Guide
 Getting Started
 ---------------
 
-mdaviz is a Python Qt6 application for visualizing MDA (Measurement Data Acquisition) data with advanced curve fitting capabilities.
+`mdaviz` is a Python Qt6 application for visualizing MDA (Multi-Dimensional Array) data.
 
 Installation
-^^^^^^^^^^^
+^^^^^^^^^^^^
 
-For installation instructions, see :ref:`install`.
+For installation instructions, see the :doc:`install` page.
 
 Running the Application
-^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
 
 After installation, you can run mdaviz in several ways:
 
 **From PyPI installation:**
+
 .. code-block:: bash
 
     conda activate mdaviz
     mdaviz
 
 **From source installation:**
+
 .. code-block:: bash
 
-    git clone https://github.com/BCDA-APS/mdaviz.git
     cd mdaviz
-    pip install -e .[dev]
-    python -m mdaviz.app
+    mdaviz
 
-**With debug logging:**
-.. code-block:: bash
-
-    python -m mdaviz.app --log debug
 
 Basic Usage
-----------
+-----------
 
 Opening Data
-^^^^^^^^^^^
+^^^^^^^^^^^^
 
 1. **Auto-Load**: The application automatically loads the first valid folder from your recent folders list
-2. **Manual Open**: Use the folder dropdown to select a different folder or click "Open..." to browse
+2. **Manual Open**: Use the recent folder dropdown to select a different folder or click "Open..." or |folder_icon| to browse
 3. **Recent Folders**: The dropdown shows your recently opened folders for quick access
 
 Navigating Files
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
 
 1. **File Selection**: Click on any MDA file in the folder view to load it
 2. **Navigation**: Use the First/Previous/Next/Last buttons to navigate through files
 3. **Refresh**: Click the refresh button to reload the current folder
 
 Data Visualization
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 1. **Plot Mode**: Choose between Auto-replace, Auto-add, or Auto-off modes
 2. **Data Selection**: Use the checkbox columns to control what's plotted:
@@ -73,19 +69,18 @@ Data Visualization
 
 **Data Processing Options:**
 - **I0 Normalization**: Divide Y data by the selected I0 field to normalize intensity
-- **Curve Unscaling**: Rescale selected curves to match the range of other Y curves
+- **Curve Unscaling ("Un" column)**: Rescale selected curves to match the range of other Y curves
 - **Combined Processing**: Apply both I0 normalization and unscaling for complex data analysis
 
 Curve Fitting
-^^^^^^^^^^^^
+^^^^^^^^^^^^^
 
-mdaviz provides advanced curve fitting capabilities with 7 mathematical models:
-
-1. **Select Curve**: Choose the curve to fit from the dropdown
-2. **Choose Model**: Select from Gaussian, Lorentzian, Linear, Exponential, Quadratic, Cubic, or Error Function
-3. **Set Range** (optional): Use cursors to define a specific x-range for fitting
-4. **Perform Fit**: Click "Fit" to analyze the data
-5. **View Results**: Examine fit parameters, uncertainties, and quality metrics
+1. **Load Data**: Open an MDA file and plot the desired curves
+2. **Select Curve**: Choose the curve to fit from the curve dropdown
+3. **Choose Model**: Select a fit model from the "Fit Model" dropdown (Gaussian, Lorentzian, Linear, Exponential, Quadratic, Cubic, or Error Function)
+4. **Set Range** (optional): Check "Use cursor range" if you want to fit only a portion of the data
+5. **Perform Fit**: Click the "Fit" button
+6. **View Results**: The fit results will appear in the "Fit Results" section
 
 **Available Models:**
 - **Gaussian**: Peak analysis, spectroscopy data
@@ -97,7 +92,7 @@ mdaviz provides advanced curve fitting capabilities with 7 mathematical models:
 - **Error Function**: Step functions, cumulative distributions
 
 Cursor Utilities
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
 
 1. **Cursor 1**: Middle-click to set the first cursor position
 2. **Cursor 2**: Right-click to set the second cursor position
@@ -105,18 +100,19 @@ Cursor Utilities
 4. **Data Analysis**: View mathematical information between cursor positions
 
 Advanced Features
-----------------
+-----------------
 
 Curve Unscaling
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
 
 The "Un" column allows you to rescale curves to match the range of other Y curves:
 
 **How it works:**
 - Select both "Y" and "Un" on the same row to unscale that curve
-- The unscaling formula: `g(x) = ((f1(x) - m1) / (M1 - m1)) * (M23 - m23) + m23`
-  - `m1, M1`: min/max of the curve being unscaled
-  - `m23, M23`: global min/max of other Y curves (excluding unscaled ones)
+- The unscaling formula: ``g(x) = ((f1(x) - m1) / (M1 - m1)) * (M23 - m23) + m23``
+
+  - ``m1, M1``: min/max of the curve being unscaled
+  - ``m23, M23``: global min/max of other Y curves (excluding unscaled ones)
 
 **Use cases:**
 - **Range Matching**: Scale curves with different ranges to the same scale for comparison
@@ -130,11 +126,11 @@ The "Un" column allows you to rescale curves to match the range of other Y curve
 - Multiple "Un" selections allowed across different rows
 
 **Visual Indicators:**
-- Unscaled curves show `[unscaled]` in their labels
-- Combined I0 + unscaling shows `[norm, unscaled]` in labels
+- Unscaled curves show ``[unscaled]`` in their labels
+- Combined I0 + unscaling shows ``[norm, unscaled]`` in labels
 
 Lazy Loading
-^^^^^^^^^^^
+^^^^^^^^^^^^
 
 For large datasets, mdaviz uses lazy loading to improve performance:
 - Progress indicators show scanning status
@@ -142,7 +138,7 @@ For large datasets, mdaviz uses lazy loading to improve performance:
 - Automatic handling of large directories
 
 Data Caching
-^^^^^^^^^^^
+^^^^^^^^^^^^
 
 The application includes an LRU cache system for improved performance:
 - Frequently accessed data is cached in memory
@@ -150,7 +146,7 @@ The application includes an LRU cache system for improved performance:
 - Configurable cache size limits
 
 Recent Folders
-^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
 
 mdaviz remembers your recently opened folders:
 - Quick access to frequently used directories
@@ -158,10 +154,10 @@ mdaviz remembers your recently opened folders:
 - Clear recent folders option
 
 Troubleshooting
---------------
+---------------
 
 Common Issues
-^^^^^^^^^^^^
+^^^^^^^^^^^^^
 
 **Application won't start:**
 - Ensure PyQt6 is properly installed: `pip install PyQt6 Qt6`
@@ -170,6 +166,7 @@ Common Issues
 
 **No data displayed:**
 - Check that the selected folder contains MDA files
+- Check that the selected file is not corrupted (no points in the file) or contains only one point
 - Verify file permissions
 - Try refreshing the folder view
 
@@ -180,20 +177,8 @@ Common Issues
 
 **Performance issues:**
 - Large datasets may take time to load
-- Use lazy loading for directories with many files
-- Consider reducing cache size for memory-constrained systems
 
-Command-line Options
--------------------
 
-You can run mdaviz with command-line options:
-
-.. code-block:: bash
-
-    python -m mdaviz.app --log debug
-
-Available options:
-- `--log LEVEL`: Set logging level (debug, info, warning, error)
 
 Testing & Development
 ---------------------
@@ -219,3 +204,7 @@ Contributing
 - Submit a pull request on GitHub.
 
 For detailed contributing guidelines, see the project's GitHub repository.
+
+.. |folder_icon| raw:: html
+
+   <span class="material-icons" style="font-size: 1em; vertical-align: middle;">folder</span>

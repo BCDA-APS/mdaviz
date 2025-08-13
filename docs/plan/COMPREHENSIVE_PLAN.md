@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document provides a comprehensive plan for the mdaviz project, covering environment setup, dependency management, testing, code analysis, bug identification, improvements, and executable compilation. The project is a Python Qt6 application for visualizing MDA (Measurement Data Acquisition) data with a well-structured MVC architecture.
+This document provides a comprehensive plan for the mdaviz project, covering environment setup, dependency management, testing, code analysis, bug identification, improvements, and executable compilation. The project is a Python Qt6 application for visualizing MDA (Multi-Dimensional Array) data with a well-structured MVC architecture.
 
 ## Current Project Status
 

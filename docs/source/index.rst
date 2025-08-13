@@ -2,7 +2,7 @@
 mdaviz: MDA Data Viewer
 =======================
 
-A Python Qt6 application for visualizing MDA ( Multi-Dimensional Array) data.
+A Python Qt6 application for visualizing MDA (Multi-Dimensional Array) data.
 
 Key Features
 ============
@@ -73,7 +73,6 @@ Documentation
    :hidden:
 
    user_guide
-   fit_functionality
    install
    api
    changes
