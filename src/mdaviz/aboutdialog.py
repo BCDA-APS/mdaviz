@@ -13,7 +13,19 @@ from mdaviz import utils
 
 
 class AboutDialog(QDialog):
-    """Load a generic About... Dialog as a .ui file."""
+    """Load a generic About... Dialog as a .ui file.
+
+    .. autosummary::
+
+        ~AboutDialog.closeEvent
+        ~AboutDialog.doUrl
+        ~AboutDialog.doDocsUrl
+        ~AboutDialog.doIssuesUrl
+        ~AboutDialog.doLicense
+        ~AboutDialog.clearStatus
+        ~AboutDialog.setStatus
+
+    """
 
     # UI file name matches this module, different extension
     ui_file = utils.getUiFileName(__file__)
@@ -51,31 +63,39 @@ class AboutDialog(QDialog):
         self.setModal(False)
 
     def closeEvent(self, event):
-        """
-        called when user clicks the big [X] to quit
+        """Handle window close event.
+
+        Closes any open license dialog before allowing the window to close.
         """
         if self.license_box is not None:
             self.license_box.close()
         event.accept()  # let the window close
 
     def doUrl(self, url):
-        """opening URL in default browser"""
+        """Open a URL in the default browser.
+
+        Parameters:
+            url: The URL to open
+        """
         url = QUrl(url)
         service = QDesktopServices()
         service.openUrl(url)
 
     def doDocsUrl(self):
-        """opening documentation URL in default browser"""
+        """Open the documentation URL in the default browser."""
         self.setStatus("opening documentation URL in default browser")
         self.doUrl(DOCS_URL)
 
     def doIssuesUrl(self):
-        """opening issues URL in default browser"""
+        """Open the GitHub issues URL in the default browser."""
         self.setStatus("opening issues URL in default browser")
         self.doUrl(ISSUES_URL)
 
     def doLicense(self):
-        """show the license"""
+        """Open the license dialog in a new window.
+
+        The license dialog is modal and must be closed before the about dialog.
+        """
         from mdaviz.licensedialog import LicenseDialog
 
         self.setStatus("opening License in new window")
@@ -85,7 +105,13 @@ class AboutDialog(QDialog):
         license.open()  # modal: must close licensedialog BEFORE aboutdialog
 
     def clearStatus(self):
+        """Clear the status text in the parent window."""
         self.setStatus("")
 
     def setStatus(self, text):
+        """Set the status text in the parent window.
+
+        Parameters:
+            text: The status message to display
+        """
         self.parent.setStatus(text)
