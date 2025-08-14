@@ -7,17 +7,19 @@ Display content of the currently selected files.
     ~tabManager
 
 User: tabCloseRequested.connect (emit: index)
-        --> onTabCloseRequested(index --> file_path)
-        --> tabManager.removeTab(file_path)
-        --> tabManager.tabRemoved.emit(file_path)
-        --> onTabRemoved(file_path --> index)
+
+    --> onTabCloseRequested(index --> file_path)
+    --> tabManager.removeTab(file_path)
+    --> tabManager.tabRemoved.emit(file_path)
+    --> onTabRemoved(file_path --> index)
 
 User: clearButton.clicked (emit: no data)
-        --> onClearAllTabsRequested()
-        --> tabManager.removeAllTabs()
-        --> tabManager.allTabsRemoved.emit()
-        --> onAllTabsRemoved()
-        --> removeAllFileTabs()
+
+    --> onClearAllTabsRequested()
+    --> tabManager.removeAllTabs()
+    --> tabManager.allTabsRemoved.emit()
+    --> onAllTabsRemoved()
+    --> removeAllFileTabs()
 
 
 

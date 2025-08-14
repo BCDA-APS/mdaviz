@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-The mdaviz project is a well-structured Python Qt6 application for visualizing MDA (Measurement Data Acquisition) data. The project demonstrates modern development practices with a solid MVC architecture, comprehensive testing framework, and good documentation. The recent migration from PyQt5 to PyQt6 ensures future compatibility with Python 3.13+ and modern Qt features.
+The mdaviz project is a well-structured Python Qt6 application for visualizing MDA (Multi-Dimensional Array) data. The project demonstrates modern development practices with a solid MVC architecture, comprehensive testing framework, and good documentation. The recent migration from PyQt5 to PyQt6 ensures future compatibility with Python 3.13+ and modern Qt features.
 
 ## Current Status
 

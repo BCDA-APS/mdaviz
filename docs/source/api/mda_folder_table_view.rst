@@ -1,5 +1,5 @@
 ====================================
-mda_folder_table_view
+MDA Folder Table View
 ====================================
 
 .. automodule:: mdaviz.mda_folder_table_view

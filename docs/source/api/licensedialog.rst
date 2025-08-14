@@ -1,5 +1,5 @@
 ====================================
-licensedialog
+License Dialog
 ====================================
 
 .. automodule:: mdaviz.licensedialog

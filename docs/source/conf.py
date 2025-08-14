@@ -69,6 +69,22 @@ html_static_path = ["_static"]
 html_theme = "pydata_sphinx_theme"
 html_title = f"{project} {doc_version}"
 
+# Add Material Icons support
+html_theme_options = {
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": github_url,
+            "icon": "fab fa-github-square",
+        },
+    ],
+}
+
+# Include Material Icons CSS
+html_css_files = [
+    "https://fonts.googleapis.com/icon?family=Material+Icons",
+]
+
 # https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autodoc_mock_imports
 autodoc_mock_imports = """
     matplotlib
@@ -76,29 +92,7 @@ autodoc_mock_imports = """
     numpy
     PyQt6
     yaml
-    mdaviz.aboutdialog
-    mdaviz.app
-    mdaviz.chartview
-    mdaviz.data_table_model
-    mdaviz.data_table_view
-    mdaviz.empty_table_model
-    mdaviz.fit_manager
-    mdaviz.fit_models
-    mdaviz.licensedialog
-    mdaviz.mainwindow
-    mdaviz.mda_file
-    mdaviz.mda_file_table_model
-    mdaviz.mda_file_table_view
-    mdaviz.mda_file_viz
-    mdaviz.mda_folder
-    mdaviz.mda_folder_table_model
-    mdaviz.mda_folder_table_view
-    mdaviz.opendialog
-    mdaviz.popup
-    mdaviz.progress_dialog
-    mdaviz.user_settings
-    mdaviz.utils
-    mdaviz.virtual_table_model
+    scipy
 """.split()
 
 # Suppress warnings about mocked objects

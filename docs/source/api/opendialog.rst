@@ -1,5 +1,5 @@
 ====================================
-opendialog
+Open Dialog
 ====================================
 
 .. automodule:: mdaviz.opendialog

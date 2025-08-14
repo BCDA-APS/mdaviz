@@ -2,52 +2,74 @@
 mdaviz: MDA Data Viewer
 =======================
 
-A Python Qt6 application for visualizing MDA (Measurement Data Acquisition) data with advanced curve fitting capabilities.
+A Python Qt6 application for visualizing MDA (Multi-Dimensional Array) data.
 
 Key Features
 ============
 
-* **Data Visualization**: Visualize MDA data with support for 1-D and multi-dimensional plots
-* **Interactive Plotting**: Real-time data visualization with matplotlib integration
-* **Advanced Curve Fitting**: 7 mathematical models (Gaussian, Lorentzian, Linear, Exponential, Quadratic, Cubic, Error Function)
-* **Auto-Load Folders**: Automatically loads the first valid folder from recent folders list
-* **Lazy Loading**: Efficient folder scanning with progress indicators for large datasets
-* **Recent Folders**: Remembers recently opened folders for quick access
-* **Cursor Utilities**: Interactive cursors for data analysis and range selection
-* **Mathematical Analysis**: Basic mathematical information and data processing
-* **Cross-Platform**: Runs on Windows, macOS, and Linux
+* **Data Visualization**: Visualize MDA data with support for 1-D and 2D plots (mesh scans) with matplotlib integration.
+* **Auto-Load Folders**: Automatically loads the first valid folder from recent folders list (can be disabled in the preferences).
+* **Recent Folders**: Remembers recently opened folders for quick access.
+* **Lazy Loading**: Efficient folder scanning with progress indicators for large datasets.
+* **Curve Management**: Add, remove, and style multiple data curves.
+* **Axis Selection**: Select X-axis (positioners), Y-axis (detectors), I0 normalization, and curve unscaling using checkboxes. Axis selection is saved from one file to the next.
+* **Curve Unscaling**: Rescale curves to match the range of other Y curves for better comparison.
+* **Data Analysis**: Basic statistics, cursor measurements, and curve fitting.
+* **Metadata Search**: Searchable metadata to quickly locate specific parameters and settings.
+* **Cross-Platform**: Runs on macOS and Linux (Windows TBD).
 
 Documentation
 =============
 
-.. icons: https://fonts.google.com/icons
-.. grid:: 2 2
+.. grid:: 3
 
-    .. grid-item-card:: :material-regular:`summarize;3em` User Guide
+    .. grid-item-card:: |material_summarize| User Guide
       :link: user_guide
       :link-type: doc
 
-    .. grid-item-card:: :material-regular:`functions;3em` Fit Functionality
-      :link: fit_functionality
-      :link-type: doc
-
-    .. grid-item-card:: :material-regular:`install_desktop;3em` Install
+    .. grid-item-card:: |material_install| Installation
       :link: install
       :link-type: doc
 
-    .. grid-item-card:: :material-regular:`api;3em` API
+    .. grid-item-card:: |material_api| API
       :link: api
       :link-type: doc
 
+.. |material_summarize| raw:: html
 
-.. figure:: _static/mdaviz_gui.png
-   :alt: fig.mdaviz_gui
+   <span class="material-icons" style="font-size: 4em; vertical-align: middle;">summarize</span>
+
+.. |material_install| raw:: html
+
+   <span class="material-icons" style="font-size: 4em; vertical-align: middle;">install_desktop</span>
+
+.. |material_api| raw:: html
+
+   <span class="material-icons" style="font-size: 4em; vertical-align: middle;">api</span>
+
+
+
+
+Screenshots
+-----------
+
+.. figure:: _static/mda1D.jpg
+   :alt: fig.mda1D
    :width: 100%
    :align: center
    :figclass: align-center
    :figwidth: 100%
 
-   Screenshot of the mdaviz GUI displaying sample data with curve fitting.
+   Screenshot of the mdaviz GUI displaying sample 1D data with curve fitting.
+
+.. figure:: _static/mda2D.jpg
+   :alt: fig.mda2D
+   :width: 100%
+   :align: center
+   :figclass: align-center
+   :figwidth: 100%
+
+   Screenshot of the mdaviz GUI displaying sample 2D data.
 
 .. toctree::
    :maxdepth: 1
@@ -56,7 +78,6 @@ Documentation
    :hidden:
 
    user_guide
-   fit_functionality
    install
    api
    changes

@@ -1,5 +1,5 @@
 ====================================
-data_table_view
+Data Table View
 ====================================
 
 .. automodule:: mdaviz.data_table_view

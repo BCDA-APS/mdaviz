@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This report provides a comprehensive analysis of the mdaviz project, a Python Qt6 application for visualizing MDA (Measurement Data Acquisition) data. The analysis covers the current state, identified issues, potential improvements, and recommendations for executable compilation.
+This report provides a comprehensive analysis of the mdaviz project, a Python Qt6 application for visualizing MDA (Multi-Dimensional Array) data. The analysis covers the current state, identified issues, potential improvements, and recommendations for executable compilation.
 
 ## Project Overview
 

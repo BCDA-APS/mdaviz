@@ -14,15 +14,16 @@ Coverage | License | Python | Pre-commit
 
 ## Features
 
-- **Auto-Load Folders**: The application automatically loads the first valid folder from your recent folders list when it starts, providing a seamless experience without requiring manual folder selection. You can toggle this feature on/off from the preferences window.
-- **Recent Folders**: Remembers your recently opened folders for quick access.
-- **Lazy Loading**: Efficient folder scanning with progress indicators for large datasets.
-- **Curve Management**: Add, remove, and style multiple data curves.
-- **Axis Selection**: Select X-axis (positioners), Y-axis (detectors), I0 normalization, and curve unscaling using checkboxes. Axis selection is saved from one file to the next.
-- **Curve Unscaling**: Rescale curves to match the range of other Y curves for better comparison.
-- **Log Scale**: Toggle between linear and logarithmic scales for both X and Y axes.
-- **Data Analysis**: Basic statistics, cursor measurements, and curve fitting.
-- **PyQt6 Migration**: Complete migration to PyQt6 for future compatibility with Python 3.13+.
+* **Data Visualization**: Visualize MDA data with support for 1-D and 2D plots (mesh scans) with matplotlib integration.
+* **Auto-Load Folders**: Automatically loads the first valid folder from recent folders list (can be disabled in the preferences).
+* **Recent Folders**: Remembers recently opened folders for quick access.
+* **Lazy Loading**: Efficient folder scanning with progress indicators for large datasets.
+* **Curve Management**: Add, remove, and style multiple data curves.
+* **Axis Selection**: Select X-axis (positioners), Y-axis (detectors), I0 normalization, and curve unscaling using checkboxes. Axis selection is saved from one file to the next.
+* **Curve Unscaling**: Rescale curves to match the range of other Y curves for better comparison.
+* **Data Analysis**: Basic statistics, cursor measurements, and curve fitting.
+* **Metadata Search**: Searchable metadata to quickly locate specific parameters and settings.
+* **Cross-Platform**: Runs on macOS and Linux (Windows TBD).
 
 ## Quickstart
 
@@ -34,6 +35,7 @@ Mdaviz is available on PyPI. We recommend creating a dedicated environment:
 # Create a simple conda environment
 conda create -n mdaviz python=3.12
 conda activate mdaviz
+pip install PyQt6 Qt6
 
 # Install mdaviz
 pip install mdaviz
@@ -44,6 +46,13 @@ Once installed, you can run the application at any time using:
 conda activate mdaviz
 mdaviz
 ```
+**Note**:
+* PyQt6 and Qt6 are required dependencies that may need to be installed separately via pip as they are not available in conda-forge for all platforms.
+* At the APS: PyQt6 requires to install the following library:
+```bash
+sudo yum install xcb-util-cursor
+```
+
 
 ### Option 2: Development setup with conda environment
 
@@ -57,7 +66,7 @@ cd mdaviz
 # Create and activate conda environment
 conda env create -f env.yml
 conda activate mdaviz
-pip install PyQt6
+pip install PyQt6 Qt6
 
 # Install in development mode
 pip install -e .
@@ -67,8 +76,8 @@ Always activate the environment before running, testing, or using pre-commit hoo
 
 
 **Note**:
-* PyQt6 and Qt6 are installed via pip as they are not available in conda-forge for all platforms.
-* Att the APS: PyQt6 requires to install the following library:
+* PyQt6 and Qt6 are required dependencies that may need to be installed separately via pip as they are not available in conda-forge for all platforms.
+* At the APS: PyQt6 requires to install the following library:
 ```bash
 sudo yum install xcb-util-cursor
 ```
@@ -78,7 +87,7 @@ sudo yum install xcb-util-cursor
 
 ### Basic Operation
 
-1. **Load Data**: Select a folder containing MDA files
+1. **Load Data**: Click "Open" (folder icon) and select an MDA file.
 2. **Select Axes**: Use the checkboxes in the data table to select:
    - **X**: Positioner for the x-axis (only one can be selected)
    - **Y**: Detectors for the y-axis (multiple can be selected)
@@ -86,18 +95,20 @@ sudo yum install xcb-util-cursor
    - **Un**: Unscale curves to match the range of other Y curves (requires Y selection on same row)
 3. **Plot Data**: Data will automatically plot based on your selection mode
 
-### Plot Controls
-
-- **Log Scale**: Use the "LogX" and "LogY" checkboxes to switch between linear and logarithmic scales
-- **Curve Styling**: Select different line styles and markers for your curves
-- **Data Manipulation**: Apply offset and scaling factors to individual curves
-- **Data Analysis**: Basic statistics, cursor measurements, and curve fitting.
-
 ### Plotting Modes
 
 - **Auto-add**: New curves are added to existing plots
 - **Auto-replace**: New curves replace existing plots
 - **Auto-off**: Manual plotting using buttons
+
+### Plot Controls
+
+- **Log Scale**: Use the "LogX" and "LogY" checkboxes to switch between linear and logarithmic scales.
+- **Curve Styling**: Select different line styles and markers for the selected curve.
+- **Data Manipulation**: Apply offset and scaling factors to individual curves.
+- **Data Analysis**: Basic statistics, cursor measurements, and curve fitting.
+
+
 
 ## Development
 
