@@ -321,11 +321,12 @@ def get_det(mda_file_data):
 
     Returns:
         A tuple containing:
-            - A dictionary (d) where keys are indexes, mapping to either scanPositioner or scanDetector objects.
-                The dictionary is structured as ``{0: p0, 1: P1, ..., np: D01, np+1: D02, ..., np+nd: DX}``.
-            - The index (first_pos) of the first positioner in the returned dictionary. This is 1 if a positioner
-                other than the default index positioner exists, otherwise 0.
-            - The index (first_det) of the first detector in the returned dictionary, which directly follows the last positioner.
+
+        - A dictionary (d) where keys are indexes, mapping to either scanPositioner or scanDetector objects.
+          The dictionary is structured as ``{0: p0, 1: P1, ..., np: D01, np+1: D02, ..., np+nd: DX}``.
+        - The index (first_pos) of the first positioner in the returned dictionary. This is 1 if a positioner
+          other than the default index positioner exists, otherwise 0.
+        - The index (first_det) of the first detector in the returned dictionary, which directly follows the last positioner.
 
     Notes:
         - p0 is created by default and corresponds to the point index, described as an 'Index' scanPositioner object with predefined properties.

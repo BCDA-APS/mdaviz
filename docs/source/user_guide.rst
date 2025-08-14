@@ -49,7 +49,7 @@ Navigating Files
 ^^^^^^^^^^^^^^^^
 
 1. **File Selection**: Click on any MDA file in the folder view to load it.
-2. **Navigation**: Use the First/Previous/Next/Last buttons to navigate through files.
+2. **Navigation**: Browse through files using the First/Previous/Next/Last buttons, scroll up and down, or use your keyboard's arrow keys.
 3. **Refresh**: Click the refresh button to reload the current folder.
 
 Data Visualization
@@ -57,7 +57,7 @@ Data Visualization
 
 1. **Plot Mode**: Choose between Auto-replace, Auto-add, or Auto-off (i.e. add/replace manually) modes.
 2. **Data Selection**: Use the checkbox columns to control what's plotted:
-   
+
    - **X**: Positioner (only one allowed)
    - **Y**: Detector (multiple allowed)
    - **I0**: Select for normalization (divide Y data by this field, only one allowed)
@@ -68,13 +68,13 @@ Data Visualization
 
    - **I0 Normalization**: Divide Y data by the selected I0 field to normalize intensity.
    - **Curve Unscaling ("Un" column)**: Rescale selected curves to match the range of other Y curves.
-     
+
      - Select both "Y" and "Un" on the same row to unscale that curve
      - The unscaling formula: ``g(x) = ((f(x) - m) / (M - m)) * (Mg - mg) + mg``
 
        - `m, M`: min/max of the curve being unscaled `f(x)`
        - `mg, Mg`: global min/max of other Y curves (excluding unscaled ones)
-   - **Factor/Offset**: Open the Basic tab and apply a factor and/or offset to the selected curve (from the curve dropdown) 
+   - **Factor/Offset**: Open the Basic tab and apply a factor and/or offset to the selected curve (from the curve dropdown)
      - ``g(x) = f(x) * factor + offset``
 
 Curve Management
