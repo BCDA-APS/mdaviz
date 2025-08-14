@@ -35,6 +35,7 @@ Mdaviz is available on PyPI. We recommend creating a dedicated environment:
 # Create a simple conda environment
 conda create -n mdaviz python=3.12
 conda activate mdaviz
+pip install PyQt6 Qt6
 
 # Install mdaviz
 pip install mdaviz
@@ -45,6 +46,13 @@ Once installed, you can run the application at any time using:
 conda activate mdaviz
 mdaviz
 ```
+**Note**:
+* PyQt6 and Qt6 are required dependencies that may need to be installed separately via pip as they are not available in conda-forge for all platforms.
+* At the APS: PyQt6 requires to install the following library:
+```bash
+sudo yum install xcb-util-cursor
+```
+
 
 ### Option 2: Development setup with conda environment
 
@@ -58,7 +66,7 @@ cd mdaviz
 # Create and activate conda environment
 conda env create -f env.yml
 conda activate mdaviz
-pip install PyQt6
+pip install PyQt6 Qt6
 
 # Install in development mode
 pip install -e .
@@ -68,7 +76,7 @@ Always activate the environment before running, testing, or using pre-commit hoo
 
 
 **Note**:
-* PyQt6 and Qt6 are installed via pip as they are not available in conda-forge for all platforms.
+* PyQt6 and Qt6 are required dependencies that may need to be installed separately via pip as they are not available in conda-forge for all platforms.
 * At the APS: PyQt6 requires to install the following library:
 ```bash
 sudo yum install xcb-util-cursor

@@ -14,7 +14,7 @@ This directory contains the GitHub Actions workflows for the mdaviz project. The
 
 **Features**:
 - **Multi-Python Testing**: Tests on Python 3.10, 3.11, 3.12, and 3.13
-- **Cross-Platform Testing**: Tests on Windows and macOS
+- **Cross-Platform Testing**: Tests on Linux and macOS
 - **Comprehensive Checks**:
   - PyQt6 installation verification
   - mdaviz import testing
