@@ -1,5 +1,5 @@
 ====================================
-user_settings
+User Settings
 ====================================
 
 .. automodule:: mdaviz.user_settings

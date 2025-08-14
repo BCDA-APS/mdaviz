@@ -1,5 +1,5 @@
 ====================================
-empty_table_model
+Empty Table Model
 ====================================
 
 .. automodule:: mdaviz.empty_table_model

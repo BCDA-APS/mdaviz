@@ -1,5 +1,5 @@
 ====================================
-mda_folder
+MDA Folder
 ====================================
 
 .. automodule:: mdaviz.mda_folder

@@ -1,5 +1,5 @@
 ====================================
-mda_file_viz
+MDA File Viz
 ====================================
 
 .. automodule:: mdaviz.mda_file_viz

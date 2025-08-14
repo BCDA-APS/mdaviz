@@ -140,14 +140,15 @@ def get_file_info_lightweight(file_path: pathlib.Path) -> dict:
 
     Returns:
         dict: Dictionary containing lightweight file information with keys:
-            - Name: File name
-            - Prefix: File prefix (if extractable)
-            - Number: Scan number (if available)
-            - Points: Number of data points (if available)
-            - Dimension: Scan dimension (if available)
-            - Positioner: First positioner name (if available)
-            - Date: File date (if available)
-            - Size: Human readable file size
+
+        - Name: File name
+        - Prefix: File prefix (if extractable)
+        - Number: Scan number (if available)
+        - Points: Number of data points (if available)
+        - Dimension: Scan dimension (if available)
+        - Positioner: First positioner name (if available)
+        - Date: File date (if available)
+        - Size: Human readable file size
     """
     file_name = file_path.name
     file_size = human_readable_size(file_path.stat().st_size)
@@ -373,23 +374,23 @@ def get_scan(mda_file_data):
     Processes an mda.scanDim object to extract scanPositioner and scanDetector
     instances, organizing them into a dictionary with additional metadata like
     data, units, and names. A default scanPositioner object representing the
-    point index (p0) is included. If additional positioners exist, they follow
-    p0 in sequence. The first detector is labeled D01 and subsequent detectors
-    follow in numerical order: p0, p1,... px, d01, d02,... dX.
+    point index (``p0``) is included. If additional positioners exist, they follow
+    ``p0`` in sequence. The first detector is labeled ``D01`` and subsequent detectors
+    follow in numerical order: ``p0``, ``p1``,... ``px``, ``d01``, ``d02``,... ``dX``.
 
     Parameters:
         - mda_file_data: An instance of an mda.scanDim object to be processed.
 
     Returns:
-        - A tuple containing:
-            - A dictionary keyed by index, each mapping to a sub-dictionary containing
-              the scan object ('object') along with its 'data', 'unit', 'name' and 'type'.
-              Structure:
-              {index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...','type':...}}.
-            - The index (first_pos) of the first positioner in the returned dictionary. This
-              is 1 if a positioner other than the default index positioner exists, otherwise 0.
-            - The index (first_det) of the first detector in the returned dictionary, which
-              directly follows the last positioner.
+        A tuple containing:
+
+        - A dictionary keyed by index, each mapping to a sub-dictionary containing
+          the scan object along with its ``data``, ``unit``, ``name`` and ``type``.
+          Structure: ``{index: {'object': scanObject, 'data': [...], 'unit': '...', 'name': '...','type':...}}``.
+        - The index (first_pos) of the first positioner in the returned dictionary. This
+          is 1 if a positioner other than the default index positioner exists, otherwise 0.
+        - The index (first_det) of the first detector in the returned dictionary, which
+          directly follows the last positioner.
     """
 
     d = {}
@@ -446,21 +447,22 @@ def get_scan_2d(mda_file_data_dim1, mda_file_data_dim2):
     Processes two mda.scanDim objects (outer and inner dimensions) to extract scanPositioner
     and scanDetector instances, organizing them into a dictionary with additional metadata.
     For 2D data, the structure is typically:
-    - dim1 (outer): X2 positioner + detectors
-    - dim2 (inner): X1 positioner + detectors
+        - ``dim1`` (outer): X2 positioner + detectors
+        - ``dim2`` (inner): X1 positioner + detectors
 
     Parameters:
-        - mda_file_data_dim1: An instance of an mda.scanDim object for the outer dimension
-        - mda_file_data_dim2: An instance of an mda.scanDim object for the inner dimension
+        - mda_file_data_dim1: An instance of an ``mda.scanDim`` object for the outer dimension
+        - mda_file_data_dim2: An instance of an ``mda.scanDim`` object for the inner dimension
 
     Returns:
-        - A tuple containing:
-            - A dictionary keyed by index, each mapping to a sub-dictionary containing
-              the scan object ('object') along with its 'data', 'unit', 'name' and 'type'.
-              For 2D data, detectors have 2D arrays: data[X2_index][X1_index]
-              For positioners, includes 'all_positioners' list and 'np' count for full positioner information.
-            - The index (first_pos) of the first positioner in the returned dictionary
-            - The index (first_det) of the first detector in the returned dictionary
+        A tuple containing:
+
+        - A dictionary keyed by index, each mapping to a sub-dictionary containing
+          the scan object along with its ``data``, ``unit``, ``name`` and ``type``.
+          For 2D data, detectors have 2D arrays: ``data[X2_index][X1_index]``
+          For positioners, includes ``all_positioners`` list and ``np`` count for full positioner information.
+        - The index (first_pos) of the first positioner in the returned dictionary
+        - The index (first_det) of the first detector in the returned dictionary
     """
     from mdaviz.synApps_mdalib.mda import scanPositioner
 
