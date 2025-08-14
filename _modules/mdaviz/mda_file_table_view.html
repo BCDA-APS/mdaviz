@@ -1,0 +1,1637 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mdaviz.mda_file_table_view &#8212; mdaviz 1.1</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=eee9143e"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/mdaviz/mda_file_table_view';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mdaviz 1.1</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Changes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Changes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">mdaviz.mda_file_table_view</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for mdaviz.mda_file_table_view</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">MDA file table view for data field selection and 2D plotting controls.</span>
+
+<span class="sd">This module provides the MDAFileTableView widget which displays a table of MDA file</span>
+<span class="sd">data fields with checkboxes for selection. It supports both 1D and 2D data visualization</span>
+<span class="sd">with specialized controls for 2D plotting including X2 slice selection, X1/X2 positioner</span>
+<span class="sd">selection, Y detector selection, and I0 normalization.</span>
+
+<span class="sd">For 1D data, users can select X, Y, I0, and Unscaled fields for plotting.</span>
+<span class="sd">For 2D data, additional controls are available for:</span>
+<span class="sd">- X2 slice selection (spinbox)</span>
+<span class="sd">- X1/X2 positioner selection (comboboxes)</span>
+<span class="sd">- Y detector selection (combobox)</span>
+<span class="sd">- I0 normalization (combobox)</span>
+<span class="sd">- Plot type selection (Heatmap/Contour)</span>
+<span class="sd">- Color palette selection</span>
+<span class="sd">- Log scale options</span>
+
+<span class="sd">Uses :class:`mda_file_table_model.MDAFileTableModel` for data display.</span>
+
+<span class="sd">.. autosummary::</span>
+
+<span class="sd">    ~MDAFileTableView</span>
+<span class="sd">    ~HEADERS</span>
+<span class="sd">    ~COLUMNS</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6.QtWidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QHeaderView</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.mda_file_table_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColumnDataType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.mda_file_table_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">FieldRuleType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.mda_file_table_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">TableColumn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.mda_file_table_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">TableField</span>
+
+<span class="n">HEADERS</span> <span class="o">=</span> <span class="s2">&quot;Field&quot;</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="s2">&quot;I0&quot;</span><span class="p">,</span> <span class="s2">&quot;Un&quot;</span><span class="p">,</span> <span class="s2">&quot;PV&quot;</span><span class="p">,</span> <span class="s2">&quot;DESC&quot;</span><span class="p">,</span> <span class="s2">&quot;Unit&quot;</span>
+
+<span class="n">COLUMNS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">TableColumn</span><span class="p">(</span><span class="s2">&quot;Field&quot;</span><span class="p">,</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">text</span><span class="p">),</span>
+    <span class="n">TableColumn</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">checkbox</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">FieldRuleType</span><span class="o">.</span><span class="n">unique</span><span class="p">),</span>  <span class="c1"># type: ignore[arg-type]</span>
+    <span class="n">TableColumn</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">checkbox</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">FieldRuleType</span><span class="o">.</span><span class="n">multiple</span><span class="p">),</span>  <span class="c1"># type: ignore[arg-type]</span>
+    <span class="n">TableColumn</span><span class="p">(</span><span class="s2">&quot;I0&quot;</span><span class="p">,</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">checkbox</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">FieldRuleType</span><span class="o">.</span><span class="n">unique</span><span class="p">),</span>  <span class="c1"># type: ignore[arg-type]</span>
+    <span class="n">TableColumn</span><span class="p">(</span><span class="s2">&quot;Un&quot;</span><span class="p">,</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">checkbox</span><span class="p">,</span> <span class="n">rule</span><span class="o">=</span><span class="n">FieldRuleType</span><span class="o">.</span><span class="n">multiple</span><span class="p">),</span>  <span class="c1"># type: ignore[arg-type]</span>
+    <span class="n">TableColumn</span><span class="p">(</span><span class="s2">&quot;PV&quot;</span><span class="p">,</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">text</span><span class="p">),</span>
+    <span class="n">TableColumn</span><span class="p">(</span><span class="s2">&quot;DESC&quot;</span><span class="p">,</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">text</span><span class="p">),</span>
+    <span class="n">TableColumn</span><span class="p">(</span><span class="s2">&quot;Unit&quot;</span><span class="p">,</span> <span class="n">ColumnDataType</span><span class="o">.</span><span class="n">text</span><span class="p">),</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="MDAFileTableView">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MDAFileTableView</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="n">ui_file</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">getUiFileName</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create the table view and connect with its parent.</span>
+
+<span class="sd">        PARAMETERS</span>
+
+<span class="sd">        parent object:</span>
+<span class="sd">            Instance of mdaviz.mda_file.MDAFile</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">myLoadUi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ui_file</span><span class="p">,</span> <span class="n">baseinstance</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setData</span><span class="p">()</span>
+        <span class="c1"># Configure the horizontal header to resize based on content.</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">horizontalHeader</span><span class="p">()</span>
+        <span class="n">header</span><span class="o">.</span><span class="n">setSectionResizeMode</span><span class="p">(</span><span class="n">QHeaderView</span><span class="o">.</span><span class="n">ResizeMode</span><span class="o">.</span><span class="n">ResizeToContents</span><span class="p">)</span>
+
+        <span class="c1"># Setup 2D controls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup2DControls</span><span class="p">()</span>
+
+        <span class="c1"># Setup Y DET controls after UI is fully loaded</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setupYDetControls</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MDAFileTableView.setup2DControls">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.setup2DControls">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup2DControls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup 2D data controls (X2 selection).&quot;&quot;&quot;</span>
+        <span class="c1"># Connect X2 spinbox to update function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x2SpinBox</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onX2ValueChanged</span><span class="p">)</span>
+
+        <span class="c1"># Initially hide 2D controls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dimensionControls</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.setupYDetControls">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.setupYDetControls">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setupYDetControls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup Y DET selection controls for 2D plotting.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: setupYDetControls - Starting setup&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Use QTimer to ensure UI is fully loaded</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">QTimer</span>
+
+        <span class="n">QTimer</span><span class="o">.</span><span class="n">singleShot</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setupYDetControlsDelayed</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView._setupYDetControlsDelayed">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView._setupYDetControlsDelayed">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setupYDetControlsDelayed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup Y DET controls after UI is fully loaded.&quot;&quot;&quot;</span>
+        <span class="c1"># Connect signals for 2D controls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x1ComboBox</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onX1SelectionChanged</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x2ComboBox</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onX2SelectionChanged</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yDetComboBox</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onYDetSelectionChanged</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i0ComboBox</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onI0SelectionChanged</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotTypeComboBox</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onPlotTypeChanged</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colorPaletteComboBox</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">onColorPaletteChanged</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onPlotButtonClicked</span><span class="p">)</span>
+
+        <span class="c1"># Connect log scale controls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logYCheckBox</span><span class="o">.</span><span class="n">toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onLogScaleChanged</span><span class="p">)</span>
+
+        <span class="c1"># Populate plot type combobox</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotTypeComboBox</span><span class="o">.</span><span class="n">addItems</span><span class="p">([</span><span class="s2">&quot;Heatmap&quot;</span><span class="p">,</span> <span class="s2">&quot;Contour&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Populate color palette combobox</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colorPaletteComboBox</span><span class="o">.</span><span class="n">addItems</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;plasma&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;inferno&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;magma&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;cividis&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;coolwarm&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;RdBu&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;RdYlBu&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Spectral&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;jet&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;hot&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;cool&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;terrain&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Initially hide Y DET controls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yDetControls</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.populateX1ComboBox">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.populateX1ComboBox">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">populateX1ComboBox</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Populate X1 combobox with available positioners from scanDictInner.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">fileInfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fileInfo&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;isMultidimensional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="n">scanDictInner</span> <span class="o">=</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scanDictInner&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">x1ComboBox</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="c1"># Add positioners (fieldName starts with &quot;P&quot;)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">scanDictInner</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">fieldName</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fieldName&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fieldName</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">):</span>  <span class="c1"># Only positioners</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;PV_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unit&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">display_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">if</span> <span class="n">unit</span> <span class="k">else</span> <span class="n">name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">x1ComboBox</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">display_text</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;DEBUG: populateX1ComboBox - Added </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x1ComboBox</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="si">}</span><span class="s2"> X1 positioners&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Set P1 as default (key 1) if available</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">x1ComboBox</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Find P1 (key 1) and set as default</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x1ComboBox</span><span class="o">.</span><span class="n">count</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">x1ComboBox</span><span class="o">.</span><span class="n">itemData</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># P1 key</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">x1ComboBox</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="k">break</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.populateX2ComboBox">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.populateX2ComboBox">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">populateX2ComboBox</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Populate X2 combobox with available positioners from scanDict (outer dimension).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">fileInfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fileInfo&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;isMultidimensional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="n">scanDict</span> <span class="o">=</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scanDict&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x2ComboBox</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="c1"># Add Index option (P0)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x2ComboBox</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="s2">&quot;Index&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Add positioners from scanDict (outer dimension)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">scanDict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">fieldName</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fieldName&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">fieldName</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">key</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="p">):</span>  <span class="c1"># Only positioners, skip P0 (Index)</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;PV_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unit&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">display_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">if</span> <span class="n">unit</span> <span class="k">else</span> <span class="n">name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">x2ComboBox</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">display_text</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;DEBUG: populateX2ComboBox - Added </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">x2ComboBox</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="si">}</span><span class="s2"> X2 positioners&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Set P1 as default (key 1) if available</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">x2ComboBox</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Find P1 (key 1) and set as default</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x2ComboBox</span><span class="o">.</span><span class="n">count</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">x2ComboBox</span><span class="o">.</span><span class="n">itemData</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># P1 key</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">x2ComboBox</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="k">break</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.populateYDetComboBox">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.populateYDetComboBox">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">populateYDetComboBox</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Populate Y detector combobox with available detectors from scanDict2D.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">fileInfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fileInfo&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;isMultidimensional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="n">scanDict2D</span> <span class="o">=</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scanDict2D&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">scanDictInner</span> <span class="o">=</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scanDictInner&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yDetComboBox</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="c1"># Add detectors (fieldName starts with &quot;D&quot;)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">scanDict2D</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># Find corresponding detector info from scanDictInner</span>
+            <span class="n">detector_info</span> <span class="o">=</span> <span class="n">scanDictInner</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">fieldName</span> <span class="o">=</span> <span class="n">detector_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fieldName&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fieldName</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;D&quot;</span><span class="p">):</span>  <span class="c1"># Only detectors</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">detector_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Detector_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="n">detector_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unit&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">display_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">if</span> <span class="n">unit</span> <span class="k">else</span> <span class="n">name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">yDetComboBox</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">display_text</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;DEBUG: populateYDetComboBox - Added </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">yDetComboBox</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="si">}</span><span class="s2"> Y detectors&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.populateI0ComboBox">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.populateI0ComboBox">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">populateI0ComboBox</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Populate I0 detector combobox with available detectors from scanDict2D.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">fileInfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fileInfo&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;isMultidimensional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="n">scanDict2D</span> <span class="o">=</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scanDict2D&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">scanDictInner</span> <span class="o">=</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scanDictInner&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i0ComboBox</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="c1"># Add &quot;None&quot; option for no normalization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i0ComboBox</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># Add detectors (fieldName starts with &quot;D&quot;)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">scanDict2D</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># Find corresponding detector info from scanDictInner</span>
+            <span class="n">detector_info</span> <span class="o">=</span> <span class="n">scanDictInner</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">fieldName</span> <span class="o">=</span> <span class="n">detector_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fieldName&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fieldName</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;D&quot;</span><span class="p">):</span>  <span class="c1"># Only detectors</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">detector_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Detector_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="n">detector_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unit&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">display_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">if</span> <span class="n">unit</span> <span class="k">else</span> <span class="n">name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">i0ComboBox</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">display_text</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;DEBUG: populateI0ComboBox - Added </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">i0ComboBox</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="si">}</span><span class="s2"> I0 detectors&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.populate2DControls">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.populate2DControls">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">populate2DControls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Populate all 2D control comboboxes with data from current file.&quot;&quot;&quot;</span>
+        <span class="c1"># Populate all comboboxes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">populateX1ComboBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">populateX2ComboBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">populateYDetComboBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">populateI0ComboBox</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: populate2DControls - All 2D controls populated&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.update2DControls">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.update2DControls">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update2DControls</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">is_multidimensional</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">x2_positioner_info</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update 2D controls visibility and settings based on data dimensions.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            is_multidimensional (bool): Whether the data is multidimensional</span>
+<span class="sd">            dimensions (list): List of dimensions [X2_points, X1_points, ...]</span>
+<span class="sd">            x2_positioner_info (dict): Information about the X2 positioner (name, unit, data)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;DEBUG: update2DControls - is_multidimensional: </span><span class="si">{</span><span class="n">is_multidimensional</span><span class="si">}</span><span class="s2">, dimensions: </span><span class="si">{</span><span class="n">dimensions</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: update2DControls - x2_positioner_info: </span><span class="si">{</span><span class="n">x2_positioner_info</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_multidimensional</span> <span class="ow">and</span> <span class="n">dimensions</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">dimensions</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># Show 2D controls</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dimensionControls</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Update X2 spinbox range</span>
+            <span class="c1"># dimensions[0] is X2 dimension, dimensions[1] is X1 dimension</span>
+            <span class="n">x2_max</span> <span class="o">=</span> <span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dimensions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: update2DControls - x2_max: </span><span class="si">{</span><span class="n">x2_max</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x2SpinBox</span><span class="o">.</span><span class="n">setMaximum</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">x2_max</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x2SpinBox</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Start at first X2 position</span>
+
+            <span class="c1"># Store X2 positioner info for later use</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_x2_positioner_info</span> <span class="o">=</span> <span class="n">x2_positioner_info</span>
+
+            <span class="c1"># Update X2 label with PV name</span>
+            <span class="k">if</span> <span class="n">x2_positioner_info</span><span class="p">:</span>
+                <span class="n">pv_name</span> <span class="o">=</span> <span class="n">x2_positioner_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;X2&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">x2Label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;X2 (</span><span class="si">{</span><span class="n">pv_name</span><span class="si">}</span><span class="s2">):&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_updateX2ValueLabel</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">x2_positioner_info</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">x2Label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;X2:&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">x2ValueLabel</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Populate 2D control comboboxes</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">populate2DControls</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Hide 2D controls for 1D data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dimensionControls</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="c1"># Clear X2 value label</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x2ValueLabel</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+            <span class="c1"># Clear stored X2 positioner info</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_x2_positioner_info&quot;</span><span class="p">):</span>
+                <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_x2_positioner_info&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.onX2ValueChanged">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onX2ValueChanged">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onX2ValueChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle X2 spinbox value changes.&quot;&quot;&quot;</span>
+        <span class="c1"># Update the X2 value label if we have X2 positioner info</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_x2_positioner_info&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x2_positioner_info</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_updateX2ValueLabel</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x2_positioner_info</span><span class="p">)</span>
+
+        <span class="c1"># Emit signal to update 1D plot with new X2 slice</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="p">,</span> <span class="s2">&quot;x2ValueChanged&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">x2ValueChanged</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView._updateX2ValueLabel">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView._updateX2ValueLabel">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_updateX2ValueLabel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x2_index</span><span class="p">,</span> <span class="n">x2_positioner_info</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the X2 value label with the current positioner value.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            x2_index (int): The current X2 index</span>
+<span class="sd">            x2_positioner_info (dict): Information about the X2 positioner</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Get the positioner value at the current index</span>
+            <span class="n">positioner_data</span> <span class="o">=</span> <span class="n">x2_positioner_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="n">x2_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">positioner_data</span><span class="p">):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">positioner_data</span><span class="p">[</span><span class="n">x2_index</span><span class="p">]</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="n">x2_positioner_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unit&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Format the value with unit</span>
+                <span class="k">if</span> <span class="n">unit</span><span class="p">:</span>
+                    <span class="n">label_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">label_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">x2ValueLabel</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">label_text</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">x2ValueLabel</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="c1"># Fallback if there&#39;s an error</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x2ValueLabel</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;--&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.getX2Value">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.getX2Value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getX2Value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current X2 value from the spinbox.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x2SpinBox</span><span class="o">.</span><span class="n">value</span><span class="p">()</span></div>
+
+
+    <span class="c1"># Y DET Controls Signal Handlers</span>
+<div class="viewcode-block" id="MDAFileTableView._trigger2DPlot">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView._trigger2DPlot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_trigger2DPlot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper method to trigger 2D plotting with current selections.&quot;&quot;&quot;</span>
+
+        <span class="c1"># Check if we&#39;re on the 2D tab - only trigger 2D plotting when on 2D tab</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span>
+            <span class="k">while</span> <span class="n">parent</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;mda_file_viz&quot;</span><span class="p">):</span>
+                <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">parent</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;mda_file_viz&quot;</span><span class="p">):</span>
+                <span class="c1"># Check which tab is currently active</span>
+                <span class="n">current_tab_index</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">mda_file_viz</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">current_tab_index</span> <span class="o">!=</span> <span class="mi">3</span>
+                <span class="p">):</span>  <span class="c1"># 1D tab is index 0, Data tab is index 1, Metadata tab is index 2, 2D tab is index 3</span>
+                    <span class="k">return</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: _trigger2DPlot - Error checking tab: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Get current selections</span>
+        <span class="n">selections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get2DSelections</span><span class="p">()</span>
+
+        <span class="c1"># Validate selections</span>
+        <span class="k">if</span> <span class="n">selections</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">selections</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">selections</span><span class="p">[</span><span class="s2">&quot;X1&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">selections</span><span class="p">[</span><span class="s2">&quot;X2&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Trigger 2D plotting</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Find the parent MDA_MVC to trigger plotting</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span>
+            <span class="k">while</span> <span class="n">parent</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;doPlot&quot;</span><span class="p">):</span>
+                <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">parent</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;doPlot&quot;</span><span class="p">):</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">doPlot</span><span class="p">(</span><span class="s2">&quot;replace&quot;</span><span class="p">,</span> <span class="n">selections</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;DEBUG: _trigger2DPlot - Could not find parent with doPlot method&quot;</span>
+                <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: _trigger2DPlot - Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.onX1SelectionChanged">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onX1SelectionChanged">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onX1SelectionChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle X1 positioner selection change.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: onX1SelectionChanged - index: </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger2DPlot</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.onX2SelectionChanged">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onX2SelectionChanged">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onX2SelectionChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle X2 positioner selection change.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: onX2SelectionChanged - index: </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger2DPlot</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.onYDetSelectionChanged">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onYDetSelectionChanged">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onYDetSelectionChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle Y detector selection change.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: onYDetSelectionChanged - index: </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger2DPlot</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.onI0SelectionChanged">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onI0SelectionChanged">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onI0SelectionChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle I0 detector selection change.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: onI0SelectionChanged - index: </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger2DPlot</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.onPlotTypeChanged">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onPlotTypeChanged">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onPlotTypeChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle plot type selection change.&quot;&quot;&quot;</span>
+        <span class="n">plot_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotTypeComboBox</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: onPlotTypeChanged - plot_type: </span><span class="si">{</span><span class="n">plot_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger2DPlot</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.onColorPaletteChanged">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onColorPaletteChanged">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onColorPaletteChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle color palette selection change.&quot;&quot;&quot;</span>
+        <span class="n">palette_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colorPaletteComboBox</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: onColorPaletteChanged - palette_name: </span><span class="si">{</span><span class="n">palette_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger2DPlot</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.onLogScaleChanged">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onLogScaleChanged">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onLogScaleChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checked</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle log scale checkbox changes.&quot;&quot;&quot;</span>
+        <span class="n">sender</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sender</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">sender</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">logYCheckBox</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: onLogScaleChanged - LogY: </span><span class="si">{</span><span class="n">checked</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trigger2DPlot</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.onPlotButtonClicked">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onPlotButtonClicked">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onPlotButtonClicked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle plot button click.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: onPlotButtonClicked - Plot button clicked&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get current selections</span>
+        <span class="n">selections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get2DSelections</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: onPlotButtonClicked - selections: </span><span class="si">{</span><span class="n">selections</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Validate selections</span>
+        <span class="k">if</span> <span class="n">selections</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">selections</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: onPlotButtonClicked - No Y detector selected&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">selections</span><span class="p">[</span><span class="s2">&quot;X1&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: onPlotButtonClicked - No X1 positioner selected&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">selections</span><span class="p">[</span><span class="s2">&quot;X2&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: onPlotButtonClicked - No X2 positioner selected&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Trigger 2D plotting by emitting a signal or calling the parent</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Find the parent MDA_MVC to trigger plotting</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span>
+            <span class="k">while</span> <span class="n">parent</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;doPlot&quot;</span><span class="p">):</span>
+                <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">parent</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;doPlot&quot;</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;DEBUG: onPlotButtonClicked - Calling parent.doPlot with 2D selections&quot;</span>
+                <span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;DEBUG: onPlotButtonClicked - About to call doPlot with: action=&#39;replace&#39;, selections=</span><span class="si">{</span><span class="n">selections</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">doPlot</span><span class="p">(</span><span class="s2">&quot;replace&quot;</span><span class="p">,</span> <span class="n">selections</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: onPlotButtonClicked - doPlot call completed&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;DEBUG: onPlotButtonClicked - Could not find parent with doPlot method&quot;</span>
+                <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: onPlotButtonClicked - Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.get2DSelections">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.get2DSelections">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get2DSelections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get current 2D plotting selections.&quot;&quot;&quot;</span>
+        <span class="c1"># Get color palette with validation</span>
+        <span class="n">color_palette</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colorPaletteComboBox</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">color_palette</span> <span class="ow">or</span> <span class="n">color_palette</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">color_palette</span> <span class="o">=</span> <span class="s2">&quot;viridis&quot;</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;DEBUG: get2DSelections - Empty color palette, using default: </span><span class="si">{</span><span class="n">color_palette</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">selections</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;X1&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x1ComboBox</span><span class="o">.</span><span class="n">currentData</span><span class="p">(),</span>
+            <span class="s2">&quot;X2&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x2ComboBox</span><span class="o">.</span><span class="n">currentData</span><span class="p">(),</span>
+            <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">yDetComboBox</span><span class="o">.</span><span class="n">currentData</span><span class="p">()]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">yDetComboBox</span><span class="o">.</span><span class="n">currentData</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="k">else</span> <span class="p">[]</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;I0&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">i0ComboBox</span><span class="o">.</span><span class="n">currentData</span><span class="p">(),</span>
+            <span class="s2">&quot;plot_type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotTypeComboBox</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+            <span class="s2">&quot;color_palette&quot;</span><span class="p">:</span> <span class="n">color_palette</span><span class="p">,</span>
+            <span class="s2">&quot;log_y&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">logYCheckBox</span><span class="o">.</span><span class="n">isChecked</span><span class="p">(),</span>
+        <span class="p">}</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: get2DSelections - </span><span class="si">{</span><span class="n">selections</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">selections</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.data">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the data from the table view:</span>
+<span class="sd">        self.data=  {&quot;fileInfo&quot;: fileInfo, &quot;fields&quot;: fields}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.setData">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.setData">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Populates the `_data` attribute with file information and data extracted</span>
+<span class="sd">        from a file.</span>
+
+<span class="sd">        The populated `_data` dictionary includes:</span>
+<span class="sd">            - fileInfo (dict): A dictionary of all the file information:</span>
+<span class="sd">                - fileName (str): The name of the file without its extension.</span>
+<span class="sd">                - filePath (str): The full path of the file.</span>
+<span class="sd">                - folderPath (str): The full path of the parent folder.</span>
+<span class="sd">                - metadata (dict): The extracted metadata from the file.</span>
+<span class="sd">                - scanDict (dict): A dictionary of positioner &amp; detector dataset for plot.</span>
+<span class="sd">                - firstPos (float): The first positioner (P1, or if no positioner, P0 = index).</span>
+<span class="sd">                - firstDet (float): The first detector (D01).</span>
+<span class="sd">                - pvList (list of str): List of detectors PV names as strings.</span>
+<span class="sd">            - field (list): List of TableField object, one for each det/pos:</span>
+<span class="sd">                    ([TableField(name=&#39;P0&#39;, selection=None,...</span>
+<span class="sd">                    ...desc=&#39;Index&#39;, pv=&#39;Index&#39;, unit=&#39;a.u&#39;),...])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">data</span><span class="p">()</span> <span class="o">!=</span> <span class="p">{}:</span>
+            <span class="n">fileInfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">data</span><span class="p">()</span>
+
+            <span class="c1"># For table display, use inner dimension data for 2D files, 1D data for 1D files</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;DEBUG: isMultidimensional: </span><span class="si">{</span><span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;isMultidimensional&#39;</span><span class="p">,</span><span class="w"> </span><span class="kc">False</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: scanDictInner exists: </span><span class="si">{</span><span class="s1">&#39;scanDictInner&#39;</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">fileInfo</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;isMultidimensional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;scanDictInner&quot;</span>
+            <span class="p">):</span>
+                <span class="n">scanDict</span> <span class="o">=</span> <span class="n">fileInfo</span><span class="p">[</span><span class="s2">&quot;scanDictInner&quot;</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;DEBUG: Using scanDictInner for 2D data, keys: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">scanDict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">scanDict</span> <span class="o">=</span> <span class="n">fileInfo</span><span class="p">[</span><span class="s2">&quot;scanDict&quot;</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;DEBUG: Using scanDict for 1D data, keys: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">scanDict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">TableField</span><span class="p">(</span>
+                    <span class="n">v</span><span class="p">[</span><span class="s2">&quot;fieldName&quot;</span><span class="p">],</span>
+                    <span class="n">selection</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">pv</span><span class="o">=</span><span class="n">v</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
+                    <span class="n">desc</span><span class="o">=</span><span class="n">v</span><span class="p">[</span><span class="s2">&quot;desc&quot;</span><span class="p">],</span>
+                    <span class="n">unit</span><span class="o">=</span><span class="n">v</span><span class="p">[</span><span class="s2">&quot;unit&quot;</span><span class="p">],</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">scanDict</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;fileInfo&quot;</span><span class="p">:</span> <span class="n">fileInfo</span><span class="p">,</span> <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="n">fields</span><span class="p">}</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">displayTable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection_field</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.mda_file_table_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">MDAFileTableModel</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.empty_table_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmptyTableModel</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">()[</span><span class="s2">&quot;fields&quot;</span><span class="p">]</span>
+            <span class="n">data_model</span> <span class="o">=</span> <span class="n">MDAFileTableModel</span><span class="p">(</span>
+                <span class="n">COLUMNS</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">selection_field</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">mda_mvc</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">setModel</span><span class="p">(</span><span class="n">data_model</span><span class="p">)</span>
+            <span class="c1"># Hide Field column (Field = vertical header)</span>
+            <span class="c1"># Note: I0 column (index 3) is now visible</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">hideColumn</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># No MDA files to display, show an empty table with headers</span>
+            <span class="n">empty_model</span> <span class="o">=</span> <span class="n">EmptyTableModel</span><span class="p">(</span><span class="n">HEADERS</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">setModel</span><span class="p">(</span><span class="n">empty_model</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">setStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">mda_mvc</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">clearContents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span><span class="o">.</span><span class="n">clearAllCheckboxes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">setModel</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MDAFileTableView.data2Plot2D">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.data2Plot2D">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">data2Plot2D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selections</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts 2D datasets for plotting from scanDict2D based on user selections.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            - selections: A dictionary with keys &quot;X&quot;, &quot;Y&quot;, where &quot;X&quot; is the index for the x-axis data,</span>
+<span class="sd">              &quot;Y&quot; is a list of indices for the y-axis data.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            - A tuple of (datasets, plot_options), where datasets contains 2D data arrays,</span>
+<span class="sd">              and plot_options contains overall plotting configurations.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">datasets</span><span class="p">,</span> <span class="n">plot_options</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># ------ extract scan info:</span>
+            <span class="n">fileInfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">()[</span><span class="s2">&quot;fileInfo&quot;</span><span class="p">]</span>
+            <span class="n">fileName</span> <span class="o">=</span> <span class="n">fileInfo</span><span class="p">[</span><span class="s2">&quot;fileName&quot;</span><span class="p">]</span>
+            <span class="n">filePath</span> <span class="o">=</span> <span class="n">fileInfo</span><span class="p">[</span><span class="s2">&quot;filePath&quot;</span><span class="p">]</span>
+
+            <span class="c1"># Check if this is 2D data</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;isMultidimensional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: data2Plot2D - Not 2D data, returning empty&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">plot_options</span>
+
+            <span class="c1"># Use scanDict2D for 2D plotting</span>
+            <span class="n">scanDict2D</span> <span class="o">=</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scanDict2D&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">scanDictInner</span> <span class="o">=</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scanDictInner&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: data2Plot2D - scanDict2D keys: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">scanDict2D</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;DEBUG: data2Plot2D - scanDictInner keys: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">scanDictInner</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: data2Plot2D - selections: </span><span class="si">{</span><span class="n">selections</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># ------ extract x data (from scanDictInner - this is the X positioner):</span>
+            <span class="n">x_index</span> <span class="o">=</span> <span class="n">selections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">x_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">x_index</span> <span class="ow">in</span> <span class="n">scanDictInner</span><span class="p">:</span>
+                <span class="n">x_data_2d</span> <span class="o">=</span> <span class="n">scanDictInner</span><span class="p">[</span><span class="n">x_index</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+                <span class="n">x_name</span> <span class="o">=</span> <span class="n">scanDictInner</span><span class="p">[</span><span class="n">x_index</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;P</span><span class="si">{</span><span class="n">x_index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">x_unit</span> <span class="o">=</span> <span class="n">scanDictInner</span><span class="p">[</span><span class="n">x_index</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unit&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+                <span class="c1"># For 2D plotting, we need 1D X data - take the first row</span>
+                <span class="k">if</span> <span class="n">x_data_2d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_data_2d</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">x_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_data_2d</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>  <span class="c1"># Take first row for 1D X data</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">x_data</span> <span class="o">=</span> <span class="n">x_data_2d</span>
+
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;DEBUG: data2Plot2D - X data shape: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_data</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">x_data</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="kc">None</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;None&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x_data</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">x_name</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span>
+                <span class="n">x_unit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="c1"># ------ extract y data (detector data from scanDict2D):</span>
+            <span class="n">y_index</span> <span class="o">=</span> <span class="n">selections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="n">y_index</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_index</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">y_idx</span> <span class="o">=</span> <span class="n">y_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Take first selected detector for 2D plot</span>
+                <span class="k">if</span> <span class="n">y_idx</span> <span class="ow">in</span> <span class="n">scanDict2D</span><span class="p">:</span>
+                    <span class="n">y_data</span> <span class="o">=</span> <span class="n">scanDict2D</span><span class="p">[</span><span class="n">y_idx</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+                    <span class="n">y_name</span> <span class="o">=</span> <span class="n">scanDict2D</span><span class="p">[</span><span class="n">y_idx</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;D</span><span class="si">{</span><span class="n">y_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">y_unit</span> <span class="o">=</span> <span class="n">scanDict2D</span><span class="p">[</span><span class="n">y_idx</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unit&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;DEBUG: data2Plot2D - Y data shape: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">y_data</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;None&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">y_data</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">y_name</span> <span class="o">=</span> <span class="s2">&quot;Y&quot;</span>
+                    <span class="n">y_unit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">y_data</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">y_name</span> <span class="o">=</span> <span class="s2">&quot;Y&quot;</span>
+                <span class="n">y_unit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="c1"># ------ extract I0 data for normalization (from scanDict2D):</span>
+            <span class="n">i0_index</span> <span class="o">=</span> <span class="n">selections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;I0&quot;</span><span class="p">)</span>
+            <span class="n">i0_data</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">i0_name</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">is_normalized</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">if</span> <span class="n">i0_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">i0_index</span> <span class="ow">in</span> <span class="n">scanDict2D</span><span class="p">:</span>
+                <span class="n">i0_data</span> <span class="o">=</span> <span class="n">scanDict2D</span><span class="p">[</span><span class="n">i0_index</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+                <span class="n">i0_name</span> <span class="o">=</span> <span class="n">scanDict2D</span><span class="p">[</span><span class="n">i0_index</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;D</span><span class="si">{</span><span class="n">i0_index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;DEBUG: data2Plot2D - I0 data shape: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">i0_data</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">i0_data</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;None&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Perform normalization if both Y and I0 data are available</span>
+                <span class="k">if</span> <span class="n">y_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">i0_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">y_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span>
+                    <span class="n">i0_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">i0_data</span><span class="p">)</span>
+
+                    <span class="c1"># Check if shapes are compatible</span>
+                    <span class="k">if</span> <span class="n">y_array</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">i0_array</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                        <span class="c1"># Handle division by zero (same logic as 1D normalization)</span>
+                        <span class="c1"># Replace zeros in I0 with 1 to avoid division by zero</span>
+                        <span class="n">i0_safe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">i0_array</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i0_array</span><span class="p">)</span>
+
+                        <span class="c1"># Perform normalization</span>
+                        <span class="n">y_data</span> <span class="o">=</span> <span class="n">y_array</span> <span class="o">/</span> <span class="n">i0_safe</span>
+                        <span class="n">is_normalized</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="nb">print</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;DEBUG: data2Plot2D - Normalized Y data by I0: </span><span class="si">{</span><span class="n">i0_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;DEBUG: data2Plot2D - I0 shape </span><span class="si">{</span><span class="n">i0_array</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> incompatible with Y shape </span><span class="si">{</span><span class="n">y_array</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                        <span class="n">i0_data</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="n">i0_name</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;DEBUG: data2Plot2D - No I0 normalization (I0 index: </span><span class="si">{</span><span class="n">i0_index</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># ------ extract x2 data (from scanDict - this is the X2 positioner):</span>
+            <span class="n">x2_data</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">x2_name</span> <span class="o">=</span> <span class="s2">&quot;X2&quot;</span>
+            <span class="n">x2_unit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="c1"># Get the selected X2 index from the combobox</span>
+            <span class="n">x2_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x2ComboBox</span><span class="o">.</span><span class="n">currentData</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: data2Plot2D - Selected X2 index: </span><span class="si">{</span><span class="n">x2_index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Get scanDict for X2 data extraction</span>
+            <span class="n">scanDict</span> <span class="o">=</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scanDict&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+            <span class="k">if</span> <span class="n">x2_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">x2_index</span> <span class="ow">in</span> <span class="n">scanDict</span><span class="p">:</span>
+                <span class="n">x2_data_2d</span> <span class="o">=</span> <span class="n">scanDict</span><span class="p">[</span><span class="n">x2_index</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+                <span class="n">x2_name</span> <span class="o">=</span> <span class="n">scanDict</span><span class="p">[</span><span class="n">x2_index</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;P</span><span class="si">{</span><span class="n">x2_index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">x2_unit</span> <span class="o">=</span> <span class="n">scanDict</span><span class="p">[</span><span class="n">x2_index</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unit&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+                <span class="c1"># For 2D plotting, we need 1D X2 data - take the first column</span>
+                <span class="k">if</span> <span class="n">x2_data_2d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x2_data_2d</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">x2_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x2_data_2d</span><span class="p">)[</span>
+                        <span class="p">:,</span> <span class="mi">0</span>
+                    <span class="p">]</span>  <span class="c1"># Take first column for 1D X2 data</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">x2_data</span> <span class="o">=</span> <span class="n">x2_data_2d</span>
+
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;DEBUG: data2Plot2D - X2 data shape: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x2_data</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">x2_data</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="kc">None</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;None&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: data2Plot2D - X2 index </span><span class="si">{</span><span class="n">x2_index</span><span class="si">}</span><span class="s2"> not found in scanDict&quot;</span><span class="p">)</span>
+                <span class="c1"># Fallback to the original logic for backward compatibility</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">scanDict2D</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;POS&quot;</span> <span class="ow">and</span> <span class="n">key</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">x2_data_2d</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+                        <span class="n">x2_name</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;X2&quot;</span><span class="p">)</span>
+                        <span class="n">x2_unit</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unit&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+                        <span class="c1"># Apply same slicing logic for fallback</span>
+                        <span class="k">if</span> <span class="p">(</span>
+                            <span class="n">x2_data_2d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                            <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x2_data_2d</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+                        <span class="p">):</span>
+                            <span class="n">x2_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x2_data_2d</span><span class="p">)[</span>
+                                <span class="p">:,</span> <span class="mi">0</span>
+                            <span class="p">]</span>  <span class="c1"># Take first column for 1D X2 data</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">x2_data</span> <span class="o">=</span> <span class="n">x2_data_2d</span>
+
+                        <span class="nb">print</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;DEBUG: data2Plot2D - Using fallback X2 (key 0): </span><span class="si">{</span><span class="n">x2_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                        <span class="k">break</span>
+
+            <span class="c1"># Create 2D dataset if we have all required data</span>
+            <span class="k">if</span> <span class="n">x_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">x2_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Validate data shapes and dimensions</span>
+                <span class="n">x_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_data</span><span class="p">)</span>
+                <span class="n">y_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span>
+                <span class="n">x2_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x2_data</span><span class="p">)</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: data2Plot2D - Validation:&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  X array shape: </span><span class="si">{</span><span class="n">x_array</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Y array shape: </span><span class="si">{</span><span class="n">y_array</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  X2 array shape: </span><span class="si">{</span><span class="n">x2_array</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Check for edge cases</span>
+                <span class="n">validation_errors</span> <span class="o">=</span> <span class="p">[]</span>
+
+                <span class="c1"># Check if Y data is 2D</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">validation_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Y data is not 2D: shape </span><span class="si">{</span><span class="n">y_array</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Check if X data is 1D</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">validation_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;X data is not 1D: shape </span><span class="si">{</span><span class="n">x_array</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Check if X2 data is 1D</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x2_array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">validation_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;X2 data is not 1D: shape </span><span class="si">{</span><span class="n">x2_array</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># Check dimension compatibility</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">validation_errors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">y_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">x2_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                        <span class="n">validation_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Y rows (</span><span class="si">{</span><span class="n">y_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">) != X2 length (</span><span class="si">{</span><span class="n">x2_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span>
+                        <span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">y_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">x_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                        <span class="n">validation_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Y cols (</span><span class="si">{</span><span class="n">y_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">) != X length (</span><span class="si">{</span><span class="n">x_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span>
+                        <span class="p">)</span>
+
+                <span class="c1"># Check for empty or single-point data</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">validation_errors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">y_array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">validation_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Y data is empty&quot;</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">y_array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">validation_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Y data has only one point&quot;</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">x_array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">validation_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;X data is empty&quot;</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">x_array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">validation_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;X data has only one point&quot;</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">x2_array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">validation_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;X2 data is empty&quot;</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">x2_array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">validation_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;X2 data has only one point&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Check for NaN or infinite values</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">validation_errors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y_array</span><span class="p">)):</span>
+                        <span class="n">validation_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Y data contains NaN values&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">y_array</span><span class="p">)):</span>
+                        <span class="n">validation_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Y data contains infinite values&quot;</span><span class="p">)</span>
+
+                <span class="c1"># If validation passes, create the dataset</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">validation_errors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: data2Plot2D - Validation passed&quot;</span><span class="p">)</span>
+                    <span class="n">datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">(</span>
+                            <span class="n">y_array</span><span class="p">,</span>
+                            <span class="p">{</span>
+                                <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">y_unit</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;x_data&quot;</span><span class="p">:</span> <span class="n">x_array</span><span class="p">,</span>
+                                <span class="s2">&quot;x2_data&quot;</span><span class="p">:</span> <span class="n">x2_array</span><span class="p">,</span>
+                                <span class="s2">&quot;x_name&quot;</span><span class="p">:</span> <span class="n">x_name</span><span class="p">,</span>
+                                <span class="s2">&quot;x2_name&quot;</span><span class="p">:</span> <span class="n">x2_name</span><span class="p">,</span>
+                                <span class="s2">&quot;x_unit&quot;</span><span class="p">:</span> <span class="n">x_unit</span><span class="p">,</span>
+                                <span class="s2">&quot;x2_unit&quot;</span><span class="p">:</span> <span class="n">x2_unit</span><span class="p">,</span>
+                            <span class="p">},</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+
+                    <span class="n">plot_options</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x_name</span><span class="p">,</span>
+                        <span class="s2">&quot;x_unit&quot;</span><span class="p">:</span> <span class="n">x_unit</span><span class="p">,</span>
+                        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y_name</span><span class="p">,</span>
+                        <span class="s2">&quot;y_unit&quot;</span><span class="p">:</span> <span class="n">y_unit</span><span class="p">,</span>
+                        <span class="s2">&quot;x2&quot;</span><span class="p">:</span> <span class="n">x2_name</span><span class="p">,</span>
+                        <span class="s2">&quot;x2_unit&quot;</span><span class="p">:</span> <span class="n">x2_unit</span><span class="p">,</span>
+                        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">y_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">y_unit</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;filePath&quot;</span><span class="p">:</span> <span class="n">filePath</span><span class="p">,</span>
+                        <span class="s2">&quot;fileName&quot;</span><span class="p">:</span> <span class="n">fileName</span><span class="p">,</span>
+                        <span class="s2">&quot;folderPath&quot;</span><span class="p">:</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;folderPath&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                        <span class="s2">&quot;log_y&quot;</span><span class="p">:</span> <span class="n">selections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;log_y&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                    <span class="p">}</span>
+
+                    <span class="c1"># Update title and add normalization info if normalized</span>
+                    <span class="k">if</span> <span class="n">is_normalized</span> <span class="ow">and</span> <span class="n">i0_name</span><span class="p">:</span>
+                        <span class="n">plot_options</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">y_name</span><span class="si">}</span><span class="s2"> [norm]&quot;</span>
+                        <span class="n">plot_options</span><span class="p">[</span><span class="s2">&quot;i0_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i0_name</span>
+                        <span class="n">plot_options</span><span class="p">[</span><span class="s2">&quot;is_normalized&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: data2Plot2D - Validation failed:&quot;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">validation_errors</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ❌ </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">plot_options</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: data2Plot2D - Missing required data:&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  X data: </span><span class="si">{</span><span class="s1">&#39;✅&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">x_data</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="kc">None</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;❌&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Y data: </span><span class="si">{</span><span class="s1">&#39;✅&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">y_data</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="kc">None</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;❌&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  X2 data: </span><span class="si">{</span><span class="s1">&#39;✅&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">x2_data</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="kc">None</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;❌&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">plot_options</span></div>
+
+
+<div class="viewcode-block" id="MDAFileTableView.data2Plot">
+<a class="viewcode-back" href="../../api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.data2Plot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">data2Plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selections</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts selected datasets for plotting from scanDict based on user selections.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            - selections: A dictionary with keys &quot;X&quot;, &quot;Y&quot;, and optionally &quot;I0&quot;, where &quot;X&quot; is the index for the x-axis data,</span>
+<span class="sd">              &quot;Y&quot; is a list of indices for the y-axis data, and &quot;I0&quot; is the index for normalization data.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            - A tuple of (datasets, plot_options), where datasets is a list of tuples containing the</span>
+<span class="sd">              data and options (label) for each dataset, and plot_options contains overall plotting configurations.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">datasets</span><span class="p">,</span> <span class="n">plot_options</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># ------ extract scan info:</span>
+            <span class="n">fileInfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">()[</span><span class="s2">&quot;fileInfo&quot;</span><span class="p">]</span>
+            <span class="n">fileName</span> <span class="o">=</span> <span class="n">fileInfo</span><span class="p">[</span><span class="s2">&quot;fileName&quot;</span><span class="p">]</span>
+            <span class="n">filePath</span> <span class="o">=</span> <span class="n">fileInfo</span><span class="p">[</span><span class="s2">&quot;filePath&quot;</span><span class="p">]</span>
+
+            <span class="c1"># For 2D data, we need to use the inner dimension data for 1D plotting</span>
+            <span class="c1"># For 1D data, use scanDict as usual</span>
+            <span class="k">if</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;isMultidimensional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;scanDictInner&quot;</span>
+            <span class="p">):</span>
+                <span class="c1"># Use inner dimension data for 1D plotting (matches table display)</span>
+                <span class="n">scanDict</span> <span class="o">=</span> <span class="n">fileInfo</span><span class="p">[</span><span class="s2">&quot;scanDictInner&quot;</span><span class="p">]</span>
+                <span class="n">x2_slice</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Not needed since we&#39;re using 1D data</span>
+
+                <span class="c1"># Debug: Print field mappings</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;DEBUG: Using scanDictInner for 2D plotting, keys: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">scanDict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DEBUG: selections: </span><span class="si">{</span><span class="n">selections</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Debug: Print data shapes for first few fields</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">scanDict</span><span class="p">))):</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">scanDict</span><span class="p">:</span>
+                        <span class="n">data</span> <span class="o">=</span> <span class="n">scanDict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;DEBUG: Field </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> data shape: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;None&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Use 1D data structure</span>
+                <span class="n">scanDict</span> <span class="o">=</span> <span class="n">fileInfo</span><span class="p">[</span><span class="s2">&quot;scanDict&quot;</span><span class="p">]</span>
+                <span class="n">x2_slice</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="c1"># ------ extract x data:</span>
+            <span class="n">x_index</span> <span class="o">=</span> <span class="n">selections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">)</span>
+            <span class="n">x_data</span> <span class="o">=</span> <span class="n">scanDict</span><span class="p">[</span><span class="n">x_index</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">x_index</span> <span class="ow">in</span> <span class="n">scanDict</span> <span class="k">else</span> <span class="kc">None</span>
+
+            <span class="c1"># For 2D data in scanDictInner, slice to get 1D data</span>
+            <span class="k">if</span> <span class="n">x_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_data</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">x2_slice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getX2Value</span><span class="p">()</span>  <span class="c1"># Get current X2 value from spinbox</span>
+                <span class="n">x_data</span> <span class="o">=</span> <span class="n">x_data</span><span class="p">[</span><span class="n">x2_slice</span><span class="p">]</span>  <span class="c1"># Take the selected X2 slice</span>
+
+            <span class="c1"># ------ extract I0 data for normalization:</span>
+            <span class="n">i0_index</span> <span class="o">=</span> <span class="n">selections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;I0&quot;</span><span class="p">)</span>
+            <span class="n">i0_data</span> <span class="o">=</span> <span class="n">scanDict</span><span class="p">[</span><span class="n">i0_index</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">i0_index</span> <span class="ow">in</span> <span class="n">scanDict</span> <span class="k">else</span> <span class="kc">None</span>
+
+            <span class="c1"># For 2D data in scanDictInner, slice to get 1D data</span>
+            <span class="k">if</span> <span class="n">i0_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">i0_data</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">x2_slice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getX2Value</span><span class="p">()</span>  <span class="c1"># Get current X2 value from spinbox</span>
+                <span class="n">i0_data</span> <span class="o">=</span> <span class="n">i0_data</span><span class="p">[</span><span class="n">x2_slice</span><span class="p">]</span>  <span class="c1"># Take the selected X2 slice</span>
+
+            <span class="c1"># ------ extract y(s) data:</span>
+            <span class="n">y_index</span> <span class="o">=</span> <span class="n">selections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="n">un_index</span> <span class="o">=</span> <span class="n">selections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Un&quot;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="n">y_first_unit</span> <span class="o">=</span> <span class="n">y_first_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="c1"># Identify rows that need unscaling (have both Y and Un selected)</span>
+            <span class="n">unscaled_rows</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">y_index</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">un_index</span><span class="p">)</span>
+            <span class="n">regular_y_rows</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">y_index</span><span class="p">)</span> <span class="o">-</span> <span class="n">unscaled_rows</span>
+
+            <span class="c1"># Calculate global min/max for unscaling (from regular Y curves only)</span>
+            <span class="n">global_min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+            <span class="n">global_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unscaled_rows</span> <span class="ow">and</span> <span class="n">regular_y_rows</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">regular_y_rows</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">scanDict</span><span class="p">:</span>
+                        <span class="n">y_data</span> <span class="o">=</span> <span class="n">scanDict</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">y_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="c1"># Apply I0 normalization if I0 is selected</span>
+                            <span class="k">if</span> <span class="n">i0_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="n">i0_data_safe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">i0_data</span><span class="p">)</span>
+                                <span class="n">i0_data_safe</span><span class="p">[</span><span class="n">i0_data_safe</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                                <span class="n">y_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span> <span class="o">/</span> <span class="n">i0_data_safe</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">y_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span>
+                            <span class="n">global_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">global_min</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">y_data</span><span class="p">))</span>
+                            <span class="n">global_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">global_max</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">y_data</span><span class="p">))</span>
+
+            <span class="c1"># If no regular Y curves to reference, use 0 to 1 scale for unscaling</span>
+            <span class="k">if</span> <span class="n">unscaled_rows</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">global_min</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">global_max</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="n">global_min</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="n">global_max</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+            <span class="c1"># Process all Y curves</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y_index</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">y</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">scanDict</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">y_data</span> <span class="o">=</span> <span class="n">scanDict</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+                <span class="n">y_name</span> <span class="o">=</span> <span class="n">scanDict</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;n/a&quot;</span><span class="p">)</span>
+                <span class="n">y_unit</span> <span class="o">=</span> <span class="n">scanDict</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unit&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+                <span class="c1"># For 2D data in scanDictInner, slice to get 1D data</span>
+                <span class="k">if</span> <span class="n">y_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">x2_slice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getX2Value</span><span class="p">()</span>  <span class="c1"># Get current X2 value from spinbox</span>
+
+                    <span class="c1"># Add bounds checking to prevent IndexError</span>
+                    <span class="n">y_data_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">x2_slice</span> <span class="o">&gt;=</span> <span class="n">y_data_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                        <span class="nb">print</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;DEBUG: data2Plot - X2 slice </span><span class="si">{</span><span class="n">x2_slice</span><span class="si">}</span><span class="s2"> out of bounds for data shape </span><span class="si">{</span><span class="n">y_data_array</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, using last available slice&quot;</span>
+                        <span class="p">)</span>
+                        <span class="n">x2_slice</span> <span class="o">=</span> <span class="n">y_data_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># Use last available slice</span>
+
+                    <span class="n">y_data</span> <span class="o">=</span> <span class="n">y_data</span><span class="p">[</span><span class="n">x2_slice</span><span class="p">]</span>  <span class="c1"># Take the selected X2 slice</span>
+
+                <span class="c1"># Apply I0 normalization if I0 is selected</span>
+                <span class="k">if</span> <span class="n">i0_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># Avoid division by zero</span>
+                    <span class="n">i0_data_safe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">i0_data</span><span class="p">)</span>
+                    <span class="n">i0_data_safe</span><span class="p">[</span><span class="n">i0_data_safe</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="mi">1</span>  <span class="c1"># Replace zeros with 1 to avoid division by zero</span>
+                    <span class="p">)</span>
+                    <span class="n">y_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span> <span class="o">/</span> <span class="n">i0_data_safe</span>
+                    <span class="c1"># Display label shows base detector name with [norm] suffix for normalized data</span>
+                    <span class="n">y_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">y_name</span><span class="si">}</span><span class="s2"> [norm]&quot;</span>
+                    <span class="n">y_unit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># Normalized data typically has no units</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">y_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span>
+                    <span class="n">y_unit</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">y_unit</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">if</span> <span class="n">y_unit</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+                    <span class="n">y_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">y_name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">y_unit</span><span class="si">}</span><span class="s2">&quot;</span>
+
+                <span class="c1"># Add X2 index to label for 2D data</span>
+                <span class="k">if</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;isMultidimensional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="n">x2_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getX2Value</span><span class="p">()</span>
+                    <span class="n">y_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y_label</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">x2_index</span><span class="si">}</span><span class="s2">]&quot;</span>
+
+                <span class="c1"># Apply unscaling if this row has both Y and Un selected</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">y</span> <span class="ow">in</span> <span class="n">unscaled_rows</span>
+                    <span class="ow">and</span> <span class="n">global_min</span> <span class="o">!=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="n">global_max</span> <span class="o">!=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">)</span>
+                <span class="p">):</span>
+                    <span class="c1"># Calculate min/max of this curve</span>
+                    <span class="n">m1</span><span class="p">,</span> <span class="n">M1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">y_data</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span>
+                    <span class="c1"># Apply unscaling formula: g(x) = ((f1(x) - m1) / (M1 - m1)) * (M23 - m23) + m23</span>
+                    <span class="k">if</span> <span class="n">M1</span> <span class="o">!=</span> <span class="n">m1</span><span class="p">:</span>  <span class="c1"># Avoid division by zero</span>
+                        <span class="n">y_data</span> <span class="o">=</span> <span class="p">((</span><span class="n">y_data</span> <span class="o">-</span> <span class="n">m1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">M1</span> <span class="o">-</span> <span class="n">m1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span>
+                            <span class="n">global_max</span> <span class="o">-</span> <span class="n">global_min</span>
+                        <span class="p">)</span> <span class="o">+</span> <span class="n">global_min</span>
+                        <span class="n">y_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">y_name</span><span class="si">}</span><span class="s2"> [unscaled]&quot;</span>
+                        <span class="k">if</span> <span class="n">i0_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">y_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">y_name</span><span class="si">}</span><span class="s2"> [norm, unscaled]&quot;</span>
+
+                        <span class="c1"># Add X2 index to unscaled label for 2D data</span>
+                        <span class="k">if</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;isMultidimensional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                            <span class="n">x2_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getX2Value</span><span class="p">()</span>
+                            <span class="n">y_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y_label</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">x2_index</span><span class="si">}</span><span class="s2">]&quot;</span>
+
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">y_first_unit</span> <span class="o">=</span> <span class="n">y_unit</span>
+                    <span class="c1"># y_first_name is used for y-axis label and shows normalization status</span>
+                    <span class="n">y_first_name</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y_name</span><span class="si">}</span><span class="s2"> [norm]&quot;</span>
+                        <span class="k">if</span> <span class="n">i0_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                        <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y_name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">y_unit</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># append to dataset:</span>
+                <span class="n">ds</span><span class="p">,</span> <span class="n">ds_options</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">{}</span>
+                <span class="n">ds_options</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_label</span>
+                <span class="n">ds</span> <span class="o">=</span> <span class="p">[</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">]</span> <span class="k">if</span> <span class="n">x_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[</span><span class="n">y_data</span><span class="p">]</span>
+                <span class="n">datasets</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">ds</span><span class="p">,</span> <span class="n">ds_options</span><span class="p">))</span>
+
+            <span class="c1"># scanDict = {index: {&#39;object&#39;: scanObject, &#39;data&#39;: [...], &#39;unit&#39;: &#39;...&#39;, &#39;name&#39;: &#39;...&#39;,&#39;type&#39;:...}}</span>
+            <span class="n">plot_options</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">scanDict</span><span class="p">[</span><span class="n">x_index</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">x_index</span> <span class="ow">in</span> <span class="n">scanDict</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;x_unit&quot;</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="n">scanDict</span><span class="p">[</span><span class="n">x_index</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unit&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">x_index</span> <span class="ow">in</span> <span class="n">scanDict</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y_first_name</span><span class="p">,</span>
+                <span class="s2">&quot;y_unit&quot;</span><span class="p">:</span> <span class="n">y_first_unit</span><span class="p">,</span>
+                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;filePath&quot;</span><span class="p">:</span> <span class="n">filePath</span><span class="p">,</span>
+                <span class="s2">&quot;fileName&quot;</span><span class="p">:</span> <span class="n">fileName</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="c1"># Add X2 index to plot options for 2D data</span>
+            <span class="k">if</span> <span class="n">fileInfo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;isMultidimensional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">plot_options</span><span class="p">[</span><span class="s2">&quot;x2_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getX2Value</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;DEBUG: data2Plot - Added x2_index to plot_options: </span><span class="si">{</span><span class="n">plot_options</span><span class="p">[</span><span class="s1">&#39;x2_index&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: data2Plot - Not multidimensional, x2_index not added&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">plot_options</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
