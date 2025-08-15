@@ -71,6 +71,11 @@ class MDAFileVisualization(QWidget):
         self._log_x_state = False
         self._log_y_state = False
 
+        # Initialize control update state
+        self._last_control_update = None
+        self._last_control_update_value = None
+        self._control_update_delay = 100  # milliseconds
+
     def setup(self):
         """Setup the UI components and connections."""
         font = QFont(MD_FONT)
@@ -505,6 +510,27 @@ class MDAFileVisualization(QWidget):
             if hasattr(self, "cursorInfo"):
                 self.cursorInfo.setVisible(show)
 
+            # If showing 1D controls, restore their state based on current curve selection
+            if show and hasattr(self, "chart_view") and self.chart_view:
+                print("DEBUG: show1DControls - Restoring control state for 1D tab")
+
+                # Reconnect the curveRemove button signal
+                if hasattr(self, "curveRemove") and hasattr(
+                    self.chart_view, "onRemoveButtonClicked"
+                ):
+                    print("DEBUG: show1DControls - Reconnecting curveRemove signal")
+                    from mdaviz import utils
+
+                    utils.reconnect(
+                        self.curveRemove.clicked, self.chart_view.onRemoveButtonClicked
+                    )
+
+                selected_id = self.chart_view.getSelectedCurveID()
+                has_curve = (
+                    selected_id and selected_id in self.chart_view.curveManager.curves()
+                )
+                self.updatePlotControls(has_curve)
+
         except Exception as e:
             print(f"DEBUG: show1DControls - Error: {e}")
 
@@ -569,6 +595,30 @@ class MDAFileVisualization(QWidget):
         Parameters:
         - curve_selected: Whether a curve is currently selected
         """
+        from PyQt6.QtCore import QTimer
+
+        print(f"DEBUG: updatePlotControls called with curve_selected={curve_selected}")
+
+        # Prevent rapid successive calls that would disable controls
+        if (
+            hasattr(self, "_last_control_update")
+            and self._last_control_update is not None
+            and hasattr(self, "_last_control_update_value")
+            and self._last_control_update_value is True
+            and curve_selected is False
+        ):
+            # If this is called too soon after enabling controls, and trying to disable them, ignore it
+            print("DEBUG: updatePlotControls - Skipping rapid disable call")
+            return
+
+        # Set a timer to allow the next call after a delay
+        self._last_control_update = QTimer()
+        self._last_control_update.singleShot(
+            self._control_update_delay,
+            lambda: setattr(self, "_last_control_update", None),
+        )
+        self._last_control_update_value = curve_selected
+
         self.fitButton.setEnabled(curve_selected)  # type: ignore[attr-defined]
         self.clearFitsButton.setEnabled(curve_selected)  # type: ignore[attr-defined]
         self.curveStyle.setEnabled(curve_selected)  # type: ignore[attr-defined]
