@@ -21,6 +21,10 @@ from collections import OrderedDict
 from PyQt6.QtCore import QObject, pyqtSignal
 from mdaviz.synApps_mdalib.mda import readMDA
 from mdaviz.utils import get_scan, get_scan_2d
+from mdaviz.logger import get_logger
+
+# Get logger for this module
+logger = get_logger("data_cache")
 
 
 @dataclass
@@ -136,12 +140,12 @@ class DataCache(QObject):
             # psutil not available, skip memory monitoring
             return 0.0
         except Exception as e:
-            print(f"Error checking memory usage: {e}")
+            logger.error(f"Error checking memory usage: {e}")
             return 0.0
 
     def _perform_memory_cleanup(self) -> None:
         """Perform aggressive memory cleanup when usage is high."""
-        print(
+        logger.info(
             f"Performing memory cleanup - current cache size: {len(self._cache)} entries"
         )
 
@@ -154,7 +158,7 @@ class DataCache(QObject):
         # Force garbage collection
         gc.collect()
 
-        print(
+        logger.info(
             f"Memory cleanup complete - remaining cache size: {len(self._cache)} entries"
         )
 
@@ -234,7 +238,7 @@ class DataCache(QObject):
 
             # If file is large and memory usage is high, skip caching
             if file_size_mb > 100 and current_memory > self.max_memory_mb * 0.8:
-                print(
+                logger.warning(
                     f"Warning: Large file ({file_size_mb:.1f}MB) and high memory usage ({current_memory:.1f}MB) - loading without caching"
                 )
                 return self._load_without_caching(path_obj)
@@ -242,7 +246,7 @@ class DataCache(QObject):
             # Load the file data
             result = readMDA(str(path_obj))
             if result is None:
-                print(f"Could not read file: {file_path}")
+                logger.error(f"Could not read file: {file_path}")
                 return None
 
             file_metadata, file_data_dim1, *_ = result
@@ -266,7 +270,7 @@ class DataCache(QObject):
                     # Also store inner dimension data for 1D plotting
                     scan_dict_inner, _, _ = get_scan(file_data_dim2)
                 except Exception as e:
-                    print(f"Warning: Could not process 2D data: {e}")
+                    logger.warning(f"Warning: Could not process 2D data: {e}")
                     scan_dict_2d = {}
                     scan_dict_inner = {}
 
@@ -302,7 +306,7 @@ class DataCache(QObject):
             return cached_data
 
         except Exception as e:
-            print(f"Error loading file {file_path}: {e}")
+            logger.error(f"Error loading file {file_path}: {e}")
             return None
 
     def _load_without_caching(self, path_obj: Path) -> Optional[CachedFileData]:
@@ -341,7 +345,7 @@ class DataCache(QObject):
                     # Also store inner dimension data for 1D plotting
                     scan_dict_inner, _, _ = get_scan(file_data_dim2)
                 except Exception as e:
-                    print(f"Warning: Could not process 2D data: {e}")
+                    logger.warning(f"Warning: Could not process 2D data: {e}")
                     scan_dict_2d = {}
                     scan_dict_inner = {}
 
@@ -363,7 +367,7 @@ class DataCache(QObject):
                 acquired_dimensions=acquired_dimensions,
             )
         except Exception as e:
-            print(f"Error loading file without caching {path_obj}: {e}")
+            logger.error(f"Error loading file without caching {path_obj}: {e}")
             return None
 
     def get_or_load(self, file_path: str) -> Optional[CachedFileData]:

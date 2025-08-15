@@ -17,6 +17,10 @@ from pathlib import Path
 from typing import Any, Optional
 from dataclasses import dataclass, asdict
 from PyQt6.QtCore import QObject, pyqtSignal
+from mdaviz.logger import get_logger
+
+# Get logger for this module
+logger = get_logger("lazy_loading_config")
 
 
 @dataclass
@@ -75,7 +79,7 @@ class LazyLoadingConfig:
                 json.dump(self.to_dict(), f, indent=2)
             return True
         except Exception as e:
-            print(f"Error saving configuration: {e}")
+            logger.error(f"Error saving configuration: {e}")
             return False
 
     @classmethod
@@ -94,7 +98,7 @@ class LazyLoadingConfig:
                 data = json.load(f)
             return cls.from_dict(data)
         except Exception as e:
-            print(f"Error loading configuration: {e}")
+            logger.error(f"Error loading configuration: {e}")
             return None
 
 
@@ -153,7 +157,7 @@ class ConfigManager(QObject):
                 if hasattr(self.config, key):
                     setattr(self.config, key, value)
                 else:
-                    print(f"Unknown configuration key: {key}")
+                    logger.warning(f"Unknown configuration key: {key}")
 
             # Save updated configuration
             success = self.save_config(self.config)
@@ -161,7 +165,7 @@ class ConfigManager(QObject):
                 self.config_changed.emit(self.config)
             return success
         except Exception as e:
-            print(f"Error updating configuration: {e}")
+            logger.error(f"Error updating configuration: {e}")
             return False
 
     def save_config(self, config: LazyLoadingConfig) -> bool:
@@ -179,7 +183,7 @@ class ConfigManager(QObject):
             self.config_file.parent.mkdir(parents=True, exist_ok=True)
             return config.save_to_file(self.config_file)
         except Exception as e:
-            print(f"Error saving configuration: {e}")
+            logger.error(f"Error saving configuration: {e}")
             return False
 
     def reset_to_defaults(self) -> bool:

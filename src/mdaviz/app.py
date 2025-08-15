@@ -10,11 +10,15 @@ mdaviz: Python Qt5 application to visualize mda data.
     ~main
 """
 
-import logging
 import sys
 from PyQt6 import QtWidgets
 from mdaviz.mainwindow import MainWindow
 import argparse
+from mdaviz.logger import get_logger, set_log_level, enable_debug_mode
+from mdaviz.logging_config import clear_old_logs
+
+# Get logger for this module
+logger = get_logger("app")
 
 
 def gui() -> None:
@@ -54,12 +58,6 @@ def command_line_interface() -> argparse.Namespace:
     )
     # fmt: on
 
-    # parser.add_argument(
-    #     "directory",
-    #     help=("Directory loaded at start up. This argument is required."),
-    #     type=str,
-    # )
-
     parser.add_argument("-v", "--version", action="version", version=__version__)
 
     return parser.parse_args()
@@ -69,32 +67,26 @@ def main() -> None:  # for future command-line options
     """Main entry point for the application."""
     options = command_line_interface()
 
-    logging.basicConfig(level=options.log.upper())
-    logger = logging.getLogger(__name__)
+    # Clean up old log files (keep logs from last 1 day)
+    clear_old_logs(keep_days=1)
 
-    # # Resolve the directory to an absolute path and remove trailing slash
-    # directory_path = Path(options.directory).resolve()
-    # directory = directory_path.as_posix().rstrip("/")
+    # Configure logging level based on command line argument or environment variable
+    import os
 
-    # # Ensure the path is absolute (starts with a "/")
-    # if not directory.startswith("/"):
-    #     print(
-    #         f"\n\nERROR: The specified directory is not an absolute path:\n\t{directory}\n"
-    #     )
-    #     sys.exit(1)
-
-    # # Check if the directory exists
-    # if not directory_path.exists() or not directory_path.is_dir():
-    #     print(
-    #         f"\n\nERROR: The specified directory does not exist or is not a directory:\n\t{directory}\n"
-    #     )
-    #     sys.exit(1)
+    # Use command line argument first, then environment variable as fallback
+    if options.log != "warning":  # If user specified a log level
+        set_log_level(options.log.upper())
+        logger.info("Starting mdaviz application")
+    elif os.environ.get("MDAVIZ_DEBUG", "").lower() in ("1", "true", "yes"):
+        # Fallback to environment variable if no command line argument
+        enable_debug_mode()
+        logger.info("Debug mode enabled via environment variable")
+    else:
+        # Default to command line argument (warning)
+        set_log_level(options.log.upper())
+        logger.info("Starting mdaviz application")
 
     logger.info("Logging level: %s", options.log)
-
-    # set warning log level for (noisy) support packages
-    for package in "httpcore httpx PyQt6 tiled".split():
-        logging.getLogger(package).setLevel(logging.WARNING)
 
     gui()
 

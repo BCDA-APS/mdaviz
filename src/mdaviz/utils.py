@@ -30,6 +30,11 @@ from datetime import datetime
 from typing import Any
 from PyQt6 import uic
 from mdaviz.synApps_mdalib.mda import scanPositioner, scanDetector, readMDA, skimMDA
+from mdaviz.logger import get_logger
+
+# Get logger for this module
+logger = get_logger("utils")
+
 
 HEADERS = "Prefix", "Scan #", "Points", "Dim", "Date", "Size"
 
@@ -192,7 +197,7 @@ def get_file_info_lightweight(file_path: pathlib.Path) -> dict:
 
     except Exception as e:
         # If skimMDA fails, provide minimal info
-        print(f"Error reading {file_path}: {e}")
+        logger.error(f"Error reading {file_path}: {e}")
         file_num = None
         file_prefix = None
         file_pts = 0
@@ -335,7 +340,7 @@ def get_det(mda_file_data):
     """
 
     d = {}
-    print(f"\n\n{mda_file_data=}\n\n")
+    logger.debug(f"\n\n{mda_file_data=}\n\n")
 
     p_list = mda_file_data.p  # list of scanDetector instances
     d_list = mda_file_data.d  # list of scanPositioner instances
@@ -714,7 +719,7 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
     if isinstance(ui_file, str):
         ui_file = UI_DIR / ui_file
 
-    # print(f"myLoadUi({ui_file=})")
+    logger.debug(f"myLoadUi({ui_file=})")
     return uic.loadUi(ui_file, baseinstance=baseinstance, **kw)
 
 
@@ -749,4 +754,4 @@ def reconnect(signal, new_slot):
 
 
 def debug_signal(*args, **kwargs):
-    print("\nSignal emitted with args:", args, "and kwargs:", kwargs)
+    logger.debug("\nSignal emitted with args:", args, "and kwargs:", kwargs)
