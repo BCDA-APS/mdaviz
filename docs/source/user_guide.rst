@@ -177,10 +177,15 @@ Common Issues
 - Verify file permissions
 - Try refreshing the folder view
 
-**Known bugs:**
+:doc:`known_bugs`:
 
-- If the plot area starts expanding vertically at each new plot, set the maximum plot height to a reasonable value (e.g., 600 pixels) in the preferences
-- If the curve management options are greyed out (Fit, Style, etc.), restart the application.
+1. After switching from the 2D tab to the 1D tab, basic statistics (min, max, mean, COM) may display "n/a" for curves that were previously working correctly.
+
+   - Workaround: manipulate the curve in any way (change style, offset, factor, or apply a fit)
+
+2. The plotting area sometimes expands vertically beyond reasonable bounds: 
+
+   - Workaround: set the maximum plot height to a reasonable value (e.g., 600 pixels) in the preferences
 
 **Fitting fails:**
 
