@@ -183,7 +183,7 @@ Common Issues
 
    - Workaround: manipulate the curve in any way (change style, offset, factor, or apply a fit)
 
-2. The plotting area sometimes expands vertically beyond reasonable bounds: 
+2. The plotting area sometimes expands vertically beyond reasonable bounds:
 
    - Workaround: set the maximum plot height to a reasonable value (e.g., 600 pixels) in the preferences
 

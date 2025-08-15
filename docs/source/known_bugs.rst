@@ -17,7 +17,7 @@ Statistics Display Bug After Tab Switching
 5. Select a different curve - statistics now show "n/a"
 6. The originally selected curve may also show "n/a" after switching curves
 
-**Workaround**: 
+**Workaround**:
 
 - Manipulate the curve in any way (change style, offset, factor, or apply a fit)
 - This triggers a plot update that restores the statistics display
@@ -44,7 +44,7 @@ Plotting Area Vertical Expansion Bug
 2. Plot many files one after another (typically 50+ files)
 3. The plotting area may suddenly expand vertically at each new file, making the interface unusable
 
-**Workaround**: 
+**Workaround**:
 
 - Set a maximum height for the plotting area in the preferences (e.g., 500 pixels)
 - This prevents the plotting area from expanding beyond the specified limit
@@ -57,4 +57,4 @@ Plotting Area Vertical Expansion Bug
 - Triggered by opening many files one after another (typically 50+ files)
 - The plotting widget loses its size constraints temporarily during file loading
 
-**Status**: Known issue, low priority. The workaround is effective and prevents the problem. 
+**Status**: Known issue, low priority. The workaround is effective and prevents the problem.

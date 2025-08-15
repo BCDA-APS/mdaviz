@@ -129,6 +129,60 @@ class MDAFileVisualization(QWidget):
         # Connect tab change signal
         self.tabWidget.currentChanged.connect(self.onTabChanged)
 
+        # Connect to file tab changes to update 2D plot when switching files
+        # Use a timer to delay connection until widget is fully initialized
+        from PyQt6.QtCore import QTimer
+
+        QTimer.singleShot(100, self.connectToFileTabChanges)
+
+    def connectToFileTabChanges(self):
+        """Connect to file tab changes to update 2D plot when needed."""
+        try:
+            print("DEBUG: connectToFileTabChanges - Starting connection attempt")
+
+            # Find the parent MDA_MVC to connect to the tabChanged signal
+            parent = self.parent()
+            print(f"DEBUG: connectToFileTabChanges - Initial parent: {type(parent)}")
+
+            while parent and not hasattr(parent, "mda_file"):
+                parent = parent.parent()
+                print(
+                    f"DEBUG: connectToFileTabChanges - Traversed to parent: {type(parent)}"
+                )
+
+            if parent and hasattr(parent, "mda_file"):
+                # Connect to the tabChanged signal from MDAFile
+                parent.mda_file.tabChanged.connect(self.onFileTabChanged)
+                print("DEBUG: connectToFileTabChanges - Connected to file tab changes")
+            else:
+                print(
+                    "DEBUG: connectToFileTabChanges - Could not find MDA_MVC with mda_file"
+                )
+        except Exception as e:
+            print(f"DEBUG: connectToFileTabChanges - Error: {e}")
+
+    def onFileTabChanged(self, tab_index, file_path, file_data, selection_field):
+        """
+        Handle file tab changes and update 2D plot if on 2D tab.
+
+        Parameters:
+            tab_index (int): Index of the newly selected file tab
+            file_path (str): Path of the file associated with the new tab
+            file_data (dict): Contains metadata and table data for the file
+            selection_field (dict): Specifies the fields (POS/DET) selected for plotting
+        """
+        print(f"DEBUG: onFileTabChanged - File tab changed to {file_path}")
+
+        # Always update control visibility to ensure correct controls are shown
+        current_tab_index = self.tabWidget.currentIndex()
+        print(f"DEBUG: onFileTabChanged - Current viz tab index: {current_tab_index}")
+        self.updateControlVisibility(current_tab_index)
+
+        # Update 2D plot if we're currently on the 2D tab
+        if current_tab_index == 3:  # 2D tab
+            print("DEBUG: onFileTabChanged - On 2D tab, updating 2D plot")
+            self.update2DPlot()
+
     def update2DTabVisibility(self, show_2d_tab=False):
         """
         Update 2D tab visibility based on data dimensions.
@@ -362,8 +416,6 @@ class MDAFileVisualization(QWidget):
         # Handle 2D plotting
         if is_2d_visible and index == 3:  # 2D tab
             print("DEBUG: onTabChanged - Switching to 2D tab, calling update2DPlot")
-            # Force auto-replace mode when switching to 2D tab
-            self.forceAutoReplaceMode()
             self.update2DPlot()
         elif index == 0:  # 1D tab
             print("DEBUG: onTabChanged - Switching to 1D tab")
@@ -387,37 +439,6 @@ class MDAFileVisualization(QWidget):
             and self.search_dialog.isVisible()
         ):
             self.search_dialog.close()
-
-    def forceAutoReplaceMode(self):
-        """Force auto-replace mode and clear other tabs when switching to 2D tab."""
-        try:
-            # Get the parent MDA_MVC widget
-            parent = self.parent()
-            while parent and not hasattr(parent, "mda_file"):
-                parent = parent.parent()
-
-            if parent and hasattr(parent, "mda_file"):
-                # Found the MDA_MVC, now access the mda_file widget
-                mda_file_widget = parent.mda_file
-
-                # Set mode to auto-replace
-                mda_file_widget.autoBox.setCurrentText("Auto-replace")
-
-                # Get current file path from the current tab
-                current_file_path = parent.getCurrentFilePath()
-                if current_file_path:
-                    # Clear all tabs except the current one
-                    parent.clearOtherTabs(current_file_path)
-
-                print(
-                    "DEBUG: forceAutoReplaceMode - Set to auto-replace and cleared other tabs"
-                )
-            else:
-                print(
-                    "DEBUG: forceAutoReplaceMode - Could not find MDA_MVC with mda_file"
-                )
-        except Exception as e:
-            print(f"DEBUG: forceAutoReplaceMode - Error: {e}")
 
     def updateControlVisibility(self, tab_index):
         """
