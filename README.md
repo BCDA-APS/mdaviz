@@ -72,6 +72,13 @@ pip install PyQt6 Qt6
 pip install -e .
 ```
 
+Once installed, you can run the application at any time using:
+```bash
+cd mdaviz
+conda activate mdaviz
+mdaviz
+```
+
 Always activate the environment before running, testing, or using pre-commit hooks.
 
 
@@ -112,6 +119,28 @@ sudo yum install xcb-util-cursor
 
 ## Development
 
+### Logging and Debugging
+
+**Default Behavior:**
+By default, `mdaviz` logs at the INFO level, showing progress messages, file loading status, and important application events.
+
+**Command Line Options:**
+You can control the logging level using the `--log` argument:
+
+```bash
+# Show only warnings and errors (quiet mode)
+mdaviz --log warning
+
+# Show all messages including debug information
+mdaviz --log debug
+
+# Show only errors and critical messages
+mdaviz --log error
+```
+**Log Files:**
+Log files are automatically created in `~/.mdaviz/logs/` with timestamps. Old log files (older than 1 day) are automatically cleaned up on startup.
+
+
 ### Testing
 
 Run all tests:
@@ -123,6 +152,7 @@ Current test status:
 - **223 tests passing** with 54% coverage
 - **48 skipped tests** (GUI tests in headless environment)
 - **0 failed tests** (all tests are now passing!)
+
 
 ### Code Quality
 

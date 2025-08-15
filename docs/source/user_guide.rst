@@ -237,3 +237,44 @@ For detailed contributing guidelines, see the project's GitHub repository.
 .. |remove_icon| raw:: html
 
    <span class="material-icons" style="font-size: 1em; vertical-align: middle; color: black;">close</span>
+
+
+Logging and Debugging
+---------------------
+
+**Default Behavior:**
+By default, `mdaviz` logs at the INFO level, showing progress messages, file loading status, and important application events.
+
+**Command Line Options:**
+You can control the logging level using the ``--log`` argument:
+
+.. code-block:: bash
+
+    # Show only warnings and errors (quiet mode)
+    mdaviz --log warning
+
+    # Show all messages including debug information
+    mdaviz --log debug
+
+    # Show only errors and critical messages
+    mdaviz --log error
+
+**Available Log Levels:**
+
+- **debug**: Most verbose - shows all messages including detailed debugging information
+- **info**: Default level - shows progress, file operations, and general application status
+- **warning**: Shows warnings, errors, and critical messages
+- **error**: Shows only errors and critical messages
+- **critical**: Shows only critical errors
+
+**Environment Variables:**
+You can also enable debug mode using the environment variable:
+
+.. code-block:: bash
+
+    # Enable debug mode via environment variable
+    export MDAVIZ_DEBUG=1
+    mdaviz
+
+**Log Files:**
+Log files are automatically created in ``~/.mdaviz/logs/`` with timestamps. Old log files (older than 1 day) are automatically cleaned up on startup.

@@ -49,11 +49,11 @@ def command_line_interface() -> argparse.Namespace:
     # fmt: off
     parser.add_argument(
         "--log",
-        default="warning",
+        default="info",
         help=(
             "Provide logging level. "
             "Example '--log debug'. "
-            "Default level: 'warning'"),
+            "Default level: 'info'"),
         choices=["debug", "info", "warning", "error", "critical"],
     )
     # fmt: on
