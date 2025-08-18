@@ -49,11 +49,11 @@ def command_line_interface() -> argparse.Namespace:
     # fmt: off
     parser.add_argument(
         "--log",
-        default="info",
+        default="warning",
         help=(
             "Provide logging level. "
             "Example '--log debug'. "
-            "Default level: 'info'"),
+            "Default level: 'warning'"),
         choices=["debug", "info", "warning", "error", "critical"],
     )
     # fmt: on
@@ -72,6 +72,11 @@ def main() -> None:  # for future command-line options
 
     # Configure logging level based on command line argument or environment variable
     import os
+    import logging
+
+    # Set external package loggers to WARNING to reduce noise
+    for package in ["httpcore", "httpx", "PyQt6", "tiled"]:
+        logging.getLogger(package).setLevel(logging.WARNING)
 
     # Use command line argument first, then environment variable as fallback
     if options.log != "warning":  # If user specified a log level

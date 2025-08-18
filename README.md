@@ -122,20 +122,20 @@ sudo yum install xcb-util-cursor
 ### Logging and Debugging
 
 **Default Behavior:**
-By default, `mdaviz` logs at the INFO level, showing progress messages, file loading status, and important application events.
+By default, `mdaviz` logs at the WARNING level, showing only warnings, errors and critical messages (quiet mode).
 
 **Command Line Options:**
 You can control the logging level using the `--log` argument:
 
 ```bash
-# Show only warnings and errors (quiet mode)
-mdaviz --log warning
+# Show only errors and critical messages
+mdaviz --log error
+
+# Show warnings, errors, critical messages and info (progress messages, file loading status, and important application events).
+mdaviz --log info
 
 # Show all messages including debug information
 mdaviz --log debug
-
-# Show only errors and critical messages
-mdaviz --log error
 ```
 **Log Files:**
 Log files are automatically created in `~/.mdaviz/logs/` with timestamps. Old log files (older than 1 day) are automatically cleaned up on startup.

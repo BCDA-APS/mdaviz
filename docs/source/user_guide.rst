@@ -243,27 +243,29 @@ Logging and Debugging
 ---------------------
 
 **Default Behavior:**
-By default, `mdaviz` logs at the INFO level, showing progress messages, file loading status, and important application events.
+By default, `mdaviz` logs at the WARNING level, showing only warnings, errors and critical messages (quiet mode).
 
 **Command Line Options:**
 You can control the logging level using the ``--log`` argument:
 
 .. code-block:: bash
 
-    # Show only warnings and errors (quiet mode)
-    mdaviz --log warning
+    # Show only errors and critical messages
+    mdaviz --log error
+
+    # Show warnings, errors, critical messages and info (progress messages, file loading status, and important application events).
+    mdaviz --log info
 
     # Show all messages including debug information
     mdaviz --log debug
 
-    # Show only errors and critical messages
-    mdaviz --log error
+
 
 **Available Log Levels:**
 
 - **debug**: Most verbose - shows all messages including detailed debugging information
-- **info**: Default level - shows progress, file operations, and general application status
-- **warning**: Shows warnings, errors, and critical messages
+- **info**: Shows warnings, errors, critical messages, progress, file operations, and general application status
+- **warning**: Default level - shows warnings, errors, and critical messages
 - **error**: Shows only errors and critical messages
 - **critical**: Shows only critical errors
 

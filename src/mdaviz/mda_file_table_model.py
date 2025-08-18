@@ -35,10 +35,8 @@ from mdaviz.utils import mda2ftm, ftm2mda
 from dataclasses import KW_ONLY
 from dataclasses import dataclass
 
-from PyQt6.QtCore import pyqtSignal, Qt, QAbstractTableModel, QModelIndex
+from PyQt6.QtCore import pyqtSignal, Qt, QAbstractTableModel
 from PyQt6.QtGui import QBrush, QColor
-from enum import Enum
-from typing import List, Dict, Any, Optional, Set
 from mdaviz.logger import get_logger
 
 # Get logger for this module

@@ -65,7 +65,6 @@ def clear_old_logs(keep_days=7):
     Args:
         keep_days: Number of days to keep log files
     """
-    import time
     from datetime import datetime, timedelta
 
     cutoff_time = datetime.now() - timedelta(days=keep_days)

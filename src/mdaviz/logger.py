@@ -6,7 +6,6 @@ file output, and consistent formatting across all modules.
 """
 
 import logging
-import os
 import sys
 from pathlib import Path
 from typing import Optional
@@ -76,10 +75,14 @@ class MDALogger:
             # Fallback to current directory if home directory is not accessible
             return Path("mdaviz.log")
 
-    def get_logger(self, name: str = None) -> logging.Logger:
+    def get_logger(self, name: Optional[str] = None) -> logging.Logger:
         """Get a logger instance, optionally with a specific name."""
         if name:
             return logging.getLogger(f"mdaviz.{name}")
+        # Ensure _logger is not None before returning
+        if self._logger is None:
+            self._setup_logger()
+        assert self._logger is not None  # Type checker assertion
         return self._logger
 
     def set_level(self, level: str):
@@ -93,6 +96,10 @@ class MDALogger:
         }
 
         if level.upper() in level_map:
+            # Ensure _logger is not None before using it
+            if self._logger is None:
+                self._setup_logger()
+            assert self._logger is not None  # Type checker assertion
             self._logger.setLevel(level_map[level.upper()])
             for handler in self._logger.handlers:
                 handler.setLevel(level_map[level.upper()])
@@ -102,7 +109,7 @@ class MDALogger:
 _mda_logger = MDALogger()
 
 
-def get_logger(name: str = None) -> logging.Logger:
+def get_logger(name: Optional[str] = None) -> logging.Logger:
     """
     Get a logger instance for the specified module.
 

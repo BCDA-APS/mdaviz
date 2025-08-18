@@ -142,7 +142,7 @@ WARNING - mdaviz.mda_file_viz - No current tableview found
    # Good
    logger.debug(f"Processing file: {file_path}")
    logger.error(f"Failed to load data from {file_path}: {e}")
-   
+
    # Avoid
    logger.debug("Processing file")
    logger.error("Failed to load data")
@@ -182,4 +182,4 @@ The logging system is designed to be a drop-in replacement for debug print state
 
 ### Log files too large
 - Use `clear_old_logs()` to remove old log files
-- Consider implementing log rotation for long-running applications 
+- Consider implementing log rotation for long-running applications

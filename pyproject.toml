@@ -236,6 +236,11 @@ include = ["mdaviz*"]  # package names should match these glob patterns (["*"] b
 [tool.mypy]
 python_version = "3.11"
 # All strict options removed for initial release; only import errors will be checked by pre-commit
+# no_strict_optional = true
+namespace_packages = true
+exclude = [
+    "src/mdaviz/synApps_mdalib/.*",
+]
 
 [[tool.mypy.overrides]]
 module = [
@@ -245,6 +250,7 @@ module = [
     "numpy.*",
     "lmfit.*",
     "tiled.*",
+    "mdaviz.synApps_mdalib.*",
 ]
 ignore_missing_imports = true
 

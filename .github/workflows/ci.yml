@@ -55,7 +55,7 @@ jobs:
 
       - name: Run mypy
         run: |
-          mypy src/mdaviz --ignore-missing-imports
+          cd src && mypy --ignore-missing-imports --package mdaviz
 
       - name: Set timezone
         uses: szenius/set-timezone@v2.0
