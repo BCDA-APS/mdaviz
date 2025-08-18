@@ -29,14 +29,6 @@ Version 1.2.0 (latest)
 - Updated dependencies and build configuration
 
 
-
-Version 1.2.0
--------------
-
-- Add 2D data visualization functionality
-- Update documentation
-
-
 Version 1.1.2
 -------------
 
