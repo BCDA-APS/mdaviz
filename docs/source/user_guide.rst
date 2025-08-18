@@ -177,10 +177,15 @@ Common Issues
 - Verify file permissions
 - Try refreshing the folder view
 
-**Known bugs:**
+:doc:`known_bugs`:
 
-- If the plot area starts expanding vertically at each new plot, set the maximum plot height to a reasonable value (e.g., 600 pixels) in the preferences
-- If the curve management options are greyed out (Fit, Style, etc.), restart the application.
+1. After switching from the 2D tab to the 1D tab, basic statistics (min, max, mean, COM) may display "n/a" for curves that were previously working correctly.
+
+   - Workaround: manipulate the curve in any way (change style, offset, factor, or apply a fit)
+
+2. The plotting area sometimes expands vertically beyond reasonable bounds:
+
+   - Workaround: set the maximum plot height to a reasonable value (e.g., 600 pixels) in the preferences
 
 **Fitting fails:**
 
@@ -232,3 +237,46 @@ For detailed contributing guidelines, see the project's GitHub repository.
 .. |remove_icon| raw:: html
 
    <span class="material-icons" style="font-size: 1em; vertical-align: middle; color: black;">close</span>
+
+
+Logging and Debugging
+---------------------
+
+**Default Behavior:**
+By default, `mdaviz` logs at the WARNING level, showing only warnings, errors and critical messages (quiet mode).
+
+**Command Line Options:**
+You can control the logging level using the ``--log`` argument:
+
+.. code-block:: bash
+
+    # Show only errors and critical messages
+    mdaviz --log error
+
+    # Show warnings, errors, critical messages and info (progress messages, file loading status, and important application events).
+    mdaviz --log info
+
+    # Show all messages including debug information
+    mdaviz --log debug
+
+
+
+**Available Log Levels:**
+
+- **debug**: Most verbose - shows all messages including detailed debugging information
+- **info**: Shows warnings, errors, critical messages, progress, file operations, and general application status
+- **warning**: Default level - shows warnings, errors, and critical messages
+- **error**: Shows only errors and critical messages
+- **critical**: Shows only critical errors
+
+**Environment Variables:**
+You can also enable debug mode using the environment variable:
+
+.. code-block:: bash
+
+    # Enable debug mode via environment variable
+    export MDAVIZ_DEBUG=1
+    mdaviz
+
+**Log Files:**
+Log files are automatically created in ``~/.mdaviz/logs/`` with timestamps. Old log files (older than 1 day) are automatically cleaned up on startup.

@@ -35,9 +35,12 @@ from mdaviz.utils import mda2ftm, ftm2mda
 from dataclasses import KW_ONLY
 from dataclasses import dataclass
 
-from PyQt6.QtCore import pyqtSignal, Qt
+from PyQt6.QtCore import pyqtSignal, Qt, QAbstractTableModel
 from PyQt6.QtGui import QBrush, QColor
-from PyQt6.QtCore import QAbstractTableModel
+from mdaviz.logger import get_logger
+
+# Get logger for this module
+logger = get_logger("mda_file_table_model")
 
 
 class ColumnDataType:
@@ -262,10 +265,10 @@ class MDAFileTableModel(QAbstractTableModel):
         checked = state == Qt.CheckState.Checked
         prior = self.selections.get(row)  # value if row exist as a key, None otherwise
 
-        print(
-            f"DEBUG: setCheckbox - row={row}, column_name={column_name}, checked={checked}"
+        logger.debug(
+            f"setCheckbox - row={row}, column_name={column_name}, checked={checked}"
         )
-        print(f"DEBUG: setCheckbox - prior={prior}")
+        logger.debug(f"setCheckbox - prior={prior}")
 
         # Handle multiple selections per row
         if isinstance(prior, list):
@@ -278,8 +281,8 @@ class MDAFileTableModel(QAbstractTableModel):
                     new_selection = None
             self.selections[row] = new_selection
             changes = new_selection != prior
-            print(
-                f"DEBUG: setCheckbox - multiple selection: new_selection={new_selection}, changes={changes}"
+            logger.debug(
+                f"setCheckbox - multiple selection: new_selection={new_selection}, changes={changes}"
             )
         else:
             # Handle single selection (backward compatibility)
@@ -289,28 +292,28 @@ class MDAFileTableModel(QAbstractTableModel):
                     new_selection = [prior, column_name]
                     self.selections[row] = new_selection
                     changes = True
-                    print(
-                        f"DEBUG: setCheckbox - converting to multiple selection: new_selection={new_selection}"
+                    logger.debug(
+                        f"setCheckbox - converting to multiple selection: new_selection={new_selection}"
                     )
                 else:
                     # Normal single selection replacement
                     new_selection = column_name
                     self.selections[row] = new_selection
                     changes = new_selection != prior
-                    print(
-                        f"DEBUG: setCheckbox - single selection replacement: new_selection={new_selection}, changes={changes}"
+                    logger.debug(
+                        f"setCheckbox - single selection replacement: new_selection={new_selection}, changes={changes}"
                     )
             else:
                 # Unchecking - just clear the selection
                 new_selection = None
                 self.selections[row] = new_selection
                 changes = new_selection != prior
-                print(
-                    f"DEBUG: setCheckbox - unchecking: new_selection={new_selection}, changes={changes}"
+                logger.debug(
+                    f"setCheckbox - unchecking: new_selection={new_selection}, changes={changes}"
                 )
 
         changes = self.applySelectionRules(index, changes)
-        print(f"DEBUG: setCheckbox - after applySelectionRules: changes={changes}")
+        logger.debug(f"setCheckbox - after applySelectionRules: changes={changes}")
         if changes:
             det_removed = self.updateCheckboxes(old_selection=old_selection)
             self.checkboxStateChanged.emit(self.plotFields(), det_removed)
@@ -394,25 +397,25 @@ class MDAFileTableModel(QAbstractTableModel):
         column_name = self.columnName(index.column())
         current_column_number = self.columnNumber(column_name)
 
-        print(f"DEBUG: applySelectionRules - row={row}, column_name={column_name}")
-        print(f"DEBUG: applySelectionRules - current selections={self.selections}")
+        logger.debug(f"applySelectionRules - row={row}, column_name={column_name}")
+        logger.debug(f"applySelectionRules - current selections={self.selections}")
 
         # Handle "Un" column special rules
         if column_name == "Un":
-            print("DEBUG: applySelectionRules - handling Un column")
+            logger.debug("applySelectionRules - handling Un column")
             # Rule 1: Cannot be same as X
             if isinstance(
                 self.selections.get(row), list
             ) and "X" in self.selections.get(row, []):
                 if "Un" in self.selections.get(row, []):
-                    print(
-                        "DEBUG: applySelectionRules - removing Un because X is selected"
+                    logger.debug(
+                        "applySelectionRules - removing Un because X is selected"
                     )
                     self.selections[row].remove("Un")
                     changes = True
             elif self.selections.get(row) == "X":
                 if "Un" in self.selections.get(row, []):
-                    print("DEBUG: applySelectionRules - keeping only X, removing Un")
+                    logger.debug("applySelectionRules - keeping only X, removing Un")
                     self.selections[row] = "X"  # Keep only X
                     changes = True
             # Rule 2: Cannot be same as I0
@@ -420,14 +423,14 @@ class MDAFileTableModel(QAbstractTableModel):
                 self.selections.get(row), list
             ) and "I0" in self.selections.get(row, []):
                 if "Un" in self.selections.get(row, []):
-                    print(
-                        "DEBUG: applySelectionRules - removing Un because I0 is selected"
+                    logger.debug(
+                        "applySelectionRules - removing Un because I0 is selected"
                     )
                     self.selections[row].remove("Un")
                     changes = True
             elif self.selections.get(row) == "I0":
                 if "Un" in self.selections.get(row, []):
-                    print("DEBUG: applySelectionRules - keeping only I0, removing Un")
+                    logger.debug("applySelectionRules - keeping only I0, removing Un")
                     self.selections[row] = "I0"  # Keep only I0
                     changes = True
             # Rule 3: Requires Y selection (handled in data2Plot)
@@ -451,8 +454,8 @@ class MDAFileTableModel(QAbstractTableModel):
                                         == column_name  # Only conflict if same column type
                                     ):
                                         if r != row:
-                                            print(
-                                                f"DEBUG: applySelectionRules - removing {single_v} from row {r} because {column_name} selected"
+                                            logger.debug(
+                                                f"applySelectionRules - removing {single_v} from row {r} because {column_name} selected"
                                             )
                                             # Remove the conflicting selection from the list
                                             v.remove(single_v)
@@ -465,15 +468,15 @@ class MDAFileTableModel(QAbstractTableModel):
                             if r == row and isinstance(v, list):
                                 # Remove "Un" if "X" is also selected
                                 if "X" in v and "Un" in v:
-                                    print(
-                                        "DEBUG: applySelectionRules - removing Un because X is selected on same row"
+                                    logger.debug(
+                                        "applySelectionRules - removing Un because X is selected on same row"
                                     )
                                     v.remove("Un")
                                     changes = True
                                 # Remove "Un" if "I0" is also selected
                                 if "I0" in v and "Un" in v:
-                                    print(
-                                        "DEBUG: applySelectionRules - removing Un because I0 is selected on same row"
+                                    logger.debug(
+                                        "applySelectionRules - removing Un because I0 is selected on same row"
                                     )
                                     v.remove("Un")
                                     changes = True
@@ -485,14 +488,14 @@ class MDAFileTableModel(QAbstractTableModel):
                                 and current_column_number in self.uniqueSelectionColumns
                             ):
                                 if r != row and column_name == v:
-                                    print(
-                                        f"DEBUG: applySelectionRules - removing {v} from row {r} because {column_name} selected"
+                                    logger.debug(
+                                        f"applySelectionRules - removing {v} from row {r} because {column_name} selected"
                                     )
                                     self.selections[r] = None
                                     changes = True
 
-        print(
-            f"DEBUG: applySelectionRules - final selections={self.selections}, changes={changes}"
+        logger.debug(
+            f"applySelectionRules - final selections={self.selections}, changes={changes}"
         )
         return changes
 
@@ -532,7 +535,7 @@ class MDAFileTableModel(QAbstractTableModel):
         self.mda_mvc.setSelectionField(new_selection)
 
     def logCheckboxSelections(self):
-        print("checkbox selections:")
+        logger.info("Checkbox selections:")
         for r in range(self.rowCount()):
             text = ""
             for c in self.checkboxColumns:
@@ -543,7 +546,7 @@ class MDAFileTableModel(QAbstractTableModel):
                 }  # {Qt.Checked: "*", Qt.Unchecked: "-"}
                 text += choices[state]
             text += f" {self.fieldName(r)}"
-            print(text)
+            logger.info(text)
 
     # ------------ local methods
 

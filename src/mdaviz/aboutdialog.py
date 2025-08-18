@@ -10,6 +10,10 @@ from mdaviz import DOCS_URL
 from mdaviz import ISSUES_URL
 from mdaviz import __version__
 from mdaviz import utils
+from mdaviz.logger import get_logger
+
+# Get logger for this module
+logger = get_logger("aboutdialog")
 
 
 class AboutDialog(QDialog):
@@ -51,7 +55,7 @@ class AboutDialog(QDialog):
         self.authors.setText(", ".join(AUTHOR_LIST))
         self.copyright.setText(COPYRIGHT_TEXT)
 
-        self.setStatus(f"About {APP_TITLE}, {pid=}")
+        self.setStatus(f"About {APP_TITLE}, {pid=}; press ESC to close")
 
         # handle the push buttons
         self.docs_pb.setToolTip(DOCS_URL)
@@ -98,7 +102,7 @@ class AboutDialog(QDialog):
         """
         from mdaviz.licensedialog import LicenseDialog
 
-        self.setStatus("opening License in new window")
+        self.setStatus("opening License in new window; press ESC to close")
 
         license = LicenseDialog(self)
         license.finished.connect(self.clearStatus)

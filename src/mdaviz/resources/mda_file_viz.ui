@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>799</width>
-    <height>716</height>
+    <height>688</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,7 +43,7 @@
         <x>0</x>
         <y>0</y>
         <width>797</width>
-        <height>714</height>
+        <height>686</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -1050,6 +1050,13 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
+             <item>
+              <widget class="QCheckBox" name="snapCursors">
+               <property name="text">
+                <string> Snap cursors to selected curve</string>
+               </property>
+              </widget>
+             </item>
              <item>
               <widget class="QWidget" name="basicStats" native="true">
                <layout class="QVBoxLayout" name="verticalLayout_stats">

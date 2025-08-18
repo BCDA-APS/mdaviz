@@ -79,6 +79,7 @@ Screenshots
 
    user_guide
    install
+   known_bugs
    api
    changes
    license

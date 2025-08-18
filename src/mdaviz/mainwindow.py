@@ -20,6 +20,10 @@ from mdaviz import utils
 from mdaviz.user_settings import settings
 from mdaviz.opendialog import DIR_SETTINGS_KEY
 from mdaviz.lazy_folder_scanner import LazyFolderScanner, FolderScanResult
+from mdaviz.logger import get_logger
+
+# Get logger for this module
+logger = get_logger("mainwindow")
 
 UI_FILE = utils.getUiFileName(__file__)
 MAX_FILES = 500
@@ -99,7 +103,7 @@ class MainWindow(QMainWindow):
 
         # Restore window geometry from settings
         geometry_restored = settings.restoreWindowGeometry(self, "mainwindow_geometry")
-        print("Settings are saved in:", settings.fileName())
+        logger.info(f"Settings are saved in: {settings.fileName()}")
 
         # Calculate screen size constraints
         screen = QApplication.primaryScreen().geometry()
@@ -152,7 +156,10 @@ class MainWindow(QMainWindow):
 
     def setStatus(self, text, timeout=0):
         """Write new status to the main window and terminal output."""
-        print(text)
+        # Avoid logging duplicate consecutive messages
+        if not hasattr(self, "_last_status") or self._last_status != text:
+            logger.info(text)
+            self._last_status = text
         self.statusbar.showMessage(str(text), msecs=timeout)
 
     def doAboutDialog(self, *args, **kw):
@@ -288,7 +295,7 @@ class MainWindow(QMainWindow):
 
     def doOpen(self, *args, **kw):
         """
-        User chose to open (connect with) a tiled server.
+        User chose to open a file or folder dialog.
         """
         from mdaviz.opendialog import OpenDialog
         from PyQt6.QtWidgets import QFileDialog
@@ -333,7 +340,7 @@ class MainWindow(QMainWindow):
 
     def doPopUp(self, message):
         """
-        User chose to open (connect with) a tiled server.
+        User chose to show a popup dialog with a message.
         """
         from mdaviz.popup import PopUp
 

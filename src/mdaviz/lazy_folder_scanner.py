@@ -16,6 +16,10 @@ from typing import Any, Optional, Callable
 from PyQt6.QtCore import QObject, QThread, pyqtSignal
 from mdaviz.utils import get_file_info_lightweight, get_file_info_full
 from dataclasses import dataclass
+from mdaviz.logger import get_logger
+
+# Get logger for this module
+logger = get_logger("lazy_folder_scanner")
 
 
 @dataclass
@@ -142,7 +146,7 @@ class LazyFolderScanner(QObject):
 
                 except Exception as e:
                     # Continue scanning other files even if one fails
-                    print(f"Error scanning {file_path}: {e}")
+                    logger.error(f"Error scanning {file_path}: {e}")
                     continue
 
         result = FolderScanResult(
@@ -205,7 +209,7 @@ class LazyFolderScanner(QObject):
                     progress_callback(scanned_files, total_files)
 
             except Exception as e:
-                print(f"Error scanning {file_path}: {e}")
+                logger.error(f"Error scanning {file_path}: {e}")
                 continue
 
         # Return partial result
@@ -270,7 +274,7 @@ class LazyFolderScanner(QObject):
                         progress_callback(scanned_files, total_files)
 
                 except Exception as e:
-                    print(f"Error scanning {file_path}: {e}")
+                    logger.error(f"Error scanning {file_path}: {e}")
                     continue
 
             # Emit progressive update every batch
@@ -464,7 +468,7 @@ class FolderScanWorker(QObject):
                         self.progress.emit(scanned_files, total_files)
 
                     except Exception as e:
-                        print(f"Error scanning {file_path}: {e}")
+                        logger.error(f"Error scanning {file_path}: {e}")
                         continue
 
             if not self._cancelled:
@@ -516,7 +520,7 @@ class FolderScanWorker(QObject):
                 self.progress.emit(scanned_files, total_files)
 
             except Exception as e:
-                print(f"Error scanning {file_path}: {e}")
+                logger.error(f"Error scanning {file_path}: {e}")
                 continue
 
         # Emit initial result
@@ -574,7 +578,7 @@ class FolderScanWorker(QObject):
                     self.progress.emit(scanned_files, total_files)
 
                 except Exception as e:
-                    print(f"Error scanning {file_path}: {e}")
+                    logger.error(f"Error scanning {file_path}: {e}")
                     continue
 
             # Emit progressive update every batch

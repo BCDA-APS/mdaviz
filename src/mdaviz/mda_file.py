@@ -34,6 +34,10 @@ import yaml
 from mdaviz import utils
 from mdaviz.mda_file_table_view import MDAFileTableView
 from mdaviz.data_cache import get_global_cache
+from mdaviz.logger import get_logger
+
+# Get logger for this module
+logger = get_logger("mda_file")
 
 
 class MDAFile(QWidget):
@@ -172,10 +176,10 @@ class MDAFile(QWidget):
         file_path = self.dataPath() / file_name
 
         # Debug: print the paths to see what's happening
-        print(f"Debug - folder_path: {folder_path}")
-        print(f"Debug - file_name: {file_name}")
-        print(f"Debug - file_path: {file_path}")
-        print(f"Debug - file_path.exists(): {file_path.exists()}")
+        logger.debug(f"folder_path: {folder_path}")
+        logger.debug(f"file_name: {file_name}")
+        logger.debug(f"file_path: {file_path}")
+        logger.debug(f"file_path.exists(): {file_path.exists()}")
 
         # Use data cache for better performance
         cache = get_global_cache()
@@ -247,7 +251,7 @@ class MDAFile(QWidget):
                     # Also store inner dimension data for 1D plotting
                     scan_dict_inner, _, _ = utils.get_scan(file_data_dim2)
                 except Exception as e:
-                    print(f"Warning: Could not process 2D data: {e}")
+                    logger.warning(f"Warning: Could not process 2D data: {e}")
                     scanDict2D = {}
                     scan_dict_inner = {}
 
@@ -285,20 +289,20 @@ class MDAFile(QWidget):
             table_view = self.tabIndex2Tableview(self.tabWidget.currentIndex())
             if table_view:
                 dimensions = self._data.get("dimensions", [])
-                print(f"DEBUG: handle2DMode - dimensions: {dimensions}")
+                logger.debug(f"handle2DMode - dimensions: {dimensions}")
 
                 # Extract X2 positioner information from scanDict2D
                 x2_positioner_info = None
                 scan_dict_2d = self._data.get("scanDict2D", {})
-                print(
-                    f"DEBUG: handle2DMode - scanDict2D keys: {list(scan_dict_2d.keys())}"
+                logger.debug(
+                    f"handle2DMode - scanDict2D keys: {list(scan_dict_2d.keys())}"
                 )
                 if scan_dict_2d:
                     # Find the X2 positioner (first positioner in 2D data)
                     # In 2D data, the first positioner (index 0) is typically X2
                     for key, value in scan_dict_2d.items():
-                        print(
-                            f"DEBUG: handle2DMode - Field {key}: type={value.get('type')}, name={value.get('name')}"
+                        logger.debug(
+                            f"handle2DMode - Field {key}: type={value.get('type')}, name={value.get('name')}"
                         )
                         if (
                             value.get("type") == "POS" and key == 0
@@ -308,8 +312,8 @@ class MDAFile(QWidget):
                                 "unit": value.get("unit", ""),
                                 "data": value.get("data", []),
                             }
-                            print(
-                                f"DEBUG: handle2DMode - X2 positioner found: {x2_positioner_info['name']}"
+                            logger.debug(
+                                f"handle2DMode - X2 positioner found: {x2_positioner_info['name']}"
                             )
                             break
 
@@ -611,7 +615,7 @@ class MDAFile(QWidget):
         action:
             from buttons: add, clear, replace
         """
-        print(f"\nResponder: {action=}")
+        logger.debug(f"\nResponder: {action=}")
         self.buttonPushed.emit(action)
 
     def updateButtonVisibility(self):

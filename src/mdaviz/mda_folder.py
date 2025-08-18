@@ -71,6 +71,10 @@ from PyQt6.QtCore import QItemSelectionModel, Qt, pyqtSignal
 from PyQt6.QtWidgets import QAbstractItemView, QWidget
 
 from mdaviz import utils
+from mdaviz.logger import get_logger
+
+# Get logger for this module
+logger = get_logger("mda_folder")
 
 
 class MDA_MVC(QWidget):
@@ -307,11 +311,11 @@ class MDA_MVC(QWidget):
             None: Updates the selection field directly if changes are made.
         """
         if not old_selection:
-            print("No previous selection.")
+            logger.debug("No previous selection.")
             return
 
         if verbose:
-            print(f"\n----- Selection before clean up: {old_selection}")
+            logger.debug(f"\n----- Selection before clean up: {old_selection}")
         changes_made = False
         tableview = self.currentFileTableview()
         new_selection = {"Y": [], "X": 0}
@@ -340,26 +344,30 @@ class MDA_MVC(QWidget):
                     if new_i0_idx != old_i0_idx:
                         changes_made = True
                         if verbose:
-                            print(
+                            logger.debug(
                                 f"I0 <{old_i0_pv}> changed from {old_i0_idx} to {new_i0_idx}"
                             )
                 else:
                     changes_made = True
                     if verbose:
-                        print(f"I0 <{old_i0_pv}> was removed - auto-unchecking I0")
+                        logger.debug(
+                            f"I0 <{old_i0_pv}> was removed - auto-unchecking I0"
+                        )
                     # I0 PV doesn't exist in new file, so uncheck the I0 checkbox
                     tableview.tableView.model().uncheckCheckBox(old_i0_idx)
             else:
                 changes_made = True
                 if verbose:
-                    print(f"I0 index {old_i0_idx} out of range - auto-unchecking I0")
+                    logger.debug(
+                        f"I0 index {old_i0_idx} out of range - auto-unchecking I0"
+                    )
                 # I0 index was invalid, so uncheck the I0 checkbox
                 tableview.tableView.model().uncheckCheckBox(old_i0_idx)
 
         if changes_made:
             self.applySelectionChanges(new_selection)
         if verbose:
-            print(f"----- Selection After clean up: {self.selectionField()}\n")
+            logger.debug(f"----- Selection After clean up: {self.selectionField()}\n")
 
     def updateDetectorSelection(
         self, oldPvList, old_selection, newPvList, new_selection, verbose=False
@@ -380,13 +388,13 @@ class MDA_MVC(QWidget):
                     if new_index != old_index:
                         changes_made = True
                         if verbose:
-                            print(
+                            logger.debug(
                                 f"DET <{old_pv}> changed from {old_index} to {new_index}"
                             )
                 else:
                     changes_made = True
                     if verbose:
-                        print(f"DET <{old_pv}> was removed")
+                        logger.debug(f"DET <{old_pv}> was removed")
         return changes_made
 
     # # ------------ File selection methods:
@@ -419,7 +427,8 @@ class MDA_MVC(QWidget):
         """
 
         selected_file = self.mdaFileList()[index.row()]
-        self.setStatus(f"\nLoading {str(self.dataPath())}/{selected_file}")
+        file_path = f"{str(self.dataPath())}/{selected_file}"
+        self.setStatus(f"\nLoading {file_path}")
 
         # Ensures the table view scrolls to the selected item.
         if isinstance(index, QtCore.QModelIndex):
@@ -455,7 +464,7 @@ class MDA_MVC(QWidget):
                         old_selection, old_pv_list, new_pv_list, verbose=False
                     )
                 except Exception as exc:
-                    print(str(exc))
+                    logger.error(str(exc))
 
             self.handlePlotBasedOnMode()
         else:
@@ -502,18 +511,18 @@ class MDA_MVC(QWidget):
                 action = "add"
             elif mode == "Auto-off":
                 # Do nothing in auto-off mode - user must manually add/replace
-                print(
+                logger.debug(
                     f"\ndoPlot called for X2 value change: X2={args[0]}, mode={mode}, action=ignore"
                 )
                 return
             else:
                 action = "replace"  # Default for Auto-replace
-            print(
+            logger.debug(
                 f"\ndoPlot called for X2 value change: X2={args[0]}, mode={mode}, action={action}"
             )
         else:
             action = args[0]
-            print(f"\ndoPlot called: action={action}")
+            logger.debug(f"\ndoPlot called: action={action}")
 
         tableview = self.currentFileTableview()
 
@@ -524,12 +533,12 @@ class MDA_MVC(QWidget):
             and "X1" in args[1]
             and "X2" in args[1]
         )
-        print(f"DEBUG: doPlot - is_2d_selection: {is_2d_selection}")
+        logger.debug(f"doPlot - is_2d_selection: {is_2d_selection}")
 
         if is_2d_selection:
             # Handle 2D plotting - use the passed selection
             selection = args[1]
-            print("DEBUG: doPlot - Handling 2D plotting")
+            logger.debug("doPlot - Handling 2D plotting")
             self._doPlot2D(action, selection)
             return
 
@@ -538,7 +547,7 @@ class MDA_MVC(QWidget):
 
         # Clear all content from the file table view & viz panel:
         if action in ("clear"):
-            print("\n\nPushButton Clear...")
+            logger.debug("\n\nPushButton Clear...")
             self.mda_file.removeAllFileTabs()
             return
 
@@ -547,7 +556,7 @@ class MDA_MVC(QWidget):
             self.setStatus("Nothing to plot.")
             return
 
-        print(f"\ndoPlot called: {action=}, {selection=}")
+        logger.debug(f"\ndoPlot called: {action=}, {selection=}")
 
         # Handle 1D plotting (existing logic)
         # Get the matplotlib chartview widget, if exists:
@@ -559,7 +568,7 @@ class MDA_MVC(QWidget):
         if action in ("replace", "add"):
             # Get dataset for the positioner/detector selection:
             datasets, plot_options = tableview.data2Plot(selection)
-            print(f"DEBUG: doPlot - Received plot_options: {plot_options}")
+            logger.debug(f"doPlot - Received plot_options: {plot_options}")
             y_index = selection.get("Y", [])
             if not isinstance(widgetMpl, ChartView):  # Make a blank chart.
                 widgetMpl = ChartView(self, **plot_options)
@@ -582,11 +591,11 @@ class MDA_MVC(QWidget):
                 # Add X2 index to options if available
                 if "x2_index" in plot_options:
                     options["x2_index"] = plot_options["x2_index"]
-                    print(
-                        f"DEBUG: doPlot - Passing x2_index: {plot_options['x2_index']}"
+                    logger.debug(
+                        f"doPlot - Passing x2_index: {plot_options['x2_index']}"
                     )
                 else:
-                    print("DEBUG: doPlot - No x2_index in plot_options")
+                    logger.debug("doPlot - No x2_index in plot_options")
                 widgetMpl.plot(i, *ds, **options)
             self.mda_file_viz.setPlot(widgetMpl)
 
@@ -598,11 +607,11 @@ class MDA_MVC(QWidget):
             action (str): 'add' or 'replace'
             selection (dict): 2D selection with X1, X2, Y, I0, plot_type keys
         """
-        print(f"DEBUG: _doPlot2D - action: {action}, selection: {selection}")
+        logger.debug(f"_doPlot2D - action: {action}, selection: {selection}")
 
         tableview = self.currentFileTableview()
         if not tableview:
-            print("DEBUG: _doPlot2D - No tableview available")
+            logger.debug("_doPlot2D - No tableview available")
             return
 
         # Convert 2D selection to 1D format for data2Plot2D
@@ -614,13 +623,13 @@ class MDA_MVC(QWidget):
             "log_y": selection.get("log_y", False),
         }
 
-        print(f"DEBUG: _doPlot2D - Converted selection: {converted_selection}")
+        logger.debug(f"_doPlot2D - Converted selection: {converted_selection}")
 
         # Get 2D data and plot options
         try:
             datasets, plot_options = tableview.data2Plot2D(converted_selection)
-            print(
-                f"DEBUG: _doPlot2D - Got datasets: {len(datasets)}, plot_options: {plot_options}"
+            logger.debug(
+                f"_doPlot2D - Got datasets: {len(datasets)}, plot_options: {plot_options}"
             )
 
             # Update the 2D plot in the 2D tab
@@ -633,10 +642,10 @@ class MDA_MVC(QWidget):
                 and self.mda_file_viz.widgetMpl2D
             ):
                 self.mda_file_viz.widgetMpl2D.set_plot_type(plot_type)
-                print(f"DEBUG: _doPlot2D - Set plot type to: {plot_type}")
+                logger.debug(f"_doPlot2D - Set plot type to: {plot_type}")
 
         except Exception as e:
-            print(f"DEBUG: _doPlot2D - Error: {e}")
+            logger.debug(f"_doPlot2D - Error: {e}")
             self.setStatus(f"Error plotting 2D data: {e}")
 
     def onTabChanged(self, index, file_path, file_data, selection_field):
@@ -675,7 +684,7 @@ class MDA_MVC(QWidget):
 
         # Fetch and display the metadata and data associated with the file path
         if file_data:
-            print(f"Displaying data and metadata for {Path(file_path).name}.")
+            logger.debug(f"Displaying data and metadata for {Path(file_path).name}.")
             self.mda_file.displayMetadata(file_data.get("metadata", None))
             # Reconstruct full data structure for 2D support by setting data again
             # This ensures we have scanDict, scanDict2D, isMultidimensional, etc.
@@ -770,7 +779,7 @@ class MDA_MVC(QWidget):
                 if nextIndex.isValid():
                     self.selectAndShowIndex(nextIndex)
         except RuntimeError as e:
-            print("The selection model is no longer valid:", e)
+            logger.error("The selection model is no longer valid:", e)
 
     def goToPrevious(self):
         """
@@ -785,7 +794,7 @@ class MDA_MVC(QWidget):
                 if prevIndex.isValid():
                     self.selectAndShowIndex(prevIndex)
         except RuntimeError as e:
-            print("The selection model is no longer valid:", e)
+            logger.error("The selection model is no longer valid:", e)
 
     def selectAndShowIndex(self, index):
         """
@@ -878,7 +887,7 @@ class MDA_MVC(QWidget):
 
         # Get dataset for the positioner/detector selection:
         datasets, plot_options = tableview.data2Plot(selection)
-        print(f"DEBUG: doPlot - Received plot_options: {plot_options}")
+        logger.debug(f"doPlot - Received plot_options: {plot_options}")
 
         if not isinstance(widgetMpl, ChartView):
             widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
@@ -900,9 +909,9 @@ class MDA_MVC(QWidget):
             # Add X2 index to options if available
             if "x2_index" in plot_options:
                 options["x2_index"] = plot_options["x2_index"]
-                print(f"DEBUG: doPlot - Passing x2_index: {plot_options['x2_index']}")
+                logger.debug(f"doPlot - Passing x2_index: {plot_options['x2_index']}")
             else:
-                print("DEBUG: doPlot - No x2_index in plot_options")
+                logger.debug("doPlot - No x2_index in plot_options")
             widgetMpl.plot(row, *ds, **options)
         self.mda_file_viz.setPlot(widgetMpl)
 
@@ -967,7 +976,7 @@ class MDA_MVC(QWidget):
         try:
             # Get the current tab index
             current_index = self.mda_file.tabWidget.currentIndex()
-            print(f"DEBUG: getCurrentFilePath - Current tab index: {current_index}")
+            logger.debug(f"getCurrentFilePath - Current tab index: {current_index}")
 
             if current_index >= 0:
                 # Get the file path directly from the tab manager using the current tab
@@ -977,29 +986,29 @@ class MDA_MVC(QWidget):
                     file_info = current_tableview.data().get("fileInfo", {})
                     file_path = file_info.get("filePath")
                     if file_path:
-                        print(
-                            f"DEBUG: getCurrentFilePath - Found file path: {file_path}"
+                        logger.debug(
+                            f"getCurrentFilePath - Found file path: {file_path}"
                         )
                         return file_path
 
-                print(
-                    "DEBUG: getCurrentFilePath - No file path found in current tableview"
+                logger.debug(
+                    "getCurrentFilePath - No file path found in current tableview"
                 )
             return None
         except Exception as e:
-            print(f"DEBUG: getCurrentFilePath - Error: {e}")
+            logger.debug(f"getCurrentFilePath - Error: {e}")
             return None
 
     def clearOtherTabs(self, keep_file_path):
         """Clear all tabs except the one with the specified file path."""
         try:
-            print(
-                f"DEBUG: clearOtherTabs - Starting with keep_file_path: {keep_file_path}"
+            logger.debug(
+                f"clearOtherTabs - Starting with keep_file_path: {keep_file_path}"
             )
 
             # Get all file paths from tab manager
             all_file_paths = list(self.mda_file.tabManager.tabs().keys())
-            print(f"DEBUG: clearOtherTabs - All file paths: {all_file_paths}")
+            logger.debug(f"clearOtherTabs - All file paths: {all_file_paths}")
 
             tabs_to_remove = []
 
@@ -1007,17 +1016,17 @@ class MDA_MVC(QWidget):
             for file_path in all_file_paths:
                 if file_path != keep_file_path:
                     tabs_to_remove.append(file_path)
-                    print(f"DEBUG: clearOtherTabs - Will remove: {file_path}")
+                    logger.debug(f"clearOtherTabs - Will remove: {file_path}")
 
-            print(f"DEBUG: clearOtherTabs - Tabs to remove: {tabs_to_remove}")
+            logger.debug(f"clearOtherTabs - Tabs to remove: {tabs_to_remove}")
 
             # Remove tabs using the tab manager
             for file_path in tabs_to_remove:
-                print(f"DEBUG: clearOtherTabs - Removing tab: {file_path}")
+                logger.debug(f"clearOtherTabs - Removing tab: {file_path}")
                 self.mda_file.tabManager.removeTab(file_path)
 
-            print(
-                f"DEBUG: clearOtherTabs - Removed {len(tabs_to_remove)} tabs, kept: {keep_file_path}"
+            logger.debug(
+                f"clearOtherTabs - Removed {len(tabs_to_remove)} tabs, kept: {keep_file_path}"
             )
         except Exception as e:
-            print(f"DEBUG: clearOtherTabs - Error: {e}")
+            logger.debug(f"clearOtherTabs - Error: {e}")

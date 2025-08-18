@@ -33,6 +33,10 @@ from mdaviz.mda_file_table_model import ColumnDataType
 from mdaviz.mda_file_table_model import FieldRuleType
 from mdaviz.mda_file_table_model import TableColumn
 from mdaviz.mda_file_table_model import TableField
+from mdaviz.logger import get_logger
+
+# Get logger for this module
+logger = get_logger("mda_file_table_view")
 
 HEADERS = "Field", "X", "Y", "I0", "Un", "PV", "DESC", "Unit"
 
@@ -88,7 +92,7 @@ class MDAFileTableView(QWidget):
 
     def setupYDetControls(self):
         """Setup Y DET selection controls for 2D plotting."""
-        print("DEBUG: setupYDetControls - Starting setup")
+        logger.debug("setupYDetControls - Starting setup")
 
         # Use QTimer to ensure UI is fully loaded
         from PyQt6.QtCore import QTimer
@@ -158,8 +162,8 @@ class MDAFileTableView(QWidget):
                 display_text = f"{name} ({unit})" if unit else name
                 self.x1ComboBox.addItem(display_text, key)
 
-        print(
-            f"DEBUG: populateX1ComboBox - Added {self.x1ComboBox.count()} X1 positioners"
+        logger.debug(
+            f"populateX1ComboBox - Added {self.x1ComboBox.count()} X1 positioners"
         )
 
         # Set P1 as default (key 1) if available
@@ -196,8 +200,8 @@ class MDAFileTableView(QWidget):
                 display_text = f"{name} ({unit})" if unit else name
                 self.x2ComboBox.addItem(display_text, key)
 
-        print(
-            f"DEBUG: populateX2ComboBox - Added {self.x2ComboBox.count()} X2 positioners"
+        logger.debug(
+            f"populateX2ComboBox - Added {self.x2ComboBox.count()} X2 positioners"
         )
 
         # Set P1 as default (key 1) if available
@@ -232,8 +236,8 @@ class MDAFileTableView(QWidget):
                 display_text = f"{name} ({unit})" if unit else name
                 self.yDetComboBox.addItem(display_text, key)
 
-        print(
-            f"DEBUG: populateYDetComboBox - Added {self.yDetComboBox.count()} Y detectors"
+        logger.debug(
+            f"populateYDetComboBox - Added {self.yDetComboBox.count()} Y detectors"
         )
 
     def populateI0ComboBox(self):
@@ -263,8 +267,8 @@ class MDAFileTableView(QWidget):
                 display_text = f"{name} ({unit})" if unit else name
                 self.i0ComboBox.addItem(display_text, key)
 
-        print(
-            f"DEBUG: populateI0ComboBox - Added {self.i0ComboBox.count()} I0 detectors"
+        logger.debug(
+            f"populateI0ComboBox - Added {self.i0ComboBox.count()} I0 detectors"
         )
 
     def populate2DControls(self):
@@ -275,7 +279,7 @@ class MDAFileTableView(QWidget):
         self.populateYDetComboBox()
         self.populateI0ComboBox()
 
-        print("DEBUG: populate2DControls - All 2D controls populated")
+        logger.debug("populate2DControls - All 2D controls populated")
 
     def update2DControls(
         self, is_multidimensional=False, dimensions=None, x2_positioner_info=None
@@ -288,10 +292,10 @@ class MDAFileTableView(QWidget):
             dimensions (list): List of dimensions [X2_points, X1_points, ...]
             x2_positioner_info (dict): Information about the X2 positioner (name, unit, data)
         """
-        print(
-            f"DEBUG: update2DControls - is_multidimensional: {is_multidimensional}, dimensions: {dimensions}"
+        logger.debug(
+            f"update2DControls - is_multidimensional: {is_multidimensional}, dimensions: {dimensions}"
         )
-        print(f"DEBUG: update2DControls - x2_positioner_info: {x2_positioner_info}")
+        logger.debug(f"update2DControls - x2_positioner_info: {x2_positioner_info}")
         if is_multidimensional and dimensions and len(dimensions) >= 2:
             # Show 2D controls
             self.dimensionControls.setVisible(True)
@@ -299,7 +303,7 @@ class MDAFileTableView(QWidget):
             # Update X2 spinbox range
             # dimensions[0] is X2 dimension, dimensions[1] is X1 dimension
             x2_max = dimensions[0] - 1 if len(dimensions) > 0 else 0
-            print(f"DEBUG: update2DControls - x2_max: {x2_max}")
+            logger.debug(f"update2DControls - x2_max: {x2_max}")
             self.x2SpinBox.setMaximum(max(0, x2_max))
             self.x2SpinBox.setValue(0)  # Start at first X2 position
 
@@ -386,7 +390,7 @@ class MDAFileTableView(QWidget):
                 ):  # 1D tab is index 0, Data tab is index 1, Metadata tab is index 2, 2D tab is index 3
                     return
         except Exception as e:
-            print(f"DEBUG: _trigger2DPlot - Error checking tab: {e}")
+            logger.debug(f"_trigger2DPlot - Error checking tab: {e}")
             return
 
         # Get current selections
@@ -412,70 +416,70 @@ class MDAFileTableView(QWidget):
             if parent and hasattr(parent, "doPlot"):
                 parent.doPlot("replace", selections)
             else:
-                print(
-                    "DEBUG: _trigger2DPlot - Could not find parent with doPlot method"
+                logger.debug(
+                    "_trigger2DPlot - Could not find parent with doPlot method"
                 )
         except Exception as e:
-            print(f"DEBUG: _trigger2DPlot - Error: {e}")
+            logger.debug(f"_trigger2DPlot - Error: {e}")
 
     def onX1SelectionChanged(self, index):
         """Handle X1 positioner selection change."""
-        print(f"DEBUG: onX1SelectionChanged - index: {index}")
+        logger.debug(f"onX1SelectionChanged - index: {index}")
         self._trigger2DPlot()
 
     def onX2SelectionChanged(self, index):
         """Handle X2 positioner selection change."""
-        print(f"DEBUG: onX2SelectionChanged - index: {index}")
+        logger.debug(f"onX2SelectionChanged - index: {index}")
         self._trigger2DPlot()
 
     def onYDetSelectionChanged(self, index):
         """Handle Y detector selection change."""
-        print(f"DEBUG: onYDetSelectionChanged - index: {index}")
+        logger.debug(f"onYDetSelectionChanged - index: {index}")
         self._trigger2DPlot()
 
     def onI0SelectionChanged(self, index):
         """Handle I0 detector selection change."""
-        print(f"DEBUG: onI0SelectionChanged - index: {index}")
+        logger.debug(f"onI0SelectionChanged - index: {index}")
         self._trigger2DPlot()
 
     def onPlotTypeChanged(self, index):
         """Handle plot type selection change."""
         plot_type = self.plotTypeComboBox.currentText().lower()
-        print(f"DEBUG: onPlotTypeChanged - plot_type: {plot_type}")
+        logger.debug(f"onPlotTypeChanged - plot_type: {plot_type}")
         self._trigger2DPlot()
 
     def onColorPaletteChanged(self, index):
         """Handle color palette selection change."""
         palette_name = self.colorPaletteComboBox.currentText()
-        print(f"DEBUG: onColorPaletteChanged - palette_name: {palette_name}")
+        logger.debug(f"onColorPaletteChanged - palette_name: {palette_name}")
         self._trigger2DPlot()
 
     def onLogScaleChanged(self, checked):
         """Handle log scale checkbox changes."""
         sender = self.sender()
         if sender == self.logYCheckBox:
-            print(f"DEBUG: onLogScaleChanged - LogY: {checked}")
+            logger.debug(f"onLogScaleChanged - LogY: {checked}")
         self._trigger2DPlot()
 
     def onPlotButtonClicked(self):
         """Handle plot button click."""
-        print("DEBUG: onPlotButtonClicked - Plot button clicked")
+        logger.debug("onPlotButtonClicked - Plot button clicked")
 
         # Get current selections
         selections = self.get2DSelections()
-        print(f"DEBUG: onPlotButtonClicked - selections: {selections}")
+        logger.debug(f"onPlotButtonClicked - selections: {selections}")
 
         # Validate selections
         if selections["Y"] is None or len(selections["Y"]) == 0:
-            print("DEBUG: onPlotButtonClicked - No Y detector selected")
+            logger.debug("onPlotButtonClicked - No Y detector selected")
             return
 
         if selections["X1"] is None:
-            print("DEBUG: onPlotButtonClicked - No X1 positioner selected")
+            logger.debug("onPlotButtonClicked - No X1 positioner selected")
             return
 
         if selections["X2"] is None:
-            print("DEBUG: onPlotButtonClicked - No X2 positioner selected")
+            logger.debug("onPlotButtonClicked - No X2 positioner selected")
             return
 
         # Trigger 2D plotting by emitting a signal or calling the parent
@@ -486,20 +490,20 @@ class MDAFileTableView(QWidget):
                 parent = parent.parent()
 
             if parent and hasattr(parent, "doPlot"):
-                print(
-                    "DEBUG: onPlotButtonClicked - Calling parent.doPlot with 2D selections"
+                logger.debug(
+                    "onPlotButtonClicked - Calling parent.doPlot with 2D selections"
                 )
-                print(
-                    f"DEBUG: onPlotButtonClicked - About to call doPlot with: action='replace', selections={selections}"
+                logger.debug(
+                    f"onPlotButtonClicked - About to call doPlot with: action='replace', selections={selections}"
                 )
                 parent.doPlot("replace", selections)
-                print("DEBUG: onPlotButtonClicked - doPlot call completed")
+                logger.debug("onPlotButtonClicked - doPlot call completed")
             else:
-                print(
-                    "DEBUG: onPlotButtonClicked - Could not find parent with doPlot method"
+                logger.debug(
+                    "onPlotButtonClicked - Could not find parent with doPlot method"
                 )
         except Exception as e:
-            print(f"DEBUG: onPlotButtonClicked - Error: {e}")
+            logger.debug(f"onPlotButtonClicked - Error: {e}")
 
     def get2DSelections(self):
         """Get current 2D plotting selections."""
@@ -507,8 +511,8 @@ class MDAFileTableView(QWidget):
         color_palette = self.colorPaletteComboBox.currentText()
         if not color_palette or color_palette.strip() == "":
             color_palette = "viridis"
-            print(
-                f"DEBUG: get2DSelections - Empty color palette, using default: {color_palette}"
+            logger.debug(
+                f"get2DSelections - Empty color palette, using default: {color_palette}"
             )
 
         selections = {
@@ -524,7 +528,7 @@ class MDAFileTableView(QWidget):
             "color_palette": color_palette,
             "log_y": self.logYCheckBox.isChecked(),
         }
-        print(f"DEBUG: get2DSelections - {selections}")
+        logger.debug(f"get2DSelections - {selections}")
         return selections
 
     def data(self):
@@ -558,21 +562,21 @@ class MDAFileTableView(QWidget):
             fileInfo = self.mda_file.data()
 
             # For table display, use inner dimension data for 2D files, 1D data for 1D files
-            print(
-                f"DEBUG: isMultidimensional: {fileInfo.get('isMultidimensional', False)}"
+            logger.debug(
+                f"isMultidimensional: {fileInfo.get('isMultidimensional', False)}"
             )
-            print(f"DEBUG: scanDictInner exists: {'scanDictInner' in fileInfo}")
+            logger.debug(f"scanDictInner exists: {'scanDictInner' in fileInfo}")
             if fileInfo.get("isMultidimensional", False) and fileInfo.get(
                 "scanDictInner"
             ):
                 scanDict = fileInfo["scanDictInner"]
-                print(
-                    f"DEBUG: Using scanDictInner for 2D data, keys: {list(scanDict.keys())}"
+                logger.debug(
+                    f"Using scanDictInner for 2D data, keys: {list(scanDict.keys())}"
                 )
             else:
                 scanDict = fileInfo["scanDict"]
-                print(
-                    f"DEBUG: Using scanDict for 1D data, keys: {list(scanDict.keys())}"
+                logger.debug(
+                    f"Using scanDict for 1D data, keys: {list(scanDict.keys())}"
                 )
 
             fields = [
@@ -636,18 +640,18 @@ class MDAFileTableView(QWidget):
 
             # Check if this is 2D data
             if not fileInfo.get("isMultidimensional", False):
-                print("DEBUG: data2Plot2D - Not 2D data, returning empty")
+                logger.debug("data2Plot2D - Not 2D data, returning empty")
                 return datasets, plot_options
 
             # Use scanDict2D for 2D plotting
             scanDict2D = fileInfo.get("scanDict2D", {})
             scanDictInner = fileInfo.get("scanDictInner", {})
 
-            print(f"DEBUG: data2Plot2D - scanDict2D keys: {list(scanDict2D.keys())}")
-            print(
-                f"DEBUG: data2Plot2D - scanDictInner keys: {list(scanDictInner.keys())}"
+            logger.debug(f"data2Plot2D - scanDict2D keys: {list(scanDict2D.keys())}")
+            logger.debug(
+                f"data2Plot2D - scanDictInner keys: {list(scanDictInner.keys())}"
             )
-            print(f"DEBUG: data2Plot2D - selections: {selections}")
+            logger.debug(f"data2Plot2D - selections: {selections}")
 
             # ------ extract x data (from scanDictInner - this is the X positioner):
             x_index = selections.get("X")
@@ -662,8 +666,8 @@ class MDAFileTableView(QWidget):
                 else:
                     x_data = x_data_2d
 
-                print(
-                    f"DEBUG: data2Plot2D - X data shape: {np.array(x_data).shape if x_data is not None else 'None'}"
+                logger.debug(
+                    f"data2Plot2D - X data shape: {np.array(x_data).shape if x_data is not None else 'None'}"
                 )
             else:
                 x_data = None
@@ -678,8 +682,8 @@ class MDAFileTableView(QWidget):
                     y_data = scanDict2D[y_idx].get("data")
                     y_name = scanDict2D[y_idx].get("name", f"D{y_idx}")
                     y_unit = scanDict2D[y_idx].get("unit", "")
-                    print(
-                        f"DEBUG: data2Plot2D - Y data shape: {np.array(y_data).shape if y_data else 'None'}"
+                    logger.debug(
+                        f"data2Plot2D - Y data shape: {np.array(y_data).shape if y_data else 'None'}"
                     )
                 else:
                     y_data = None
@@ -699,8 +703,8 @@ class MDAFileTableView(QWidget):
             if i0_index is not None and i0_index in scanDict2D:
                 i0_data = scanDict2D[i0_index].get("data")
                 i0_name = scanDict2D[i0_index].get("name", f"D{i0_index}")
-                print(
-                    f"DEBUG: data2Plot2D - I0 data shape: {np.array(i0_data).shape if i0_data else 'None'}"
+                logger.debug(
+                    f"data2Plot2D - I0 data shape: {np.array(i0_data).shape if i0_data else 'None'}"
                 )
 
                 # Perform normalization if both Y and I0 data are available
@@ -717,18 +721,18 @@ class MDAFileTableView(QWidget):
                         # Perform normalization
                         y_data = y_array / i0_safe
                         is_normalized = True
-                        print(
-                            f"DEBUG: data2Plot2D - Normalized Y data by I0: {i0_name}"
+                        logger.debug(
+                            f"data2Plot2D - Normalized Y data by I0: {i0_name}"
                         )
                     else:
-                        print(
-                            f"DEBUG: data2Plot2D - I0 shape {i0_array.shape} incompatible with Y shape {y_array.shape}"
+                        logger.debug(
+                            f"data2Plot2D - I0 shape {i0_array.shape} incompatible with Y shape {y_array.shape}"
                         )
                         i0_data = None
                         i0_name = None
             else:
-                print(
-                    f"DEBUG: data2Plot2D - No I0 normalization (I0 index: {i0_index})"
+                logger.debug(
+                    f"data2Plot2D - No I0 normalization (I0 index: {i0_index})"
                 )
 
             # ------ extract x2 data (from scanDict - this is the X2 positioner):
@@ -738,7 +742,7 @@ class MDAFileTableView(QWidget):
 
             # Get the selected X2 index from the combobox
             x2_index = self.x2ComboBox.currentData()
-            print(f"DEBUG: data2Plot2D - Selected X2 index: {x2_index}")
+            logger.debug(f"data2Plot2D - Selected X2 index: {x2_index}")
 
             # Get scanDict for X2 data extraction
             scanDict = fileInfo.get("scanDict", {})
@@ -756,11 +760,11 @@ class MDAFileTableView(QWidget):
                 else:
                     x2_data = x2_data_2d
 
-                print(
-                    f"DEBUG: data2Plot2D - X2 data shape: {np.array(x2_data).shape if x2_data is not None else 'None'}"
+                logger.debug(
+                    f"data2Plot2D - X2 data shape: {np.array(x2_data).shape if x2_data is not None else 'None'}"
                 )
             else:
-                print(f"DEBUG: data2Plot2D - X2 index {x2_index} not found in scanDict")
+                logger.debug(f"data2Plot2D - X2 index {x2_index} not found in scanDict")
                 # Fallback to the original logic for backward compatibility
                 for key, value in scanDict2D.items():
                     if value.get("type") == "POS" and key == 0:
@@ -779,8 +783,8 @@ class MDAFileTableView(QWidget):
                         else:
                             x2_data = x2_data_2d
 
-                        print(
-                            f"DEBUG: data2Plot2D - Using fallback X2 (key 0): {x2_name}"
+                        logger.debug(
+                            f"data2Plot2D - Using fallback X2 (key 0): {x2_name}"
                         )
                         break
 
@@ -791,10 +795,10 @@ class MDAFileTableView(QWidget):
                 y_array = np.array(y_data)
                 x2_array = np.array(x2_data)
 
-                print("DEBUG: data2Plot2D - Validation:")
-                print(f"  X array shape: {x_array.shape}")
-                print(f"  Y array shape: {y_array.shape}")
-                print(f"  X2 array shape: {x2_array.shape}")
+                logger.debug("data2Plot2D - Validation:")
+                logger.debug(f"  X array shape: {x_array.shape}")
+                logger.debug(f"  Y array shape: {y_array.shape}")
+                logger.debug(f"  X2 array shape: {x2_array.shape}")
 
                 # Check for edge cases
                 validation_errors = []
@@ -851,7 +855,7 @@ class MDAFileTableView(QWidget):
 
                 # If validation passes, create the dataset
                 if len(validation_errors) == 0:
-                    print("DEBUG: data2Plot2D - Validation passed")
+                    logger.debug("data2Plot2D - Validation passed")
                     datasets.append(
                         (
                             y_array,
@@ -887,15 +891,15 @@ class MDAFileTableView(QWidget):
                         plot_options["i0_name"] = i0_name
                         plot_options["is_normalized"] = True
                 else:
-                    print("DEBUG: data2Plot2D - Validation failed:")
+                    logger.debug("data2Plot2D - Validation failed:")
                     for error in validation_errors:
-                        print(f"  ❌ {error}")
+                        logger.debug(f"  ❌ {error}")
                     return datasets, plot_options
             else:
-                print("DEBUG: data2Plot2D - Missing required data:")
-                print(f"  X data: {'✅' if x_data is not None else '❌'}")
-                print(f"  Y data: {'✅' if y_data is not None else '❌'}")
-                print(f"  X2 data: {'✅' if x2_data is not None else '❌'}")
+                logger.debug("data2Plot2D - Missing required data:")
+                logger.debug(f"  X data: {'✅' if x_data is not None else '❌'}")
+                logger.debug(f"  Y data: {'✅' if y_data is not None else '❌'}")
+                logger.debug(f"  X2 data: {'✅' if x2_data is not None else '❌'}")
 
         return datasets, plot_options
 
@@ -931,17 +935,17 @@ class MDAFileTableView(QWidget):
                 x2_slice = 0  # Not needed since we're using 1D data
 
                 # Debug: Print field mappings
-                print(
-                    f"DEBUG: Using scanDictInner for 2D plotting, keys: {list(scanDict.keys())}"
+                logger.debug(
+                    f"Using scanDictInner for 2D plotting, keys: {list(scanDict.keys())}"
                 )
-                print(f"DEBUG: selections: {selections}")
+                logger.debug(f"selections: {selections}")
 
                 # Debug: Print data shapes for first few fields
                 for i in range(min(3, len(scanDict))):
                     if i in scanDict:
                         data = scanDict[i].get("data")
-                        print(
-                            f"DEBUG: Field {i} data shape: {np.array(data).shape if data else 'None'}"
+                        logger.debug(
+                            f"Field {i} data shape: {np.array(data).shape if data else 'None'}"
                         )
             else:
                 # Use 1D data structure
@@ -1016,8 +1020,8 @@ class MDAFileTableView(QWidget):
                     # Add bounds checking to prevent IndexError
                     y_data_array = np.array(y_data)
                     if x2_slice >= y_data_array.shape[0]:
-                        print(
-                            f"DEBUG: data2Plot - X2 slice {x2_slice} out of bounds for data shape {y_data_array.shape}, using last available slice"
+                        logger.debug(
+                            f"data2Plot - X2 slice {x2_slice} out of bounds for data shape {y_data_array.shape}, using last available slice"
                         )
                         x2_slice = y_data_array.shape[0] - 1  # Use last available slice
 
@@ -1097,10 +1101,10 @@ class MDAFileTableView(QWidget):
             # Add X2 index to plot options for 2D data
             if fileInfo.get("isMultidimensional", False):
                 plot_options["x2_index"] = self.getX2Value()
-                print(
-                    f"DEBUG: data2Plot - Added x2_index to plot_options: {plot_options['x2_index']}"
+                logger.debug(
+                    f"data2Plot - Added x2_index to plot_options: {plot_options['x2_index']}"
                 )
             else:
-                print("DEBUG: data2Plot - Not multidimensional, x2_index not added")
+                logger.debug("data2Plot - Not multidimensional, x2_index not added")
 
         return datasets, plot_options

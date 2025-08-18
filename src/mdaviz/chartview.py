@@ -50,6 +50,7 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QApplication
 from mdaviz import utils
 from mdaviz.fit_manager import FitManager
 from mdaviz.user_settings import settings
+from mdaviz.logger import get_logger
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
@@ -92,6 +93,10 @@ def auto_color():
 def auto_symbol():
     """Returns next symbol for scatter plots."""
     return next(_AUTO_SYMBOL_CYCLE)
+
+
+# Initialize logger for this module
+logger = get_logger("chartview")
 
 
 class ChartView(QWidget):
@@ -273,6 +278,14 @@ class ChartView(QWidget):
         self.key_check_timer.timeout.connect(self.check_modifier_keys)
         self.key_check_timer.start(50)  # Check every 50ms
 
+        # Initialize snap to curve setting (default to False for free cursor placement)
+        self._snap_to_curve = False
+
+        # Connect the snap cursors checkbox
+        self.snapCursors = self.mda_mvc.mda_file_viz.snapCursors
+        self.snapCursors.setChecked(self._snap_to_curve)
+        self.snapCursors.toggled.connect(self.onSnapCursorsToggled)
+
         self.cursors = {
             1: None,
             "pos1": None,
@@ -413,7 +426,7 @@ class ChartView(QWidget):
             # Redraw the canvas to apply changes
             self.canvas.draw()
         except Exception as exc:
-            print(f"Error setting log scales: {exc}")
+            logger.error(f"Error setting log scales: {exc}")
             # If setting log scale fails (e.g., negative values), revert to linear
             self._log_x = False
             self._log_y = False
@@ -492,8 +505,8 @@ class ChartView(QWidget):
         factor = curveData.get("factor", 1)
         offset = curveData.get("offset", 0)
         style = curveData.get("style", "-")
-        print(
-            f"DEBUG: onCurveAdded - curve {curveID}: style={style}, offset={offset}, factor={factor}"
+        logger.debug(
+            f"onCurveAdded - curve {curveID}: style={style}, offset={offset}, factor={factor}"
         )
         if factor != 1 or offset != 0:
             new_y = numpy.multiply(ds[1], factor) + offset
@@ -504,7 +517,7 @@ class ChartView(QWidget):
             plot_obj = self.main_axes.plot(*ds, **ds_options)[0]
             self.plotObjects[curveID] = plot_obj
         except Exception as exc:
-            print(str(exc))
+            logger.error(str(exc))
         # Update plot
         self.updatePlot(update_title=True)
         # Add to the comboBox
@@ -534,8 +547,8 @@ class ChartView(QWidget):
             recompute_y (bool): If True, update Y-data with current offset/factor.
             update_x (bool): If True, recreate plot object for X-data changes.
         """
-        print(
-            f"DEBUG: onCurveUpdated called for {curveID}, recompute_y={recompute_y}, update_x={update_x}"
+        logger.debug(
+            f"onCurveUpdated called for {curveID}, recompute_y={recompute_y}, update_x={update_x}"
         )
         curve_data = self.curveManager.getCurveData(curveID)
         if curve_data and recompute_y:
@@ -592,7 +605,7 @@ class ChartView(QWidget):
                 plot_obj = self.main_axes.plot(*ds, **ds_options)[0]
                 self.plotObjects[curveID] = plot_obj
             except Exception as exc:
-                print(str(exc))
+                logger.error(str(exc))
 
         self.updatePlot(update_title=False)
 
@@ -674,12 +687,12 @@ class ChartView(QWidget):
                 # Only uncheck if no curves remain for this detector
                 if remaining_curves_for_det == 0:
                     tableview.tableView.model().uncheckCheckBox(row)
-                    print(
-                        f"DEBUG: Unchecked DET {row} - no curves remaining for this detector"
+                    logger.debug(
+                        f"Unchecked DET {row} - no curves remaining for this detector"
                     )
                 else:
-                    print(
-                        f"DEBUG: Kept DET {row} checked - {remaining_curves_for_det} curves still exist for this detector"
+                    logger.debug(
+                        f"Kept DET {row} checked - {remaining_curves_for_det} curves still exist for this detector"
                     )
             else:
                 # For 1D data, always uncheck (original behavior)
@@ -831,8 +844,8 @@ class ChartView(QWidget):
             try:
                 self.mda_mvc.mda_file.highlightRowInTab(file_path, row)
             except Exception as exc:
-                print(str(exc))
-                print("highlightRowInTab failed; ignoring exception.")
+                logger.error(str(exc))
+                logger.error("highlightRowInTab failed; ignoring exception.")
         else:
             self.offset_value.setText("0")
             self.factor_value.setText("1")
@@ -951,7 +964,7 @@ class ChartView(QWidget):
                         result = f"{utils.num2fstr(i)}" if i else "n/a"
                     self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText(result)
             except Exception as exc:
-                print(str(exc))
+                logger.error(str(exc))
                 self.clearBasicMath()
         else:
             self.clearBasicMath()
@@ -1008,6 +1021,14 @@ class ChartView(QWidget):
         self.onRemoveCursor(1)
         self.onRemoveCursor(2)
 
+    def onSnapCursorsToggled(self, checked):
+        """Handle snap cursors checkbox toggle.
+
+        Parameters:
+            checked (bool): True if checkbox is checked (snap enabled), False if unchecked (snap disabled)
+        """
+        self._snap_to_curve = checked
+
     def findNearestPoint(
         self, x_click: float, y_click: float
     ) -> Optional[tuple[float, float]]:
@@ -1058,14 +1079,19 @@ class ChartView(QWidget):
     def onclick(self, event):
         # Check if the click was in the main_axes
         if event.inaxes is self.main_axes:
-            # Find the nearest point in the selected curve
-            nearest_point = self.findNearestPoint(event.xdata, event.ydata)
+            # Determine cursor position based on snap setting
+            if self._snap_to_curve:
+                # Find the nearest point in the selected curve
+                nearest_point = self.findNearestPoint(event.xdata, event.ydata)
 
-            if nearest_point is None:
-                # No curve selected or no data available
-                return
+                if nearest_point is None:
+                    # No curve selected or no data available
+                    return
 
-            x_nearest, y_nearest = nearest_point
+                x_cursor, y_cursor = nearest_point
+            else:
+                # Use exact click position
+                x_cursor, y_cursor = event.xdata, event.ydata
 
             # Middle click or Alt+right click for red cursor (cursor 1)
             if event.button == MIDDLE_BUTTON or (
@@ -1078,10 +1104,10 @@ class ChartView(QWidget):
                         # Handle case where artist cannot be removed
                         pass
                 (self.cursors[1],) = self.main_axes.plot(
-                    x_nearest, y_nearest, "r+", markersize=15, linewidth=2
+                    x_cursor, y_cursor, "r+", markersize=15, linewidth=2
                 )
-                # Update cursor position to nearest point
-                self.cursors["pos1"] = (x_nearest, y_nearest)
+                # Update cursor position
+                self.cursors["pos1"] = (x_cursor, y_cursor)
 
             # Right click (without Alt) for blue cursor (cursor 2)
             elif event.button == RIGHT_BUTTON and not self.alt_pressed:
@@ -1092,11 +1118,11 @@ class ChartView(QWidget):
                         # Handle case where artist cannot be removed
                         pass
                 (self.cursors[2],) = self.main_axes.plot(
-                    x_nearest, y_nearest, "b+", markersize=15, linewidth=2
+                    x_cursor, y_cursor, "b+", markersize=15, linewidth=2
                 )
 
-                # Update cursor position to nearest point
-                self.cursors["pos2"] = (x_nearest, y_nearest)
+                # Update cursor position
+                self.cursors["pos2"] = (x_cursor, y_cursor)
 
             # Update the info panel with cursor positions
             self.calculateCursors()
@@ -1556,17 +1582,17 @@ class CurveManager(QObject):
         label = ds_options.get("label", "unknown label")
         file_path = plot_options.get("filePath", "unknown path")
         x2_index = options.get("x2_index")  # Extract X2 index from options
-        print(f"DEBUG: addCurve - Received x2_index: {x2_index}")
+        logger.debug(f"addCurve - Received x2_index: {x2_index}")
         # Generate unique curve ID & update options:
         curveID = self.generateCurveID(label, file_path, row, x2_index)
         ds_options["label"] = label  # Keep the original label for display purposes
-        print(
-            f"DEBUG: Adding curve with ID: {curveID}, label: {label}, file_path: {file_path}"
+        logger.debug(
+            f"Adding curve with ID: {curveID}, label: {label}, file_path: {file_path}"
         )
-        print(f"DEBUG: Current curves in manager: {list(self._curves.keys())}")
+        logger.debug(f"Current curves in manager: {list(self._curves.keys())}")
         x_data = ds[0]
         if curveID in self._curves:
-            print(f"DEBUG: Curve {curveID} already exists")
+            logger.debug(f"Curve {curveID} already exists")
             # Check if x_data is the same
             existing_x_data = self._curves[curveID]["ds"][0]
             existing_label = (
@@ -1575,11 +1601,15 @@ class CurveManager(QObject):
 
             # Update the curve if x_data is different OR if the label has changed (I0 normalization)
             if numpy.array_equal(x_data, existing_x_data) and label == existing_label:
-                print(" x_data and label are the same, do not add or update the curve")
+                logger.debug(
+                    " x_data and label are the same, do not add or update the curve"
+                )
                 # x_data and label are the same, do not add or update the curve
                 return
             else:
-                print(" x_data is different OR label has changed, update the curve")
+                logger.debug(
+                    " x_data is different OR label has changed, update the curve"
+                )
                 # x_data is different or label has changed, update the curve:
                 # Get existing curve data and preserve all properties
                 existing_curve_data = self._curves[curveID]
@@ -1590,7 +1620,7 @@ class CurveManager(QObject):
                 self.updateCurve(curveID, existing_curve_data, recompute_y=True)
                 return
         else:
-            print(f"DEBUG: Curve {curveID} does NOT exist, creating new curve")
+            logger.debug(f"Curve {curveID} does NOT exist, creating new curve")
             # Check if this might be a re-creation after removeAllCurves was called
             # Look for any existing curve with the same file_path, row, and x2_index
             for existing_curve_id, existing_data in self._curves.items():
@@ -1614,7 +1644,7 @@ class CurveManager(QObject):
                     }
                     # Remove the old curve entry
                     del self._curves[existing_curve_id]
-                    print(f"DEBUG: Transferred properties to new curve ID: {curveID}")
+                    logger.debug(f"Transferred properties to new curve ID: {curveID}")
                     self.curveAdded.emit(curveID)
                     return
         # Add new curve if not already present on the graph:
@@ -1634,8 +1664,8 @@ class CurveManager(QObject):
             "ds_options": ds_options,
             "x2_index": x2_index,  # Store X2 index for 2D data
         }
-        print(
-            f"DEBUG: Created curve {curveID} with persistent properties: {persistent_props}"
+        logger.debug(
+            f"Created curve {curveID} with persistent properties: {persistent_props}"
         )
         self.curveAdded.emit(curveID)
 
@@ -1652,7 +1682,7 @@ class CurveManager(QObject):
             None: Emits curveUpdated signal when curve is successfully updated
         """
         if curveID in self._curves:
-            print(f"Emits curveUpdated {curveID=}, {recompute_y=}, {update_x=}")
+            logger.debug(f"Emits curveUpdated {curveID=}, {recompute_y=}, {update_x=}")
             self._curves[curveID] = curveData
             self.curveUpdated.emit(curveID, recompute_y, update_x)
 
@@ -1739,8 +1769,8 @@ class CurveManager(QObject):
         if curve_data:
             offset = curve_data["offset"]
             if offset != new_offset:
-                print(
-                    f"DEBUG: Updating offset for curve {curveID}: {offset} -> {new_offset}"
+                logger.debug(
+                    f"Updating offset for curve {curveID}: {offset} -> {new_offset}"
                 )
                 curve_data["offset"] = new_offset
                 # Save to persistent storage
@@ -1752,8 +1782,8 @@ class CurveManager(QObject):
                 if persistent_key not in self._persistent_properties:
                     self._persistent_properties[persistent_key] = {}
                 self._persistent_properties[persistent_key]["offset"] = new_offset
-                print(
-                    f"DEBUG: Saved offset to persistent storage: {persistent_key} -> {new_offset}"
+                logger.debug(
+                    f"Saved offset to persistent storage: {persistent_key} -> {new_offset}"
                 )
                 self.updateCurve(curveID, curve_data, recompute_y=True)
 
@@ -1774,8 +1804,8 @@ class CurveManager(QObject):
         if curve_data:
             factor = curve_data["factor"]
             if factor != new_factor:
-                print(
-                    f"DEBUG: Updating factor for curve {curveID}: {factor} -> {new_factor}"
+                logger.debug(
+                    f"Updating factor for curve {curveID}: {factor} -> {new_factor}"
                 )
                 curve_data["factor"] = new_factor
                 # Save to persistent storage
@@ -1787,8 +1817,8 @@ class CurveManager(QObject):
                 if persistent_key not in self._persistent_properties:
                     self._persistent_properties[persistent_key] = {}
                 self._persistent_properties[persistent_key]["factor"] = new_factor
-                print(
-                    f"DEBUG: Saved factor to persistent storage: {persistent_key} -> {new_factor}"
+                logger.debug(
+                    f"Saved factor to persistent storage: {persistent_key} -> {new_factor}"
                 )
                 self.updateCurve(curveID, curve_data, recompute_y=True)
 
@@ -1812,7 +1842,7 @@ class CurveManager(QObject):
         else:
             curve_id = f"{file_path}_{row}"
 
-        print(f"DEBUG: generateCurveID - curve_id={curve_id}")
+        logger.debug(f"generateCurveID - curve_id={curve_id}")
 
         # Check if this curve ID already exists
         if curve_id in self._curves:
@@ -1901,13 +1931,13 @@ class ChartView2D(ChartView):
         if plot_options is None:
             plot_options = {}
 
-        print("DEBUG: ChartView2D.plot2D - Plotting 2D data")
-        print(f"  Y data shape: {y_data.shape}")
-        print(f"  X data shape: {x_data.shape}")
-        print(f"  X2 data shape: {x2_data.shape}")
-        print(f"  Plot type: {self._plot_type}")
-        print(f"  Canvas exists: {self.canvas is not None}")
-        print(f"  Main axes exists: {self.main_axes is not None}")
+        logger.debug("ChartView2D.plot2D - Plotting 2D data")
+        logger.debug(f"  Y data shape: {y_data.shape}")
+        logger.debug(f"  X data shape: {x_data.shape}")
+        logger.debug(f"  X2 data shape: {x2_data.shape}")
+        logger.debug(f"  Plot type: {self._plot_type}")
+        logger.debug(f"  Canvas exists: {self.canvas is not None}")
+        logger.debug(f"  Main axes exists: {self.main_axes is not None}")
 
         # Clear the previous plot
         self.figure.clear()
@@ -1928,7 +1958,7 @@ class ChartView2D(ChartView):
         elif self._plot_type == "contour":
             self._plot_contour(y_data, x_data, x2_data, plot_options, color_palette)
         else:
-            print(f"ERROR: Unknown plot type: {self._plot_type}")
+            logger.error(f"Unknown plot type: {self._plot_type}")
             return
 
         # Set labels and title
@@ -2078,8 +2108,8 @@ class ChartView2D(ChartView):
             self._plot_type = plot_type
 
         else:
-            print(
-                f"ERROR: Invalid plot type: {plot_type}. Must be 'heatmap' or 'contour'"
+            logger.error(
+                f"Invalid plot type: {plot_type}. Must be 'heatmap' or 'contour'"
             )
 
     def get_plot_type(self):
@@ -2112,7 +2142,7 @@ class ChartView2D(ChartView):
             self.canvas.draw()
 
         except Exception as exc:
-            print(f"Error setting 2D log scales: {exc}")
+            logger.error(f"Error setting 2D log scales: {exc}")
             # If setting log scale fails (e.g., negative values), revert to linear
             self._log_y_2d = False
             self.canvas.draw()
@@ -2153,4 +2183,4 @@ class ChartView2D(ChartView):
 
         # Update the plot
         self.canvas.draw()
-        print(f"DEBUG: ChartView2D.showMessage - Displayed message: {message}")
+        logger.debug(f"ChartView2D.showMessage - Displayed message: {message}")
