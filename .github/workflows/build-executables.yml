@@ -33,6 +33,7 @@ jobs:
         with:
           name: mdaviz-windows
           path: dist/mdaviz.exe
+          retention-days: 1
 
   build-linux:
     name: Build Linux Executable
@@ -75,6 +76,7 @@ jobs:
         with:
           name: mdaviz-linux
           path: dist/mdaviz
+          retention-days: 1
 
   build-macos:
     name: Build macOS Executable
@@ -102,6 +104,7 @@ jobs:
         with:
           name: mdaviz-macos
           path: dist/mdaviz
+          retention-days: 1
 
   create-release:
     name: Create Release
@@ -126,5 +129,4 @@ jobs:
           draft: false
           prerelease: false
           fail_on_unmatched_files: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
