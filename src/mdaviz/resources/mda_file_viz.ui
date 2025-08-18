@@ -1053,7 +1053,7 @@
              <item>
               <widget class="QCheckBox" name="snapCursors">
                <property name="text">
-                <string> Snap cursor to selected curve</string>
+                <string> Snap cursors to selected curve</string>
                </property>
               </widget>
              </item>
