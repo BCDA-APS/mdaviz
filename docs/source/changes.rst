@@ -3,8 +3,35 @@
 Changes
 =======
 
-Version 1.2.0 (Latest)
+Version 1.2.0 (latest)
 ----------------------
+
+**Major Features**
+
+- **2D Mesh Scan Visualization**: Implemented 2D mesh scan support, enabling visualization of mesh scans in both 2D and 1D slice modes. 2D visualization is available in contour and heatmap modes, with multiple color palettes options.
+- **Snap Cursor to Selected Curve**: Added configurable cursor snapping functionality. Users can now toggle between snapping cursors to the nearest data point or placing them at exact mouse click locations.
+
+**Bug Fixes**
+
+- **Tab Switching Responsiveness**: Fixed issue where curve remove button and plot controls became unresponsive after switching between 1D and 2D tabs.
+- **2D Mode Auto-Replace Behavior**: Improved user experience in 2D mode by addressing confusing behavior with forceAutoReplaceMode. The interface now provides more intuitive and predictable interactions.
+
+**Infrastructure Improvements**
+
+- **Logging System**: Replaced print statements with proper logging infrastructure.
+- **Documentation Updates**: Comprehensive documentation updates including user guides, API documentation, and improved examples to support new features and functionality.
+- **Type Safety Enhancements**: Improved code quality with enhanced type annotations, stricter mypy configuration, and better error handling throughout the codebase.
+
+**Technical Notes**
+
+- Enhanced type checking with proper Optional handling
+- Improved CI/CD pipeline with stricter quality checks
+- Updated dependencies and build configuration
+
+
+
+Version 1.2.0
+-------------
 
 - Add 2D data visualization functionality
 - Update documentation
