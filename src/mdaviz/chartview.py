@@ -278,6 +278,14 @@ class ChartView(QWidget):
         self.key_check_timer.timeout.connect(self.check_modifier_keys)
         self.key_check_timer.start(50)  # Check every 50ms
 
+        # Initialize snap to curve setting (default to False for free cursor placement)
+        self._snap_to_curve = False
+
+        # Connect the snap cursors checkbox
+        self.snapCursors = self.mda_mvc.mda_file_viz.snapCursors
+        self.snapCursors.setChecked(self._snap_to_curve)
+        self.snapCursors.toggled.connect(self.onSnapCursorsToggled)
+
         self.cursors = {
             1: None,
             "pos1": None,
@@ -1013,6 +1021,14 @@ class ChartView(QWidget):
         self.onRemoveCursor(1)
         self.onRemoveCursor(2)
 
+    def onSnapCursorsToggled(self, checked):
+        """Handle snap cursors checkbox toggle.
+
+        Parameters:
+            checked (bool): True if checkbox is checked (snap enabled), False if unchecked (snap disabled)
+        """
+        self._snap_to_curve = checked
+
     def findNearestPoint(
         self, x_click: float, y_click: float
     ) -> Optional[tuple[float, float]]:
@@ -1063,14 +1079,19 @@ class ChartView(QWidget):
     def onclick(self, event):
         # Check if the click was in the main_axes
         if event.inaxes is self.main_axes:
-            # Find the nearest point in the selected curve
-            nearest_point = self.findNearestPoint(event.xdata, event.ydata)
+            # Determine cursor position based on snap setting
+            if self._snap_to_curve:
+                # Find the nearest point in the selected curve
+                nearest_point = self.findNearestPoint(event.xdata, event.ydata)
 
-            if nearest_point is None:
-                # No curve selected or no data available
-                return
+                if nearest_point is None:
+                    # No curve selected or no data available
+                    return
 
-            x_nearest, y_nearest = nearest_point
+                x_cursor, y_cursor = nearest_point
+            else:
+                # Use exact click position
+                x_cursor, y_cursor = event.xdata, event.ydata
 
             # Middle click or Alt+right click for red cursor (cursor 1)
             if event.button == MIDDLE_BUTTON or (
@@ -1083,10 +1104,10 @@ class ChartView(QWidget):
                         # Handle case where artist cannot be removed
                         pass
                 (self.cursors[1],) = self.main_axes.plot(
-                    x_nearest, y_nearest, "r+", markersize=15, linewidth=2
+                    x_cursor, y_cursor, "r+", markersize=15, linewidth=2
                 )
-                # Update cursor position to nearest point
-                self.cursors["pos1"] = (x_nearest, y_nearest)
+                # Update cursor position
+                self.cursors["pos1"] = (x_cursor, y_cursor)
 
             # Right click (without Alt) for blue cursor (cursor 2)
             elif event.button == RIGHT_BUTTON and not self.alt_pressed:
@@ -1097,11 +1118,11 @@ class ChartView(QWidget):
                         # Handle case where artist cannot be removed
                         pass
                 (self.cursors[2],) = self.main_axes.plot(
-                    x_nearest, y_nearest, "b+", markersize=15, linewidth=2
+                    x_cursor, y_cursor, "b+", markersize=15, linewidth=2
                 )
 
-                # Update cursor position to nearest point
-                self.cursors["pos2"] = (x_nearest, y_nearest)
+                # Update cursor position
+                self.cursors["pos2"] = (x_cursor, y_cursor)
 
             # Update the info panel with cursor positions
             self.calculateCursors()
