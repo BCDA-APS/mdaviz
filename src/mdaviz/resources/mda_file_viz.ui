@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>799</width>
-    <height>688</height>
+    <height>660</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,7 +43,7 @@
         <x>0</x>
         <y>0</y>
         <width>797</width>
-        <height>686</height>
+        <height>658</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -494,12 +494,8 @@
                       <property name="toolTip">
                        <string>center of mass</string>
                       </property>
-                      <property name="styleSheet">
-                       <string notr="true">QLabel {
-    background-color: rgb(248, 248, 248);
-    border: none;
-    padding: 2px;
-}</string>
+                      <property name="frameShape">
+                       <enum>QFrame::StyledPanel</enum>
                       </property>
                       <property name="text">
                        <string>n/a</string>
@@ -531,12 +527,8 @@
                     </item>
                     <item row="8" column="1">
                      <widget class="QLabel" name="mean_text">
-                      <property name="styleSheet">
-                       <string notr="true">QLabel {
-    background-color: rgb(248, 248, 248);
-    border: none;
-    padding: 2px;
-}</string>
+                      <property name="frameShape">
+                       <enum>QFrame::StyledPanel</enum>
                       </property>
                       <property name="text">
                        <string>n/a</string>
@@ -591,12 +583,8 @@
                       <property name="toolTip">
                        <string>(x,y) coordinates for MAX</string>
                       </property>
-                      <property name="styleSheet">
-                       <string notr="true">QLabel {
-    background-color: rgb(248, 248, 248);
-    border: none;
-    padding: 2px;
-}</string>
+                      <property name="frameShape">
+                       <enum>QFrame::StyledPanel</enum>
                       </property>
                       <property name="text">
                        <string>n/a</string>
@@ -630,12 +618,8 @@
                       <property name="toolTip">
                        <string>(x,y) coordinates for MIN</string>
                       </property>
-                      <property name="styleSheet">
-                       <string notr="true">QLabel {
-    background-color: rgb(248, 248, 248);
-    border: none;
-    padding: 2px;
-}</string>
+                      <property name="frameShape">
+                       <enum>QFrame::StyledPanel</enum>
                       </property>
                       <property name="text">
                        <string>n/a</string>
@@ -1117,12 +1101,8 @@
                      <property name="toolTip">
                       <string>Cursor 1 position</string>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true">QLabel {
-    background-color: rgb(248, 248, 248);
-    border: none;
-    padding: 2px;
-}</string>
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
                      </property>
                      <property name="text">
                       <string>middle click</string>
@@ -1134,12 +1114,8 @@
                      <property name="toolTip">
                       <string>Cursor 2 position</string>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true">QLabel {
-    background-color: rgb(248, 248, 248);
-    border: none;
-    padding: 2px;
-}</string>
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
                      </property>
                      <property name="text">
                       <string>right click</string>
@@ -1275,12 +1251,8 @@
                      <property name="toolTip">
                       <string>(x1-x2,y1-y2)</string>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true">QLabel {
-    background-color: rgb(248, 248, 248);
-    border: none;
-    padding: 2px;
-}</string>
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
                      </property>
                      <property name="text">
                       <string>n/a</string>
@@ -1314,12 +1286,8 @@
                      <property name="toolTip">
                       <string>(0.5*(x1 + x2), 0.5*(y1 + y2))</string>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true">QLabel {
-    background-color: rgb(248, 248, 248);
-    border: none;
-    padding: 2px;
-}</string>
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
                      </property>
                      <property name="text">
                       <string>n/a</string>

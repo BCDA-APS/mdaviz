@@ -188,10 +188,10 @@ class MDAFileTableModel(QAbstractTableModel):
         elif role == Qt.ItemDataRole.BackgroundRole:
             # Highlight row if it's the highlighted row
             if row == self.highlightedRow:
-                return QBrush(QColor(210, 226, 247))
+                return QBrush(QColor(100, 150, 200))
             # Highlight I0 column if I0 is selected
             elif column == self.columnNumber("I0") and self.isI0Selected():
-                return QBrush(QColor(210, 226, 247))
+                return QBrush(QColor(100, 150, 200))
 
         elif role == Qt.ItemDataRole.ToolTipRole:
             # Provide tooltips for checkbox columns
