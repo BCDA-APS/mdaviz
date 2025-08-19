@@ -118,8 +118,8 @@ Platform-Specific Notes
 Linux
 ^^^^^
 
-- Most dependencies available via conda-forge
 - X11 libraries required for GUI
+- Tested on RHEL 8
 
 macOS
 ^^^^^
@@ -188,10 +188,15 @@ To build the executables, install pyinstaller (available via pip) and use the fo
 
 .. code-block:: bash
 
+    # Install pyinstaller via conda
+    conda install -c conda-forge pyinstaller
+    # OR install pyinstaller via pip
     pip install pyinstaller
 
+    # Build the spec file
     pyi-makespec --onefile --windowed --name mdaviz src/mdaviz/app.py --add-data "src/mdaviz/resources:mdaviz/resources"
 
+    # Build the executable
     pyinstaller mdaviz.spec
 
 You can start the application by running the executable:
@@ -200,9 +205,9 @@ You can start the application by running the executable:
 
     ./dist/mdaviz  # Linux & MacOS
 
-    ./dist/mdaviz.exe  # Windows
+    dist\mdaviz.exe  # Windows; you can also double click on the executable to start the application.
 
 **Notes:**
 
 - The executable can be run without activating the conda environment.
-- The application is **slow to start** when running from the executable, but once loaded, it is as fast as when running from the conda environment.
+- On MacOS, the application can be **slow to start** when running from the executable, but once loaded, it is as fast as when running from the conda environment.
