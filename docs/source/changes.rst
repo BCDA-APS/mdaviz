@@ -3,8 +3,22 @@
 Changes
 =======
 
-Version 1.2.0 (latest)
+Version 1.2.1 (latest)
 ----------------------
+
+**Bug Fixes**
+
+- **UI/UX Improvements**: Fixed dark mode contrast issues in data table view
+- **Data Visualization**: Fixed X2 spinner control incorrectly appearing for 1D data files
+
+**Infrastructure**
+
+- **Build System**: Commented out automatic release creation and fixed PyInstaller commands to properly include UI resources with `--add-data` flag
+- **Documentation**: Enhanced installation and build documentation
+
+
+Version 1.2.0
+-------------
 
 **Major Features**
 
