@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mdaviz"
-description = "Python Qt5 application to visualize MDA data."
+description = "Python Qt6 application to visualize multi-dimensional arrays (MDA) files from synchrotron beamlines."
 authors = [
   { name="Fanny Rodolakis", email="rodolakis@anl.gov" },
   { name="Pete Jemian", email="prjemian@gmail.com" },
@@ -23,7 +23,7 @@ maintainers = [
 dynamic = ["version"]
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
-keywords = ["bluesky", "databroker", "tiled", "catalog"]
+keywords = ["mda", "multidimensional-data", "visualization", "synchrotron", "beamline", "EPICS"]
 # https://packaging.python.org/en/latest/specifications/declaring-project-metadata/?highlight=license
 license = {file = "LICENSE"}
 # https://pypi.org/classifiers/
