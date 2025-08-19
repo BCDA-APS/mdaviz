@@ -118,22 +118,18 @@ Platform-Specific Notes
 Linux
 ^^^^^
 
-- Most dependencies available via conda-forge
-- PyQt6 may need to be installed via pip
 - X11 libraries required for GUI
+- Tested on RHEL 8
 
 macOS
 ^^^^^
 
-- Qt6 and PyQt6 available via conda-forge or pip
-- May need to handle code signing for distribution
 - Tested on macOS 12+
 
 Windows
 ^^^^^^^
 
 - Visual Studio Build Tools may be required for some dependencies
-- PyQt6 and Qt6 available via pip
 - Tested on Windows 10/11
 
 Troubleshooting
@@ -162,14 +158,6 @@ Common Installation Issues (Windows)
     conda activate mdaviz
     pip install PyQt6 Qt6
 
-**Permission Errors:**
-
-.. code-block:: bash
-
-    # Use user installation if system-wide fails
-    pip install --user mdaviz
-    pip install --user PyQt6 Qt6
-
 **Missing Dependencies:**
 
 .. code-block:: bash
@@ -177,3 +165,49 @@ Common Installation Issues (Windows)
     # Install all dependencies explicitly
     conda install matplotlib scipy lmfit pyyaml
     pip install PyQt6 Qt6
+
+
+
+Build Executables
+-----------------
+
+Clone the repository and install the dependencies:
+
+.. code-block:: bash
+
+    git clone https://github.com/BCDA-APS/mdaviz.git
+    cd mdaviz
+
+    conda env create -f env.yml
+    conda activate mdaviz
+
+    pip install -e ".[dev,build]"
+
+
+To build the executables, install pyinstaller (available via pip) and use the following commands:
+
+.. code-block:: bash
+
+    # Install pyinstaller via conda
+    conda install -c conda-forge pyinstaller
+    # OR install pyinstaller via pip
+    pip install pyinstaller
+
+    # Build the spec file
+    pyi-makespec --onefile --windowed --name mdaviz src/mdaviz/app.py --add-data "src/mdaviz/resources:mdaviz/resources"
+
+    # Build the executable
+    pyinstaller mdaviz.spec
+
+You can start the application by running the executable:
+
+.. code-block:: bash
+
+    ./dist/mdaviz  # Linux & MacOS
+
+    dist\mdaviz.exe  # Windows; you can also double click on the executable to start the application.
+
+**Notes:**
+
+- The executable can be run without activating the conda environment.
+- On MacOS, the application can be **slow to start** when running from the executable, but once loaded, it is as fast as when running from the conda environment.

@@ -16,7 +16,7 @@ Key Features
 * **Curve Unscaling**: Rescale curves to match the range of other Y curves for better comparison.
 * **Data Analysis**: Basic statistics, cursor measurements, and curve fitting.
 * **Metadata Search**: Searchable metadata to quickly locate specific parameters and settings.
-* **Cross-Platform**: Runs on macOS and Linux (Windows TBD).
+* **Cross-Platform**: Runs on macOS, Windows and Linux.
 
 Documentation
 =============
