@@ -506,6 +506,12 @@ class MDAFile(QWidget):
         else:
             # Clear 2D data for 1D files
             self.mda_mvc.mda_file_viz.set2DData(None)
+            # Hide 2D controls for 1D files
+            table_view = self.tabIndex2Tableview(self.tabWidget.currentIndex())
+            if table_view:
+                table_view.update2DControls(
+                    is_multidimensional=False, dimensions=None, x2_positioner_info=None
+                )
 
     def createNewTab(self, file_name, file_path, selection_field):
         """
