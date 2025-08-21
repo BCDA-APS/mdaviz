@@ -3,8 +3,23 @@
 Changes
 =======
 
-Version 1.2.1 (latest)
+Version 1.22 (latest)
 ----------------------
+
+**Bug Fixes**
+
+- **Crash on 2D Data**: Fixed crash when loading incomplete 2D data files
+
+Version 1.2.2
+-------------
+
+**Bug Fixes**
+
+- **Incomplete 2D Scan Handling**: Fixed crash and display issues when loading aborted 2D scans.
+
+
+Version 1.2.1
+-------------
 
 **Bug Fixes**
 

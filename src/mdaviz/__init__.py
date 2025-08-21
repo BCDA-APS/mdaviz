@@ -36,7 +36,7 @@ def _get_version() -> str:
 
     # Fallback for PyInstaller executables or when package metadata is not available
     # This version should match what's in pyproject.toml or be updated manually
-    return "1.2.1"
+    return "1.2.2"
 
 
 __version__ = _get_version()
