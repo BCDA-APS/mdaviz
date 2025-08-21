@@ -289,7 +289,11 @@ class MDAFile(QWidget):
             table_view = self.tabIndex2Tableview(self.tabWidget.currentIndex())
             if table_view:
                 dimensions = self._data.get("dimensions", [])
+                acquired_dimensions = self._data.get("acquiredDimensions", [])
                 logger.debug(f"handle2DMode - dimensions: {dimensions}")
+                logger.debug(
+                    f"handle2DMode - acquired_dimensions: {acquired_dimensions}"
+                )
 
                 # Extract X2 positioner information from scanDict2D
                 x2_positioner_info = None
@@ -320,6 +324,7 @@ class MDAFile(QWidget):
                 table_view.update2DControls(
                     is_multidimensional=self._data.get("isMultidimensional", False),
                     dimensions=dimensions,
+                    acquired_dimensions=acquired_dimensions,
                     x2_positioner_info=x2_positioner_info,
                 )
 

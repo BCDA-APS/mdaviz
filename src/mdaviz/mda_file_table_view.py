@@ -282,28 +282,48 @@ class MDAFileTableView(QWidget):
         logger.debug("populate2DControls - All 2D controls populated")
 
     def update2DControls(
-        self, is_multidimensional=False, dimensions=None, x2_positioner_info=None
+        self,
+        is_multidimensional=False,
+        dimensions=None,
+        acquired_dimensions=None,
+        x2_positioner_info=None,
     ):
         """
         Update 2D controls visibility and settings based on data dimensions.
 
         Parameters:
             is_multidimensional (bool): Whether the data is multidimensional
-            dimensions (list): List of dimensions [X2_points, X1_points, ...]
+            dimensions (list): List of intended dimensions [X2_points, X1_points, ...]
+            acquired_dimensions (list): List of actual acquired dimensions [X2_points, X1_points, ...]
             x2_positioner_info (dict): Information about the X2 positioner (name, unit, data)
         """
         logger.debug(
             f"update2DControls - is_multidimensional: {is_multidimensional}, dimensions: {dimensions}"
         )
+        logger.debug(f"update2DControls - acquired_dimensions: {acquired_dimensions}")
         logger.debug(f"update2DControls - x2_positioner_info: {x2_positioner_info}")
         if is_multidimensional and dimensions and len(dimensions) >= 2:
             # Show 2D controls
             self.dimensionControls.setVisible(True)
 
             # Update X2 spinbox range
-            # dimensions[0] is X2 dimension, dimensions[1] is X1 dimension
-            x2_max = dimensions[0] - 1 if len(dimensions) > 0 else 0
-            logger.debug(f"update2DControls - x2_max: {x2_max}")
+            # Use acquired_dimensions if available, otherwise fall back to intended dimensions
+            if acquired_dimensions and len(acquired_dimensions) >= 2:
+                x2_max = acquired_dimensions[0] - 1  # Use actual acquired points
+                logger.debug(
+                    f"update2DControls - using acquired_dimensions, x2_max: {x2_max}"
+                )
+            elif dimensions and len(dimensions) >= 2:
+                x2_max = dimensions[0] - 1  # Fallback to intended dimensions
+                logger.debug(
+                    f"update2DControls - using intended dimensions, x2_max: {x2_max}"
+                )
+            else:
+                x2_max = 0  # Default fallback
+                logger.debug(
+                    f"update2DControls - using default fallback, x2_max: {x2_max}"
+                )
+
             self.x2SpinBox.setMaximum(max(0, x2_max))
             self.x2SpinBox.setValue(0)  # Start at first X2 position
 
@@ -759,6 +779,21 @@ class MDAFileTableView(QWidget):
                     ]  # Take first column for 1D X2 data
                 else:
                     x2_data = x2_data_2d
+
+                # If we have acquired_dimensions, slice X2 data to match actual acquired points
+                acquired_dimensions = fileInfo.get("acquiredDimensions", [])
+                if (
+                    acquired_dimensions
+                    and len(acquired_dimensions) >= 2
+                    and x2_data is not None
+                ):
+                    acquired_x2_points = acquired_dimensions[0]
+                    x2_data_array = np.array(x2_data)
+                    if len(x2_data_array) > acquired_x2_points:
+                        logger.debug(
+                            f"data2Plot2D - Truncating X2 data from {len(x2_data_array)} to {acquired_x2_points} points"
+                        )
+                        x2_data = x2_data_array[:acquired_x2_points]
 
                 logger.debug(
                     f"data2Plot2D - X2 data shape: {np.array(x2_data).shape if x2_data is not None else 'None'}"

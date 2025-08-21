@@ -17,7 +17,7 @@ Option 1: Download the executable from the `GitHub Releases <https://github.com/
 .. code-block:: bash
 
     cd Download # Navigate to the directory where you downloaded the executable
-    
+
     mdaviz  # Linux & MacOS
 
     mdaviz.exe  # Windows; you can also double click on the executable to start the application.
