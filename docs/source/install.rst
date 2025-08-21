@@ -8,7 +8,28 @@ Please [report](https://github.com/BCDA-APS/mdaviz/issues/new) any issues you en
 Quick Install
 -------------
 
-Option 1: Install from PyPI (Recommended for users)
+Option 1: Download the executable from the `GitHub Releases <https://github.com/BCDA-APS/mdaviz/releases>`_ page.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Download the executable for your platform from the `GitHub Releases <https://github.com/BCDA-APS/mdaviz/releases>`_ page.
+- Run the executable.
+
+.. code-block:: bash
+
+    cd Download # Navigate to the directory where you downloaded the executable
+    
+    mdaviz  # Linux & MacOS
+
+    mdaviz.exe  # Windows; you can also double click on the executable to start the application.
+
+**Note**:
+
+- The executable is self contained and does not require a conda environment.
+- The Linux executable available on the GitHub Releases page requires recent Linux distribution and does not currently work on APS machines. See below to build the executable manually.
+- On MacOS, the application can be **slow to start** when running from the executable, but once loaded, it is as fast as when running from the conda environment.
+
+
+Option 2: Install from PyPI (Recommended for users)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 For most users, the quickest way to get started is to install from `PyPI
 <https://pypi.python.org/pypi/mdaviz>`_.
@@ -33,7 +54,7 @@ For most users, the quickest way to get started is to install from `PyPI
     sudo yum install xcb-util-cursor
 
 
-Option 2: Install from source (Recommended for developers)
+Option 3: Install from source (Recommended for developers)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For development and contributing, it is strongly recommended to use the provided conda environment. This ensures all dependencies (including PyQt6) are available and compatible.
@@ -111,26 +132,6 @@ You can also create an alias for convenience; e.g., in bash:
 
     alias start_mdaviz="conda activate mdaviz; mdaviz"
 
-
-Platform-Specific Notes
------------------------
-
-Linux
-^^^^^
-
-- X11 libraries required for GUI
-- Tested on RHEL 8
-
-macOS
-^^^^^
-
-- Tested on macOS 12+
-
-Windows
-^^^^^^^
-
-- Visual Studio Build Tools may be required for some dependencies
-- Tested on Windows 10/11
 
 Troubleshooting
 ---------------
