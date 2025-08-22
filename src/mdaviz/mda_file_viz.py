@@ -178,6 +178,21 @@ class MDAFileVisualization(QWidget):
         logger.debug(f"Current viz tab index: {current_tab_index}")
         self.updateControlVisibility(current_tab_index)
 
+        # Update 2D tab visibility based on the active file's data
+        current_tableview = self.getCurrentFileTableview()
+        if (
+            current_tableview
+            and current_tableview.mda_file
+            and current_tableview.mda_file.data()
+        ):
+            active_file_data = current_tableview.mda_file.data()
+            is_2d_data = active_file_data.get("isMultidimensional", False)
+            logger.debug(f"Active file data isMultidimensional: {is_2d_data}")
+            self.update2DTabVisibility(is_2d_data)
+        else:
+            logger.debug("No current tableview or file data available")
+            self.update2DTabVisibility(False)
+
         # Update 2D plot if we're currently on the 2D tab
         if current_tab_index == 3:  # 2D tab
             logger.debug("On 2D tab, updating 2D plot")
@@ -192,8 +207,17 @@ class MDAFileVisualization(QWidget):
         """
         # Find the 2D tab index (should be index 3 after Metadata tab)
         tab_count = self.tabWidget.count()
-        if tab_count >= 4:
-            # Hide/show 2D tab
+        if tab_count < 4 and not show_2d_tab:
+            # Do nothing - tab doesn't exist and we don't want to show it
+            pass
+        elif tab_count < 4 and show_2d_tab:
+            # The 2D tab should exist but might be hidden
+            # Try to show it anyway - the tab should be at index 3
+            self.tabWidget.setTabVisible(3, show_2d_tab)
+            # Update the 2D plot to populate the tab
+            self.update2DPlot()
+        else:
+            # tab_count >= 4, just show/hide as needed
             self.tabWidget.setTabVisible(3, show_2d_tab)
 
             # If hiding 2D tab and it's currently selected, switch to 1D tab
@@ -436,7 +460,7 @@ class MDAFileVisualization(QWidget):
 
     def updateControlVisibility(self, tab_index):
         """
-        Update control visibility based on the selected tab.
+        Update control visibility based on the selected tab (1D vs 2D).
 
         Parameters:
             tab_index (int): Index of the selected tab
@@ -475,7 +499,7 @@ class MDAFileVisualization(QWidget):
             # Hide mode controls and clear button
             self.showModeControls(False)
 
-            # Hide 1D-specific controls
+            # Hide 1D-specific controls: curve box, graphInfo, cursorInfo
             self.show1DControls(False)
 
     def showModeControls(self, show: bool):
