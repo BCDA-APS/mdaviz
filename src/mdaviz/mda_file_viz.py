@@ -449,10 +449,17 @@ class MDAFileVisualization(QWidget):
 
         # Tab indices: 0=1D, 1=Data, 2=Metadata, 3=2D(if visible)
         if tab_index == 0:  # 1D tab
-            # Show table view and X2 controls, hide Y DET controls
+            # Show table view, hide Y DET controls
             current_tableview.tableView.setVisible(True)
-            current_tableview.dimensionControls.setVisible(True)
             current_tableview.yDetControls.setVisible(False)
+
+            # Only show X2 controls if the active tab contains 2D data
+            if current_tableview.mda_file.data():
+                active_file_data = current_tableview.mda_file.data()
+                is_2d_data = active_file_data.get("isMultidimensional", False)
+                current_tableview.dimensionControls.setVisible(is_2d_data)
+            else:
+                current_tableview.dimensionControls.setVisible(False)
 
             # Show mode controls and clear button
             self.showModeControls(True)
