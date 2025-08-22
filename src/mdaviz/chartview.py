@@ -702,9 +702,47 @@ class ChartView(QWidget):
         self.removeItemCurveBox(curveID)
         # Update plot labels, legend and title
         self.updatePlot(update_title=False)
+
+        # Check if any remaining curves are from 2D data and update 2D controls accordingly
+        try:
+            self._update2DControlsAfterCurveRemoval()
+        except Exception as e:
+            logger.error(f"Error in _update2DControlsAfterCurveRemoval: {e}")
+
         # If this was the last curve for this file, remove the tab
         if count == 0 and self.mda_mvc.mda_file.mode() == "Auto-add":
+            logger.debug(
+                f"Removing tab for file: {file_path}, count: {count}, mode: {self.mda_mvc.mda_file.mode()}"
+            )
             self.mda_mvc.mda_file.tabManager.removeTab(file_path)
+
+    def _update2DControlsAfterCurveRemoval(self):
+        """
+        Check if the active tab is 2D and update 2D controls visibility accordingly.
+        This prevents X2 spinbox from appearing incorrectly when the active tab is 1D.
+        """
+        # Skip if there are no remaining curves (last curve being removed)
+        if not self.curveManager.curves():
+            return
+
+        # Get the currently active tab
+        current_index = self.mda_mvc.mda_file.tabWidget.currentIndex()
+        if current_index < 0:
+            return  # No active tab
+
+        current_tableview = self.mda_mvc.mda_file.tabIndex2Tableview(current_index)
+
+        # Only update controls if we have a valid tableview and it's not about to be removed
+        if current_tableview and current_tableview.mda_file.data():
+            # Check if the active tab contains 2D data
+            file_info = current_tableview.mda_file.data()
+            is_2d_data = file_info.get("isMultidimensional", False)
+
+            if not is_2d_data:
+                # If the active tab is 1D, hide 2D controls
+                current_tableview.update2DControls(
+                    is_multidimensional=False, dimensions=None, x2_positioner_info=None
+                )
 
     def onAllCurvesRemoved(self, doNotClearCheckboxes=True):
         # Store current log scale state before clearing
