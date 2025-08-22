@@ -551,8 +551,8 @@ class MDA_MVC(QWidget):
             self.mda_file.removeAllFileTabs()
             return
 
-        # If there is no file selected (ie no tableview) or no DET:
-        if not tableview or not selection.get("Y"):
+        # If there is no file selected (ie no tableview) or no selection or no DET:
+        if not tableview or not selection or not selection.get("Y"):
             self.setStatus("Nothing to plot.")
             return
 
@@ -869,7 +869,8 @@ class MDA_MVC(QWidget):
             return
 
         # If no POS, default to index:
-        if not selection.get("X"):
+        if not selection or not selection.get("X"):
+            selection = selection or {}
             selection["X"] = 0
             tableview.tableView.model().checkCheckBox(0, "X")
 
