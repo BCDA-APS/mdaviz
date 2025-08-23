@@ -702,8 +702,12 @@ class ChartView(QWidget):
         self.removeItemCurveBox(curveID)
         # Update plot labels, legend and title
         self.updatePlot(update_title=False)
+
         # If this was the last curve for this file, remove the tab
         if count == 0 and self.mda_mvc.mda_file.mode() == "Auto-add":
+            logger.debug(
+                f"Removing tab for file: {file_path}, count: {count}, mode: {self.mda_mvc.mda_file.mode()}"
+            )
             self.mda_mvc.mda_file.tabManager.removeTab(file_path)
 
     def onAllCurvesRemoved(self, doNotClearCheckboxes=True):
