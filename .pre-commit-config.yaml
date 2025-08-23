@@ -21,9 +21,10 @@ repos:
       - id: mypy
         name: mypy
         entry: bash -c 'cd src && python -m mypy --package mdaviz --ignore-missing-imports'
-        language: system
+        language: python
         pass_filenames: false
         always_run: true
+        additional_dependencies: [mypy, types-PyYAML]
 
   - repo: local
     hooks:
