@@ -50,6 +50,8 @@ class CachedFileData:
     rank: int = 1
     dimensions: list[int] = field(default_factory=list)
     acquired_dimensions: list[int] = field(default_factory=list)
+    # File modification tracking
+    file_mtime: float = field(default_factory=time.time)
 
     def update_access_time(self) -> None:
         """Update the last access time."""
@@ -170,14 +172,33 @@ class DataCache(QObject):
             file_path (str): Path to the file
 
         Returns:
-            CachedFileData or None: Cached data if available, None otherwise
+            CachedFileData or None: Cached data if available and not stale, None otherwise
         """
         # Check memory usage periodically
         self._check_memory_usage()
 
         if file_path in self._cache:
-            # Move to end (most recently used)
             cached_data = self._cache.pop(file_path)
+
+            # Check if file has been modified since caching
+            try:
+                current_mtime = Path(file_path).stat().st_mtime
+                if current_mtime > cached_data.file_mtime:
+                    # File has been modified, cache is stale
+                    logger.debug(
+                        f"File {file_path} has been modified, invalidating cache"
+                    )
+                    self.cache_miss.emit(file_path)
+                    return None
+            except (OSError, FileNotFoundError):
+                # File no longer exists or can't be accessed
+                logger.debug(
+                    f"File {file_path} no longer accessible, invalidating cache"
+                )
+                self.cache_miss.emit(file_path)
+                return None
+
+            # File is still valid, move to end (most recently used)
             self._cache[file_path] = cached_data
             cached_data.update_access_time()
             self.cache_hit.emit(file_path)
@@ -283,6 +304,7 @@ class DataCache(QObject):
                 pv_list = [v["name"] for v in scan_dict.values()]
 
             # Create cached data
+            file_stat = path_obj.stat()
             cached_data = CachedFileData(
                 file_path=str(path_obj),
                 metadata=file_metadata,
@@ -292,13 +314,14 @@ class DataCache(QObject):
                 pv_list=pv_list,
                 file_name=path_obj.stem,
                 folder_path=str(path_obj.parent),
-                size_bytes=path_obj.stat().st_size,
+                size_bytes=file_stat.st_size,
                 scan_dict_2d=scan_dict_2d,
                 scan_dict_inner=scan_dict_inner,
                 is_multidimensional=is_multidimensional,
                 rank=rank,
                 dimensions=dimensions,
                 acquired_dimensions=acquired_dimensions,
+                file_mtime=file_stat.st_mtime,
             )
 
             # Cache the data
@@ -349,6 +372,7 @@ class DataCache(QObject):
                     scan_dict_2d = {}
                     scan_dict_inner = {}
 
+            file_stat = path_obj.stat()
             return CachedFileData(
                 file_path=str(path_obj),
                 metadata=file_metadata,
@@ -358,13 +382,14 @@ class DataCache(QObject):
                 pv_list=pv_list,
                 file_name=path_obj.stem,
                 folder_path=str(path_obj.parent),
-                size_bytes=path_obj.stat().st_size,
+                size_bytes=file_stat.st_size,
                 scan_dict_2d=scan_dict_2d,
                 scan_dict_inner=scan_dict_inner,
                 is_multidimensional=is_multidimensional,
                 rank=rank,
                 dimensions=dimensions,
                 acquired_dimensions=acquired_dimensions,
+                file_mtime=file_stat.st_mtime,
             )
         except Exception as e:
             logger.error(f"Error loading file without caching {path_obj}: {e}")
@@ -401,6 +426,40 @@ class DataCache(QObject):
             self._current_size_mb -= cached_data.get_size_mb()
             return True
         return False
+
+    def invalidate_file(self, file_path: str) -> bool:
+        """
+        Invalidate cached data for a specific file, forcing it to be reloaded.
+
+        Parameters:
+            file_path (str): Path to the file to invalidate
+
+        Returns:
+            bool: True if the file was in the cache and invalidated, False otherwise
+        """
+        return self.remove(file_path)
+
+    def invalidate_folder(self, folder_path: str) -> int:
+        """
+        Invalidate cached data for all files in a specific folder.
+
+        Parameters:
+            folder_path (str): Path to the folder
+
+        Returns:
+            int: Number of files invalidated
+        """
+        folder_path = str(Path(folder_path).resolve())
+        files_to_remove = []
+
+        for file_path in self._cache.keys():
+            if str(Path(file_path).parent.resolve()) == folder_path:
+                files_to_remove.append(file_path)
+
+        for file_path in files_to_remove:
+            self.remove(file_path)
+
+        return len(files_to_remove)
 
     def clear(self) -> None:
         """Clear all cached data."""

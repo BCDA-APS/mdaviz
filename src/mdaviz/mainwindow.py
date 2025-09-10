@@ -425,10 +425,19 @@ class MainWindow(QMainWindow):
         Refreshes the file list in the currently selected folder
         - Re-fetch the list of MDA files in the current folder.
         - Display the updated file list in the MDA folder table view.
+        - Invalidate cache for files in the current folder to ensure fresh data.
         """
         self.setStatus("Refreshing folder...")
         current_folder = self.dataPath()
         if current_folder:
+            # Invalidate cache for all files in the current folder
+            from mdaviz.data_cache import get_global_cache
+
+            cache = get_global_cache()
+            invalidated_count = cache.invalidate_folder(str(current_folder))
+            if invalidated_count > 0:
+                self.setStatus(f"Invalidated cache for {invalidated_count} files")
+
             current_mdaFileList = self.mdaFileList()
             self.onFolderSelected(current_folder)
             new_mdaFileList = self.mdaFileList()
