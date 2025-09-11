@@ -208,11 +208,9 @@ class DataCache(QObject):
             # File is still valid, move to end (most recently used)
             self._cache[file_path] = cached_data
             cached_data.update_access_time()
-            print(f"✅ CACHE HIT: {file_path}")
             self.cache_hit.emit(file_path)
             return cached_data
         else:
-            print(f"❌ CACHE MISS: {file_path}")
             self.cache_miss.emit(file_path)
             return None
 

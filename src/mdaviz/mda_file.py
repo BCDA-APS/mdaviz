@@ -183,16 +183,7 @@ class MDAFile(QWidget):
 
         # Use data cache for better performance
         cache = get_global_cache()
-        print(f"🔍 CACHE DEBUG: Loading data for file: {file_path}")
-        print(f"🔍 CACHE DEBUG: Cache object: {cache}")
         cached_data = cache.get_or_load(str(file_path))
-        print(f"🔍 CACHE DEBUG: Cache result: {cached_data}")
-        if cached_data:
-            print(f"✅ CACHE DEBUG: Using cached data for: {file_path}")
-        else:
-            print(
-                f"❌ CACHE DEBUG: No cached data available for: {file_path}, falling back to direct loading"
-            )
 
         if cached_data:
             # Use cached data
