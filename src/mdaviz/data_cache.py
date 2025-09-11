@@ -459,13 +459,19 @@ class DataCache(QObject):
         folder_path = str(Path(folder_path).resolve())
         files_to_remove = []
 
-        logger.info(f"🔄 CACHE INVALIDATE: Starting invalidation for folder: {folder_path}")
-        logger.debug(f"🔄 CACHE INVALIDATE: Current cache contains {len(self._cache)} files")
+        logger.info(
+            f"🔄 CACHE INVALIDATE: Starting invalidation for folder: {folder_path}"
+        )
+        logger.debug(
+            f"🔄 CACHE INVALIDATE: Current cache contains {len(self._cache)} files"
+        )
 
         for file_path in self._cache.keys():
             if str(Path(file_path).parent.resolve()) == folder_path:
                 files_to_remove.append(file_path)
-                logger.debug(f"🔄 CACHE INVALIDATE: Marking for invalidation: {file_path}")
+                logger.debug(
+                    f"🔄 CACHE INVALIDATE: Marking for invalidation: {file_path}"
+                )
 
         for file_path in files_to_remove:
             self.remove(file_path)

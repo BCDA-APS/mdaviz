@@ -3,8 +3,16 @@
 Changes
 =======
 
-Version 1.2.3 (latest)
+Version 1.2.4 (latest)
 ----------------------
+
+**Bug Fixes**
+
+- Fixed plot refresh issue where plots would not update when clicking refresh during real-time data acquisition.
+- Added file selection preservation to maintain the currently selected file after folder refresh.
+
+Version 1.2.3
+-------------
 
 **Bug Fixes**
 
