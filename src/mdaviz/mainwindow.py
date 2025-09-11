@@ -444,14 +444,40 @@ class MainWindow(QMainWindow):
                     if current_index.row() < len(current_file_list):
                         selected_file_name = current_file_list[current_index.row()]
                         self._selected_file_name = selected_file_name
+                        self.setStatus(f"Preserving selection: {selected_file_name}")
+                    else:
+                        self.setStatus("Invalid row index for current selection")
+                else:
+                    self.setStatus("No valid selection to preserve")
+            else:
+                self.setStatus("No selection model available to preserve selection")
+
+            # Alternative approach: try to get selection from the table view directly
+            if not selected_file_name and (
+                self.mvc_folder and hasattr(self.mvc_folder, "mda_folder_tableview")
+            ):
+                table_view = self.mvc_folder.mda_folder_tableview.tableView
+                if table_view.selectionModel():
+                    current_index = table_view.selectionModel().currentIndex()
+                    if current_index.isValid():
+                        current_file_list = self.mdaFileList()
+                        if current_index.row() < len(current_file_list):
+                            selected_file_name = current_file_list[current_index.row()]
+                            self._selected_file_name = selected_file_name
+                            self.setStatus(
+                                f"Preserving selection (alt method): {selected_file_name}"
+                            )
 
             # Invalidate cache for all files in the current folder
             from mdaviz.data_cache import get_global_cache
 
             cache = get_global_cache()
+            self.setStatus(f"Invalidating cache for folder: {current_folder}")
             invalidated_count = cache.invalidate_folder(str(current_folder))
             if invalidated_count > 0:
                 self.setStatus(f"Invalidated cache for {invalidated_count} files")
+            else:
+                self.setStatus("No cached files found to invalidate")
 
             current_mdaFileList = self.mdaFileList()
             self.onFolderSelected(current_folder)
@@ -576,28 +602,39 @@ class MainWindow(QMainWindow):
 
                 # Highlight the selected file if one was specified, otherwise select the first file
                 if hasattr(self, "_selected_file_name") and self._selected_file_name:
-                    try:
-                        # Find the index of the selected file
-                        selected_index = sorted_files.index(self._selected_file_name)
-                        # Select and highlight the file in the folder view
-                        if self.mvc_folder and hasattr(
-                            self.mvc_folder, "mda_folder_tableview"
-                        ):
-                            model = (
-                                self.mvc_folder.mda_folder_tableview.tableView.model()
+                    # Use a timer to delay selection restoration (helps with timing issues on Linux)
+                    from PyQt6.QtCore import QTimer
+
+                    def restore_selection():
+                        try:
+                            # Find the index of the selected file
+                            selected_index = sorted_files.index(
+                                self._selected_file_name
                             )
-                            if model and selected_index < model.rowCount():
-                                index = model.index(selected_index, 0)
-                                self.mvc_folder.selectAndShowIndex(index)
-                                self.setStatus(
-                                    f"Highlighted selected file: {self._selected_file_name}"
+                            # Select and highlight the file in the folder view
+                            if self.mvc_folder and hasattr(
+                                self.mvc_folder, "mda_folder_tableview"
+                            ):
+                                model = (
+                                    self.mvc_folder.mda_folder_tableview.tableView.model()
                                 )
-                    except ValueError:
-                        # File not found in the list, ignore
-                        pass
-                    finally:
-                        # Clear the selected file name
-                        self._selected_file_name = None
+                                if model and selected_index < model.rowCount():
+                                    index = model.index(selected_index, 0)
+                                    self.mvc_folder.selectAndShowIndex(index)
+                                    self.setStatus(
+                                        f"Highlighted selected file: {self._selected_file_name}"
+                                    )
+                        except ValueError:
+                            # File not found in the list, ignore
+                            self.setStatus(
+                                f"Selected file {self._selected_file_name} not found after refresh"
+                            )
+                        finally:
+                            # Clear the selected file name
+                            self._selected_file_name = None
+
+                    # Use a short delay to ensure the model is fully updated
+                    QTimer.singleShot(100, restore_selection)
                 else:
                     # Auto-select the first file if no specific file was selected
                     if self.mvc_folder and hasattr(
