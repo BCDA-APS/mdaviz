@@ -183,22 +183,24 @@ class DataCache(QObject):
             # Check if file has been modified since caching
             try:
                 current_mtime = Path(file_path).stat().st_mtime
-                logger.debug(
-                    f"Cache check for {file_path}: cached_mtime={cached_data.file_mtime}, current_mtime={current_mtime}"
+                print(
+                    f"🔍 CACHE CHECK: {file_path}: cached_mtime={cached_data.file_mtime}, current_mtime={current_mtime}"
                 )
                 if current_mtime > cached_data.file_mtime:
                     # File has been modified, cache is stale
-                    logger.info(
-                        f"File {file_path} has been modified, invalidating cache (cached: {cached_data.file_mtime}, current: {current_mtime})"
+                    print(
+                        f"⚠️ CACHE STALE: File {file_path} has been modified, invalidating cache"
                     )
                     self.cache_miss.emit(file_path)
                     return None
                 else:
-                    logger.debug(f"File {file_path} not modified, using cached data")
+                    print(
+                        f"✅ CACHE VALID: File {file_path} not modified, using cached data"
+                    )
             except (OSError, FileNotFoundError):
                 # File no longer exists or can't be accessed
-                logger.warning(
-                    f"File {file_path} no longer accessible, invalidating cache"
+                print(
+                    f"❌ CACHE ERROR: File {file_path} no longer accessible, invalidating cache"
                 )
                 self.cache_miss.emit(file_path)
                 return None
@@ -206,11 +208,11 @@ class DataCache(QObject):
             # File is still valid, move to end (most recently used)
             self._cache[file_path] = cached_data
             cached_data.update_access_time()
-            logger.debug(f"Cache hit for {file_path}")
+            print(f"✅ CACHE HIT: {file_path}")
             self.cache_hit.emit(file_path)
             return cached_data
         else:
-            logger.debug(f"Cache miss for {file_path}")
+            print(f"❌ CACHE MISS: {file_path}")
             self.cache_miss.emit(file_path)
             return None
 
@@ -459,20 +461,20 @@ class DataCache(QObject):
         folder_path = str(Path(folder_path).resolve())
         files_to_remove = []
 
-        logger.info(f"Invalidating cache for folder: {folder_path}")
-        logger.debug(f"Current cache contains {len(self._cache)} files")
+        print(f"🔄 CACHE INVALIDATE: Starting invalidation for folder: {folder_path}")
+        print(f"🔄 CACHE INVALIDATE: Current cache contains {len(self._cache)} files")
 
         for file_path in self._cache.keys():
             if str(Path(file_path).parent.resolve()) == folder_path:
                 files_to_remove.append(file_path)
-                logger.debug(f"Marking for invalidation: {file_path}")
+                print(f"🔄 CACHE INVALIDATE: Marking for invalidation: {file_path}")
 
         for file_path in files_to_remove:
             self.remove(file_path)
-            logger.debug(f"Invalidated cache for: {file_path}")
+            print(f"🔄 CACHE INVALIDATE: Invalidated cache for: {file_path}")
 
-        logger.info(
-            f"Invalidated cache for {len(files_to_remove)} files in folder {folder_path}"
+        print(
+            f"🔄 CACHE INVALIDATE: Invalidated cache for {len(files_to_remove)} files in folder {folder_path}"
         )
         return len(files_to_remove)
 
