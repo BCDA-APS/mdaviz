@@ -176,7 +176,7 @@ class TestDataCache:
         assert miss_signal_received
         assert not hit_signal_received
 
-        # Test hit
+        # Test hit - mock the file system call to return a valid mtime
         data = CachedFileData(
             file_path="/test/file.mda",
             metadata={},
@@ -192,9 +192,12 @@ class TestDataCache:
         hit_signal_received = False
         miss_signal_received = False
 
-        cache.get("/test/file.mda")
-        assert hit_signal_received
-        assert not miss_signal_received
+        # Mock Path.stat().st_mtime to return the same mtime as cached data
+        with patch("pathlib.Path.stat") as mock_stat:
+            mock_stat.return_value.st_mtime = data.file_mtime
+            cache.get("/test/file.mda")
+            assert hit_signal_received
+            assert not miss_signal_received
 
     def test_lru_eviction(self) -> None:
         """Test least recently used eviction."""

@@ -15,7 +15,7 @@ it works correctly and handles large folders efficiently.
 import pytest
 from pathlib import Path
 from typing import TYPE_CHECKING, Dict, Any
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from PyQt6 import QtCore
 
@@ -176,8 +176,10 @@ class TestDataCache:
         # Put data in cache
         cache.put(file_path, test_file_data)
 
-        # Get data from cache
-        retrieved_data = cache.get(file_path)
+        # Get data from cache - mock the file system call to return a valid mtime
+        with patch("pathlib.Path.stat") as mock_stat:
+            mock_stat.return_value.st_mtime = test_file_data.file_mtime
+            retrieved_data = cache.get(file_path)
 
         assert retrieved_data is not None
         assert retrieved_data.file_path == test_file_data.file_path
