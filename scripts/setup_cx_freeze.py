@@ -21,7 +21,6 @@ build_exe_options = {
         "scipy",
         "numpy",
         "lmfit",
-        "tiled",
         "yaml",
         "mdaviz",
         "mdaviz.mainwindow",
@@ -63,9 +62,11 @@ executables = [
         str(project_root / "src" / "mdaviz" / "app.py"),
         base=base,
         target_name="mdaviz",
-        icon=str(project_root / "src" / "mdaviz" / "resources" / "viz.png")
-        if (project_root / "src" / "mdaviz" / "resources" / "viz.png").exists()
-        else None,
+        icon=(
+            str(project_root / "src" / "mdaviz" / "resources" / "viz.png")
+            if (project_root / "src" / "mdaviz" / "resources" / "viz.png").exists()
+            else None
+        ),
     )
 ]
 

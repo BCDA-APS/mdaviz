@@ -75,7 +75,7 @@ def main() -> None:  # for future command-line options
     import logging
 
     # Set external package loggers to WARNING to reduce noise
-    for package in ["httpcore", "httpx", "PyQt6", "tiled"]:
+    for package in ["httpcore", "httpx", "PyQt6"]:
         logging.getLogger(package).setLevel(logging.WARNING)
 
     # Use command line argument first, then environment variable as fallback

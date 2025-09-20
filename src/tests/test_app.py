@@ -119,7 +119,7 @@ class TestMainFunction:
         main()
 
         # Verify package logging levels were set
-        for package in ["httpcore", "httpx", "PyQt6", "tiled"]:
+        for package in ["httpcore", "httpx", "PyQt6"]:
             logger = logging.getLogger(package)
             assert logger.level == logging.WARNING
 
