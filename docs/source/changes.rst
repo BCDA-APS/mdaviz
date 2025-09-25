@@ -3,8 +3,15 @@
 Changes
 =======
 
-Version 1.2.4 (latest)
+Version 1.2.5 (latest)
 ----------------------
+
+**Bug Fixes**
+
+- Fix detector selection mismatch in 2D panel
+
+Version 1.2.4
+-------------
 
 **Bug Fixes**
 
