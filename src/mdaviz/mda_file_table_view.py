@@ -222,19 +222,19 @@ class MDAFileTableView(QWidget):
             return
 
         scanDict2D = fileInfo.get("scanDict2D", {})
-        scanDictInner = fileInfo.get("scanDictInner", {})
         self.yDetComboBox.clear()
 
-        # Add detectors (fieldName starts with "D")
+        # Add detectors (fieldName starts with "D") directly from scanDict2D
         for key, value in scanDict2D.items():
-            # Find corresponding detector info from scanDictInner
-            detector_info = scanDictInner.get(key, {})
-            fieldName = detector_info.get("fieldName", "")
+            fieldName = value.get("fieldName", "")
             if fieldName.startswith("D"):  # Only detectors
-                name = detector_info.get("name", f"Detector_{key}")
-                unit = detector_info.get("unit", "")
+                name = value.get("name", f"Detector_{key}")
+                unit = value.get("unit", "")
                 display_text = f"{name} ({unit})" if unit else name
                 self.yDetComboBox.addItem(display_text, key)
+                logger.debug(
+                    f"populateYDetComboBox - Added detector: {name} (key={key})"
+                )
 
         logger.debug(
             f"populateYDetComboBox - Added {self.yDetComboBox.count()} Y detectors"
@@ -250,22 +250,20 @@ class MDAFileTableView(QWidget):
             return
 
         scanDict2D = fileInfo.get("scanDict2D", {})
-        scanDictInner = fileInfo.get("scanDictInner", {})
         self.i0ComboBox.clear()
 
         # Add "None" option for no normalization
         self.i0ComboBox.addItem("None", None)
 
-        # Add detectors (fieldName starts with "D")
+        # Add detectors (fieldName starts with "D") directly from scanDict2D
         for key, value in scanDict2D.items():
-            # Find corresponding detector info from scanDictInner
-            detector_info = scanDictInner.get(key, {})
-            fieldName = detector_info.get("fieldName", "")
+            fieldName = value.get("fieldName", "")
             if fieldName.startswith("D"):  # Only detectors
-                name = detector_info.get("name", f"Detector_{key}")
-                unit = detector_info.get("unit", "")
+                name = value.get("name", f"Detector_{key}")
+                unit = value.get("unit", "")
                 display_text = f"{name} ({unit})" if unit else name
                 self.i0ComboBox.addItem(display_text, key)
+                logger.debug(f"populateI0ComboBox - Added detector: {name} (key={key})")
 
         logger.debug(
             f"populateI0ComboBox - Added {self.i0ComboBox.count()} I0 detectors"
