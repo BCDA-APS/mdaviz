@@ -200,6 +200,10 @@ class MainWindow(QMainWindow):
                 QtWidgets.QSizePolicy.Policy.Expanding,
             )
 
+    # ==========================================
+    # Status & Dialog Management
+    # ==========================================
+
     @property
     def status(self):
         return self.statusbar.currentMessage()
