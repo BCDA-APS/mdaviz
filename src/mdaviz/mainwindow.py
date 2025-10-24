@@ -57,41 +57,37 @@ class MainWindow(QMainWindow):
         ~_updateRecentFolders
     """
 
+    # ==========================================
+    # Window Initialization & Setup
+    # ==========================================
+
     def __init__(self):
         super().__init__()
         utils.myLoadUi(UI_FILE, baseinstance=self)
         self.setWindowTitle(APP_TITLE)
 
-        # Set proper window flags for macOS resizing
-        self.setWindowFlags(
-            Qt.WindowType.Window
-            | Qt.WindowType.WindowMinimizeButtonHint
-            | Qt.WindowType.WindowMaximizeButtonHint
-            | Qt.WindowType.WindowCloseButtonHint
-        )
+        self._setup_window_properties()
+        self._initialize_data()
+        self._setup_scanner()
+        self._connect()
+        self._setup_window_geometry()
 
-        # Additional macOS-specific properties for proper resizing
-        self.setAttribute(Qt.WidgetAttribute.WA_MacShowFocusRect, False)
-        self.setAttribute(Qt.WidgetAttribute.WA_MacNormalSize, True)
+        # Create tab widget and fit data components if they don't exist
+        self._setup_fit_data_tab()
 
-        # Ensure the window can be resized
-        self.setMinimumSize(400, 300)
-        self.resize(720, 400)  # More reasonable initial size
+        # Auto-load the first valid folder from recent folders (delayed to preserve startup message)
+        QTimer.singleShot(100, self._auto_load_first_folder)
 
-        # Ensure the window is resizable
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-
-        # Ensure central widget and main content area are resizable
-        self._setup_resizable_layout()
-
-        # self.directory = directory
+    def _initialize_data(self):
+        """Initialize data structures and state."""
         self.mvc_folder = None
         self.setDataPath()  # the combined data path obj
         self.setFolderList()  # the list of recent folders in folder QComboBox
         self.setMdaFileList()  # the list of mda file NAME str (name only)
         self.setMdaInfoList()  # the list of mda file Info (all the data necessary to fill the table view)
 
-        # Initialize lazy folder scanner
+    def _setup_scanner(self):
+        """Initialize and configure the lazy folder scanner."""
         self.lazy_scanner = LazyFolderScanner(
             batch_size=50, max_files=10000, use_lightweight_scan=True
         )
@@ -99,8 +95,20 @@ class MainWindow(QMainWindow):
         self.lazy_scanner.scan_complete.connect(self._on_scan_complete)
         self.lazy_scanner.scan_error.connect(self._on_scan_error)
 
-        self.connect()
+    def _connect(self):
+        self.actionOpen.triggered.connect(self.doOpen)
+        self.actionAbout.triggered.connect(self.doAboutDialog)
+        self.actionPreferences.triggered.connect(self.doPreferences)
+        self.actionExit.triggered.connect(self.doClose)
+        utils.reconnect(self.open.released, self.doOpen)
+        utils.reconnect(self.refresh.released, self.onRefresh)
+        self.folder.currentTextChanged.connect(self.onFolderSelected)
 
+    # ==========================================
+    # Window Geometry
+    # ==========================================
+
+    def _setup_window_geometry(self):
         # Restore window geometry from settings
         geometry_restored = settings.restoreWindowGeometry(self, "mainwindow_geometry")
         logger.info(f"Settings are saved in: {settings.fileName()}")
@@ -131,24 +139,66 @@ class MainWindow(QMainWindow):
                     int(min(self.height(), max_height)),
                 )
 
-        # Auto-load the first valid folder from recent folders (delayed to preserve startup message)
-        QTimer.singleShot(100, self._auto_load_first_folder)
+    def _setup_window_properties(self):
+        """Set up window flags, attributes, and basic properties."""
+        # Set proper window flags for macOS resizing
+        self.setWindowFlags(
+            Qt.WindowType.Window
+            | Qt.WindowType.WindowMinimizeButtonHint
+            | Qt.WindowType.WindowMaximizeButtonHint
+            | Qt.WindowType.WindowCloseButtonHint
+        )
 
-    def connect(self):
-        self.actionOpen.triggered.connect(self.doOpen)
-        self.actionAbout.triggered.connect(self.doAboutDialog)
-        self.actionPreferences.triggered.connect(self.doPreferences)
-        self.actionExit.triggered.connect(self.doClose)
-        utils.reconnect(self.open.released, self.doOpen)
-        utils.reconnect(self.refresh.released, self.onRefresh)
-        self.folder.currentTextChanged.connect(self.onFolderSelected)
+        # Additional macOS-specific properties for proper resizing
+        self.setAttribute(Qt.WidgetAttribute.WA_MacShowFocusRect, False)
+        self.setAttribute(Qt.WidgetAttribute.WA_MacNormalSize, True)
 
-        # Auto-load menu removed - now handled in preferences dialog
+        # Ensure the window can be resized
+        self.setMinimumSize(400, 300)
+        self.resize(720, 400)  # More reasonable initial size
 
-        # Create tab widget and fit data components if they don't exist
-        self._setup_fit_data_tab()
+        # Ensure the window is resizable
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
-    # Auto-load menu methods removed - now handled in preferences dialog
+        # Ensure central widget and main content area are resizable
+        self._setup_resizable_layout()
+
+    def _setup_resizable_layout(self) -> None:
+        """Set up proper size policies for resizable layout."""
+        # Ensure central widget is resizable
+        if hasattr(self, "centralwidget"):
+            self.centralwidget.setSizePolicy(
+                QtWidgets.QSizePolicy.Policy.Expanding,
+                QtWidgets.QSizePolicy.Policy.Expanding,
+            )
+
+        # Ensure the main content area (groupbox) is resizable
+        if hasattr(self, "groupbox"):
+            self.groupbox.setSizePolicy(
+                QtWidgets.QSizePolicy.Policy.Expanding,
+                QtWidgets.QSizePolicy.Policy.Expanding,
+            )
+
+        # Ensure the tab widget is resizable
+        if hasattr(self, "mainTabWidget"):
+            self.mainTabWidget.setSizePolicy(
+                QtWidgets.QSizePolicy.Policy.Expanding,
+                QtWidgets.QSizePolicy.Policy.Expanding,
+            )
+
+        # Ensure the fit data tab is resizable
+        if hasattr(self, "fitDataTab"):
+            self.fitDataTab.setSizePolicy(
+                QtWidgets.QSizePolicy.Policy.Expanding,
+                QtWidgets.QSizePolicy.Policy.Expanding,
+            )
+
+        # Ensure the fit data text widget is resizable
+        if hasattr(self, "fitDataText"):
+            self.fitDataText.setSizePolicy(
+                QtWidgets.QSizePolicy.Policy.Expanding,
+                QtWidgets.QSizePolicy.Policy.Expanding,
+            )
 
     @property
     def status(self):
@@ -572,6 +622,10 @@ class MainWindow(QMainWindow):
         count = self.folder.count()  # type: ignore[attr-defined]
         self.folder.insertSeparator(count - 1)  # type: ignore[attr-defined]
 
+    # ==========================================
+    # Scan Progress Handling
+    # ==========================================
+
     def _on_scan_progress(self, current: int, total: int) -> None:
         """Handle scan progress updates."""
         progress_percent = (current / total * 100) if total > 0 else 0
@@ -622,7 +676,9 @@ class MainWindow(QMainWindow):
                             if self.mvc_folder and hasattr(
                                 self.mvc_folder, "mda_folder_tableview"
                             ):
-                                model = self.mvc_folder.mda_folder_tableview.tableView.model()
+                                model = (
+                                    self.mvc_folder.mda_folder_tableview.tableView.model()
+                                )
                                 if model and selected_index < model.rowCount():
                                     index = model.index(selected_index, 0)
                                     self.mvc_folder.selectAndShowIndex(index)
@@ -674,43 +730,6 @@ class MainWindow(QMainWindow):
         self.reset_mainwindow()
         self.setStatus(f"Scan error: {error_message}")
         self.doPopUp(f"Error scanning folder: {error_message}")
-
-    def _setup_resizable_layout(self) -> None:
-        """Set up proper size policies for resizable layout."""
-        # Ensure central widget is resizable
-        if hasattr(self, "centralwidget"):
-            self.centralwidget.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding,
-                QtWidgets.QSizePolicy.Policy.Expanding,
-            )
-
-        # Ensure the main content area (groupbox) is resizable
-        if hasattr(self, "groupbox"):
-            self.groupbox.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding,
-                QtWidgets.QSizePolicy.Policy.Expanding,
-            )
-
-        # Ensure the tab widget is resizable
-        if hasattr(self, "mainTabWidget"):
-            self.mainTabWidget.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding,
-                QtWidgets.QSizePolicy.Policy.Expanding,
-            )
-
-        # Ensure the fit data tab is resizable
-        if hasattr(self, "fitDataTab"):
-            self.fitDataTab.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding,
-                QtWidgets.QSizePolicy.Policy.Expanding,
-            )
-
-        # Ensure the fit data text widget is resizable
-        if hasattr(self, "fitDataText"):
-            self.fitDataText.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding,
-                QtWidgets.QSizePolicy.Policy.Expanding,
-            )
 
     def _auto_load_first_folder(self) -> None:
         """
