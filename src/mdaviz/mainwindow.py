@@ -270,7 +270,7 @@ class MainWindow(QMainWindow):
                         self.mvc_folder.mda_file_viz._updateTabWidgetMaxHeight()
 
     # ==========================================
-    # Window Lifecycle & File Operations
+    # Window Lifecycle
     # ==========================================
 
     def closeEvent(self, event):
@@ -292,6 +292,27 @@ class MainWindow(QMainWindow):
 
         settings.saveWindowGeometry(self, "mainwindow_geometry")
         self.close()
+
+    def doPopUp(self, message):
+        """
+        User chose to show a popup dialog with a message.
+        """
+        from mdaviz.popup import PopUp
+
+        popup = PopUp(self, message)
+        return popup.exec() == QtWidgets.QDialog.accepted
+
+    def proceed(self):
+        """Handle the logic when the user clicks 'OK'."""
+        return True
+
+    def cancel(self):
+        """Handle the logic when the user clicks 'Cancel'."""
+        return False
+
+    # ==========================================
+    # File Operations
+    # ==========================================
 
     def doOpen(self, *args, **kw):
         """User chose to open a file or folder dialog."""
@@ -350,23 +371,6 @@ class MainWindow(QMainWindow):
 
         # Set the combobox selection to the new folder
         self.folder.setCurrentText(str(folder_path))  # type: ignore[attr-defined]
-
-    def doPopUp(self, message):
-        """
-        User chose to show a popup dialog with a message.
-        """
-        from mdaviz.popup import PopUp
-
-        popup = PopUp(self, message)
-        return popup.exec() == QtWidgets.QDialog.accepted
-
-    def proceed(self):
-        """Handle the logic when the user clicks 'OK'."""
-        return True
-
-    def cancel(self):
-        """Handle the logic when the user clicks 'Cancel'."""
-        return False
 
     # ==========================================
     # Data Management
@@ -647,9 +651,7 @@ class MainWindow(QMainWindow):
                             if self.mvc_folder and hasattr(
                                 self.mvc_folder, "mda_folder_tableview"
                             ):
-                                model = (
-                                    self.mvc_folder.mda_folder_tableview.tableView.model()
-                                )
+                                model = self.mvc_folder.mda_folder_tableview.tableView.model()
                                 if model and selected_index < model.rowCount():
                                     index = model.index(selected_index, 0)
                                     self.mvc_folder.selectAndShowIndex(index)
