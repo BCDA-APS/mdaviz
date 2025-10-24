@@ -294,9 +294,14 @@ class MainWindow(QMainWindow):
         self.close()
 
     def doOpen(self, *args, **kw):
-        """
-        User chose to open a file or folder dialog.
-        """
+        """User chose to open a file or folder dialog."""
+        result = self._show_open_dialog()
+        if result:
+            folder_path, selected_file_name = result
+            self._handle_folder_selection(folder_path, selected_file_name)
+
+    def _show_open_dialog(self):
+        """Show the open dialog and return selected path info."""
         from mdaviz.opendialog import OpenDialog
         from PyQt6.QtWidgets import QFileDialog
 
@@ -309,34 +314,42 @@ class MainWindow(QMainWindow):
             # Get the selected files
             selected_files = open_dialog.selectedFiles()
             if selected_files:
-                selected_path = selected_files[0]
-                if selected_path:
-                    # Convert file selection to folder selection
-                    path_obj = Path(selected_path)
+                return self._process_selected_path(selected_files[0])
+        return None
 
-                    if path_obj.is_file():
-                        # If a file was selected, get its parent directory
-                        folder_path = path_obj.parent
-                        selected_file_name = path_obj.name
-                        self.setStatus(
-                            f"Selected file: {selected_file_name}, loading folder: {folder_path}"
-                        )
-                    else:
-                        # If a directory was selected, use it directly
-                        folder_path = path_obj
-                        selected_file_name = None
-                        self.setStatus(f"Selected folder: {folder_path}")
+    def _process_selected_path(self, selected_path: str):
+        """Process the selected path and return folder/file info."""
+        path_obj = Path(selected_path)
 
-                    # Store the selected file name for highlighting
-                    self._selected_file_name = selected_file_name
+        if path_obj.is_file():
+            # If a file was selected, get its parent directory
+            folder_path = path_obj.parent
+            selected_file_name = path_obj.name
+            self.setStatus(
+                f"Selected file: {selected_file_name}, loading folder: {folder_path}"
+            )
+            return folder_path, selected_file_name
+        else:
+            # If a directory was selected, use it directly
+            folder_path = path_obj
+            selected_file_name = None
+            self.setStatus(f"Selected folder: {folder_path}")
+            return folder_path, selected_file_name
 
-                    # Add to folder list and load
-                    folder_list = self.folderList()
-                    folder_list.insert(0, str(folder_path))
-                    self.setFolderList(folder_list)
+    def _handle_folder_selection(
+        self, folder_path: Path, selected_file_name: Optional[str]
+    ):
+        """Handle the selected folder and file."""
+        # Store the selected file name for highlighting
+        self._selected_file_name = selected_file_name
 
-                    # Set the combobox selection to the new folder
-                    self.folder.setCurrentText(str(folder_path))
+        # Add to folder list and load
+        folder_list = self.folderList()
+        folder_list.insert(0, str(folder_path))
+        self.setFolderList(folder_list)
+
+        # Set the combobox selection to the new folder
+        self.folder.setCurrentText(str(folder_path))  # type: ignore[attr-defined]
 
     def doPopUp(self, message):
         """
