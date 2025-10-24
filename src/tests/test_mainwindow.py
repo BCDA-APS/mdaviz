@@ -437,8 +437,8 @@ class TestMainWindow:
         ):
             window = MainWindow()
 
-            # Test connect method
-            window.connect()
+            # Test _connect method
+            window._connect()
             # If we get here without exceptions, the method works
 
     def test_mainwindow_about_dialog_method(self, qapp: QApplication) -> None:
