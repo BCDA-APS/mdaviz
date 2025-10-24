@@ -269,6 +269,10 @@ class MainWindow(QMainWindow):
                     ):
                         self.mvc_folder.mda_file_viz._updateTabWidgetMaxHeight()
 
+    # ==========================================
+    # Window Lifecycle & File Operations
+    # ==========================================
+
     def closeEvent(self, event):
         """
         User clicked the big [X] to quit.
@@ -351,6 +355,10 @@ class MainWindow(QMainWindow):
         """Handle the logic when the user clicks 'Cancel'."""
         return False
 
+    # ==========================================
+    # Data Management
+    # ==========================================
+
     def reset_mainwindow(self):
         self.setDataPath()
         self.setMdaInfoList()
@@ -379,6 +387,10 @@ class MainWindow(QMainWindow):
 
     def setMdaInfoList(self, infoList=None):
         self._mdaInfoList = infoList if infoList else []
+
+    # ==========================================
+    # Folder Operations
+    # ==========================================
 
     def folderList(self):
         return self._folderList
