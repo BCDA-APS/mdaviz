@@ -226,106 +226,48 @@ class MainWindow(QMainWindow):
         about.open()
 
     def doPreferences(self, *args, **kw):
-        """
-        Show the Preferences dialog
-        """
-        from PyQt6.QtWidgets import (
-            QDialog,
-            QVBoxLayout,
-            QLabel,
-            QSpinBox,
-            QDialogButtonBox,
-            QCheckBox,
-        )
+        """Show the Preferences dialog."""
+        from mdaviz.preferences_dialog import PreferencesDialog
+        from PyQt6.QtWidgets import QDialog
 
-        # Create preferences dialog
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Preferences")
-        dialog.setModal(True)
-        dialog.resize(400, 200)
-
-        layout = QVBoxLayout(dialog)
-
-        # Auto-load setting (first)
-        auto_load_checkbox = QCheckBox("Auto-load first folder on startup")
-        auto_load_val = settings.getKey("auto_load_folder")
-        if auto_load_val is None:
-            auto_load_val = True
-        elif isinstance(auto_load_val, str):
-            auto_load_val = auto_load_val.lower() in ("true", "1", "yes", "on")
-        auto_load_checkbox.setChecked(bool(auto_load_val))
-        layout.addWidget(auto_load_checkbox)
-
-        # Add some spacing
-        layout.addStretch()
-
-        # Plot height setting (second)
-        plot_label = QLabel("Maximum Plot Height (pixels):")
-        plot_spinbox = QSpinBox()
-        plot_spinbox.setRange(200, 2000)
-        plot_spinbox.setSingleStep(100)  # Change step size to 100 pixels
-        plot_height_val = settings.getKey("plot_max_height")
-        try:
-            plot_height_val = int(plot_height_val)
-        except (TypeError, ValueError):
-            plot_height_val = 800
-        plot_spinbox.setValue(plot_height_val)
-        plot_spinbox.setSuffix(" px")
-        layout.addWidget(plot_label)
-        layout.addWidget(plot_spinbox)
-
-        # Add helpful caption for plot height setting
-        plot_caption = QLabel(
-            "Use this setting if plot areas expand vertically unexpectedly due to UI bugs."
-        )
-        plot_caption.setWordWrap(True)
-        plot_caption.setStyleSheet("color: gray; font-size: 10px;")
-        layout.addWidget(plot_caption)
-
-        # Add some spacing
-        layout.addStretch()
-
-        # Buttons
-        button_box = QDialogButtonBox(
-            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
-        )
-        button_box.accepted.connect(dialog.accept)
-        button_box.rejected.connect(dialog.reject)
-        layout.addWidget(button_box)
-
-        # Show dialog
+        dialog = PreferencesDialog(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            # Save the new plot height setting
-            new_height = plot_spinbox.value()
-            settings.setKey("plot_max_height", new_height)
+            new_settings = dialog.get_settings()
+            self._apply_preferences(new_settings)
 
-            # Save the new auto-load setting
-            new_auto_load = auto_load_checkbox.isChecked()
-            settings.setKey("auto_load_folder", new_auto_load)
+    def _apply_preferences(self, settings_dict):
+        """Apply preference changes to the application."""
+        # Save settings
+        settings.setKey("plot_max_height", settings_dict["plot_max_height"])
+        settings.setKey("auto_load_folder", settings_dict["auto_load_folder"])
 
-            # Update any existing ChartView widgets
-            if hasattr(self, "mvc_folder") and self.mvc_folder:
+        # Update UI components
+        self._update_plot_height(settings_dict["plot_max_height"])
+
+        self.setStatus(
+            f"Settings updated: plot height {settings_dict['plot_max_height']}px, "
+            f"auto-load {'enabled' if settings_dict['auto_load_folder'] else 'disabled'}"
+        )
+
+    def _update_plot_height(self, new_height):
+        """Update plot height in existing components."""
+        if hasattr(self, "mvc_folder") and self.mvc_folder:
+            if (
+                hasattr(self.mvc_folder, "mda_file_viz")
+                and self.mvc_folder.mda_file_viz
+            ):
                 if (
-                    hasattr(self.mvc_folder, "mda_file_viz")
-                    and self.mvc_folder.mda_file_viz
+                    hasattr(self.mvc_folder.mda_file_viz, "chart_view")
+                    and self.mvc_folder.mda_file_viz.chart_view
                 ):
-                    if (
-                        hasattr(self.mvc_folder.mda_file_viz, "chart_view")
-                        and self.mvc_folder.mda_file_viz.chart_view
-                    ):
-                        self.mvc_folder.mda_file_viz.chart_view.setMaximumPlotHeight(
-                            new_height
-                        )
+                    self.mvc_folder.mda_file_viz.chart_view.setMaximumPlotHeight(
+                        new_height
+                    )
 
-                    # Update tab widget max height to match
                     if hasattr(
                         self.mvc_folder.mda_file_viz, "_updateTabWidgetMaxHeight"
                     ):
                         self.mvc_folder.mda_file_viz._updateTabWidgetMaxHeight()
-
-            self.setStatus(
-                f"Settings updated: plot height {new_height}px, auto-load {'enabled' if new_auto_load else 'disabled'}"
-            )
 
     def closeEvent(self, event):
         """
