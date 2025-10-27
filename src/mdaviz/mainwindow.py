@@ -200,6 +200,14 @@ class MainWindow(QMainWindow):
                 QtWidgets.QSizePolicy.Policy.Expanding,
             )
 
+    def _center_window(self):
+        """Center the window on the screen."""
+        screen = QtWidgets.QApplication.primaryScreen().geometry()
+        window_geometry = self.geometry()
+        x = (screen.width() - window_geometry.width()) // 2
+        y = (screen.height() - window_geometry.height()) // 2
+        self.move(x, y)
+
     # ==========================================
     # Status & Dialog Management
     # ==========================================
@@ -651,7 +659,9 @@ class MainWindow(QMainWindow):
                             if self.mvc_folder and hasattr(
                                 self.mvc_folder, "mda_folder_tableview"
                             ):
-                                model = self.mvc_folder.mda_folder_tableview.tableView.model()
+                                model = (
+                                    self.mvc_folder.mda_folder_tableview.tableView.model()
+                                )
                                 if model and selected_index < model.rowCount():
                                     index = model.index(selected_index, 0)
                                     self.mvc_folder.selectAndShowIndex(index)
@@ -774,14 +784,6 @@ class MainWindow(QMainWindow):
             # Convert string to boolean
             setting = setting.lower() in ("true", "1", "yes", "on")
         return bool(setting)
-
-    def _center_window(self):
-        """Center the window on the screen."""
-        screen = QtWidgets.QApplication.primaryScreen().geometry()
-        window_geometry = self.geometry()
-        x = (screen.width() - window_geometry.width()) // 2
-        y = (screen.height() - window_geometry.height()) // 2
-        self.move(x, y)
 
     def showFitDataTab(self):
         """Show the fit data tab and switch to it."""
