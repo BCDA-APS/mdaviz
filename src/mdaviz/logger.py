@@ -142,6 +142,48 @@ def disable_debug_mode():
     set_log_level("INFO")
 
 
+def list_log_files():
+    """
+    List all available log files.
+
+    Returns:
+        List of log file paths
+    """
+    try:
+        home_dir = Path.home()
+        log_dir = home_dir / ".mdaviz" / "logs"
+        if log_dir.exists():
+            return sorted(log_dir.glob("mdaviz_*.log"), reverse=True)
+        return []
+    except Exception:
+        return []
+
+
+def clear_old_logs(keep_days=7):
+    """
+    Clear old log files.
+
+    Args:
+        keep_days: Number of days to keep log files
+    """
+    from datetime import datetime, timedelta
+
+    cutoff_time = datetime.now() - timedelta(days=keep_days)
+
+    for log_file in list_log_files():
+        try:
+            # Try to parse timestamp from filename
+            # Format: mdaviz_YYYYMMDD_HHMMSS.log
+            timestamp_str = log_file.stem.split("_", 1)[1]
+            file_time = datetime.strptime(timestamp_str, "%Y%m%d_%H%M%S")
+
+            if file_time < cutoff_time:
+                log_file.unlink()
+                print(f"Deleted old log file: {log_file}")
+        except Exception as e:
+            print(f"Error processing log file {log_file}: {e}")
+
+
 # Convenience functions for common logging patterns
 def debug(msg: str, *args, **kwargs):
     """Log a debug message."""

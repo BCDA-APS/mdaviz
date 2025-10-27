@@ -14,8 +14,7 @@ import sys
 from PyQt6 import QtWidgets
 from mdaviz.mainwindow import MainWindow
 import argparse
-from mdaviz.logger import get_logger, set_log_level, enable_debug_mode
-from mdaviz.logging_config import clear_old_logs
+from mdaviz.logger import get_logger, set_log_level, enable_debug_mode, clear_old_logs
 
 # Get logger for this module
 logger = get_logger("app")
