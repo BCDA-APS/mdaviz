@@ -572,10 +572,6 @@ class MDA_MVC(QWidget):
             y_index = selection.get("Y", [])
             if not isinstance(widgetMpl, ChartView):  # Make a blank chart.
                 widgetMpl = ChartView(self, **plot_options)
-                # Connect fit signals to main window
-                if hasattr(self.mainWindow, "connectToFitSignals"):
-                    self.mainWindow.connectToFitSignals(widgetMpl)
-
                 # Apply stored log scale state to the new chart
                 if hasattr(self.mda_file_viz, "getLogScaleState"):
                     stored_log_x, stored_log_y = self.mda_file_viz.getLogScaleState()
@@ -892,10 +888,6 @@ class MDA_MVC(QWidget):
 
         if not isinstance(widgetMpl, ChartView):
             widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
-            # Connect fit signals to main window
-            if hasattr(self.mainWindow, "connectToFitSignals"):
-                self.mainWindow.connectToFitSignals(widgetMpl)
-
             # Apply stored log scale state to the new chart
             if hasattr(self.mda_file_viz, "getLogScaleState"):
                 stored_log_x, stored_log_y = self.mda_file_viz.getLogScaleState()

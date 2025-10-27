@@ -72,9 +72,6 @@ class MainWindow(QMainWindow):
         self._connect()
         self._setup_window_geometry()
 
-        # Create tab widget and fit data components if they don't exist
-        self._setup_fit_data_tab()
-
         # Auto-load the first valid folder from recent folders (delayed to preserve startup message)
         QTimer.singleShot(100, self._auto_load_first_folder)
 
@@ -159,46 +156,6 @@ class MainWindow(QMainWindow):
 
         # Ensure the window is resizable
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-
-        # Ensure central widget and main content area are resizable
-        self._setup_resizable_layout()
-
-    def _setup_resizable_layout(self) -> None:
-        """Set up proper size policies for resizable layout."""
-        # Ensure central widget is resizable
-        if hasattr(self, "centralwidget"):
-            self.centralwidget.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding,
-                QtWidgets.QSizePolicy.Policy.Expanding,
-            )
-
-        # Ensure the main content area (groupbox) is resizable
-        if hasattr(self, "groupbox"):
-            self.groupbox.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding,
-                QtWidgets.QSizePolicy.Policy.Expanding,
-            )
-
-        # Ensure the tab widget is resizable
-        if hasattr(self, "mainTabWidget"):
-            self.mainTabWidget.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding,
-                QtWidgets.QSizePolicy.Policy.Expanding,
-            )
-
-        # Ensure the fit data tab is resizable
-        if hasattr(self, "fitDataTab"):
-            self.fitDataTab.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding,
-                QtWidgets.QSizePolicy.Policy.Expanding,
-            )
-
-        # Ensure the fit data text widget is resizable
-        if hasattr(self, "fitDataText"):
-            self.fitDataText.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding,
-                QtWidgets.QSizePolicy.Policy.Expanding,
-            )
 
     def _center_window(self):
         """Center the window on the screen."""
@@ -659,9 +616,7 @@ class MainWindow(QMainWindow):
                             if self.mvc_folder and hasattr(
                                 self.mvc_folder, "mda_folder_tableview"
                             ):
-                                model = (
-                                    self.mvc_folder.mda_folder_tableview.tableView.model()
-                                )
+                                model = self.mvc_folder.mda_folder_tableview.tableView.model()
                                 if model and selected_index < model.rowCount():
                                     index = model.index(selected_index, 0)
                                     self.mvc_folder.selectAndShowIndex(index)
@@ -784,115 +739,3 @@ class MainWindow(QMainWindow):
             # Convert string to boolean
             setting = setting.lower() in ("true", "1", "yes", "on")
         return bool(setting)
-
-    def showFitDataTab(self):
-        """Show the fit data tab and switch to it."""
-        self.mainTabWidget.setTabVisible(0, True)  # Show fit data tab
-        self.mainTabWidget.setCurrentIndex(0)  # Switch to fit data tab
-
-    def updateFitData(self, fit_data: str):
-        """
-        Update the fit data tab with new fit information.
-
-        Parameters:
-        - fit_data: String containing formatted fit data to display
-        """
-        self.fitDataText.setPlainText(fit_data)
-        self.fitDataLabel.setText("Fit Data Available")
-        self.showFitDataTab()
-
-    def connectToFitSignals(self, chart_view):
-        """
-        Connect to fit signals from a chart view.
-
-        Parameters:
-        - chart_view: ChartView instance that emits fit signals
-        """
-        if hasattr(chart_view, "fitAdded"):
-            chart_view.fitAdded.connect(self._on_fit_added)
-        if hasattr(chart_view, "fitUpdated"):
-            chart_view.fitUpdated.connect(self._on_fit_updated)
-
-    def _on_fit_added(self, curve_id: str, fit_id: str):
-        """Handle when a new fit is added."""
-        if hasattr(self, "mvc_folder") and self.mvc_folder:
-            # Get fit data from the fit manager
-            fit_manager = getattr(self.mvc_folder, "fit_manager", None)
-            if fit_manager:
-                fit_data = fit_manager.getFitData(curve_id)
-                if fit_data:
-                    self._display_fit_data(fit_data, curve_id)
-
-    def _on_fit_updated(self, curve_id: str, fit_id: str):
-        """Handle when a fit is updated."""
-        self._on_fit_added(curve_id, fit_id)
-
-    def _display_fit_data(self, fit_data, curve_id: str):
-        """Display fit data in the fit data tab."""
-        try:
-            # Format the fit data for display
-            formatted_data = f"Curve ID: {curve_id}\n"
-            formatted_data += f"Model: {fit_data.model_name}\n"
-            formatted_data += f"Fit Range: {fit_data.x_range}\n\n"
-
-            # Add fit parameters
-            if fit_data.fit_result and hasattr(fit_data.fit_result, "parameters"):
-                formatted_data += "Parameters:\n"
-                for param, value in fit_data.fit_result.parameters.items():
-                    formatted_data += f"  {param}: {value:.6f}\n"
-
-            # Add fit quality metrics if available
-            if fit_data.fit_result and hasattr(fit_data.fit_result, "quality_metrics"):
-                formatted_data += "\nQuality Metrics:\n"
-                for metric, value in fit_data.fit_result.quality_metrics.items():
-                    formatted_data += f"  {metric}: {value:.6f}\n"
-
-            self.updateFitData(formatted_data)
-
-        except Exception as e:
-            error_msg = f"Error displaying fit data: {str(e)}"
-            self.updateFitData(error_msg)
-
-    def _setup_fit_data_tab(self):
-        """Set up the fit data tab widget and components."""
-        # Check if mainTabWidget exists, if not create it
-        if not hasattr(self, "mainTabWidget"):
-            # Create a tab widget and add it to the groupbox layout
-            self.mainTabWidget = QtWidgets.QTabWidget()
-
-            # Create fit data tab
-            self.fitDataTab = QtWidgets.QWidget()
-            fit_layout = QtWidgets.QVBoxLayout(self.fitDataTab)
-
-            # Create fit data label
-            self.fitDataLabel = QtWidgets.QLabel("No Fit Data Available")
-            fit_layout.addWidget(self.fitDataLabel)
-
-            # Create fit data text widget
-            self.fitDataText = QtWidgets.QTextEdit()
-            self.fitDataText.setReadOnly(True)
-            fit_layout.addWidget(self.fitDataText)
-
-            # Add fit data tab to main tab widget
-            self.mainTabWidget.addTab(self.fitDataTab, "Fit Data")
-
-            # Add the tab widget to the groupbox layout
-            if hasattr(self, "groupbox") and self.groupbox.layout():
-                self.groupbox.layout().addWidget(self.mainTabWidget)
-
-            # Initially hide the fit data tab until a fit is performed
-            self.mainTabWidget.setTabVisible(0, False)
-        else:
-            # If mainTabWidget exists, ensure fit data components exist
-            if not hasattr(self, "fitDataTab"):
-                self.fitDataTab = QtWidgets.QWidget()
-                fit_layout = QtWidgets.QVBoxLayout(self.fitDataTab)
-                self.fitDataLabel = QtWidgets.QLabel("No Fit Data Available")
-                fit_layout.addWidget(self.fitDataLabel)
-                self.fitDataText = QtWidgets.QTextEdit()
-                self.fitDataText.setReadOnly(True)
-                fit_layout.addWidget(self.fitDataText)
-                self.mainTabWidget.addTab(self.fitDataTab, "Fit Data")
-
-            # Initially hide the fit data tab until a fit is performed
-            self.mainTabWidget.setTabVisible(0, False)

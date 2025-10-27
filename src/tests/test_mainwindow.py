@@ -402,27 +402,7 @@ class TestMainWindow:
                     f"Error scanning folder: {error_message}"
                 )
 
-    def test_mainwindow_fit_data_methods(self, qapp: QApplication) -> None:
-        """Test fit data related methods."""
-        with (
-            patch(
-                "mdaviz.mainwindow.settings.getKey", side_effect=create_mock_settings()
-            ),
-            patch(
-                "mdaviz.mainwindow.settings.fileName",
-                return_value="/tmp/test_settings.ini",
-            ),
-        ):
-            window = MainWindow()
-
-            # Test showFitDataTab method
-            window.showFitDataTab()
-            # If we get here without exceptions, the method works
-
-            # Test updateFitData method
-            test_fit_data = "Test fit data"
-            window.updateFitData(test_fit_data)
-            # If we get here without exceptions, the method works
+    # Fit-related methods removed - functionality handled in mda_file_viz.ui and fit_manager.py
 
     def test_mainwindow_connect_method(self, qapp: QApplication) -> None:
         """Test connect method."""
@@ -612,95 +592,4 @@ class TestMainWindow:
             window._auto_load_first_folder()
             # If we get here without exceptions, the method works
 
-    def test_mainwindow_setup_resizable_layout(self, qapp: QApplication) -> None:
-        """Test _setup_resizable_layout method."""
-        with (
-            patch(
-                "mdaviz.mainwindow.settings.getKey", side_effect=create_mock_settings()
-            ),
-            patch(
-                "mdaviz.mainwindow.settings.fileName",
-                return_value="/tmp/test_settings.ini",
-            ),
-        ):
-            window = MainWindow()
-
-            # Test _setup_resizable_layout method
-            window._setup_resizable_layout()
-            # If we get here without exceptions, the method works
-
     # Auto-load menu tests removed - functionality moved to preferences dialog
-
-    def test_mainwindow_connect_to_fit_signals(self, qapp: QApplication) -> None:
-        """Test connectToFitSignals method."""
-        with (
-            patch(
-                "mdaviz.mainwindow.settings.getKey", side_effect=create_mock_settings()
-            ),
-            patch(
-                "mdaviz.mainwindow.settings.fileName",
-                return_value="/tmp/test_settings.ini",
-            ),
-        ):
-            window = MainWindow()
-
-            # Test connectToFitSignals method
-            mock_chart_view = MagicMock()
-            window.connectToFitSignals(mock_chart_view)
-            # If we get here without exceptions, the method works
-
-    def test_mainwindow_fit_signal_handlers(self, qapp: QApplication) -> None:
-        """Test fit signal handler methods."""
-        with (
-            patch(
-                "mdaviz.mainwindow.settings.getKey", side_effect=create_mock_settings()
-            ),
-            patch(
-                "mdaviz.mainwindow.settings.fileName",
-                return_value="/tmp/test_settings.ini",
-            ),
-        ):
-            window = MainWindow()
-
-            # Test _on_fit_added method
-            window._on_fit_added("curve1", "fit1")
-            # If we get here without exceptions, the method works
-
-            # Test _on_fit_updated method
-            window._on_fit_updated("curve1", "fit1")
-            # If we get here without exceptions, the method works
-
-    def test_mainwindow_display_fit_data(self, qapp: QApplication) -> None:
-        """Test _display_fit_data method."""
-        with (
-            patch(
-                "mdaviz.mainwindow.settings.getKey", side_effect=create_mock_settings()
-            ),
-            patch(
-                "mdaviz.mainwindow.settings.fileName",
-                return_value="/tmp/test_settings.ini",
-            ),
-        ):
-            window = MainWindow()
-
-            # Test _display_fit_data method
-            test_fit_data = {"parameter": "value"}
-            window._display_fit_data(test_fit_data, "curve1")
-            # If we get here without exceptions, the method works
-
-    def test_mainwindow_setup_fit_data_tab(self, qapp: QApplication) -> None:
-        """Test _setup_fit_data_tab method."""
-        with (
-            patch(
-                "mdaviz.mainwindow.settings.getKey", side_effect=create_mock_settings()
-            ),
-            patch(
-                "mdaviz.mainwindow.settings.fileName",
-                return_value="/tmp/test_settings.ini",
-            ),
-        ):
-            window = MainWindow()
-
-            # Test _setup_fit_data_tab method
-            window._setup_fit_data_tab()
-            # If we get here without exceptions, the method works
