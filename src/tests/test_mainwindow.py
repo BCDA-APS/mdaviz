@@ -241,10 +241,6 @@ class TestMainWindow:
             auto_load_setting = window.get_auto_load_setting()
             assert isinstance(auto_load_setting, bool)
 
-            # Test toggle_auto_load method
-            new_setting = window.toggle_auto_load()
-            assert isinstance(new_setting, bool)
-
     def test_mainwindow_folder_selection(self, qapp: QApplication) -> None:
         """Test onFolderSelected method."""
         with (

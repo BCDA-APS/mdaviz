@@ -704,25 +704,6 @@ class MainWindow(QMainWindow):
         else:
             self.setStatus("No recent folders available for auto-loading")
 
-    def toggle_auto_load(self) -> bool:
-        """
-        Toggle the auto-load folder setting.
-
-        Returns:
-            bool: The new state of the auto-load setting (True if enabled, False if disabled)
-        """
-        current_setting = settings.getKey("auto_load_folder")
-        if current_setting is None:
-            current_setting = True
-
-        new_setting = not current_setting
-        settings.setKey("auto_load_folder", new_setting)
-
-        status_text = "Auto-loading enabled" if new_setting else "Auto-loading disabled"
-        self.setStatus(status_text)
-
-        return new_setting
-
     def get_auto_load_setting(self) -> bool:
         """
         Get the current auto-load folder setting.
