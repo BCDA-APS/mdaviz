@@ -87,6 +87,10 @@ class ProgressDialog(QProgressDialog):
         else:
             percentage = 0
 
+        # Cap at 99% to avoid rendering issue at 100%
+        if percentage >= 100:
+            percentage = 99
+
         # Update progress bar
         self.setValue(percentage)
 
@@ -202,8 +206,6 @@ class AsyncProgressDialog(ProgressDialog):
     def _operation_completed_slot(self) -> None:
         """Slot for operation completion."""
         self.setLabelText("Operation completed successfully")
-        # Don't set value to 100 to avoid rendering issue
-        # Just show the completion message
 
         # Keep dialog open for a moment to show completion message
         def close_dialog() -> None:
