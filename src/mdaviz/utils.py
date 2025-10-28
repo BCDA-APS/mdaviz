@@ -151,7 +151,6 @@ def get_file_info_lightweight(file_path: pathlib.Path) -> dict:
         - Number: Scan number (if available)
         - Points: Number of data points (if available)
         - Dimension: Scan dimension (if available)
-        - Positioner: First positioner name (if available)
         - Date: File date (if available)
         - Size: Human readable file size
     """
