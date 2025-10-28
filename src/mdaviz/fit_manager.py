@@ -8,7 +8,7 @@ and retrieval, and coordinates between UI and fit calculations.
 from typing import Optional, Tuple, Dict
 import numpy as np
 from PyQt6.QtCore import QObject, pyqtSignal
-from mdaviz.fit_models import FitModel, FitResult, get_available_models
+from mdaviz.fit_models import FitResult, get_available_models
 
 
 class FitData:
@@ -54,15 +54,6 @@ class FitManager(QObject):
         super().__init__(parent)
         self._fits: dict[str, FitData] = {}  # {curveID: FitData}
         self._models = get_available_models()
-
-    def get_available_models(self) -> dict[str, FitModel]:
-        """
-        Get available fit models.
-
-        Returns:
-        - Dictionary mapping model names to FitModel instances
-        """
-        return self._models
 
     def addFit(
         self,

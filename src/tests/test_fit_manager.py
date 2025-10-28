@@ -10,6 +10,7 @@ import pytest
 import numpy as np
 
 from mdaviz.fit_manager import FitManager
+from mdaviz.fit_models import get_available_models
 
 if TYPE_CHECKING:
     from _pytest.logging import LogCaptureFixture
@@ -204,8 +205,7 @@ def test_fit_manager_clear_all_fits() -> None:
 
 def test_fit_manager_get_available_models() -> None:
     """Test getting available fit models."""
-    fit_manager = FitManager()
-    models = fit_manager.get_available_models()
+    models = get_available_models()
 
     assert isinstance(models, dict)
     assert len(models) > 0

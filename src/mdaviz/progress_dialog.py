@@ -204,9 +204,11 @@ class AsyncProgressDialog(ProgressDialog):
         self.setLabelText("Operation completed successfully")
         # Hide the progress bar to avoid rendering issue
         self.setRange(0, 0)  # This hides the progress bar
+
         # Delay close slightly to let the user read the completion message
         def close_dialog() -> None:
             self.close()
+
         QtCore.QTimer.singleShot(500, close_dialog)
 
     def _operation_failed_slot(self, error_message: str) -> None:
