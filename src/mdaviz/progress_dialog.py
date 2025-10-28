@@ -87,10 +87,6 @@ class ProgressDialog(QProgressDialog):
         else:
             percentage = 0
 
-        # Cap at 99% to avoid rendering issue at 100%
-        if percentage >= 100:
-            percentage = 99
-
         # Update progress bar
         self.setValue(percentage)
 
