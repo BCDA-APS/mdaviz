@@ -206,6 +206,8 @@ class AsyncProgressDialog(ProgressDialog):
     def _operation_completed_slot(self) -> None:
         """Slot for operation completion."""
         self.setLabelText("Operation completed successfully")
+        # Hide the progress bar to avoid rendering issue
+        self.setRange(0, 0)  # This hides the progress bar
 
         # Keep dialog open for a moment to show completion message
         def close_dialog() -> None:
