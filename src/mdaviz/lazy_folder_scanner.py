@@ -17,6 +17,7 @@ from PyQt6.QtCore import QObject, QThread, pyqtSignal
 from mdaviz.utils import get_file_info_lightweight, get_file_info_full
 from dataclasses import dataclass
 from mdaviz.logger import get_logger
+from mdaviz.progress_dialog import AsyncProgressDialog
 
 # Get logger for this module
 logger = get_logger("lazy_folder_scanner")
@@ -318,6 +319,10 @@ class LazyFolderScanner(QObject):
         self._scanning = True
         self._current_scan_path = folder_path
 
+        # Create progress dialog
+        self._progress_dialog = AsyncProgressDialog("Scanning folder...", parent=None)
+        self._progress_dialog.show()
+
         # Create a worker thread for scanning
         self.scanner_thread = QThread()
         self.scanner_worker = FolderScanWorker(
@@ -334,6 +339,7 @@ class LazyFolderScanner(QObject):
         # Connect signals
         self.scanner_thread.started.connect(self.scanner_worker.scan)
         self.scanner_worker.progress.connect(self.scan_progress)
+        self.scanner_worker.progress.connect(self._update_progress)
         self.scanner_worker.complete.connect(self._on_scan_complete)
         self.scanner_worker.error.connect(self._on_scan_error)
         self.scanner_worker.progressive_update.connect(self.progressive_scan_update)
@@ -344,16 +350,29 @@ class LazyFolderScanner(QObject):
         # Start scanning
         self.scanner_thread.start()
 
+    def _update_progress(self, current: int, total: int) -> None:
+        """Update progress dialog."""
+        if hasattr(self, "_progress_dialog") and self._progress_dialog:
+            self._progress_dialog.update_progress_async(
+                current, total, f"Scanning files: {current}/{total}"
+            )
+
     def _on_scan_complete(self, result: FolderScanResult) -> None:
         """Handle scan completion."""
         self._scanning = False
         self._current_scan_path = None
+        # Close progress dialog
+        if hasattr(self, "_progress_dialog") and self._progress_dialog:
+            self._progress_dialog.complete_async()
         self.scan_complete.emit(result)
 
     def _on_scan_error(self, error_message: str) -> None:
         """Handle scan error."""
         self._scanning = False
         self._current_scan_path = None
+        # Close progress dialog on error
+        if hasattr(self, "_progress_dialog") and self._progress_dialog:
+            self._progress_dialog.fail_async(error_message)
         self.scan_error.emit(error_message)
 
     def is_scanning(self) -> bool:

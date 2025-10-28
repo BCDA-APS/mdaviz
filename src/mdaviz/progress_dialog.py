@@ -203,7 +203,12 @@ class AsyncProgressDialog(ProgressDialog):
         """Slot for operation completion."""
         self.setValue(100)
         self.setLabelText("Operation completed successfully")
-        self.close()
+
+        # Keep dialog open for a moment to show completion message
+        def close_dialog() -> None:
+            self.close()
+
+        QtCore.QTimer.singleShot(1000, close_dialog)  # Close after 1 second
 
     def _operation_failed_slot(self, error_message: str) -> None:
         """Slot for operation failure."""
