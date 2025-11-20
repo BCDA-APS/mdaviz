@@ -247,9 +247,36 @@ class FitManager(QObject):
         - Tuple of (x_fit, y_fit) arrays if found, None otherwise
         """
         fit_data = self.getFitData(curveID)
-        if fit_data:
+        if not fit_data:
+            return None
+
+        # Get the mmodel
+        available_models = get_available_models()
+        model = available_models.get(fit_data.model_name)
+        if not model:
+            # Falls back to original data if model not found
             return fit_data.fit_result.x_fit, fit_data.fit_result.fit_curve
-        return None
+
+        # Get parameters
+        parameters = fit_data.fit_result.parameters
+
+        # Determine x range for smooth curve
+        x_original = fit_data.fit_result.x_fit
+        if fit_data.x_range:
+            x_min, x_max = fit_data.x_range
+        else:
+            x_min, x_max = np.min(x_original), np.max(x_original)
+
+        # Generate smooth x array (500 points for smooth plotting)
+        num_points = 500
+        x_smooth = np.linspace(x_min, x_max, num_points)
+
+        # Evaluate the fit function at smooth points
+        # Convert parameters dict to ordered list matching model.parameters
+        param_values = [parameters[param] for param in model.parameters]
+        y_smooth = model.function(x_smooth, *param_values)
+
+        return x_smooth, y_smooth
 
     def getFitParameters(self, curveID: str) -> Optional[Dict[str, float]]:
         """
