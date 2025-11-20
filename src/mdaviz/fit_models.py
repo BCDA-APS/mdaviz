@@ -182,6 +182,18 @@ class GaussianFit(FitModel):
             ["amplitude", "center", "sigma", "offset"],
         )
 
+
+class GaussianFit(FitModel):
+    """Gaussian fit model."""
+
+    def __init__(self):
+        """Initialize Gaussian fit model."""
+        super().__init__(
+            "Gaussian",
+            self._gaussian_function,
+            ["amplitude", "center", "sigma", "offset"],
+        )
+
     def _gaussian_function(
         self,
         x: np.ndarray,
@@ -213,16 +225,43 @@ class GaussianFit(FitModel):
         y_min = np.min(y_data)
         x_max_idx = np.argmax(y_data)
         x_max = x_data[x_max_idx]
+        x_min_idx = np.argmin(y_data)
+        x_min = x_data[x_min_idx]
+
+        # Calculate second derivative
+        d2y_dx2 = np.gradient(np.gradient(y_data, x_data), x_data)
+
+        # Check second derivative at the extremes
+        d2y_at_max = d2y_dx2[x_max_idx]
+        d2y_at_min = d2y_dx2[x_min_idx]
+
+        # If second derivative at max is negative → it's a peak (positive)
+        # If second derivative at min is positive → it's a valley (negative)
+        # Check which one is more "peak-like"
+        is_negative_peak = d2y_at_min > 0 and d2y_at_min > abs(d2y_at_max)
+
+        if is_negative_peak:
+            # Negative peak (valley)
+            amplitude = y_min - y_max  # negative
+            center = x_min
+            offset = y_max  # baseline
+            peak_idx = x_min_idx  # Use for sigma estimation
+        else:
+            # Positive peak (normal)
+            amplitude = y_max - y_min
+            center = x_max
+            offset = y_min
+            peak_idx = x_max_idx  # Use for sigma estimation
 
         # Estimate sigma from FWHM
         half_max = (y_max + y_min) / 2
         left_idx = np.where(y_data <= half_max)[0]
         if len(left_idx) > 0:
-            left_idx = left_idx[left_idx < x_max_idx]
+            left_idx = left_idx[left_idx < peak_idx]
             if len(left_idx) > 0:
                 left_x = x_data[left_idx[-1]]
                 right_idx = np.where(y_data <= half_max)[0]
-                right_idx = right_idx[right_idx > x_max_idx]
+                right_idx = right_idx[right_idx > peak_idx]
                 if len(right_idx) > 0:
                     right_x = x_data[right_idx[0]]
                     fwhm = right_x - left_x
@@ -235,10 +274,10 @@ class GaussianFit(FitModel):
             sigma_est = (x_data[-1] - x_data[0]) / 10
 
         return {
-            "amplitude": y_max - y_min,
-            "center": x_max,
+            "amplitude": amplitude,
+            "center": center,
             "sigma": sigma_est,
-            "offset": y_min,
+            "offset": offset,
         }
 
 
@@ -284,16 +323,43 @@ class LorentzianFit(FitModel):
         y_min = np.min(y_data)
         x_max_idx = np.argmax(y_data)
         x_max = x_data[x_max_idx]
+        x_min_idx = np.argmin(y_data)
+        x_min = x_data[x_min_idx]
+
+        # Calculate second derivative
+        d2y_dx2 = np.gradient(np.gradient(y_data, x_data), x_data)
+
+        # Check second derivative at the extremes
+        d2y_at_max = d2y_dx2[x_max_idx]
+        d2y_at_min = d2y_dx2[x_min_idx]
+
+        # If second derivative at max is negative → it's a peak (positive)
+        # If second derivative at min is positive → it's a valley (negative)
+        # Check which one is more "peak-like"
+        is_negative_peak = d2y_at_min > 0 and d2y_at_min > abs(d2y_at_max)
+
+        if is_negative_peak:
+            # Negative peak (valley)
+            amplitude = y_min - y_max  # negative
+            center = x_min
+            offset = y_max  # baseline
+            peak_idx = x_min_idx  # Use for sigma estimation
+        else:
+            # Positive peak (normal)
+            amplitude = y_max - y_min
+            center = x_max
+            offset = y_min
+            peak_idx = x_max_idx  # Use for sigma estimation
 
         # Estimate gamma from FWHM
         half_max = (y_max + y_min) / 2
         left_idx = np.where(y_data <= half_max)[0]
         if len(left_idx) > 0:
-            left_idx = left_idx[left_idx < x_max_idx]
+            left_idx = left_idx[left_idx < peak_idx]
             if len(left_idx) > 0:
                 left_x = x_data[left_idx[-1]]
                 right_idx = np.where(y_data <= half_max)[0]
-                right_idx = right_idx[right_idx > x_max_idx]
+                right_idx = right_idx[right_idx > peak_idx]
                 if len(right_idx) > 0:
                     right_x = x_data[right_idx[0]]
                     fwhm = right_x - left_x
@@ -306,10 +372,10 @@ class LorentzianFit(FitModel):
             gamma_est = (x_data[-1] - x_data[0]) / 10
 
         return {
-            "amplitude": y_max - y_min,
-            "center": x_max,
+            "amplitude": amplitude,
+            "center": center,
             "gamma": gamma_est,
-            "offset": y_min,
+            "offset": offset,
         }
 
 
