@@ -104,7 +104,7 @@ def ts2iso(timestamp: float) -> str:
     return ts2dt(timestamp).isoformat(sep=" ")
 
 
-def num2fstr(x: float) -> str:
+def num2fstr(x: float, decimal=2) -> str:
     """Return a string with the adequate precision and format.
 
     Parameters:
@@ -113,7 +113,8 @@ def num2fstr(x: float) -> str:
     Returns:
         str: Formatted string
     """
-    return f"{x:.2e}" if abs(x) < 1e-3 else f"{x:.2f}"
+    precision = decimal if decimal >= 0 else 2
+    return f"{x:.{precision}e}" if abs(x) < 1e-3 else f"{x:.{precision}f}"
 
 
 def byte2str(byte_literal):
