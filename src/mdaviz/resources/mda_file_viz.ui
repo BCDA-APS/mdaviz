@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>799</width>
-    <height>660</height>
+    <height>632</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,7 +43,7 @@
         <x>0</x>
         <y>0</y>
         <width>797</width>
-        <height>658</height>
+        <height>630</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -422,6 +422,12 @@
              <size>
               <width>0</width>
               <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>250</height>
              </size>
             </property>
             <property name="tabPosition">
