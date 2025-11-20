@@ -262,10 +262,7 @@ class FitManager(QObject):
 
         # Determine x range for smooth curve
         x_original = fit_data.fit_result.x_fit
-        if fit_data.x_range:
-            x_min, x_max = fit_data.x_range
-        else:
-            x_min, x_max = np.min(x_original), np.max(x_original)
+        x_min, x_max = np.min(x_original), np.max(x_original)
 
         # Generate smooth x array (500 points for smooth plotting)
         num_points = 500
