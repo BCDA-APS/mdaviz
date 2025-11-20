@@ -482,6 +482,70 @@ class ErrorFunctionFit(FitModel):
         }
 
 
+class TopHatFit(FitModel):
+    """Top-hat fit model (difference of two error functions)."""
+
+    def __init__(self):
+        """Initialize top-hat fit model."""
+        super().__init__(
+            "Top Hat",
+            self._tophat_function,
+            ["amplitude", "a", "b", "sigma", "offset"],
+        )
+
+    def _tophat_function(
+        self,
+        x: np.ndarray,
+        amplitude: float,
+        a: float,
+        b: float,
+        sigma: float,
+        offset: float,
+    ) -> np.ndarray:
+        """
+        Top-hat function (difference of two error functions).
+
+        Parameters:
+        - x: X values
+        - amplitude: Amplitude scaling factor
+        - a: Left edge position
+        - b: Right edge position
+        - sigma: Width parameter
+        - offset: Vertical offset
+
+        Returns:
+        - Y values of top-hat function
+        """
+        from scipy.special import erf
+
+        return (amplitude / 2) * (
+            erf((x - a) / (sigma * np.sqrt(2))) - erf((x - b) / (sigma * np.sqrt(2)))
+        ) + offset
+
+    def _get_default_initial_guess(
+        self, x_data: np.ndarray, y_data: np.ndarray
+    ) -> dict[str, float]:
+        """Get default initial guesses for top-hat fit."""
+        y_max = np.max(y_data)
+        y_min = np.min(y_data)
+        x_range = x_data[-1] - x_data[0]
+
+        # Estimate edges at 1/4 and 3/4 of the data range
+        a_est = x_data[0] + x_range / 4
+        b_est = x_data[0] + 3 * x_range / 4
+
+        # Estimate sigma as 1/10 of the data range
+        sigma_est = x_range / 10 if x_range > 0 else 1.0
+
+        return {
+            "amplitude": y_max - y_min,
+            "a": a_est,
+            "b": b_est,
+            "sigma": sigma_est,
+            "offset": y_min,
+        }
+
+
 # Factory function to get available fit models
 def get_available_models() -> dict[str, FitModel]:
     """
@@ -498,4 +562,5 @@ def get_available_models() -> dict[str, FitModel]:
         "Quadratic": PolynomialFit(degree=2),
         "Cubic": PolynomialFit(degree=3),
         "Error Function": ErrorFunctionFit(),
+        "Top Hat": TopHatFit(),
     }
