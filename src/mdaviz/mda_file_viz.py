@@ -601,15 +601,7 @@ class MDAFileVisualization(QWidget):
         """Setup the fit UI components and connections."""
         # Populate fit model combo box in the desired order
         models = get_available_models()
-        ordered_model_names = [
-            "Gaussian",
-            "Lorentzian",
-            "Error Function",
-            "Linear",
-            "Quadratic",
-            "Cubic",
-            "Exponential",
-        ]
+        ordered_model_names = list(models)
         for model_name in ordered_model_names:
             if model_name in models:
                 self.fitModelCombo.addItem(model_name)
