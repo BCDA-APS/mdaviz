@@ -245,7 +245,6 @@ class ChartView(QWidget):
         self.fitManager.fitAdded.connect(self.onFitAdded)
         self.fitManager.fitUpdated.connect(self.onFitUpdated)
         self.fitManager.fitRemoved.connect(self.onFitRemoved)
-        self.fitManager.fitVisibilityChanged.connect(self.onFitVisibilityChanged)
 
         # Remove buttons definitions:
         self.clearAll = self.mda_mvc.mda_file_viz.clearAll
@@ -1260,18 +1259,6 @@ class ChartView(QWidget):
             # Emit signal for main window
             self.fitRemoved.emit(curveID, "single_fit")
 
-    def onFitVisibilityChanged(self, curveID: str, visible: bool) -> None:
-        """
-        Handle when fit visibility changes.
-
-        Parameters:
-        - curveID: ID of the curve
-        - visible: Whether the fit should be visible
-        """
-        if curveID in self.fitObjects:
-            self.fitObjects[curveID].set_visible(visible)
-            self.canvas.draw()
-
     def updateFitList(self, curveID: str) -> None:
         """
         Update the fit list in the UI for a given curve.
@@ -1444,9 +1431,9 @@ class ChartView(QWidget):
             )
             if persistent_key not in self.curveManager._persistent_properties:
                 self.curveManager._persistent_properties[persistent_key] = {}
-            self.curveManager._persistent_properties[persistent_key]["style"] = (
-                format_string
-            )
+            self.curveManager._persistent_properties[persistent_key][
+                "style"
+            ] = format_string
             self.curveManager.updateCurve(curveID, curve_data)
 
             # Update the plot object with the new style
@@ -1573,7 +1560,9 @@ class CurveManager(QObject):
         super().__init__(parent)
         self._curves = {}  # Store curves with a unique identifier as the key
         # Persistent storage for curve properties across manager clears
-        self._persistent_properties = {}  # key: (file_path, row), value: {style, offset, factor}
+        self._persistent_properties = (
+            {}
+        )  # key: (file_path, row), value: {style, offset, factor}
 
     def addCurve(self, row, *ds, **options):
         """Add a new curve to the manager if not already present on the graph.

@@ -19,7 +19,6 @@ class FitData:
         model_name: str,
         fit_result: FitResult,
         x_range: Optional[Tuple[float, float]] = None,
-        visible: bool = True,
     ):
         """
         Initialize fit data.
@@ -28,12 +27,10 @@ class FitData:
         - model_name: Name of the fit model used
         - fit_result: FitResult object containing fit parameters and metrics
         - x_range: Optional range of x values used for fitting
-        - visible: Whether the fit curve should be visible
         """
         self.model_name = model_name
         self.fit_result = fit_result
         self.x_range = x_range
-        self.visible = visible
 
 
 class FitManager(QObject):
@@ -42,7 +39,6 @@ class FitManager(QObject):
     fitAdded = pyqtSignal(str)  # curveID
     fitUpdated = pyqtSignal(str)  # curveID
     fitRemoved = pyqtSignal(str)  # curveID
-    fitVisibilityChanged = pyqtSignal(str, bool)  # curveID, visible
 
     def __init__(self, parent=None):
         """
@@ -140,7 +136,7 @@ class FitManager(QObject):
 
         # Store fit data (replaces existing fit if any)
         fit_data = FitData(
-            model_name=model_name, fit_result=fit_result, x_range=x_range, visible=True
+            model_name=model_name, fit_result=fit_result, x_range=x_range
         )
 
         self._fits[curveID] = fit_data
@@ -209,32 +205,6 @@ class FitManager(QObject):
             curve_id: {"single_fit": fit_data}
             for curve_id, fit_data in self._fits.items()
         }
-
-    def setFitVisibility(self, curveID: str, visible: bool) -> None:
-        """
-        Set visibility of a fit curve.
-
-        Parameters:
-        - curveID: ID of the curve
-        - visible: Whether the fit curve should be visible
-        """
-        fit_data = self.getFitData(curveID)
-        if fit_data and fit_data.visible != visible:
-            fit_data.visible = visible
-            self.fitVisibilityChanged.emit(curveID, visible)
-
-    def isFitVisible(self, curveID: str) -> bool:
-        """
-        Check if a fit is visible.
-
-        Parameters:
-        - curveID: ID of the curve
-
-        Returns:
-        - True if fit is visible, False otherwise
-        """
-        fit_data = self.getFitData(curveID)
-        return fit_data.visible if fit_data else False
 
     def getFitCurveData(self, curveID: str) -> Optional[Tuple[np.ndarray, np.ndarray]]:
         """

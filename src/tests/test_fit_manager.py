@@ -131,26 +131,6 @@ def test_fit_manager_remove_fit() -> None:
     assert fit_manager.getFitData(curve_id) is None
 
 
-def test_fit_manager_fit_visibility() -> None:
-    """Test fit visibility controls."""
-    x = np.linspace(0, 10, 50)
-    y = 2 * x + 1
-    fit_manager = FitManager()
-
-    curve_id = "test_curve"
-    fit_manager.addFit(curve_id, "Linear", x, y)
-
-    # Test visibility
-    assert fit_manager.isFitVisible(curve_id)
-
-    # Change visibility
-    fit_manager.setFitVisibility(curve_id, False)
-    assert not fit_manager.isFitVisible(curve_id)
-
-    fit_manager.setFitVisibility(curve_id, True)
-    assert fit_manager.isFitVisible(curve_id)
-
-
 def test_fit_manager_fit_with_range() -> None:
     """Test fitting with a specific x range."""
     x = np.linspace(0, 10, 100)
