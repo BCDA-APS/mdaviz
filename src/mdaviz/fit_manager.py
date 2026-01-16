@@ -158,15 +158,6 @@ class FitManager(QObject):
             del self._fits[curveID]
             self.fitRemoved.emit(curveID)
 
-    def removeAllFits(self, curveID: str) -> None:
-        """
-        Remove the fit from a curve (alias for removeFit).
-
-        Parameters:
-        - curveID: ID of the curve
-        """
-        self.removeFit(curveID)
-
     def getFitData(self, curveID: str) -> Optional[FitData]:
         """
         Get fit data for a curve.
@@ -178,33 +169,6 @@ class FitManager(QObject):
         - FitData object if found, None otherwise
         """
         return self._fits.get(curveID)
-
-    def getCurveFits(self, curveID: str) -> Dict[str, FitData]:
-        """
-        Get the fit for a curve (maintains compatibility with existing code).
-
-        Parameters:
-        - curveID: ID of the curve
-
-        Returns:
-        - Dictionary with single fit data if exists, empty dict otherwise
-        """
-        fit_data = self.getFitData(curveID)
-        if fit_data:
-            return {"single_fit": fit_data}
-        return {}
-
-    def getAllFits(self) -> Dict[str, Dict[str, FitData]]:
-        """
-        Get all fits for all curves (maintains compatibility with existing code).
-
-        Returns:
-        - Dictionary mapping curve IDs to their single fit
-        """
-        return {
-            curve_id: {"single_fit": fit_data}
-            for curve_id, fit_data in self._fits.items()
-        }
 
     def getFitCurveData(self, curveID: str) -> Optional[Tuple[np.ndarray, np.ndarray]]:
         """
@@ -220,7 +184,7 @@ class FitManager(QObject):
         if not fit_data:
             return None
 
-        # Get the mmodel
+        # Get the model
         available_models = get_available_models()
         model = available_models.get(fit_data.model_name)
         if not model:
@@ -301,18 +265,6 @@ class FitManager(QObject):
         - True if curve has a fit, False otherwise
         """
         return curveID in self._fits
-
-    def getFitCount(self, curveID: str) -> int:
-        """
-        Get the number of fits for a curve.
-
-        Parameters:
-        - curveID: ID of the curve
-
-        Returns:
-        - Number of fits for the curve (0 or 1)
-        """
-        return 1 if curveID in self._fits else 0
 
     def clearAllFits(self) -> None:
         """Remove all fits from all curves."""
