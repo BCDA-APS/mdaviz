@@ -96,8 +96,12 @@ def test_fit_manager_parameter_update_and_extraction() -> None:
     curve_data = fit_manager.getFitCurveData(curve_id)
     assert curve_data is not None
     x_fit, y_fit = curve_data
-    assert len(x_fit) == len(x)
-    assert len(y_fit) == len(y)
+    # getFitCurveData returns 500 points for smooth plotting
+    assert len(x_fit) == 500
+    assert len(y_fit) == 500
+    # Verify the x range matches the input data
+    assert np.min(x_fit) <= np.min(x)
+    assert np.max(x_fit) >= np.max(x)
 
 
 def test_fit_manager_fit_with_nan_data() -> None:
