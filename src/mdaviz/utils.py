@@ -398,31 +398,10 @@ def get_scan(mda_file_data):
           directly follows the last positioner.
     """
 
-    d = {}
+    d, first_pos_index, first_det_index = get_det(mda_file_data)
 
-    p_list = mda_file_data.p  # list of scanDetector instances
-    d_list = mda_file_data.d  # list of scanPositioner instances
-    np = mda_file_data.np  # number of positioners
+    np = mda_file_data.np  # number of positioners (excluding p0)
     npts = mda_file_data.curr_pt  # number of data points actually acquired
-
-    first_pos_index = 1 if np else 0
-    first_det_index = np + 1
-
-    # Defining a default scanPositioner Object for "Index":
-    p0 = scanPositioner()
-    # Set predefined properties for p0
-    p0.number = 0
-    p0.fieldName, p0.name, p0.desc = "P0", "Index", "Index"
-    p0.step_mode, p0.unit = "", ""
-    p0.readback_name, p0.readback_desc, p0.readback_unit = "", "", ""
-    p0.data = list(range(npts))
-
-    # Make the Index scanPositioner the positioner 0 and build d:
-    d[0] = p0
-    for e, pos in enumerate(p_list):
-        d[e + 1] = pos
-    for e, det in enumerate(d_list):
-        d[e + 1 + np] = det
 
     datasets = {}
     for k, v in d.items():
@@ -469,7 +448,6 @@ def get_scan_2d(mda_file_data_dim1, mda_file_data_dim2):
         - The index (first_pos) of the first positioner in the returned dictionary
         - The index (first_det) of the first detector in the returned dictionary
     """
-    from mdaviz.synApps_mdalib.mda import scanPositioner
 
     d = {}
 
@@ -487,8 +465,6 @@ def get_scan_2d(mda_file_data_dim1, mda_file_data_dim2):
     # Create X2 positioner (outer dimension)
     if np_dim1 > 0:
         x2_pos = p_list_dim1[0]  # First positioner from outer dimension
-        d[0] = x2_pos
-        first_pos_index = 0
     else:
         # Create default X2 positioner if none exists
         x2_pos = scanPositioner()
@@ -497,13 +473,12 @@ def get_scan_2d(mda_file_data_dim1, mda_file_data_dim2):
         x2_pos.step_mode, x2_pos.unit = "", ""
         x2_pos.readback_name, x2_pos.readback_desc, x2_pos.readback_unit = "", "", ""
         x2_pos.data = list(range(npts_dim1))
-        d[0] = x2_pos
-        first_pos_index = 0
+    d[0] = x2_pos
+    first_pos_index = 0
 
     # Create X1 positioner (inner dimension)
     if np_dim2 > 0:
         x1_pos = p_list_dim2[0]  # First positioner from inner dimension
-        d[1] = x1_pos
     else:
         # Create default X1 positioner if none exists
         x1_pos = scanPositioner()
@@ -512,7 +487,7 @@ def get_scan_2d(mda_file_data_dim1, mda_file_data_dim2):
         x1_pos.step_mode, x1_pos.unit = "", ""
         x1_pos.readback_name, x1_pos.readback_desc, x1_pos.readback_unit = "", "", ""
         x1_pos.data = list(range(npts_dim2))
-        d[1] = x1_pos
+    d[1] = x1_pos
 
     # Add detectors from inner dimension (these are the Y values)
     detector_index = 2
@@ -568,9 +543,8 @@ def get_md(mda_file_metadata: dict) -> dict:
     Returns:
         dict: Processed metadata with string keys and cleaned values
     """
-    from collections import OrderedDict
 
-    new_metadata = OrderedDict()
+    new_metadata = {}
     for key, value in mda_file_metadata.items():
         if isinstance(key, bytes):
             key = key.decode("utf-8", "ignore")
