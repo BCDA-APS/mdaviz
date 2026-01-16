@@ -618,9 +618,7 @@ class MainWindow(QMainWindow):
                             if self.mvc_folder and hasattr(
                                 self.mvc_folder, "mda_folder_tableview"
                             ):
-                                model = (
-                                    self.mvc_folder.mda_folder_tableview.tableView.model()
-                                )
+                                model = self.mvc_folder.mda_folder_tableview.tableView.model()
                                 if model and selected_index < model.rowCount():
                                     index = model.index(selected_index, 0)
                                     self.mvc_folder.selectAndShowIndex(index)
