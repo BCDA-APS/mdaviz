@@ -1391,18 +1391,18 @@ class ChartView(QWidget):
                 details_text += f" ± {utils.num2fstr(uncertainty, 3)}"
             details_text += "\n"
             if fit_data.model_name == "Gaussian" and param_name == "sigma":
-                details_text += f"  FWHM: {utils.num2fstr(2.35482*param_value,3)}"
-                details_text += f" ± {utils.num2fstr(2.35482*uncertainty, 3)}\n"
+                details_text += f"  FWHM: {utils.num2fstr(2.35482 * param_value, 3)}"
+                details_text += f" ± {utils.num2fstr(2.35482 * uncertainty, 3)}\n"
             if fit_data.model_name == "Lorentzian" and param_name == "gamma":
-                details_text += f"  FWHM: {utils.num2fstr(2*param_value,3)}"
-                details_text += f" ± {utils.num2fstr(2*uncertainty, 3)}\n"
+                details_text += f"  FWHM: {utils.num2fstr(2 * param_value, 3)}"
+                details_text += f" ± {utils.num2fstr(2 * uncertainty, 3)}\n"
 
         # Quality metrics
         details_text += "\nQuality Metrics:\n"
-        details_text += f"  R²: {utils.num2fstr(result.r_squared,3)}\n"
-        details_text += f"  χ²: {utils.num2fstr(result.chi_squared,3)}\n"
+        details_text += f"  R²: {utils.num2fstr(result.r_squared, 3)}\n"
+        details_text += f"  χ²: {utils.num2fstr(result.chi_squared, 3)}\n"
         details_text += (
-            f"  Reduced χ²: {utils.num2fstr(result.reduced_chi_squared,3)}\n"
+            f"  Reduced χ²: {utils.num2fstr(result.reduced_chi_squared, 3)}\n"
         )
 
         fit_details.setText(details_text)
@@ -1444,9 +1444,9 @@ class ChartView(QWidget):
             )
             if persistent_key not in self.curveManager._persistent_properties:
                 self.curveManager._persistent_properties[persistent_key] = {}
-            self.curveManager._persistent_properties[persistent_key][
-                "style"
-            ] = format_string
+            self.curveManager._persistent_properties[persistent_key]["style"] = (
+                format_string
+            )
             self.curveManager.updateCurve(curveID, curve_data)
 
             # Update the plot object with the new style
@@ -1573,9 +1573,7 @@ class CurveManager(QObject):
         super().__init__(parent)
         self._curves = {}  # Store curves with a unique identifier as the key
         # Persistent storage for curve properties across manager clears
-        self._persistent_properties = (
-            {}
-        )  # key: (file_path, row), value: {style, offset, factor}
+        self._persistent_properties = {}  # key: (file_path, row), value: {style, offset, factor}
 
     def addCurve(self, row, *ds, **options):
         """Add a new curve to the manager if not already present on the graph.
