@@ -319,8 +319,12 @@ class MDA_MVC(QWidget):
         changes_made = False
         tableview = self.currentFileTableview()
         new_selection = {"Y": [], "X": 0}
-        # Update Y selections: if either left operand or right operand is True, result will be True.
+        # Update Y selections:
         changes_made |= self.updateDetectorSelection(
+            oldPvList, old_selection, newPvList, new_selection, verbose
+        )  # if either left operand or right operand is True, result will be True
+        # Update I0 selection
+        changes_made |= self.updateI0Selection(
             oldPvList, old_selection, newPvList, new_selection, verbose
         )
         # Update X selection and check for changes: if X was 0 or None, set to 0; if not, set to 1st POS
@@ -332,37 +336,6 @@ class MDA_MVC(QWidget):
         if old_idx != new_idx:
             changes_made = True
             new_selection["X"] = new_idx
-
-        # Update I0 selection and check for changes
-        old_i0_idx = old_selection.get("I0")
-        if old_i0_idx is not None:
-            if old_i0_idx < len(oldPvList):
-                old_i0_pv = oldPvList[old_i0_idx]
-                if old_i0_pv in newPvList:
-                    new_i0_idx = newPvList.index(old_i0_pv)
-                    new_selection["I0"] = new_i0_idx
-                    if new_i0_idx != old_i0_idx:
-                        changes_made = True
-                        if verbose:
-                            logger.debug(
-                                f"I0 <{old_i0_pv}> changed from {old_i0_idx} to {new_i0_idx}"
-                            )
-                else:
-                    changes_made = True
-                    if verbose:
-                        logger.debug(
-                            f"I0 <{old_i0_pv}> was removed - auto-unchecking I0"
-                        )
-                    # I0 PV doesn't exist in new file, so uncheck the I0 checkbox
-                    tableview.tableView.model().uncheckCheckBox(old_i0_idx)
-            else:
-                changes_made = True
-                if verbose:
-                    logger.debug(
-                        f"I0 index {old_i0_idx} out of range - auto-unchecking I0"
-                    )
-                # I0 index was invalid, so uncheck the I0 checkbox
-                tableview.tableView.model().uncheckCheckBox(old_i0_idx)
 
         if changes_made:
             self.applySelectionChanges(new_selection)
@@ -395,7 +368,66 @@ class MDA_MVC(QWidget):
                     changes_made = True
                     if verbose:
                         logger.debug(f"DET <{old_pv}> was removed")
+            else:
+                # Handle out-of-bounds index
+                changes_made = True
+                if verbose:
+                    logger.debug(
+                        f"DET index {old_index} out of range (oldPvList length: {len(oldPvList)})"
+                    )
         return changes_made
+
+    def updateI0Selection(
+        self, oldPvList, old_selection, newPvList, new_selection, verbose=False
+    ):
+        """
+        Helper function to update the I0 selection in the new selection field.
+        Returns True if changes were made, otherwise False.
+        """
+        changes_made = False
+        # Update I0 selection and check for changes
+        old_i0_idx = old_selection.get("I0")
+        if old_i0_idx is not None:
+            if old_i0_idx < len(oldPvList):
+                old_i0_pv = oldPvList[old_i0_idx]
+                if old_i0_pv in newPvList:
+                    new_i0_idx = newPvList.index(old_i0_pv)
+                    new_selection["I0"] = new_i0_idx
+                    if new_i0_idx != old_i0_idx:
+                        changes_made = True
+                        if verbose:
+                            logger.debug(
+                                f"I0 <{old_i0_pv}> changed from {old_i0_idx} to {new_i0_idx}"
+                            )
+                else:
+                    changes_made = True
+                    # I0 PV doesn't exist in new file, so uncheck the I0 checkbox
+                    self.uncheckI0()
+                    if verbose:
+                        logger.debug(
+                            f"I0 <{old_i0_pv}> was removed - auto-unchecking I0"
+                        )
+            else:
+                changes_made = True
+                # I0 index was invalid, so uncheck the I0 checkbox
+                self.uncheckI0()
+                if verbose:
+                    logger.debug(
+                        f"I0 index {old_i0_idx} out of range - auto-unchecking I0"
+                    )
+        return changes_made
+
+    def uncheckI0(self):
+        """
+        Finds and unchecks the I0 checkbox in the current file's table view.
+        Only unchecks if I0 is currently selected.
+        """
+        tableview = self.currentFileTableview()
+        model = tableview.tableView.model()
+        plot_fields = model.plotFields()
+        if "I0" in plot_fields:
+            i0_row = plot_fields["I0"]
+            model.uncheckCheckBox(i0_row)
 
     # # ------------ File selection methods:
 
