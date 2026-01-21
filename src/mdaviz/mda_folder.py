@@ -353,7 +353,7 @@ class MDA_MVC(QWidget):
         """
         changes_made = False
         for old_index in old_selection.get("Y", []):
-            if old_index < len(oldPvList):
+            if oldPvList and old_index < len(oldPvList):
                 old_pv = oldPvList[old_index]
                 if old_pv in newPvList:
                     new_index = newPvList.index(old_pv)
@@ -388,7 +388,7 @@ class MDA_MVC(QWidget):
         # Update I0 selection and check for changes
         old_i0_idx = old_selection.get("I0")
         if old_i0_idx is not None:
-            if old_i0_idx < len(oldPvList):
+            if oldPvList and old_i0_idx < len(oldPvList):
                 old_i0_pv = oldPvList[old_i0_idx]
                 if old_i0_pv in newPvList:
                     new_i0_idx = newPvList.index(old_i0_pv)
@@ -431,7 +431,7 @@ class MDA_MVC(QWidget):
 
     # # ------------ File selection methods:
 
-    def onFileSelected(self, index, verbose=False):
+    def onFileSelected(self, index):
         """
         - Handles the selection of a new file in the folder table view.
         - Updates the UI to:
@@ -571,7 +571,7 @@ class MDA_MVC(QWidget):
             # Handle 2D plotting - use the passed selection
             selection = args[1]
             logger.debug("doPlot - Handling 2D plotting")
-            self._doPlot2D(action, selection)
+            self.doPlot2D(action, selection)
             return
 
         # For 1D plotting, use the selection from the table view
@@ -627,7 +627,7 @@ class MDA_MVC(QWidget):
                 widgetMpl.plot(i, *ds, **options)
             self.mda_file_viz.setPlot(widgetMpl)
 
-    def _doPlot2D(self, action, selection):
+    def doPlot2D(self, action, selection):
         """
         Handle 2D plotting with the given selection.
 
@@ -635,45 +635,19 @@ class MDA_MVC(QWidget):
             action (str): 'add' or 'replace'
             selection (dict): 2D selection with X1, X2, Y, I0, plot_type keys
         """
-        logger.debug(f"_doPlot2D - action: {action}, selection: {selection}")
+        logger.debug(f"doPlot2D - action: {action}, selection: {selection}")
 
         tableview = self.currentFileTableview()
         if not tableview:
-            logger.debug("_doPlot2D - No tableview available")
+            logger.debug("doPlot2D - No tableview available")
             return
 
-        # Convert 2D selection to 1D format for data2Plot2D
-        # data2Plot2D expects: {'X': x_index, 'Y': [y_indices], 'I0': i0_index}
-        converted_selection = {
-            "X": selection.get("X1"),
-            "Y": selection.get("Y", []),
-            "I0": selection.get("I0"),
-            "log_y": selection.get("log_y", False),
-        }
-
-        logger.debug(f"_doPlot2D - Converted selection: {converted_selection}")
-
-        # Get 2D data and plot options
         try:
-            datasets, plot_options = tableview.data2Plot2D(converted_selection)
-            logger.debug(
-                f"_doPlot2D - Got datasets: {len(datasets)}, plot_options: {plot_options}"
-            )
-
             # Update the 2D plot in the 2D tab
             self.mda_file_viz.update2DPlot()
 
-            # Set the plot type in the 2D chart view
-            plot_type = selection.get("plot_type", "heatmap")
-            if (
-                hasattr(self.mda_file_viz, "widgetMpl2D")
-                and self.mda_file_viz.widgetMpl2D
-            ):
-                self.mda_file_viz.widgetMpl2D.set_plot_type(plot_type)
-                logger.debug(f"_doPlot2D - Set plot type to: {plot_type}")
-
         except Exception as e:
-            logger.debug(f"_doPlot2D - Error: {e}")
+            logger.debug(f"doPlot2D - Error: {e}")
             self.setStatus(f"Error plotting 2D data: {e}")
 
     def onTabChanged(self, index, file_path, file_data, selection_field):
@@ -724,10 +698,10 @@ class MDA_MVC(QWidget):
                     # Set the data again to get the full structure
                     self.mda_file.setData(file_index)
                     # Now display the full data structure
-                    self.mda_file.displayData(self.mda_file.data())
+                    self.mda_file.displayData()
                 except ValueError:
                     # File not found in current folder, use fallback
-                    self.mda_file.displayData(file_data)
+                    self.mda_file.displayData()
 
         # Highlight the corresponding file in the folder table view if it belongs to the current folder
         if file_path:
@@ -882,7 +856,6 @@ class MDA_MVC(QWidget):
 
         mode = self.mda_file.mode()
         tableview = self.currentFileTableview()
-        new_y_selection = selection.get("Y", [])
 
         # Get the matplotlib chartview widget, if exists:
         layoutMpl = self.mda_file_viz.plotPageMpl.layout()
@@ -903,6 +876,7 @@ class MDA_MVC(QWidget):
             tableview.tableView.model().checkCheckBox(0, "X")
 
         # If no DET and there is only 1 tab open, clear the graph
+        new_y_selection = selection.get("Y", [])
         if not new_y_selection and self.mda_file.tabWidget.count() == 1:
             widgetMpl.curveManager.removeAllCurves()
             return
@@ -995,63 +969,3 @@ class MDA_MVC(QWidget):
     def setStatus(self, text):
         """Set status text."""
         self.mainWindow.setStatus(text)
-
-    def getCurrentFilePath(self):
-        """Get the file path of the currently active tab."""
-        try:
-            # Get the current tab index
-            current_index = self.mda_file.tabWidget.currentIndex()
-            logger.debug(f"getCurrentFilePath - Current tab index: {current_index}")
-
-            if current_index >= 0:
-                # Get the file path directly from the tab manager using the current tab
-                # We can get this from the current file tableview's data
-                current_tableview = self.currentFileTableview()
-                if current_tableview and hasattr(current_tableview, "data"):
-                    file_info = current_tableview.data().get("fileInfo", {})
-                    file_path = file_info.get("filePath")
-                    if file_path:
-                        logger.debug(
-                            f"getCurrentFilePath - Found file path: {file_path}"
-                        )
-                        return file_path
-
-                logger.debug(
-                    "getCurrentFilePath - No file path found in current tableview"
-                )
-            return None
-        except Exception as e:
-            logger.debug(f"getCurrentFilePath - Error: {e}")
-            return None
-
-    def clearOtherTabs(self, keep_file_path):
-        """Clear all tabs except the one with the specified file path."""
-        try:
-            logger.debug(
-                f"clearOtherTabs - Starting with keep_file_path: {keep_file_path}"
-            )
-
-            # Get all file paths from tab manager
-            all_file_paths = list(self.mda_file.tabManager.tabs().keys())
-            logger.debug(f"clearOtherTabs - All file paths: {all_file_paths}")
-
-            tabs_to_remove = []
-
-            # Find file paths to remove (all except keep_file_path)
-            for file_path in all_file_paths:
-                if file_path != keep_file_path:
-                    tabs_to_remove.append(file_path)
-                    logger.debug(f"clearOtherTabs - Will remove: {file_path}")
-
-            logger.debug(f"clearOtherTabs - Tabs to remove: {tabs_to_remove}")
-
-            # Remove tabs using the tab manager
-            for file_path in tabs_to_remove:
-                logger.debug(f"clearOtherTabs - Removing tab: {file_path}")
-                self.mda_file.tabManager.removeTab(file_path)
-
-            logger.debug(
-                f"clearOtherTabs - Removed {len(tabs_to_remove)} tabs, kept: {keep_file_path}"
-            )
-        except Exception as e:
-            logger.debug(f"clearOtherTabs - Error: {e}")

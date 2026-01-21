@@ -23,7 +23,7 @@ class Test2DI0Normalization:
             "color_palette": "viridis",
         }
 
-        # Simulate the conversion that should happen in _doPlot2D
+        # Simulate the conversion that should happen in doPlot2D
         converted_selection = {
             "X": original_2d_selection.get("X1"),
             "Y": original_2d_selection.get("Y", []),
