@@ -279,6 +279,7 @@ class MDAFileVisualization(QWidget):
         # data2Plot2D expects: {'X': x_index, 'Y': [y_indices], 'I0': i0_index}
         converted_selection = {
             "X": selection.get("X1"),
+            "X2": selection.get("X2"),
             "Y": selection.get("Y", []),
             "I0": selection.get("I0"),
             "log_y": selection.get("log_y", False),

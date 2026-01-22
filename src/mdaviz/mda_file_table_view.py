@@ -284,7 +284,7 @@ class MDAFileTableView(QWidget):
         logger.debug("populate2DControls - All 2D controls populated")
 
     # ==========================================
-    # x2 spinBox methods
+    # x2 controls & spinBox
     # ==========================================
 
     def update2DControls(
@@ -399,7 +399,7 @@ class MDAFileTableView(QWidget):
         return self.x2SpinBox.value()
 
     # ==========================================
-    # 2D data plot & slots
+    # 2D data plot & event handlers
     # ==========================================
 
     def get2DSelections(self):
@@ -523,7 +523,7 @@ class MDAFileTableView(QWidget):
         self._trigger2DPlot()
 
     # ==========================================
-    # TBD
+    # Data management & table display
     # ==========================================
 
     def data(self):
@@ -615,13 +615,21 @@ class MDAFileTableView(QWidget):
         self.tableView.model().clearAllCheckboxes()
         self.tableView.setModel(None)
 
+    # ==========================================
+    # Data extraction for plotting
+    # ==========================================
+
     def data2Plot2D(self, selections):
         """
         Extracts 2D datasets for plotting from scanDict2D based on user selections.
 
         Parameters:
-            - selections: A dictionary with keys "X", "Y", where "X" is the index for the x-axis data,
-              "Y" is a list of indices for the y-axis data.
+            - selections: A dictionary with keys:
+                - "X": The index for the x1-axis data
+                - "X2": The index for the x2-axis data
+                - "Y": A list of indices for the y-axis data (only the 1st element is used)
+                - "I0" (optional): The index for normalization data
+                - e.g. selections = {"X": 1, "X2": 2 ,"Y": [3], "I0": 4}
 
         Returns:
             - A tuple of (datasets, plot_options), where datasets contains 2D data arrays,
@@ -635,6 +643,7 @@ class MDAFileTableView(QWidget):
             fileInfo = self.data()["fileInfo"]
             fileName = fileInfo["fileName"]
             filePath = fileInfo["filePath"]
+            acquired_dim = fileInfo.get("acquiredDimensions", [])
 
             # Check if this is 2D data
             if not fileInfo.get("isMultidimensional", False):
@@ -667,6 +676,12 @@ class MDAFileTableView(QWidget):
                 logger.debug(
                     f"data2Plot2D - X data shape: {np.array(x_data).shape if x_data is not None else 'None'}"
                 )
+                if acquired_dim and len(acquired_dim) >= 2 and x_data is not None:
+                    acquired_x1_points = acquired_dim[1]
+                    x_array = np.array(x_data)
+                    if len(x_array) > acquired_x1_points:
+                        x_data = x_array[:acquired_x1_points]
+
             else:
                 x_data = None
                 x_name = "X"
@@ -728,18 +743,28 @@ class MDAFileTableView(QWidget):
                         )
                         i0_data = None
                         i0_name = None
+
             else:
                 logger.debug(
                     f"data2Plot2D - No I0 normalization (I0 index: {i0_index})"
                 )
+
+            if acquired_dim and len(acquired_dim) >= 2 and y_data is not None:
+                acquired_x2_points = acquired_dim[0]
+                acquired_x1_points = acquired_dim[1]
+                y_array = np.array(y_data)
+                if (
+                    y_array.shape[0] > acquired_x2_points
+                    or y_array.shape[1] > acquired_x1_points
+                ):
+                    y_data = y_array[:acquired_x2_points, :acquired_x1_points]
 
             # ------ extract x2 data (from scanDict - this is the X2 positioner):
             x2_data = None
             x2_name = "X2"
             x2_unit = ""
 
-            # Get the selected X2 index from the combobox
-            x2_index = self.x2ComboBox.currentData()
+            x2_index = selections.get("X2")
             logger.debug(f"data2Plot2D - Selected X2 index: {x2_index}")
 
             # Get scanDict for X2 data extraction
@@ -758,14 +783,9 @@ class MDAFileTableView(QWidget):
                 else:
                     x2_data = x2_data_2d
 
-                # If we have acquired_dimensions, slice X2 data to match actual acquired points
-                acquired_dimensions = fileInfo.get("acquiredDimensions", [])
-                if (
-                    acquired_dimensions
-                    and len(acquired_dimensions) >= 2
-                    and x2_data is not None
-                ):
-                    acquired_x2_points = acquired_dimensions[0]
+                # If we have acquired_dim, slice X2 data to match actual acquired points
+                if acquired_dim and len(acquired_dim) >= 2 and x2_data is not None:
+                    acquired_x2_points = acquired_dim[0]  # first element = X2 dimension
                     x2_data_array = np.array(x2_data)
                     if len(x2_data_array) > acquired_x2_points:
                         logger.debug(
@@ -919,11 +939,15 @@ class MDAFileTableView(QWidget):
     def data2Plot(self, selections):
         """
         Extracts selected datasets for plotting from scanDict based on user selections.
+        Slice (if multidimensional), normalize and/or unscale the data as needed.
 
         Parameters:
-            - selections: A dictionary with keys "X", "Y", and optionally "I0", where "X" is the index for the x-axis data,
-              "Y" is a list of indices for the y-axis data, and "I0" is the index for normalization data.
-
+            - selections: A dictionary with keys:
+                - "X": The index for the x-axis data
+                - "Y": A list of indices for the y-axis data
+                - "I0" (optional): The index for normalization data
+                - "Un" (optional): A list of indices for unscaled data (rows that will be unscaled when both Y and Un are selected)
+                - e.g. selections = {"X": 1, "Y": [2, 3, 5], "I0": 4, "Un": [3, 5]}
         Returns:
             - A tuple of (datasets, plot_options), where datasets is a list of tuples containing the
               data and options (label) for each dataset, and plot_options contains overall plotting configurations.
@@ -945,7 +969,7 @@ class MDAFileTableView(QWidget):
             ):
                 # Use inner dimension data for 1D plotting (matches table display)
                 scanDict = fileInfo["scanDictInner"]
-                x2_slice = 0  # Not needed since we're using 1D data
+                x2_slice = 0  # Initial value
 
                 # Debug: Print field mappings
                 logger.debug(
@@ -972,6 +996,9 @@ class MDAFileTableView(QWidget):
             # For 2D data in scanDictInner, slice to get 1D data
             if x_data is not None and len(np.array(x_data).shape) > 1:
                 x2_slice = self.getX2Value()  # Get current X2 value from spinbox
+                x_data_array = np.array(x_data)
+                if x2_slice >= x_data_array.shape[0]:
+                    x2_slice = x_data_array.shape[0] - 1  # Use last available slice
                 x_data = x_data[x2_slice]  # Take the selected X2 slice
 
             # ------ extract I0 data for normalization:
@@ -981,6 +1008,9 @@ class MDAFileTableView(QWidget):
             # For 2D data in scanDictInner, slice to get 1D data
             if i0_data is not None and len(np.array(i0_data).shape) > 1:
                 x2_slice = self.getX2Value()  # Get current X2 value from spinbox
+                i0_data_array = np.array(i0_data)
+                if x2_slice >= i0_data_array.shape[0]:
+                    x2_slice = i0_data_array.shape[0] - 1  # Use last available slice
                 i0_data = i0_data[x2_slice]  # Take the selected X2 slice
 
             # ------ extract y(s) data:
@@ -1009,6 +1039,18 @@ class MDAFileTableView(QWidget):
                                 y_data = np.array(y_data)
                             global_min = min(global_min, np.min(y_data))
                             global_max = max(global_max, np.max(y_data))
+
+            # If reference curve is constant (global_max == global_min), create a range around it
+            if (
+                unscaled_rows
+                and global_min != float("inf")
+                and global_max != float("-inf")
+            ):
+                if global_max == global_min:
+                    # Reference is constant, use constant ± 0.5 as the target range
+                    constant_value = global_min
+                    global_min = constant_value - 0.5
+                    global_max = constant_value + 0.5
 
             # If no regular Y curves to reference, use 0 to 1 scale for unscaling
             if unscaled_rows and (
@@ -1085,12 +1127,20 @@ class MDAFileTableView(QWidget):
 
                 if i == 0:
                     y_first_unit = y_unit
-                    # y_first_name is used for y-axis label and shows normalization status
-                    y_first_name = (
-                        f"{y_name} [norm]"
-                        if i0_data is not None
-                        else f"{y_name} {y_unit}"
-                    )
+                    # y_first_name is used for y-axis label and shows normalization/unscaling status
+                    if (
+                        y in unscaled_rows
+                        and global_min != float("inf")
+                        and global_max != float("-inf")
+                    ):
+                        if i0_data is not None:
+                            y_first_name = f"{y_name} [norm, unscaled]"
+                        else:
+                            y_first_name = f"{y_name} [unscaled]"
+                    elif i0_data is not None:
+                        y_first_name = f"{y_name} [norm]"
+                    else:
+                        y_first_name = f"{y_name} {y_unit}"
 
                 # append to dataset:
                 ds, ds_options = [], {}
