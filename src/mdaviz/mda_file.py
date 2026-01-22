@@ -375,11 +375,12 @@ class MDAFile(QWidget):
         metadata = yaml.dump(metadata, default_flow_style=False)
         self.mda_mvc.mda_file_viz.setMetadata(metadata)
 
-    def displayData(self, tabledata):
+    def displayData(self, tabledata=None):
         """Display pos(s) & det(s) values as a tableview in the vizualization panel."""
         if not self.data():
             return
         # Pass full data structure instead of just scanDict for 2D support
+        # Note: tabledata parameter is kept for backward compatibility but not used
         self.mda_mvc.mda_file_viz.setTableData(self.data())
 
     def defaultSelection(self, first_pos, first_det, selection_field):
