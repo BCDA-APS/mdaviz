@@ -252,3 +252,31 @@ class TestUnscalingSelection:
         x_col = table_model.columnNumber("X")
         x_state = table_model.checkbox(table_model.index(1, x_col))
         assert x_state == Qt.CheckState.Unchecked
+
+    def test_duplicate_selection_prevention(self, table_model: MDAFileTableModel) -> None:
+        """Test that checking an already-checked checkbox doesn't create duplicates."""
+        # Select Y on row 1
+        y_col = table_model.columnNumber("Y")
+        y_index = table_model.index(1, y_col)
+        table_model.setCheckbox(y_index, Qt.CheckState.Checked)
+        assert table_model.selections[1] == "Y"
+
+        # Try to check Y again on the same row (should not create ["Y", "Y"])
+        table_model.setCheckbox(y_index, Qt.CheckState.Checked)
+        # Should remain as "Y", not become ["Y", "Y"]
+        assert table_model.selections[1] == "Y"
+        assert not isinstance(table_model.selections[1], list)
+
+    def test_duplicate_selection_prevention_x(self, table_model: MDAFileTableModel) -> None:
+        """Test that checking an already-checked X checkbox doesn't create duplicates."""
+        # Select X on row 2
+        x_col = table_model.columnNumber("X")
+        x_index = table_model.index(2, x_col)
+        table_model.setCheckbox(x_index, Qt.CheckState.Checked)
+        assert table_model.selections[2] == "X"
+
+        # Try to check X again on the same row (should not create ["X", "X"])
+        table_model.setCheckbox(x_index, Qt.CheckState.Checked)
+        # Should remain as "X", not become ["X", "X"]
+        assert table_model.selections[2] == "X"
+        assert not isinstance(table_model.selections[2], list)
