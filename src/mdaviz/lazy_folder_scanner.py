@@ -18,6 +18,7 @@ from mdaviz.utils import get_file_info_lightweight, get_file_info_full
 from dataclasses import dataclass
 from mdaviz.logger import get_logger
 from mdaviz.progress_dialog import AsyncProgressDialog
+from mdaviz.lazy_loading_config import get_config
 
 # Get logger for this module
 logger = get_logger("lazy_folder_scanner")
@@ -81,6 +82,7 @@ class LazyFolderScanner(QObject):
         self._current_scan_path: Optional[Path] = None
         self.scanner_thread: Optional[QThread] = None
         self.scanner_worker: Optional[FolderScanWorker] = None
+        self._progress_dialog: Optional[AsyncProgressDialog] = None
 
     def scan_folder(
         self,
@@ -319,9 +321,14 @@ class LazyFolderScanner(QObject):
         self._scanning = True
         self._current_scan_path = folder_path
 
-        # Create progress dialog
-        self._progress_dialog = AsyncProgressDialog("Scanning folder...", parent=None)
-        self._progress_dialog.show()
+        # Create progress dialog if enabled
+        if get_config().enable_progress_dialogs:
+            self._progress_dialog = AsyncProgressDialog(
+                "Scanning folder...", parent=None
+            )
+            self._progress_dialog.show()
+        else:
+            self._progress_dialog = None
 
         # Create a worker thread for scanning
         self.scanner_thread = QThread()

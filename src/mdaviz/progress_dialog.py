@@ -48,7 +48,9 @@ class ProgressDialog(QProgressDialog):
         self.setAutoClose(auto_close)
         self.setAutoReset(auto_reset)
         self.setMinimumDuration(0)  # Show immediately
-        self.setModal(True)
+        # Use non-modal since we're using .show() instead of .exec()
+        # This avoids modalSession warnings on macOS
+        self.setModal(False)
 
         # Set up the dialog
         self.setLabelText("Initializing...")
@@ -207,7 +209,8 @@ class AsyncProgressDialog(ProgressDialog):
 
         # Delay close slightly to let the user read the completion message
         def close_dialog() -> None:
-            self.close()
+            self.hide()
+            self.deleteLater()
 
         QtCore.QTimer.singleShot(500, close_dialog)
 
@@ -217,6 +220,7 @@ class AsyncProgressDialog(ProgressDialog):
 
         # Keep dialog open for a moment to show error
         def close_dialog() -> None:
-            self.close()
+            self.hide()
+            self.deleteLater()
 
         QtCore.QTimer.singleShot(2000, close_dialog)
