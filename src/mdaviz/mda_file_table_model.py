@@ -1,8 +1,8 @@
 """
 Select data fields for 1-D plotting: QAbstractTableModel.
 
-General plot model is: Y/Mon vs X.  If X is not selected, use index number. If
-Mon is not selected, use 1.0 (trivial case, do not divide by Mon).
+General plot model is: Y/I0 vs X.  If X is not selected, use index number. If
+I0 is not selected, use 1.0 (trivial case, do not divide by I0).
 
 Data Field Selection Rules:
 
@@ -10,10 +10,14 @@ Data Field Selection Rules:
     * unselected (`None`)
     * `"X"`: abscissa (independent axis)
     * `"Y"` : ordinate (dependent axes)
-    * `"Mon"` : divide this array into each Y
+    * `"I0"` : divide this array into each Y
 2. Only zero or one data field can be selected as `"X"`.
-3. Only zero or one data field can be selected as `"Mon"`.
+3. Only zero or one data field can be selected as `"I0"`.
 4. One or more data fields can be selected as `"Y"`.
+5. "Un" cannot be with X on the same row
+6. "Un" cannot be with I0 on the same row
+7. "Un" requires Y on the same row (validation handled elsewhere)
+8. Multiple "Un" selections allowed (across rows)
 
 When Model/View is created, the view should call 'model.setFields(fields)' with
 the list of field names for selection.  (If 'fields' is a different structure,
@@ -150,7 +154,9 @@ class MDAFileTableModel(QAbstractTableModel):
         plot_fields = self.plotFields()
         return "I0" in plot_fields
 
-    # ------------ methods required by Qt's view
+    # =============================================
+    # Methods required by Qt's view
+    # =============================================
 
     def rowCount(self, parent=None):
         """Number of fields."""
@@ -208,6 +214,29 @@ class MDAFileTableModel(QAbstractTableModel):
 
         return None
 
+    def setData(self, index, value, role):
+        """Set the data for the given index and role."""
+        if not index.isValid():
+            return False
+
+        if role == Qt.ItemDataRole.CheckStateRole:
+            # Handle checkbox state changes
+            if index.column() in self.checkboxColumns:
+                # PyQt6 checkbox behavior fix: toggle the state
+                current_state = self.data(index, Qt.ItemDataRole.CheckStateRole)
+                if current_state == Qt.CheckState.Checked:
+                    new_state = Qt.CheckState.Unchecked
+                else:
+                    new_state = Qt.CheckState.Checked
+                self.setCheckbox(index, new_state)
+                return True
+
+        elif role == Qt.ItemDataRole.EditRole:
+            # Handle data editing if needed
+            return True
+
+        return False
+
     def headerData(self, section, orientation, role):
         """Return the header data for the given section and role."""
         if role == Qt.ItemDataRole.DisplayRole:
@@ -244,12 +273,16 @@ class MDAFileTableModel(QAbstractTableModel):
             self.highlightedRow = None
             self.layoutChanged.emit()
 
-    # ------------ checkbox methods
+    # =============================================
+    # Checkbox methods
+    # =============================================
 
     def checkbox(self, index):
         """Return the checkbox state for a given cell: (row, column) = (index.row(), index.column())."""
         nm = self.columnName(index.column())  # selection name of THIS column
-        selection = self.selections.get(index.row())  # user selection
+        selection = self.selections.get(
+            index.row()
+        )  # user selection, eg selection = ["Y", "Un"]
 
         # Handle both single selections (str) and multiple selections (list)
         if isinstance(selection, list):
@@ -288,10 +321,10 @@ class MDAFileTableModel(QAbstractTableModel):
             # Handle single selection (backward compatibility)
             if checked:
                 # If we're adding any column to a row that already has a selection, convert to multiple selection
-                if prior is not None:
+                if prior is not None and prior != column_name:
                     new_selection = [prior, column_name]
                     self.selections[row] = new_selection
-                    changes = True
+                    changes = new_selection != prior
                     logger.debug(
                         f"setCheckbox - converting to multiple selection: new_selection={new_selection}"
                     )
@@ -386,7 +419,7 @@ class MDAFileTableModel(QAbstractTableModel):
         )
         # Update the mda_mvc selection
         if self.mda_mvc is not None:
-            self.mda_mvc.setSelectionField()
+            self.mda_mvc.setSelectionField()  # No argument = None
         # Refresh background highlighting for I0 column if I0 selection changed
         if had_i0:
             self.layoutChanged.emit()
@@ -504,7 +537,7 @@ class MDAFileTableModel(QAbstractTableModel):
     ):
         """Update checkboxes to agree with self.selections."""
         if new_selection is None:
-            new_selection = self.selections
+            new_selection = self.selections or {}
         if len(new_selection) > 0:  # was self.selections
             top, bottom = min(new_selection), max(new_selection)
         else:
@@ -548,7 +581,9 @@ class MDAFileTableModel(QAbstractTableModel):
             text += f" {self.fieldName(r)}"
             logger.info(text)
 
-    # ------------ local methods
+    # =============================================
+    # Local methods
+    # =============================================
 
     def columnName(self, column: int):
         return self.columns()[column]
@@ -627,7 +662,7 @@ class MDAFileTableModel(QAbstractTableModel):
         """
         Returns a dictionary with the selected fields to be plotted.
 
-        key=column_name, value= row_number(s) or fieldName(s)
+        key=column_name, value= row_number(s)
         """
         choices = dict(Y=[], Un=[])
         for row, selection in self.selections.items():
@@ -654,26 +689,3 @@ class MDAFileTableModel(QAbstractTableModel):
     def setStatus(self, text):
         if self.mda_mvc is not None:
             self.mda_mvc.setStatus(text)
-
-    def setData(self, index, value, role):
-        """Set the data for the given index and role."""
-        if not index.isValid():
-            return False
-
-        if role == Qt.ItemDataRole.CheckStateRole:
-            # Handle checkbox state changes
-            if index.column() in self.checkboxColumns:
-                # PyQt6 checkbox behavior fix: toggle the state
-                current_state = self.data(index, Qt.ItemDataRole.CheckStateRole)
-                if current_state == Qt.CheckState.Checked:
-                    new_state = Qt.CheckState.Unchecked
-                else:
-                    new_state = Qt.CheckState.Checked
-                self.setCheckbox(index, new_state)
-                return True
-
-        elif role == Qt.ItemDataRole.EditRole:
-            # Handle data editing if needed
-            return True
-
-        return False
