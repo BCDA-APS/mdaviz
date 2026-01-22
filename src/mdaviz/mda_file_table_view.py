@@ -402,6 +402,32 @@ class MDAFileTableView(QWidget):
     # 2D data plot & slots
     # ==========================================
 
+    def get2DSelections(self):
+        """Get current 2D plotting selections."""
+        # Get color palette with validation
+        color_palette = self.colorPaletteComboBox.currentText()
+        if not color_palette or color_palette.strip() == "":
+            color_palette = "viridis"
+            logger.debug(
+                f"get2DSelections - Empty color palette, using default: {color_palette}"
+            )
+
+        selections = {
+            "X1": self.x1ComboBox.currentData(),
+            "X2": self.x2ComboBox.currentData(),
+            "Y": (
+                [self.yDetComboBox.currentData()]
+                if self.yDetComboBox.currentData() is not None
+                else []
+            ),
+            "I0": self.i0ComboBox.currentData(),
+            "plot_type": self.plotTypeComboBox.currentText().lower(),
+            "color_palette": color_palette,
+            "log_y": self.logYCheckBox.isChecked(),
+        }
+        logger.debug(f"get2DSelections - {selections}")
+        return selections
+
     # Y DET Controls Signal Handlers
     def _trigger2DPlot(self):
         """Helper method to trigger 2D plotting with current selections."""
@@ -494,72 +520,11 @@ class MDAFileTableView(QWidget):
     def onPlotButtonClicked(self):
         """Handle plot button click."""
         logger.debug("onPlotButtonClicked - Plot button clicked")
+        self._trigger2DPlot()
 
-        # Get current selections
-        selections = self.get2DSelections()
-        logger.debug(f"onPlotButtonClicked - selections: {selections}")
-
-        # Validate selections
-        if selections["Y"] is None or len(selections["Y"]) == 0:
-            logger.debug("onPlotButtonClicked - No Y detector selected")
-            return
-
-        if selections["X1"] is None:
-            logger.debug("onPlotButtonClicked - No X1 positioner selected")
-            return
-
-        if selections["X2"] is None:
-            logger.debug("onPlotButtonClicked - No X2 positioner selected")
-            return
-
-        # Trigger 2D plotting by emitting a signal or calling the parent
-        try:
-            # Find the parent MDA_MVC to trigger plotting
-            parent = self.parent()
-            while parent and not hasattr(parent, "doPlot"):
-                parent = parent.parent()
-
-            if parent and hasattr(parent, "doPlot"):
-                logger.debug(
-                    "onPlotButtonClicked - Calling parent.doPlot with 2D selections"
-                )
-                logger.debug(
-                    f"onPlotButtonClicked - About to call doPlot with: action='replace', selections={selections}"
-                )
-                parent.doPlot("replace", selections)
-                logger.debug("onPlotButtonClicked - doPlot call completed")
-            else:
-                logger.debug(
-                    "onPlotButtonClicked - Could not find parent with doPlot method"
-                )
-        except Exception as e:
-            logger.debug(f"onPlotButtonClicked - Error: {e}")
-
-    def get2DSelections(self):
-        """Get current 2D plotting selections."""
-        # Get color palette with validation
-        color_palette = self.colorPaletteComboBox.currentText()
-        if not color_palette or color_palette.strip() == "":
-            color_palette = "viridis"
-            logger.debug(
-                f"get2DSelections - Empty color palette, using default: {color_palette}"
-            )
-
-        selections = {
-            "X1": self.x1ComboBox.currentData(),
-            "X2": self.x2ComboBox.currentData(),
-            "Y": (
-                [self.yDetComboBox.currentData()]
-                if self.yDetComboBox.currentData() is not None
-                else []
-            ),
-            "I0": self.i0ComboBox.currentData(),
-            "plot_type": self.plotTypeComboBox.currentText().lower(),
-            "color_palette": color_palette,
-            "log_y": self.logYCheckBox.isChecked(),
-        }
-        logger.debug(f"get2DSelections - {selections}")
-        return selections
+    # ==========================================
+    # TBD
+    # ==========================================
 
     def data(self):
         """Return the data from the table view:
