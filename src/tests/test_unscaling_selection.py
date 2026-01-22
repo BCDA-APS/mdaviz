@@ -253,7 +253,9 @@ class TestUnscalingSelection:
         x_state = table_model.checkbox(table_model.index(1, x_col))
         assert x_state == Qt.CheckState.Unchecked
 
-    def test_duplicate_selection_prevention(self, table_model: MDAFileTableModel) -> None:
+    def test_duplicate_selection_prevention(
+        self, table_model: MDAFileTableModel
+    ) -> None:
         """Test that checking an already-checked checkbox doesn't create duplicates."""
         # Select Y on row 1
         y_col = table_model.columnNumber("Y")
@@ -267,7 +269,9 @@ class TestUnscalingSelection:
         assert table_model.selections[1] == "Y"
         assert not isinstance(table_model.selections[1], list)
 
-    def test_duplicate_selection_prevention_x(self, table_model: MDAFileTableModel) -> None:
+    def test_duplicate_selection_prevention_x(
+        self, table_model: MDAFileTableModel
+    ) -> None:
         """Test that checking an already-checked X checkbox doesn't create duplicates."""
         # Select X on row 2
         x_col = table_model.columnNumber("X")
