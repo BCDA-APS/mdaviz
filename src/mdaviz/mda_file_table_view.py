@@ -77,29 +77,29 @@ class MDAFileTableView(QWidget):
         header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
         # Setup 2D controls
-        self.setup2DControls()
+        self.setupX2Controls()
 
         # Setup Y DET controls after UI is fully loaded
-        self.setupYDetControls()
+        self.setup2DControls()
 
-    def setup2DControls(self):
-        """Setup 2D data controls (X2 selection)."""
+    def setupX2Controls(self):
+        """Setup 2D data controls (X2 selection for 1D plot/slice)."""
         # Connect X2 spinbox to update function
         self.x2SpinBox.valueChanged.connect(self.onX2ValueChanged)
 
         # Initially hide 2D controls
         self.dimensionControls.setVisible(False)
 
-    def setupYDetControls(self):
+    def setup2DControls(self):
         """Setup Y DET selection controls for 2D plotting."""
-        logger.debug("setupYDetControls - Starting setup")
+        logger.debug("setup2DControls - Starting setup")
 
         # Use QTimer to ensure UI is fully loaded
         from PyQt6.QtCore import QTimer
 
-        QTimer.singleShot(100, self._setupYDetControlsDelayed)
+        QTimer.singleShot(100, self._setup2DControlsDelayed)
 
-    def _setupYDetControlsDelayed(self):
+    def _setup2DControlsDelayed(self):
         """Setup Y DET controls after UI is fully loaded."""
         # Connect signals for 2D controls
         self.x1ComboBox.currentIndexChanged.connect(self.onX1SelectionChanged)
@@ -139,6 +139,10 @@ class MDAFileTableView(QWidget):
 
         # Initially hide Y DET controls
         self.yDetControls.setVisible(False)
+
+    # ==========================================
+    # Populate 2D-data comboBoxes
+    # ==========================================
 
     def populateX1ComboBox(self):
         """Populate X1 combobox with available positioners from scanDictInner."""
@@ -279,6 +283,10 @@ class MDAFileTableView(QWidget):
 
         logger.debug("populate2DControls - All 2D controls populated")
 
+    # ==========================================
+    # x2 spinBox methods
+    # ==========================================
+
     def update2DControls(
         self,
         is_multidimensional=False,
@@ -389,6 +397,10 @@ class MDAFileTableView(QWidget):
     def getX2Value(self):
         """Get the current X2 value from the spinbox."""
         return self.x2SpinBox.value()
+
+    # ==========================================
+    # 2D data plot & slots
+    # ==========================================
 
     # Y DET Controls Signal Handlers
     def _trigger2DPlot(self):
@@ -567,6 +579,9 @@ class MDAFileTableView(QWidget):
                 - folderPath (str): The full path of the parent folder.
                 - metadata (dict): The extracted metadata from the file.
                 - scanDict (dict): A dictionary of positioner & detector dataset for plot.
+                - scanDict2D (dict): For 2D data
+                - scanDictInner (dict): For 2D data
+                - isMultidimensional (bool)
                 - firstPos (float): The first positioner (P1, or if no positioner, P0 = index).
                 - firstDet (float): The first detector (D01).
                 - pvList (list of str): List of detectors PV names as strings.
