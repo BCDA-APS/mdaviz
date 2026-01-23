@@ -129,8 +129,7 @@ class MDAFileVisualization(QWidget):
         """Setup 2D plotting functionality."""
         # Initially hide 2D tab
         self.update2DTabVisibility(False)
-
-        # Connect tab change signal
+        # Connect mda_file_viz tab change signal (1D, data, 2D...)
         self.tabWidget.currentChanged.connect(self.onTabChanged)
 
         # Connect to file tab changes to update 2D plot when switching files
@@ -142,16 +141,9 @@ class MDAFileVisualization(QWidget):
     def connectToFileTabChanges(self):
         """Connect to file tab changes to update 2D plot when needed."""
         try:
-            logger.debug("Starting connection attempt")
-
-            # Find the parent MDA_MVC to connect to the tabChanged signal
-            parent = self.parent()
-            logger.debug(f"Initial parent: {type(parent)}")
-
+            parent = self.parent()  # MDA_MVC
             while parent and not hasattr(parent, "mda_file"):
                 parent = parent.parent()
-                logger.debug(f"Traversed to parent: {type(parent)}")
-
             if parent and hasattr(parent, "mda_file"):
                 # Connect to the tabChanged signal from MDAFile
                 parent.mda_file.tabChanged.connect(self.onFileTabChanged)
@@ -173,11 +165,6 @@ class MDAFileVisualization(QWidget):
         """
         logger.debug(f"File tab changed to {file_path}")
 
-        # Always update control visibility to ensure correct controls are shown
-        current_tab_index = self.tabWidget.currentIndex()
-        logger.debug(f"Current viz tab index: {current_tab_index}")
-        self.updateControlVisibility(current_tab_index)
-
         # Update 2D tab visibility based on the active file's data
         current_tableview = self.getCurrentFileTableview()
         if (
@@ -192,6 +179,11 @@ class MDAFileVisualization(QWidget):
         else:
             logger.debug("No current tableview or file data available")
             self.update2DTabVisibility(False)
+
+        # Always update control visibility to ensure correct controls are shown
+        current_tab_index = self.tabWidget.currentIndex()
+        logger.debug(f"Current viz tab index: {current_tab_index}")
+        self.updateControlVisibility(current_tab_index)
 
         # Update 2D plot if we're currently on the 2D tab
         if current_tab_index == 3:  # 2D tab
@@ -584,11 +576,9 @@ class MDAFileVisualization(QWidget):
     def getCurrentFileTableview(self):
         """Get the current file table view from the parent."""
         try:
-            # Traverse up to find MDA_MVC
             parent = self.parent()
             while parent and not hasattr(parent, "currentFileTableview"):
                 parent = parent.parent()
-
             if parent and hasattr(parent, "currentFileTableview"):
                 return parent.currentFileTableview()
             else:
