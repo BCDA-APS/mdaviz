@@ -245,7 +245,7 @@ class TestTabManager:
 
         # Try to get data from nonexistent tab
         data = tab_manager.getTabData("Nonexistent Tab")
-        assert data is None
+        assert data == {}
 
     def test_tab_manager_tabs_list(self, qapp: QApplication, qtbot: "QtBot") -> None:
         """Test getting the list of all tabs."""

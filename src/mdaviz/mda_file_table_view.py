@@ -348,7 +348,7 @@ class MDAFileTableView(QWidget):
             # Populate 2D control comboboxes
             self.populate2DControls()
         else:
-            # Hide 2D controls for 1D data
+            # Hide 2D controls (X2 spinBox) for 1D data
             self.dimensionControls.setVisible(False)
             # Clear X2 value label
             self.x2ValueLabel.setText("--")

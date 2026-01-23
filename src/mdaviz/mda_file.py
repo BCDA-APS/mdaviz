@@ -123,7 +123,9 @@ class MDAFile(QWidget):
         """List of mda file (name only) in the selected folder."""
         return self.mda_mvc.mdaFileList()
 
-    # ------ Get & set methods:
+    # =============================================
+    # Get & set methods
+    # =============================================
 
     def mode(self):
         """
@@ -331,7 +333,9 @@ class MDAFile(QWidget):
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
 
-    # ------ Tab utilities:
+    # =============================================
+    # Tab utilities
+    # =============================================
 
     def tabPath2Index(self, file_path):
         """Finds and returns the index of a tab based on its associated file path."""
@@ -365,7 +369,9 @@ class MDAFile(QWidget):
             return tab_tableview
         return None  # Return None if the index is out of range.
 
-    # ------ Populating UIs with selected file content:
+    # =============================================
+    # Populating UIs with selected file content
+    # =============================================
 
     def displayMetadata(self, metadata):
         """Display metadata in the vizualization panel."""
@@ -401,7 +407,9 @@ class MDAFile(QWidget):
         self.mda_mvc.setSelectionField(default)
         return default
 
-    # ------ Slots (UI):
+    # =============================================
+    # Slots (UI)
+    # =============================================
 
     def onTabCloseRequested(self, index):
         """
@@ -440,7 +448,9 @@ class MDAFile(QWidget):
                 plot_widget.curveManager.removeAllCurves(doNotClearCheckboxes=False)
         self.setStatus("Graph cleared.")
 
-    # ------ Tabs management:
+    # =============================================
+    # Tab management
+    # =============================================
 
     def addFileTab(self, index, selection_field):
         """
@@ -534,7 +544,7 @@ class MDAFile(QWidget):
         - selection_field (dict): Specifies the data fields (positioners/detectors) for display in the table view.
         """
         tableview = MDAFileTableView(self)
-        tab_index = self.tabWidget.addTab(tableview, file_name)
+        tab_index = self.tabWidget.addTab(tableview, file_name)  # addTab(widget, label)
         self.tabWidget.setCurrentIndex(tab_index)
         tableview.displayTable(selection_field)
         tableview.filePath.setText(file_path)
@@ -561,7 +571,7 @@ class MDAFile(QWidget):
             new_tab_index, new_file_path, new_tab_data, new_selection_field
         """
         new_file_path = self.tabIndex2Path(new_tab_index)
-        new_tab_data = self.tabManager.getTabData(new_file_path) or {}
+        new_tab_data = self.tabManager.getTabData(new_file_path)
         new_tab_tableview = self.tabWidget.widget(new_tab_index)
         if new_tab_tableview and new_tab_tableview.tableView.model():
             new_selection_field = new_tab_tableview.tableView.model().plotFields()
@@ -620,7 +630,9 @@ class MDAFile(QWidget):
         index = model.index(row, 0)
         tableview.tableView.scrollTo(index, scrollHint)
 
-    # ------ Button methods:
+    # =============================================
+    # Button methods
+    # =============================================
 
     def responder(self, action):
         """Modify the plot with the described action.
@@ -640,7 +652,9 @@ class MDAFile(QWidget):
             self.replaceButton.hide()
 
 
-# ------ Tabs management (data):
+# =============================================
+# Tab management (data)
+# =============================================
 
 
 class TabManager(QObject):
@@ -691,7 +705,7 @@ class TabManager(QObject):
 
     def getTabData(self, file_path):
         """Returns the metatdata & data for the tab associated with the given file path."""
-        return self._tabs.get(file_path)
+        return self._tabs.get(file_path, {})
 
     def tabs(self):
         """Returns a read-only view of the currently managed tabs."""
