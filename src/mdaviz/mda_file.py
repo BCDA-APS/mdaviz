@@ -424,6 +424,11 @@ class MDAFile(QWidget):
             self.removeAllFileTabs()
         elif index is not None and index < self.tabWidget.count():
             self.tabWidget.removeTab(index)
+            # Clear highlighted row references if the removed tab was the highlighted one
+            if self.currentHighlightedFilePath == file_path:
+                self.currentHighlightedRow = None
+                self.currentHighlightedFilePath = None
+                self.currentHighlightedModel = None
 
     def onClearGraphRequested(self):
         """Clear only the graph area in the visualization panel."""
@@ -546,6 +551,10 @@ class MDAFile(QWidget):
             self.tabWidget.removeTab(self.tabWidget.count() - 1)
         # Clear all data associated with the tabs from the TabManager.
         self.tabManager.removeAllTabs()
+        # Clear highlighted row references
+        self.currentHighlightedRow = None
+        self.currentHighlightedFilePath = None
+        self.currentHighlightedModel = None
         # Clear all content from the visualization panel except for graph, if no tabs are open.
         self.mda_mvc.mda_file_viz.clearContents(plot=False)
         # Update the status to reflect that all tabs have been closed.
@@ -691,107 +700,3 @@ class TabManager(QObject):
     def tabs(self):
         """Returns a read-only view of the currently managed tabs."""
         return dict(self._tabs)
-
-
-# chatGPT review:
-# Your implementation of addFileTab and createNewTab seems well thought out with
-# a clear workflow. Here are some considerations to ensure the TabManager's
-# state aligns with the UI:
-
-#     Synchronization Between Data and UI: Every action that affects tabs
-#         (adding, removing, switching) should reflect both in the UI and the
-#         data managed by TabManager. It looks like you're adding and removing
-#         tabs through the TabManager correctly. Just ensure that every UI
-#         action triggers the corresponding data update in TabManager.
-
-#     Error Handling for Tab Operations: Consider adding error handling or
-#         checks for situations where tab operations might fail or behave
-#         unexpectedly. For example, what happens if createNewTab is called with
-#         a file_path that already exists in TabManager? Although your logic
-#         should prevent this, defensive programming can help catch unexpected
-#         issues.
-
-#     Consistent State After Operations: After operations like adding a new tab
-#         or removing all tabs, verify that the application's state is
-#         consistent (e.g., no dangling references to removed tabs, UI elements
-#         are enabled/disabled appropriately).
-
-#     Update UI Responsively: Make sure the UI updates are responsive to changes
-#         in the TabManager. For instance, when a tab is added or removed, any
-#         UI elements depending on the number of open tabs (like "Close All
-#         Tabs" button) should update accordingly.
-
-#     onTabRemoved and onAllTabsRemoved Slots: You've mentioned placeholders for
-#         these methods but haven't detailed their implementations. These are
-#         crucial for handling UI updates or cleanup when tabs are removed.
-#         Ensure they're implemented to handle any necessary UI adjustments when
-#         tabs change.
-
-#     Removal of Tabs and Associated Data: In removeTabUI, you handle the
-#         removal process properly by checking if the tab exists in TabManager
-#         before attempting to remove it. Just make sure this also covers any
-#         associated data cleanup that might be needed to prevent memory leaks
-#         or stale data.
-
-#     Switching Tabs: When switching tabs (updateCurrentTabInfo), ensure that any
-#         context-sensitive UI elements (like metadata display, data tables,
-#         etc.) update to reflect the content of the newly active tab.
-
-# Overall, your methods for handling tab addition and removal appear to be on
-# the right track. Thorough testing, especially with scenarios involving rapid
-# addition/removal of tabs and switching between tabs, will help ensure that the
-# UI and TabManager remain in sync.
-
-
-# For MDA_MVC:
-
-#     Your MDA_MVC class implementation appears comprehensive and
-#     well-organized. You've covered a broad range of functionalities essential
-#     for the MVC architecture in managing MDA files. Here are a few points to
-#     consider, focusing on ensuring coherence and functionality:
-
-#     Signal and Slot Connections: Ensure all signal connections are correctly
-#         established, especially for newly introduced signals related to
-#         TabManager. It's crucial that all parts of your MVC architecture
-#         communicate as intended.
-
-#     UI and Data Synchronization: Given your use of TabManager for managing tab
-#         data, verify that UI changes (e.g., tab switches, adds, and removes)
-#         are always in sync with the data model. This includes handling of
-#         signals like onTabRemoved and onAllTabsRemoved effectively to update
-#         the UI accordingly.
-
-#     Error Handling: Consider adding error handling for cases where operations
-#         might not go as expected. For example, what happens if doFileSelected
-#         is triggered but the file cannot be processed for some reason?
-#         Providing feedback or ensuring the application can gracefully handle
-#         such scenarios is important.
-
-#     Refreshing and Updating UI: The method doRefresh should ensure that the UI
-#         correctly reflects the current state of the file system or data source
-#         it's representing. This might involve more than just updating the
-#         table views, such as resetting selections or clearing data
-#         visualizations if necessary.
-
-#     Responsiveness to User Actions: Methods like goToFirst, goToLast,
-#         goToNext, and goToPrevious are crucial for navigating through files.
-#         Ensure these actions feel responsive to the user and that any
-#         associated data visualization updates occur without noticeable delay.
-
-#     Consistency in UI Updates: When tabs are changed via onCurrentTabChanged,
-#         ensure that the displayed metadata and data are always consistent with
-#         the selected tab. This includes proper handling of cases where a tab
-#         might not contain the expected data (e.g., if the file has been moved
-#         or deleted outside the application).
-
-#     Field Selection and Plotting Logic: The logic handling field selection for
-#         plotting and subsequent plot updates (in methods like
-#         onCheckboxStateChanged and doPlot) should be robust against changes in
-#         the underlying data model. Ensure that selections are valid and that
-#         the plotting functionality reacts correctly to changes in selected
-#         fields.
-
-#     Documentation and Code Comments: Your documentation and comments provide a
-#         good overview of each method's purpose. Continuing to maintain this
-#         level of documentation as your code evolves will be beneficial for
-#         both your future self and others who may work with your code.
