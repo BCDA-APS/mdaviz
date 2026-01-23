@@ -296,7 +296,7 @@ class DataCache(QObject):
                     file_data_dim2 = result[2]
                     scan_dict_2d, _, _ = get_scan_2d(file_data_dim1, file_data_dim2)
                     # Also store inner dimension data for 1D plotting
-                    scan_dict_inner, _, _ = get_scan(file_data_dim2)
+                    scan_dict_inner, _, first_det = get_scan(file_data_dim2)
                 except Exception as e:
                     logger.warning(f"Warning: Could not process 2D data: {e}")
                     scan_dict_2d = {}
@@ -373,7 +373,7 @@ class DataCache(QObject):
                     file_data_dim2 = result[2]
                     scan_dict_2d, _, _ = get_scan_2d(file_data_dim1, file_data_dim2)
                     # Also store inner dimension data for 1D plotting
-                    scan_dict_inner, _, _ = get_scan(file_data_dim2)
+                    scan_dict_inner, _, first_det = get_scan(file_data_dim2)
                 except Exception as e:
                     logger.warning(f"Warning: Could not process 2D data: {e}")
                     scan_dict_2d = {}
