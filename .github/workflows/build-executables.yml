@@ -30,7 +30,7 @@ jobs:
           pyinstaller mdaviz.spec
 
       - name: Upload Windows executable
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: mdaviz-windows
           path: dist/mdaviz.exe
@@ -74,7 +74,7 @@ jobs:
           pyinstaller mdaviz.spec
 
       - name: Upload Linux executable
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: mdaviz-linux
           path: dist/mdaviz
@@ -103,7 +103,7 @@ jobs:
           pyinstaller mdaviz.spec
 
       - name: Upload macOS executable
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: mdaviz-macos
           path: dist/mdaviz
