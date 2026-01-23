@@ -17,8 +17,6 @@ User: clearButton.clicked (emit: no data)
 
     --> onClearAllTabsRequested()
     --> tabManager.removeAllTabs()
-    --> tabManager.allTabsRemoved.emit()
-    --> onAllTabsRemoved()
     --> removeAllFileTabs()
 
 
@@ -92,10 +90,7 @@ class MDAFile(QWidget):
         self.autoBox.currentTextChanged.connect(self.updateButtonVisibility)
 
         # Connect TabManager signals:
-        # DESIGN NOTE: Implement proper signal/slot tab management via tabManager for tabAdded and allTabsRemoved if needed.
-        self.tabManager.tabAdded.connect(self.onTabAdded)
         self.tabManager.tabRemoved.connect(self.onTabRemoved)
-        self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
 
         # Tab handling:
         self.tabWidget.currentChanged.connect(self.updateCurrentTabInfo)
@@ -419,10 +414,6 @@ class MDAFile(QWidget):
         if file_path:
             self.tabManager.removeTab(file_path)
 
-    def onTabAdded(self, file_path):
-        """To be implemented"""
-        pass
-
     def onTabRemoved(self, file_path):
         """
         Removes a tab from the tab widget based on its file_path.
@@ -433,10 +424,6 @@ class MDAFile(QWidget):
             self.removeAllFileTabs()
         elif index is not None and index < self.tabWidget.count():
             self.tabWidget.removeTab(index)
-
-    def onAllTabsRemoved(self):
-        """To be implemented"""
-        pass
 
     def onClearGraphRequested(self):
         """Clear only the graph area in the visualization panel."""
@@ -670,14 +657,10 @@ class TabManager(QObject):
     - Emits signals to notify other components of tab-related changes.
 
     Signals:
-    - tabAdded: Emitted when a new tab is added. Passes the file path of the added tab.
     - tabRemoved: Emitted when a tab is removed. Passes the file path of the removed tab.
-    - allTabRemoved: Emitted when all tabs are removed. No parameters.
     """
 
-    tabAdded = pyqtSignal(str)  # Signal emitting file path of removed tab
     tabRemoved = pyqtSignal(str)  # Signal emitting file path of removed tab
-    allTabsRemoved = pyqtSignal()  # Signal indicating all tabs have been removed
 
     def __init__(self):
         super().__init__()
@@ -687,7 +670,6 @@ class TabManager(QObject):
         """Adds a new tab with specified metadata and table data."""
         if file_path not in self._tabs:
             self._tabs[file_path] = {"metadata": metadata, "tabledata": tabledata}
-            self.tabAdded.emit(file_path)
 
     def removeTab(self, file_path):
         """
@@ -701,7 +683,6 @@ class TabManager(QObject):
     def removeAllTabs(self):
         """Removes all tabs."""
         self._tabs.clear()
-        self.allTabsRemoved.emit()
 
     def getTabData(self, file_path):
         """Returns the metatdata & data for the tab associated with the given file path."""
