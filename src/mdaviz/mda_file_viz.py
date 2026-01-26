@@ -116,6 +116,9 @@ class MDAFileVisualization(QWidget):
         # Setup fit functionality
         self.setupFitUI()
 
+        # Setup log scale controls
+        self.setupLogScaleUI()
+
         # Setup curve style functionality
         self.setupCurveStyleUI()
 
@@ -272,6 +275,7 @@ class MDAFileVisualization(QWidget):
 
         # Convert 2D selection to 1D format for data2Plot2D
         # data2Plot2D expects: {'X': x_index, 'Y': [y_indices], 'I0': i0_index}
+        # i.e X1 -> X; could refactor but it is too risky for a small gain
         converted_selection = {
             "X": selection.get("X1"),
             "X2": selection.get("X2"),
@@ -316,21 +320,12 @@ class MDAFileVisualization(QWidget):
                 layoutMpl2D.addWidget(widgetMpl2D)
                 logger.debug("Added ChartView2D to 2D layout")
 
-                # Apply stored log scale state to the new chart
-                if hasattr(self, "getLogScaleState"):
-                    stored_log_x, stored_log_y = self.getLogScaleState()
-                    widgetMpl2D.setLogScales(stored_log_x, stored_log_y)
-
-                # Apply 2D log scale state from current selections
-                log_y = selection.get("log_y", False)
-                widgetMpl2D.setLogScales2D(log_y)
-
             # Apply 2D log scale state from current selections (for both new and existing widgets)
             log_y = selection.get("log_y", False)
             widgetMpl2D.setLogScales2D(log_y)
             logger.debug(f"Applied log scale: {log_y}")
 
-            # Plot the 2D data
+            # Plot the 2D data; datasets is a list with 1 element (only 1 det selected)
             for dataset in datasets:
                 y_data, dataset_options = dataset
                 x_data = dataset_options.get("x_data")
@@ -464,7 +459,7 @@ class MDAFileVisualization(QWidget):
         # Get the current file table view
         current_tableview = self.getCurrentFileTableview()
         if not current_tableview:
-            logger.debug("updateControlVisibilityNo current tableview found")
+            logger.debug("updateControlVisibility No current tableview found")
             return
 
         # Tab indices: 0=1D, 1=Data, 2=Metadata, 3=2D(if visible)
@@ -484,8 +479,8 @@ class MDAFileVisualization(QWidget):
             # Show mode controls and clear button
             self.showModeControls(True)
 
-            # Show 1D-specific controls (curves, graphInfo, cursorInfo)
-            self.show1DControls(True)
+            # Show analysis controls (curves, graphInfo, cursorInfo)
+            self.showAnalysisControls(True)
         elif tab_index == 3:  # 2D tab
             # Hide table view and X2 controls, show Y DET controls
             current_tableview.tableView.setVisible(False)
@@ -495,8 +490,8 @@ class MDAFileVisualization(QWidget):
             # Hide mode controls and clear button
             self.showModeControls(False)
 
-            # Hide 1D-specific controls: curve box, graphInfo, cursorInfo
-            self.show1DControls(False)
+            # Hide analysis controls: curve box, graphInfo, cursorInfo
+            self.showAnalysisControls(False)
 
     def showModeControls(self, show: bool):
         """Show or hide mode controls (autoBox, clearButton, etc.)."""
@@ -515,29 +510,25 @@ class MDAFileVisualization(QWidget):
                     mda_file.clearButton.setVisible(show)
                 if hasattr(mda_file, "clearGraphButton"):
                     mda_file.clearGraphButton.setVisible(show)
-            else:
-                # Try alternative approach - look for controls in the main window
-                main_window = self.window()
-                if main_window and hasattr(main_window, "autoBox"):
-                    main_window.autoBox.setVisible(show)
-                    if hasattr(main_window, "clearButton"):
-                        main_window.clearButton.setVisible(show)
-                    if hasattr(main_window, "clearGraphButton"):
-                        main_window.clearGraphButton.setVisible(show)
+
+                # addButton and replaceButton should only be visible in Auto-off mode
+                if show and hasattr(mda_file, "mode"):
+                    is_auto_off = mda_file.mode() == "Auto-off"
+                    if hasattr(mda_file, "addButton"):
+                        mda_file.addButton.setVisible(is_auto_off)
+                    if hasattr(mda_file, "replaceButton"):
+                        mda_file.replaceButton.setVisible(is_auto_off)
                 else:
-                    # Try one more approach - look for MDAFile in the widget tree
-                    current: QWidget | None = self
-                    while current:
-                        if hasattr(current, "autoBox"):
-                            current.autoBox.setVisible(show)
-                            if hasattr(current, "clearButton"):
-                                current.clearButton.setVisible(show)
-                            break
-                        current = current.parent()  # type: ignore[assignment]
+                    # Hide when show=False (switching to 2D tab)
+                    if hasattr(mda_file, "addButton"):
+                        mda_file.addButton.setVisible(False)
+                    if hasattr(mda_file, "replaceButton"):
+                        mda_file.replaceButton.setVisible(False)
+
         except Exception as e:
             logger.error(f"Error in showModeControls: {e}")
 
-    def show1DControls(self, show: bool):
+    def showAnalysisControls(self, show: bool):
         """Show or hide 1D-specific controls by hiding/showing the entire curves widget."""
         try:
             # Hide/show the entire curves widget (contains curveBox, curveRemove, curveStyle, clearAll, etc.)
@@ -574,7 +565,7 @@ class MDAFileVisualization(QWidget):
                 self.updatePlotControls(has_curve)
 
         except Exception as e:
-            logger.error(f"Error in show1DControls: {e}")
+            logger.error(f"Error in showAnalysisControls: {e}")
 
     def getCurrentFileTableview(self):
         """Get the current file table view from the parent."""
@@ -685,8 +676,10 @@ class MDAFileVisualization(QWidget):
         # Initially disable until a curve is selected
         self.curveStyle.setEnabled(False)  # type: ignore[attr-defined]
 
-        # Setup log scale controls
-        self.setupLogScaleUI()
+    def onCurveStyleChanged(self, style_name: str):
+        """Handle curve style change."""
+        if hasattr(self, "chart_view") and self.chart_view:
+            self.chart_view.updateCurveStyle(style_name)
 
     def setupLogScaleUI(self):
         """Setup the log scale UI components and connections."""
@@ -729,11 +722,6 @@ class MDAFileVisualization(QWidget):
         """Sync checkbox states with the stored log scale state."""
         self.logXCheckBox.setChecked(self._log_x_state)  # type: ignore[attr-defined]
         self.logYCheckBox.setChecked(self._log_y_state)  # type: ignore[attr-defined]
-
-    def onCurveStyleChanged(self, style_name: str):
-        """Handle curve style change."""
-        if hasattr(self, "chart_view") and self.chart_view:
-            self.chart_view.updateCurveStyle(style_name)
 
     def setTableData(self, data):
         """
