@@ -99,19 +99,8 @@ class MDAFileVisualization(QWidget):
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
         )
 
-        # Get maximum height from user settings with default fallback
-        from mdaviz.user_settings import settings
-
-        max_height = settings.getKey("plot_max_height")
-        try:
-            max_height = int(max_height)
-        except (TypeError, ValueError):
-            max_height = 800  # Default value
-
         # Set maximum height for the tab widget to prevent vertical growth
-        self.tabWidget.setMaximumHeight(
-            max_height + 100
-        )  # Add some padding for tab headers
+        self._updateTabWidgetMaxHeight()
 
         # Setup fit functionality
         self.setupFitUI()
@@ -874,9 +863,6 @@ class MDAFileVisualization(QWidget):
 
         # Create search dialog (but don't show it yet)
         self.search_dialog = None
-
-        # Connect tab widget signals to enable/disable search
-        self.tabWidget.currentChanged.connect(self.onTabChanged)
 
     def showSearchDialog(self):
         """Show the search dialog for the metadata widget."""
