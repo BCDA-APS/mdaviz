@@ -280,7 +280,31 @@ class MDAFile(QWidget):
             }
 
     def handle2DMode(self):
-        """Handle 2D data setup - update controls but don't change mode."""
+        """
+        Configure 2D data controls in the current table view when multidimensional data is detected.
+
+        This method is called after a file tab is added/updated and the data is identified as
+        multidimensional (2D). It extracts 2D-specific information from the data structure and
+        updates the table view's 2D controls (X2 spinBox) accordingly.
+
+        The method:
+        - Retrieves the currently active table view from the tab widget
+        - Extracts dimension information (planned and acquired) from the data
+        - Identifies the X2 positioner from scanDict2D (the first positioner at key 0)
+        - Updates the table view's 2D controls with the extracted information
+
+        Note: This method only updates UI controls; it does not change the application's
+        mode (Auto-replace, Auto-add, Auto-off). The mode remains unchanged.
+
+        Data sources (from self._data):
+        - dimensions: Planned dimensions for the 2D scan
+        - acquiredDimensions: Actual dimensions acquired (may differ if scan incomplete)
+        - scanDict2D: Dictionary containing 2D scan data, where key 0 is the X2 positioner
+
+        Side effects:
+        - Updates the current table view's 2D controls via update2DControls()
+        - No effect if data is not multidimensional or no table view is available
+        """
         if self._data.get("isMultidimensional", False):
             # Update 2D controls in table view
             table_view = self.tabIndex2Tableview(self.tabWidget.currentIndex())

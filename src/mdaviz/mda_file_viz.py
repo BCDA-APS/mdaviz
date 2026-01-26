@@ -218,7 +218,10 @@ class MDAFileVisualization(QWidget):
 
     def set2DData(self, data):
         """
-        Set 2D data for plotting.
+        Set 2D data for visualization and manage 2D tab visibility.
+
+        Switches to the 1D plot tab (index 0) when called. If data is multidimensional,
+        shows the 2D tab and stores the data; otherwise hides the 2D tab and clears stored data.
 
         Parameters:
             data (dict or None): 2D data dictionary with scanDict2D and metadata, or None to clear
