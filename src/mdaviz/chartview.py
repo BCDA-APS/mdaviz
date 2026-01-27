@@ -1409,16 +1409,9 @@ class ChartView(QWidget):
         if curve_data:
             curve_data["style"] = format_string
             # Save to persistent storage
-            persistent_key = (
-                curve_data["file_path"],
-                curve_data["row"],
-                curve_data.get("x2_index"),
-            )
-            if persistent_key not in self.curveManager._persistent_properties:
-                self.curveManager._persistent_properties[persistent_key] = {}
-            self.curveManager._persistent_properties[persistent_key]["style"] = (
-                format_string
-            )
+            if curveID not in self.curveManager._persistent_properties:
+                self.curveManager._persistent_properties[curveID] = {}
+            self.curveManager._persistent_properties[curveID]["style"] = format_string
             self.curveManager.updateCurve(curveID, curve_data)
 
             # Update the plot object with the new style
