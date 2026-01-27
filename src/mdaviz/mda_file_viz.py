@@ -550,7 +550,7 @@ class MDAFileVisualization(QWidget):
                     )
 
                 selected_id = self.chart_view.getSelectedCurveID()
-                has_curve = (
+                has_curve = bool(
                     selected_id and selected_id in self.chart_view.curveManager.curves()
                 )
                 self.updatePlotControls(has_curve)
