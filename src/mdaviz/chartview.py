@@ -44,7 +44,7 @@ from itertools import cycle
 from typing import Optional
 import numpy
 from PyQt6 import QtCore, QtWidgets
-from PyQt6.QtCore import QObject, QTimer, Qt, pyqtSignal
+from PyQt6.QtCore import QTimer, Qt
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QApplication
 from mdaviz import utils
 from mdaviz.fit_manager import FitManager
@@ -1416,9 +1416,9 @@ class ChartView(QWidget):
             )
             if persistent_key not in self.curveManager._persistent_properties:
                 self.curveManager._persistent_properties[persistent_key] = {}
-            self.curveManager._persistent_properties[persistent_key][
-                "style"
-            ] = format_string
+            self.curveManager._persistent_properties[persistent_key]["style"] = (
+                format_string
+            )
             self.curveManager.updateCurve(curveID, curve_data)
 
             # Update the plot object with the new style
