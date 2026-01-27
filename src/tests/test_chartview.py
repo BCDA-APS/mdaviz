@@ -9,7 +9,8 @@ from typing import TYPE_CHECKING
 import pytest
 from unittest.mock import MagicMock
 
-from mdaviz.chartview import auto_color, auto_symbol, ChartView, CurveManager
+from mdaviz.chartview import auto_color, auto_symbol, ChartView
+from mdaviz.curve_manager import CurveManager
 import numpy as np
 from PyQt6.QtWidgets import QComboBox
 
