@@ -12,7 +12,7 @@ Classes:
 
 Key Features:
     - Interactive 1D and 2D plotting with Matplotlib backend
-    - Curve management with persistent properties (style, offset, factor)
+    - Curve management with persistent style properties
     - Real-time data fitting with multiple model support
     - Interactive cursors for data analysis
     - Logarithmic scale support for both 1D and 2D plots

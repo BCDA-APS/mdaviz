@@ -66,11 +66,12 @@ class CurveManager(QObject):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self._curves = {}  # Store curves with a unique identifier as the key
+
+        # Store curves with a unique identifier as the key
+        self._curves = {}
 
         # Persistent storage for curve properties across manager clears
-        # key: curveID, value: {style, offset, factor}
-        self._persistent_properties = {}
+        self._persistent_properties = {}  # key: curveID, value: {style}
 
     def curves(self):
         """Returns a copy of the currently managed curves.
@@ -236,8 +237,8 @@ class CurveManager(QObject):
 
         self._curves[curveID] = {
             "ds": ds,  # ds = [x_data, y_data]
-            "offset": persistent_props.get("offset", 0),  # restore offset
-            "factor": persistent_props.get("factor", 1),  # restore factor
+            "offset": 0,  # default offset
+            "factor": 1,  # default factor
             "style": persistent_props.get("style", "-"),  # restore style
             "row": row,  # DET checkbox row in the file tableview
             "file_path": file_path,
@@ -311,9 +312,6 @@ class CurveManager(QObject):
     def updateCurveOffset(self, curveID, new_offset):
         """Update the offset value for a specific curve.
 
-        Updates the curve's offset value and saves it to persistent storage
-        for restoration across sessions.
-
         Parameters:
             curveID: The unique identifier of the curve
             new_offset: The new offset value to apply to the curve
@@ -329,20 +327,10 @@ class CurveManager(QObject):
                     f"Updating offset for curve {curveID}: {offset} -> {new_offset}"
                 )
                 curve_data["offset"] = new_offset
-                # Save to persistent storage
-                if curveID not in self._persistent_properties:
-                    self._persistent_properties[curveID] = {}
-                self._persistent_properties[curveID]["offset"] = new_offset
-                logger.debug(
-                    f"Saved offset to persistent storage: {curveID} -> {new_offset}"
-                )
                 self.updateCurve(curveID, curve_data, recompute_y=True)
 
     def updateCurveFactor(self, curveID, new_factor):
         """Update the factor value for a specific curve.
-
-        Updates the curve's factor value and saves it to persistent storage
-        for restoration across sessions.
 
         Parameters:
             curveID: The unique identifier of the curve
@@ -359,11 +347,4 @@ class CurveManager(QObject):
                     f"Updating factor for curve {curveID}: {factor} -> {new_factor}"
                 )
                 curve_data["factor"] = new_factor
-                # Save to persistent storage
-                if curveID not in self._persistent_properties:
-                    self._persistent_properties[curveID] = {}
-                self._persistent_properties[curveID]["factor"] = new_factor
-                logger.debug(
-                    f"Saved factor to persistent storage: {curveID} -> {new_factor}"
-                )
                 self.updateCurve(curveID, curve_data, recompute_y=True)
