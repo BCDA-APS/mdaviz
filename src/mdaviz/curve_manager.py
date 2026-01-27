@@ -72,6 +72,99 @@ class CurveManager(QObject):
         # key: curveID, value: {style, offset, factor}
         self._persistent_properties = {}
 
+    def curves(self):
+        """Returns a copy of the currently managed curves.
+
+        Provides access to all curves currently stored in the manager by
+        returning a copy of the internal dictionary to prevent direct
+        modification of the manager's state.
+
+        Returns:
+            dict: Copy of the curves dictionary with curveID as keys
+        """
+        return dict(self._curves)
+
+    def getCurveData(self, curveID):
+        """Get curve data by ID.
+
+        Retrieves the complete data dictionary for a specific curve including
+        dataset, properties, and metadata.
+
+        Parameters:
+            curveID: The unique identifier of the curve
+
+        Returns:
+            dict or None: Complete curve data dictionary if found, None otherwise
+        """
+        return self._curves.get(curveID, None)
+
+    def getCurveXYData(self, curveID):
+        """
+        Get the X and Y data arrays for a curve.
+
+        Parameters:
+            curveID (str): Unique identifier of the curve
+
+        Returns:
+            tuple: (x_data, y_data) or (None, None) if not found
+        """
+        curve_info = self.getCurveData(curveID)
+        if curve_info:
+            data = curve_info.get("ds")
+            if data and len(data) >= 2:
+                return (data[0], data[1])  # (x_data, y_data)
+        return (None, None)
+
+    def generateCurveID(self, label, file_path, row, x2_index=None):
+        """
+        Generates a unique curve ID based on file_path, row, and X2 index, ensuring the same detector
+        always gets the same curve ID regardless of I0 normalization.
+
+        Parameters:
+        - label (str): The original label for the curve (used for display purposes)
+        - file_path (str): The file path associated with the curve
+        - row (int): The row number in the file tableview associated with the curve
+        - x2_index (int, optional): The X2 slice index for 2D data
+
+        Returns:
+        - str: A unique curve ID based on file_path, row, and X2 index
+        """
+        # Generate curve ID based on file_path, row, and X2 index
+        if x2_index is not None:
+            curve_id = f"{file_path}_{row}_x2_{x2_index}"
+        else:
+            curve_id = f"{file_path}_{row}"
+
+        logger.debug(f"generateCurveID - curve_id={curve_id}")
+
+        # Check if this curve ID already exists
+        if curve_id in self._curves:
+            # If it exists, return the existing curve ID (this should not happen in normal usage)
+            return curve_id
+        else:
+            return curve_id
+
+    def findCurveID(self, file_path, row, x2_index=None):
+        """
+        Find the curveID based on the file path, row number, and X2 index.
+
+        Parameters:
+        - file_path (str): The path of the file associated with the curve.
+        - row (int): The row number in the file tableview associated with the curve.
+        - x2_index (int, optional): The X2 slice index for 2D data.
+
+        Returns:
+        - str: The curveID if a matching curve is found; otherwise, None.
+        """
+        for curveID, curveData in self._curves.items():
+            if (
+                curveData["file_path"] == file_path
+                and curveData["row"] == row
+                and curveData.get("x2_index") == x2_index
+            ):
+                return curveID
+        return None
+
     def addCurve(self, row, *ds, **options):
         """Add a new curve to the manager if not already present on the graph.
 
@@ -215,32 +308,6 @@ class CurveManager(QObject):
         self._curves.clear()
         self.allCurvesRemoved.emit(doNotClearCheckboxes)
 
-    def getCurveData(self, curveID):
-        """Get curve data by ID.
-
-        Retrieves the complete data dictionary for a specific curve including
-        dataset, properties, and metadata.
-
-        Parameters:
-            curveID: The unique identifier of the curve
-
-        Returns:
-            dict or None: Complete curve data dictionary if found, None otherwise
-        """
-        return self._curves.get(curveID, None)
-
-    def curves(self):
-        """Returns a copy of the currently managed curves.
-
-        Provides access to all curves currently stored in the manager by
-        returning a copy of the internal dictionary to prevent direct
-        modification of the manager's state.
-
-        Returns:
-            dict: Copy of the curves dictionary with curveID as keys
-        """
-        return dict(self._curves)
-
     def updateCurveOffset(self, curveID, new_offset):
         """Update the offset value for a specific curve.
 
@@ -300,53 +367,3 @@ class CurveManager(QObject):
                     f"Saved factor to persistent storage: {curveID} -> {new_factor}"
                 )
                 self.updateCurve(curveID, curve_data, recompute_y=True)
-
-    def generateCurveID(self, label, file_path, row, x2_index=None):
-        """
-        Generates a unique curve ID based on file_path, row, and X2 index, ensuring the same detector
-        always gets the same curve ID regardless of I0 normalization.
-
-        Parameters:
-        - label (str): The original label for the curve (used for display purposes)
-        - file_path (str): The file path associated with the curve
-        - row (int): The row number in the file tableview associated with the curve
-        - x2_index (int, optional): The X2 slice index for 2D data
-
-        Returns:
-        - str: A unique curve ID based on file_path, row, and X2 index
-        """
-        # Generate curve ID based on file_path, row, and X2 index
-        if x2_index is not None:
-            curve_id = f"{file_path}_{row}_x2_{x2_index}"
-        else:
-            curve_id = f"{file_path}_{row}"
-
-        logger.debug(f"generateCurveID - curve_id={curve_id}")
-
-        # Check if this curve ID already exists
-        if curve_id in self._curves:
-            # If it exists, return the existing curve ID (this should not happen in normal usage)
-            return curve_id
-        else:
-            return curve_id
-
-    def findCurveID(self, file_path, row, x2_index=None):
-        """
-        Find the curveID based on the file path, row number, and X2 index.
-
-        Parameters:
-        - file_path (str): The path of the file associated with the curve.
-        - row (int): The row number in the file tableview associated with the curve.
-        - x2_index (int, optional): The X2 slice index for 2D data.
-
-        Returns:
-        - str: The curveID if a matching curve is found; otherwise, None.
-        """
-        for curveID, curveData in self._curves.items():
-            if (
-                curveData["file_path"] == file_path
-                and curveData["row"] == row
-                and curveData.get("x2_index") == x2_index
-            ):
-                return curveID
-        return None
