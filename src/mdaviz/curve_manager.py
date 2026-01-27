@@ -190,14 +190,18 @@ class CurveManager(QObject):
         file_path = plot_options.get("filePath", "unknown path")
         x2_index = options.get("x2_index")  # Extract X2 index from options
         logger.debug(f"addCurve - Received x2_index: {x2_index}")
+
         # Generate unique curve ID & update options:
         curveID = self.generateCurveID(label, file_path, row, x2_index)
+
         ds_options["label"] = label  # Keep the original label for display purposes
         logger.debug(
             f"Adding curve with ID: {curveID}, label: {label}, file_path: {file_path}"
         )
         logger.debug(f"Current curves in manager: {list(self._curves.keys())}")
+
         x_data = ds[0]
+
         if curveID in self._curves:
             logger.debug(f"Curve {curveID} already exists")
             # Check if x_data is the same
@@ -226,7 +230,16 @@ class CurveManager(QObject):
                     "plot_options": plot_options,  # Update plot options
                     "ds_options": ds_options,  # Update label and other ds options
                 }
-                self.updateCurve(curveID, updated_curve_data, recompute_y=True)
+                # Check if x_data actually changed (requires plot object recreation)
+                x_data_changed = not numpy.array_equal(x_data, existing_x_data)
+                # If update_x=True, recompute_y is redundant (recreation already applies offset/factor)
+                # If only label changed, recompute_y ensures offset/factor are applied to existing plot
+                self.updateCurve(
+                    curveID,
+                    updated_curve_data,
+                    recompute_y=not x_data_changed,
+                    update_x=x_data_changed,
+                )
                 return
 
         # Curve does not exist, create new curve

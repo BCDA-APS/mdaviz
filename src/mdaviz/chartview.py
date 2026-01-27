@@ -547,6 +547,27 @@ class ChartView(QWidget):
             new_y = numpy.multiply(ds[1], factor) + offset
             if curveID in self.plotObjects:
                 self.plotObjects[curveID].set_ydata(new_y)
+        # Handle label changes (e.g., I0 normalization)
+        if curve_data and not update_x:  # Only if we're not recreating the plot object
+            new_label = curve_data.get("ds_options", {}).get("label", "")
+            if curveID in self.plotObjects:
+                plot_obj = self.plotObjects[curveID]
+                old_label = (
+                    plot_obj.get_label() if hasattr(plot_obj, "get_label") else ""
+                )
+                if new_label and new_label != old_label:
+                    # Update plot object label for legend
+                    plot_obj.set_label(new_label)
+
+                    # Update combo box text
+                    for i in range(self.curveBox.count()):
+                        if (
+                            self.curveBox.itemData(i, QtCore.Qt.ItemDataRole.UserRole)
+                            == curveID
+                        ):
+                            self.curveBox.setItemText(i, new_label)
+                            break
+
         if curve_data and update_x:
             # For x-data updates, we need to recreate the plot object to maintain style
             if curveID in self.plotObjects:
