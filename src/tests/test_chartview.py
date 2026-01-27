@@ -113,7 +113,7 @@ def test_curve_manager_add_update_remove(qtbot):
 
 
 def test_curve_manager_persistent_properties():
-    """Test persistent offset and factor properties in CurveManager."""
+    """Test persistent style properties in CurveManager (offset/factor are not persistent)."""
     manager = CurveManager()
     row = 1
     file_path = "/tmp/test2.mda"
@@ -126,12 +126,12 @@ def test_curve_manager_persistent_properties():
     curve_id = manager.generateCurveID(label, file_path, row)
     manager.updateCurveOffset(curve_id, 42)
     manager.updateCurveFactor(curve_id, 3.14)
-    # Remove and re-add to test persistence
+    # Remove and re-add - offset/factor should reset to defaults (not persistent)
     manager.removeCurve(curve_id)
     manager.addCurve(row, x, y, plot_options=plot_options, ds_options=ds_options)
     curve_data = manager.getCurveData(curve_id)
-    assert curve_data["offset"] == 42
-    assert curve_data["factor"] == 3.14
+    assert curve_data["offset"] == 0  # Resets to default
+    assert curve_data["factor"] == 1  # Resets to default
 
 
 def test_curve_manager_find_curve_id():
