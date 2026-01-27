@@ -86,18 +86,20 @@ class MDAFileVisualization(QWidget):
         font.setPointSize(MD_FONT_SIZE)
         self.metadata.setFont(font)
 
-        # Set size policy for the main visualization widget to prevent unwanted expansion
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-
-        # Set size policy for the plot page to prevent vertical expansion
+        # Set size policies to prevent unwanted expansion
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )  # main visualization widget
         self.plotPageMpl.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
-        )
-
-        # Set size policy for the tab widget to prevent vertical expansion
+        )  # plot page
         self.tabWidget.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
-        )
+        )  # tab widget
+
+        # Set-up vertical splitter ratio
+        self.splitter.setStretchFactor(0, 4)  # top = 4/5
+        self.splitter.setStretchFactor(1, 1)  # bottom = 1/5
 
         # Set maximum height for the tab widget to prevent vertical growth
         self._updateTabWidgetMaxHeight()
