@@ -119,11 +119,6 @@ class ChartView(QWidget):
         fitManager: FitManager instance for curve fitting
         cursors: Dictionary storing cursor positions and information
 
-    Signals:
-        fitAdded: Emitted when a fit is added (curveID, fitID)
-        fitUpdated: Emitted when a fit is updated (curveID, fitID)
-        fitRemoved: Emitted when a fit is removed (curveID, fitID)
-
     Key Features:
         - Interactive plotting with Matplotlib backend
         - Curve selection and management via combo box
@@ -162,11 +157,6 @@ class ChartView(QWidget):
         ~ChartView.xlabel
         ~ChartView.ylabel
     """
-
-    # Fit signals for main window connection
-    fitAdded = pyqtSignal(str, str)  # curveID, fitID
-    fitUpdated = pyqtSignal(str, str)  # curveID, fitID
-    fitRemoved = pyqtSignal(str, str)  # curveID, fitID
 
     def __init__(self, parent, **kwargs):
         # parent=<mdaviz.mda_folder.MDA_MVC object at 0x10e7ff520>
@@ -1196,9 +1186,6 @@ class ChartView(QWidget):
             # Update fit details display
             self.updateFitDetails(curveID)
 
-            # Emit signal for main window
-            self.fitAdded.emit(curveID, "single_fit")
-
     def onFitUpdated(self, curveID: str) -> None:
         """
         Handle when a fit is updated.
@@ -1231,9 +1218,6 @@ class ChartView(QWidget):
             # Update fit details display
             self.updateFitDetails(curveID)
 
-            # Emit signal for main window
-            self.fitUpdated.emit(curveID, "single_fit")
-
     def onFitRemoved(self, curveID: str) -> None:
         """
         Handle when a fit is removed.
@@ -1255,9 +1239,6 @@ class ChartView(QWidget):
 
             # Clear fit details display
             self.mda_mvc.mda_file_viz.fitDetails.clear()
-
-            # Emit signal for main window
-            self.fitRemoved.emit(curveID, "single_fit")
 
     def updateFitList(self, curveID: str) -> None:
         """
@@ -1431,9 +1412,9 @@ class ChartView(QWidget):
             )
             if persistent_key not in self.curveManager._persistent_properties:
                 self.curveManager._persistent_properties[persistent_key] = {}
-            self.curveManager._persistent_properties[persistent_key]["style"] = (
-                format_string
-            )
+            self.curveManager._persistent_properties[persistent_key][
+                "style"
+            ] = format_string
             self.curveManager.updateCurve(curveID, curve_data)
 
             # Update the plot object with the new style
@@ -1560,7 +1541,9 @@ class CurveManager(QObject):
         super().__init__(parent)
         self._curves = {}  # Store curves with a unique identifier as the key
         # Persistent storage for curve properties across manager clears
-        self._persistent_properties = {}  # key: (file_path, row), value: {style, offset, factor}
+        self._persistent_properties = (
+            {}
+        )  # key: (file_path, row), value: {style, offset, factor}
 
     def addCurve(self, row, *ds, **options):
         """Add a new curve to the manager if not already present on the graph.
