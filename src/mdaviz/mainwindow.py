@@ -112,10 +112,14 @@ class MainWindow(QMainWindow):
         geometry_restored = settings.restoreWindowGeometry(self, "mainwindow_geometry")
         logger.info(f"Settings are saved in: {settings.fileName()}")
 
-        # Calculate screen size constraints
-        screen = QApplication.primaryScreen().geometry()
-        max_width = screen.width() * 0.8  # Max 80% of screen width
-        max_height = screen.height() * 0.8  # Max 80% of screen height
+        # Get the maximum dimensions across all screens
+        max_width = 0
+        max_height = 0
+        for screen in QApplication.screens():
+            max_width = max(max_width, screen.geometry().width())
+            max_height = max(max_height, screen.geometry().height())
+        max_width = int(max_width * 0.8)
+        max_height = int(max_height * 0.8)
 
         # Only apply size constraints and centering if no geometry was previously saved
         if not geometry_restored:
@@ -127,7 +131,6 @@ class MainWindow(QMainWindow):
                 )
             elif self.width() < 400 or self.height() < 300:
                 self.resize(720, 500)  # Reasonable default size
-
             # Center the window on the screen only if no geometry was restored
             self._center_window()
         else:
