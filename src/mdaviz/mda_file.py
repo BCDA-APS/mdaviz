@@ -514,7 +514,8 @@ class MDAFile(QWidget):
             else:
                 # In auto-add/auto-off mode, just switch to existing tab
                 tab_index = self.tabPath2Index(file_path)
-                self.tabWidget.setCurrentIndex(tab_index)
+                if tab_index is not None:
+                    self.tabWidget.setCurrentIndex(tab_index)
         else:
             # File is new
             if mode in ("Auto-add", "Auto-off"):
@@ -610,6 +611,9 @@ class MDAFile(QWidget):
             row (int): _description_
         """
         tab_index = self.tabPath2Index(file_path)
+        if tab_index is None:
+            # Tab not found, cannot highlight row
+            return
         self.tabWidget.setCurrentIndex(tab_index)
         tableview = self.tabWidget.widget(tab_index)
         model = tableview.tableView.model()
