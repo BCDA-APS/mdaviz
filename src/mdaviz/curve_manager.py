@@ -85,6 +85,10 @@ class CurveManager(QObject):
         """
         return dict(self._curves)
 
+    # =====================================
+    # Lookup & IDs
+    # =====================================
+
     def getCurveData(self, curveID):
         """Get curve data by ID.
 
@@ -166,6 +170,10 @@ class CurveManager(QObject):
                 return curveID
         return None
 
+    # =====================================
+    # Add & update curves
+    # =====================================
+
     def addCurve(self, row, *ds, **options):
         """Add a new curve to the manager if not already present on the graph.
 
@@ -188,7 +196,8 @@ class CurveManager(QObject):
         ds_options = options.get("ds_options", {})
         label = ds_options.get("label", "unknown label")
         file_path = plot_options.get("filePath", "unknown path")
-        x2_index = options.get("x2_index")  # Extract X2 index from options
+        x2_index = options.get("x2_index")
+
         logger.debug(f"addCurve - Received x2_index: {x2_index}")
 
         # Generate unique curve ID & update options:
@@ -229,6 +238,7 @@ class CurveManager(QObject):
                     "ds": ds,  # Update with new data
                     "plot_options": plot_options,  # Update plot options
                     "ds_options": ds_options,  # Update label and other ds options
+                    "original_y": numpy.array(ds[1]).copy(),
                 }
                 # Check if x_data actually changed (requires plot object recreation)
                 x_data_changed = not numpy.array_equal(x_data, existing_x_data)
@@ -250,8 +260,10 @@ class CurveManager(QObject):
 
         self._curves[curveID] = {
             "ds": ds,  # ds = [x_data, y_data]
+            "original_y": numpy.array(ds[1]).copy(),
             "offset": 0,  # default offset
             "factor": 1,  # default factor
+            "derivative": False,  # default
             "style": persistent_props.get("style", "-"),  # restore style
             "row": row,  # DET checkbox row in the file tableview
             "file_path": file_path,
@@ -278,49 +290,45 @@ class CurveManager(QObject):
             None: Emits curveUpdated signal when curve is successfully updated
         """
         if curveID in self._curves:
-            logger.debug(f"Emits curveUpdated {curveID=}, {recompute_y=}, {update_x=}")
+            if "original_y" not in curveData and "original_y" in self._curves[curveID]:
+                curveData["original_y"] = self._curves[curveID]["original_y"]
             self._curves[curveID] = curveData
             self.curveUpdated.emit(curveID, recompute_y, update_x)
+            logger.debug(f"Emits curveUpdated {curveID=}, {recompute_y=}, {update_x=}")
 
-    def removeCurve(self, curveID):
-        """Remove a curve from the manager.
+    # =====================================
+    # Transformations
+    # =====================================
 
-        Removes the specified curve from the internal storage and emits a signal
-        with the curve data and count of remaining curves for the same file.
+    def applyTransformations(self, curveID, original_y):
+        """
+        Apply current transformations to original_y data.
 
         Parameters:
-            curveID: The unique identifier of the curve to remove
+            curveID (str): Curve identifier
+            original_y (array-like): Raw y data to transform
 
         Returns:
-            None: Emits curveRemoved signal with curveID, curveData, and remaining count
+            numpy.ndarray: Transformed y data
         """
-        if curveID in self._curves:
-            curveData = self._curves[curveID]
-            file_path = curveData["file_path"]
-            # Remove curve entry from self.curves & emit signal:
-            del self._curves[curveID]
-            # How many curves are left for this file:
-            count = 0
-            for curve_data in self._curves.values():
-                if curve_data["file_path"] == file_path:
-                    count += 1
-            # Emit signal:
-            self.curveRemoved.emit(curveID, curveData, count)
+        curve_data = self._curves.get(curveID)
+        if not curve_data:
+            return original_y
 
-    def removeAllCurves(self, doNotClearCheckboxes=True):
-        """Remove all curves from the manager.
+        offset = curve_data.get("offset", 0.0)
+        factor = curve_data.get("factor", 1.0)
+        derivative = curve_data.get("derivative", False)
 
-        Clears all curves from internal storage and emits a signal indicating
-        whether checkboxes should be cleared in the UI.
+        x_data = curve_data["ds"][0]
+        original_y_array = numpy.array(original_y)
 
-        Parameters:
-            doNotClearCheckboxes: If True, preserves checkbox states in the UI
+        if derivative:
+            grad = numpy.gradient(original_y_array, x_data)
+            transformed_y = offset + factor * grad
+        else:
+            transformed_y = offset + factor * original_y_array
 
-        Returns:
-            None: Emits allCurvesRemoved signal with doNotClearCheckboxes parameter
-        """
-        self._curves.clear()
-        self.allCurvesRemoved.emit(doNotClearCheckboxes)
+        return transformed_y
 
     def updateCurveOffset(self, curveID, new_offset):
         """Update the offset value for a specific curve.
@@ -361,3 +369,47 @@ class CurveManager(QObject):
                 )
                 curve_data["factor"] = new_factor
                 self.updateCurve(curveID, curve_data, recompute_y=True)
+
+    # =====================================
+    # Remove curves
+    # =====================================
+
+    def removeCurve(self, curveID):
+        """Remove a curve from the manager.
+
+        Removes the specified curve from the internal storage and emits a signal
+        with the curve data and count of remaining curves for the same file.
+
+        Parameters:
+            curveID: The unique identifier of the curve to remove
+
+        Returns:
+            None: Emits curveRemoved signal with curveID, curveData, and remaining count
+        """
+        if curveID in self._curves:
+            curveData = self._curves[curveID]
+            file_path = curveData["file_path"]
+            # Remove curve entry from self.curves & emit signal:
+            del self._curves[curveID]
+            # How many curves are left for this file:
+            count = 0
+            for curve_data in self._curves.values():
+                if curve_data["file_path"] == file_path:
+                    count += 1
+            # Emit signal:
+            self.curveRemoved.emit(curveID, curveData, count)
+
+    def removeAllCurves(self, doNotClearCheckboxes=True):
+        """Remove all curves from the manager.
+
+        Clears all curves from internal storage and emits a signal indicating
+        whether checkboxes should be cleared in the UI.
+
+        Parameters:
+            doNotClearCheckboxes: If True, preserves checkbox states in the UI
+
+        Returns:
+            None: Emits allCurvesRemoved signal with doNotClearCheckboxes parameter
+        """
+        self._curves.clear()
+        self.allCurvesRemoved.emit(doNotClearCheckboxes)
