@@ -167,7 +167,9 @@ class ChartView(QWidget):
         self._log_x = False
         self._log_y = False
 
-        ############# UI initialization:
+        # ==========================================
+        #   UI initialization
+        # ==========================================
 
         # Set size policy to prevent unwanted expansion
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -215,7 +217,9 @@ class ChartView(QWidget):
         self.setYlabel(plot_options.get("x", ""))
         self.configPlot()
 
-        ############# Signals & slots:
+        # ==========================================
+        #   Signals & slots
+        # ==========================================
 
         # Track curves and display in QComboBox:
         self.plotObjects = {}  # all the Line2D on the graph, key = curveID
@@ -306,7 +310,9 @@ class ChartView(QWidget):
             self.key_check_timer.stop()
         super().closeEvent(event)
 
-    ########################################## Set & get methods:
+    # ==========================================
+    #   Set & get methods
+    # ==========================================
 
     def setPlotTitle(self, txt=""):
         self.main_axes.set_title(txt, fontsize=FONTSIZE)
@@ -427,7 +433,9 @@ class ChartView(QWidget):
             self.main_axes.set_yscale("linear")
             self.canvas.draw()
 
-    ########################################## Slot methods:
+    # ==========================================
+    #   Slot methods
+    # ==========================================
 
     def onCurveAdded(self, curveID):
         """
@@ -752,7 +760,9 @@ class ChartView(QWidget):
                 if self.curveManager.curves()[curveID]["file_path"] == file_path:
                     self.curveManager.removeCurve(curveID)
 
-    ########################################## UI methods:
+    # ==========================================
+    #   UI methods
+    # ==========================================
 
     def plot(self, row, *ds, **options):
         """The main method called by MDA_MVC"""
@@ -836,7 +846,9 @@ class ChartView(QWidget):
         # Return whether any artists have been added to the Axes (bool)
         return self.main_axes.has_data()
 
-    ########################################## Interaction with UI elements:
+    # ==========================================
+    #   Interaction with UI elements
+    # ==========================================
 
     def onCurveSelected(self, index):
         # Get the curve ID from the combo box item data
@@ -1036,7 +1048,9 @@ class ChartView(QWidget):
         y_mean = numpy.mean(y_array)
         return (x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean
 
-    ########################################## Cursors methods:
+    # ==========================================
+    #   Cursors methods
+    # ==========================================
 
     def onRemoveCursor(self, cursor_num):
         cross = self.cursors.get(cursor_num)
@@ -1218,7 +1232,9 @@ class ChartView(QWidget):
                 return (min(x1, x2), max(x1, x2))
         return None
 
-    ########################################## Fit methods:
+    # ==========================================
+    #   Fit methods
+    # ==========================================
 
     def onFitAdded(self, curveID: str) -> None:
         """
