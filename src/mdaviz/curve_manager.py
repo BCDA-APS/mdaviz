@@ -300,12 +300,39 @@ class CurveManager(QObject):
     # Transformations
     # =====================================
 
-    def applyTransformations(self, curveID, original_y):
+    def getTransformedCurveXYData(self, curveID):
+        """Get transformed (x, y) data for plotting.
+
+        Returns the x_data and transformed y_data (with offset/factor/derivative applied).
+
+        Parameters:
+            curveID: The unique identifier of the curve
+
+        Returns:
+            tuple: (x_data, y_transformed) or (None, None) if curve not found
+        """
+        curve_data = self.getCurveData(curveID)
+        if not curve_data:
+            return None, None
+
+        x_data = curve_data["ds"][0]
+        original_y = curve_data.get("original_y")
+
+        if original_y is None:
+            logger.warning(f"Curve {curveID} missing original_y, cannot transform")
+            return None, None
+
+        y_transformed = self.applyTransformations(curveID, x_data, original_y)
+
+        return x_data, y_transformed
+
+    def applyTransformations(self, curveID, x_data, original_y):
         """
         Apply current transformations to original_y data.
 
         Parameters:
             curveID (str): Curve identifier
+            x_data (array-like): X data array (needed for derivative calculation)
             original_y (array-like): Raw y data to transform
 
         Returns:
@@ -319,7 +346,6 @@ class CurveManager(QObject):
         factor = curve_data.get("factor", 1.0)
         derivative = curve_data.get("derivative", False)
 
-        x_data = curve_data["ds"][0]
         original_y_array = numpy.array(original_y)
 
         if derivative:
