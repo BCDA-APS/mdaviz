@@ -307,6 +307,10 @@ def test_chartview_find_nearest_point(qtbot):
         "factor": 1,
         "offset": 0,
     }
+    widget.curveManager.getTransformedCurveXYData.return_value = (
+        np.array([1.0, 2.0, 3.0]),
+        np.array([4.0, 5.0, 6.0]),
+    )
 
     # Mock the combo box to return a valid index
     mock_combo = MagicMock()

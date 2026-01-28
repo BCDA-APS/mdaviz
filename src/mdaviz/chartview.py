@@ -490,16 +490,10 @@ class ChartView(QWidget):
         else:
             ds_options["marker"] = ""
 
-        # Apply offset and factor to the data
-        factor = curveData.get("factor", 1)
-        offset = curveData.get("offset", 0)
-        style = curveData.get("style", "-")
-        logger.debug(
-            f"onCurveAdded - curve {curveID}: style={style}, offset={offset}, factor={factor}"
-        )
-        if factor != 1 or offset != 0:
-            new_y = numpy.multiply(ds[1], factor) + offset
-            ds = [ds[0], new_y]
+        # Apply transformation to the data
+        x_data, y_transformed = self.curveManager.getTransformedCurveXYData(curveID)
+        if x_data is not None and y_transformed is not None:
+            ds = [x_data, y_transformed]
 
         # Plot and store the plot object associated with curveID:
         try:
@@ -540,15 +534,20 @@ class ChartView(QWidget):
             f"onCurveUpdated called for {curveID}, recompute_y={recompute_y}, update_x={update_x}"
         )
         curve_data = self.curveManager.getCurveData(curveID)
+
+        # Apply transformation
         if curve_data and recompute_y:
-            factor = curve_data.get("factor", 1)
-            offset = curve_data.get("offset", 0)
-            ds = curve_data["ds"]
-            new_y = numpy.multiply(ds[1], factor) + offset
-            if curveID in self.plotObjects:
-                self.plotObjects[curveID].set_ydata(new_y)
+            x_data, y_transformed = self.curveManager.getTransformedCurveXYData(curveID)
+            if (
+                x_data is not None
+                and y_transformed is not None
+                and curveID in self.plotObjects
+            ):
+                self.plotObjects[curveID].set_ydata(y_transformed)
+
         # Handle label changes (e.g., I0 normalization)
-        if curve_data and not update_x:  # Only if we're not recreating the plot object
+        # Only if we're not recreating the plot object (i.e. not update_x)
+        if curve_data and not update_x:
             new_label = curve_data.get("ds_options", {}).get("label", "")
             if curveID in self.plotObjects:
                 plot_obj = self.plotObjects[curveID]
@@ -568,8 +567,8 @@ class ChartView(QWidget):
                             self.curveBox.setItemText(i, new_label)
                             break
 
+        # For x-data updates, we need to recreate the plot object to maintain style
         if curve_data and update_x:
-            # For x-data updates, we need to recreate the plot object to maintain style
             if curveID in self.plotObjects:
                 # Remove the old plot object
                 old_plot_obj = self.plotObjects[curveID]
@@ -604,11 +603,9 @@ class ChartView(QWidget):
                 ds_options["marker"] = ""
 
             # Apply offset and factor
-            factor = curve_data.get("factor", 1)
-            offset = curve_data.get("offset", 0)
-            if factor != 1 or offset != 0:
-                new_y = numpy.multiply(ds[1], factor) + offset
-                ds = [ds[0], new_y]
+            x_data, y_transformed = self.curveManager.getTransformedCurveXYData(curveID)
+            if x_data is not None and y_transformed is not None:
+                ds = [x_data, y_transformed]
 
             # Create new plot object
             try:
@@ -1064,31 +1061,25 @@ class ChartView(QWidget):
         if not curve_data:
             return None
 
-        ds = curve_data.get("ds")
-        if not ds or len(ds) < 2:
-            return None
+        # Apply transformations
+        x_data, y_data = self.curveManager.getTransformedCurveXYData(curveID)
 
-        x_data = ds[0]
-        y_data = ds[1]
+        if x_data is not None and y_data is not None:
+            # Ensure data are numpy arrays
+            if not isinstance(x_data, numpy.ndarray):
+                x_data = numpy.array(x_data, dtype=float)
+            if not isinstance(y_data, numpy.ndarray):
+                y_data = numpy.array(y_data, dtype=float)
 
-        # Ensure data are numpy arrays
-        if not isinstance(x_data, numpy.ndarray):
-            x_data = numpy.array(x_data, dtype=float)
-        if not isinstance(y_data, numpy.ndarray):
-            y_data = numpy.array(y_data, dtype=float)
+            # Calculate distances to all points
+            distances = numpy.sqrt((x_data - x_click) ** 2 + (y_data - y_click) ** 2)
 
-        # Apply offset and factor to y_data to match what's displayed
-        factor = curve_data.get("factor", 1)
-        offset = curve_data.get("offset", 0)
-        y_data = numpy.multiply(y_data, factor) + offset
+            # Find the index of the nearest point
+            nearest_index = numpy.argmin(distances)
 
-        # Calculate distances to all points
-        distances = numpy.sqrt((x_data - x_click) ** 2 + (y_data - y_click) ** 2)
+            return (float(x_data[nearest_index]), float(y_data[nearest_index]))
 
-        # Find the index of the nearest point
-        nearest_index = numpy.argmin(distances)
-
-        return (float(x_data[nearest_index]), float(y_data[nearest_index]))
+        return None
 
     def onclick(self, event):
         # Check if the click was in the main_axes
@@ -1304,53 +1295,49 @@ class ChartView(QWidget):
         if not curve_data:
             return
 
-        x_data = curve_data["ds"][0]
-        y_data = curve_data["ds"][1]
+        # Apply transformation
+        x_data, y_data = self.curveManager.getTransformedCurveXYData(curveID)
 
-        # Ensure data are numpy arrays with proper types
-        if not isinstance(x_data, numpy.ndarray):
-            x_data = numpy.array(x_data, dtype=float)
-        if not isinstance(y_data, numpy.ndarray):
-            y_data = numpy.array(y_data, dtype=float)
+        if x_data is not None and y_data is not None:
+            # Ensure data are numpy arrays with proper types
+            if not isinstance(x_data, numpy.ndarray):
+                x_data = numpy.array(x_data, dtype=float)
+            if not isinstance(y_data, numpy.ndarray):
+                y_data = numpy.array(y_data, dtype=float)
 
-        # Check for valid data
-        if len(x_data) == 0 or len(y_data) == 0:
-            QtWidgets.QMessageBox.warning(
-                self, "Fit Error", "No data available for fitting"
-            )
-            return
+            # Check for valid data
+            if len(x_data) == 0 or len(y_data) == 0:
+                QtWidgets.QMessageBox.warning(
+                    self, "Fit Error", "No data available for fitting"
+                )
+                return
 
-        if len(x_data) != len(y_data):
-            QtWidgets.QMessageBox.warning(
-                self, "Fit Error", "X and Y data have different lengths"
-            )
-            return
+            if len(x_data) != len(y_data):
+                QtWidgets.QMessageBox.warning(
+                    self, "Fit Error", "X and Y data have different lengths"
+                )
+                return
 
-        # Apply offset and factor
-        factor = curve_data.get("factor", 1)
-        offset = curve_data.get("offset", 0)
-        y_data = numpy.multiply(y_data, factor) + offset
+            # Determine fit range
+            x_range = None
+            if use_range:
+                x_range = self.getCursorRange()
 
-        # Determine fit range
-        x_range = None
-        if use_range:
-            x_range = self.getCursorRange()
+            try:
+                # Clear all existing fits from other curves before performing new fit
+                all_curves = list(self.curveManager.curves().keys())
+                for other_curve_id in all_curves:
+                    if other_curve_id != curveID and self.fitManager.hasFits(
+                        other_curve_id
+                    ):
+                        self.fitManager.removeFit(other_curve_id)
 
-        try:
-            # Clear all existing fits from other curves before performing new fit
-            all_curves = list(self.curveManager.curves().keys())
-            for other_curve_id in all_curves:
-                if other_curve_id != curveID and self.fitManager.hasFits(
-                    other_curve_id
-                ):
-                    self.fitManager.removeFit(other_curve_id)
+                # Perform the fit (this will replace any existing fit for the current curve)
+                self.fitManager.addFit(curveID, model_name, x_data, y_data, x_range)
 
-            # Perform the fit (this will replace any existing fit for the current curve)
-            self.fitManager.addFit(curveID, model_name, x_data, y_data, x_range)
-
-        except ValueError as e:
-            # Show error message
-            QtWidgets.QMessageBox.warning(self, "Fit Error", str(e))
+            except ValueError as e:
+                # Show error message
+                QtWidgets.QMessageBox.warning(self, "Fit Error", str(e))
 
     def updateFitDetails(self, curveID: str) -> None:
         """
