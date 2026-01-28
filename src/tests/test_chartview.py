@@ -372,13 +372,9 @@ def test_chartview_offset_factor_updates(qtbot):
     mock_factor.text.return_value = "2.0"
     widget.factor_value = mock_factor
 
-    # Test offset update
-    widget.onOffsetUpdated()
-    widget.curveManager.updateCurveOffset.assert_called()
-
-    # Test factor update
-    widget.onFactorUpdated()
-    widget.curveManager.updateCurveFactor.assert_called()
+    # Test offset and factor update (now combined)
+    widget.onFactorOffsetUpdated()
+    widget.curveManager.updateCurveOffsetFactor.assert_called()
 
 
 def test_chartview_curve_removal_signals(qtbot):

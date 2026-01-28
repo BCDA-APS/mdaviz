@@ -287,14 +287,20 @@ class CurveManager(QObject):
             update_x: If True, update X data (requires plot object recreation)
 
         Returns:
-            None: Emits curveUpdated signal when curve is successfully updated
+            bool: True if curve was found and updated, False if curve not found
+                  Emits curveUpdated signal when curve is successfully updated
         """
-        if curveID in self._curves:
-            if "original_y" not in curveData and "original_y" in self._curves[curveID]:
-                curveData["original_y"] = self._curves[curveID]["original_y"]
-            self._curves[curveID] = curveData
-            self.curveUpdated.emit(curveID, recompute_y, update_x)
-            logger.debug(f"Emits curveUpdated {curveID=}, {recompute_y=}, {update_x=}")
+        if curveID not in self._curves:
+            logger.debug(f"Curve {curveID} not found in manager for update")
+            return False
+
+        if "original_y" not in curveData and "original_y" in self._curves[curveID]:
+            curveData["original_y"] = self._curves[curveID]["original_y"]
+        self._curves[curveID] = curveData
+
+        self.curveUpdated.emit(curveID, recompute_y, update_x)
+        logger.debug(f"Emits curveUpdated {curveID=}, {recompute_y=}, {update_x=}")
+        return True
 
     # =====================================
     # Transformations
@@ -355,6 +361,19 @@ class CurveManager(QObject):
             transformed_y = offset + factor * original_y_array
 
         return transformed_y
+
+    def updateCurveOffsetFactor(self, curveID, offset=None, factor=None):
+        """Update offset and/or factor for a curve.
+
+        Parameters:
+            curveID: The unique identifier of the curve
+            offset: New offset value (None to skip, can be 0)
+            factor: New factor value (None to skip, can be 1)
+        """
+        if offset is not None:
+            self.updateCurveOffset(curveID, offset)
+        if factor is not None:
+            self.updateCurveFactor(curveID, factor)
 
     def updateCurveOffset(self, curveID, new_offset):
         """Update the offset value for a specific curve.

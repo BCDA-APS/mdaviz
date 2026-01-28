@@ -255,8 +255,8 @@ class ChartView(QWidget):
         # Connect offset & factor QLineEdit:
         self.offset_value = self.mda_mvc.mda_file_viz.offset_value
         self.factor_value = self.mda_mvc.mda_file_viz.factor_value
-        self.offset_value.editingFinished.connect(self.onOffsetUpdated)
-        self.factor_value.editingFinished.connect(self.onFactorUpdated)
+        self.offset_value.editingFinished.connect(self.onOffsetFactorUpdated)
+        self.factor_value.editingFinished.connect(self.onOffsetFactorUpdated)
 
         # Connect the click event to a handler
         self.cid = self.figure.canvas.mpl_connect("button_press_event", self.onclick)
@@ -935,36 +935,35 @@ class ChartView(QWidget):
                         )
                     break
 
-    def onOffsetUpdated(self):
+    # ==========================================
+    #   Basic maths methods
+    # ==========================================
+
+    def onOffsetFactorUpdated(self):
         curveID = self.getSelectedCurveID()
         try:
             offset = float(self.offset_value.text())
-        except ValueError:
-            offset = 0
-            # Reset to default if conversion fails
-            self.offset_value.setText(str(offset))
-            return
-        self.curveManager.updateCurveOffset(curveID, offset)
-
-    def onFactorUpdated(self):
-        curveID = self.getSelectedCurveID()
-        try:
             factor = float(self.factor_value.text())
         except ValueError:
+            # Reset to default if conversion fails
+            offset = 0
             factor = 1
-            # Reset to default if conversion fails or zero
-            self.factor_value.setText(str(factor))
+            self.offset_value.setText(str(offset))
+            if self.factor_value:
+                self.factor_value.setText(str(factor))
             return
-        self.curveManager.updateCurveFactor(curveID, factor)
-
-    ########################################## Basic maths methods:
+        self.curveManager.updateCurveOffsetFactor(curveID, offset, factor)
+        self.updateBasicMathInfo(curveID)
 
     def updateBasicMathInfo(self, curveID):
         if curveID and curveID in self.curveManager.curves():
             try:
-                curve_data = self.curveManager.getCurveData(curveID)
-                x = curve_data["ds"][0]
-                y = curve_data["ds"][1]
+                x, y = self.curveManager.getTransformedCurveXYData(curveID)
+
+                if x is None or y is None:
+                    self.clearBasicMath()
+                    return
+
                 stats = self.calculateBasicMath(x, y)
                 for i, txt in zip(
                     stats, ["min_text", "max_text", "com_text", "mean_text"]
@@ -974,6 +973,7 @@ class ChartView(QWidget):
                     else:
                         result = f"{utils.num2fstr(i)}" if i else "n/a"
                     self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText(result)
+
             except Exception as exc:
                 logger.error(str(exc))
                 self.clearBasicMath()
