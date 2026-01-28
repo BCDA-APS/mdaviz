@@ -377,6 +377,334 @@ def test_chartview_offset_factor_updates(qtbot):
     widget.curveManager.updateCurveOffsetFactor.assert_called()
 
 
+def test_curve_manager_apply_transformations():
+    """Test applyTransformations method with various combinations."""
+    manager = CurveManager()
+    row = 0
+    x = np.array([1, 2, 3, 4, 5])
+    y = np.array([2, 4, 6, 8, 10])
+    label = "test_curve"
+    file_path = "/tmp/test.mda"
+    plot_options = {"filePath": file_path, "fileName": "test"}
+    ds_options = {"label": label}
+
+    manager.addCurve(row, x, y, plot_options=plot_options, ds_options=ds_options)
+    curve_id = manager.generateCurveID(label, file_path, row)
+    curve_data = manager.getCurveData(curve_id)
+    original_y = curve_data["original_y"]
+
+    # Test 1: No transformations (default values)
+    result = manager.applyTransformations(curve_id, x, original_y)
+    np.testing.assert_array_equal(result, original_y)
+
+    # Test 2: Offset only
+    manager.updateCurveOffset(curve_id, 10.0)
+    result = manager.applyTransformations(curve_id, x, original_y)
+    expected = original_y + 10.0
+    np.testing.assert_array_almost_equal(result, expected)
+
+    # Test 3: Factor only
+    manager.updateCurveOffset(curve_id, 0.0)  # Reset offset
+    manager.updateCurveFactor(curve_id, 2.0)
+    result = manager.applyTransformations(curve_id, x, original_y)
+    expected = 2.0 * original_y
+    np.testing.assert_array_almost_equal(result, expected)
+
+    # Test 4: Offset + factor
+    manager.updateCurveOffset(curve_id, 5.0)
+    result = manager.applyTransformations(curve_id, x, original_y)
+    expected = 5.0 + 2.0 * original_y
+    np.testing.assert_array_almost_equal(result, expected)
+
+    # Test 5: Derivative only (no offset/factor)
+    manager.updateCurveOffset(curve_id, 0.0)
+    manager.updateCurveFactor(curve_id, 1.0)
+    manager.updateCurveDerivative(curve_id, True)
+    result = manager.applyTransformations(curve_id, x, original_y)
+    expected_grad = np.gradient(original_y, x)
+    np.testing.assert_array_almost_equal(result, expected_grad)
+
+    # Test 6: All transformations combined
+    manager.updateCurveOffset(curve_id, 3.0)
+    manager.updateCurveFactor(curve_id, 2.0)
+    result = manager.applyTransformations(curve_id, x, original_y)
+    expected = 3.0 + 2.0 * np.gradient(original_y, x)
+    np.testing.assert_array_almost_equal(result, expected)
+
+    # Test 7: Non-uniform x spacing (derivative should account for this)
+    x_nonuniform = np.array([1, 2, 5, 8, 10])  # Non-uniform spacing
+    y_nonuniform = np.array([1, 4, 16, 64, 100])
+    manager.addCurve(
+        1,
+        x_nonuniform,
+        y_nonuniform,
+        plot_options=plot_options,
+        ds_options={"label": "nonuniform"},
+    )
+    curve_id2 = manager.generateCurveID("nonuniform", file_path, 1)
+    curve_data2 = manager.getCurveData(curve_id2)
+    original_y2 = curve_data2["original_y"]
+    manager.updateCurveDerivative(curve_id2, True)
+    result = manager.applyTransformations(curve_id2, x_nonuniform, original_y2)
+    expected_grad = np.gradient(original_y2, x_nonuniform)
+    np.testing.assert_array_almost_equal(result, expected_grad)
+
+    # Test 8: Missing curve_data (should return original_y as fallback)
+    result = manager.applyTransformations("nonexistent_curve", x, original_y)
+    np.testing.assert_array_equal(result, original_y)
+
+
+def test_curve_manager_get_transformed_curve_xy_data():
+    """Test getTransformedCurveXYData method."""
+    manager = CurveManager()
+    row = 0
+    x = np.array([1, 2, 3])
+    y = np.array([4, 5, 6])
+    label = "test_curve"
+    file_path = "/tmp/test.mda"
+    plot_options = {"filePath": file_path, "fileName": "test"}
+    ds_options = {"label": label}
+
+    manager.addCurve(row, x, y, plot_options=plot_options, ds_options=ds_options)
+    curve_id = manager.generateCurveID(label, file_path, row)
+
+    # Test 1: Get transformed data with default transformations
+    x_out, y_out = manager.getTransformedCurveXYData(curve_id)
+    np.testing.assert_array_equal(x_out, x)
+    np.testing.assert_array_equal(y_out, y)  # No transformations applied
+
+    # Test 2: Get transformed data with offset and factor
+    manager.updateCurveOffset(curve_id, 10.0)
+    manager.updateCurveFactor(curve_id, 2.0)
+    x_out, y_out = manager.getTransformedCurveXYData(curve_id)
+    np.testing.assert_array_equal(x_out, x)
+    expected_y = 10.0 + 2.0 * y
+    np.testing.assert_array_almost_equal(y_out, expected_y)
+
+    # Test 3: Get transformed data with derivative
+    manager.updateCurveDerivative(curve_id, True)
+    x_out, y_out = manager.getTransformedCurveXYData(curve_id)
+    np.testing.assert_array_equal(x_out, x)
+    expected_y = 10.0 + 2.0 * np.gradient(y, x)
+    np.testing.assert_array_almost_equal(y_out, expected_y)
+
+    # Test 4: Invalid curveID
+    x_out, y_out = manager.getTransformedCurveXYData("nonexistent")
+    assert x_out is None
+    assert y_out is None
+
+    # Test 5: Missing original_y (should return None, None)
+    # Manually remove original_y to simulate edge case
+    curve_data = manager.getCurveData(curve_id)
+    original_y_backup = curve_data["original_y"]
+    del curve_data["original_y"]
+    x_out, y_out = manager.getTransformedCurveXYData(curve_id)
+    assert x_out is None
+    assert y_out is None
+    # Restore for cleanup
+    curve_data["original_y"] = original_y_backup
+
+
+def test_curve_manager_update_derivative():
+    """Test updateCurveDerivative method."""
+    manager = CurveManager()
+    row = 0
+    x = np.array([1, 2, 3])
+    y = np.array([4, 5, 6])
+    label = "test_curve"
+    file_path = "/tmp/test.mda"
+    plot_options = {"filePath": file_path, "fileName": "test"}
+    ds_options = {"label": label}
+
+    manager.addCurve(row, x, y, plot_options=plot_options, ds_options=ds_options)
+    curve_id = manager.generateCurveID(label, file_path, row)
+
+    # Track curveUpdated signals
+    curve_updated_calls = []
+    manager.curveUpdated.connect(
+        lambda cid, recompute_y, update_x: curve_updated_calls.append(
+            (cid, recompute_y, update_x)
+        )
+    )
+
+    # Test 1: Enable derivative
+    manager.updateCurveDerivative(curve_id, True)
+    curve_data = manager.getCurveData(curve_id)
+    assert curve_data["derivative"] is True
+    assert len(curve_updated_calls) == 1
+    assert curve_updated_calls[-1] == (curve_id, True, False)
+
+    # Test 2: Disable derivative
+    manager.updateCurveDerivative(curve_id, False)
+    curve_data = manager.getCurveData(curve_id)
+    assert curve_data["derivative"] is False
+    assert len(curve_updated_calls) == 2
+
+    # Test 3: Setting same value should not trigger update
+    curve_updated_calls.clear()
+    manager.updateCurveDerivative(curve_id, False)
+    assert len(curve_updated_calls) == 0
+
+    # Test 4: Invalid curveID (should not crash)
+    manager.updateCurveDerivative("nonexistent", True)
+    assert len(curve_updated_calls) == 0
+
+
+def test_chartview_derivative_toggle(qtbot):
+    """Test derivative checkbox toggle in ChartView."""
+    # Mock the parent and required attributes
+    parent = MagicMock()
+    parent.mda_file_viz.curveBox = MagicMock()
+    parent.mda_file_viz.clearAll = MagicMock()
+    parent.mda_file_viz.curveRemove = MagicMock()
+    parent.mda_file_viz.cursor1_remove = MagicMock()
+    parent.mda_file_viz.cursor2_remove = MagicMock()
+    parent.mda_file_viz.offset_value = MagicMock()
+    parent.mda_file_viz.factor_value = MagicMock()
+    parent.mda_file.tabManager.tabRemoved = MagicMock()
+    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
+    parent.detRemoved = MagicMock()
+
+    # Patch settings.getKey to avoid config issues
+    import mdaviz.user_settings
+
+    mdaviz.user_settings.settings.getKey = lambda key: 800
+
+    widget = ChartView(parent)
+    qtbot.addWidget(widget)
+
+    # Mock the curve manager
+    widget.curveManager = MagicMock()
+    widget.curveManager.curves.return_value = {"test_curve": {}}
+    widget.curveManager.getCurveData.return_value = {"derivative": False}
+
+    # Mock the combo box to return a valid curve
+    mock_combo = MagicMock()
+    mock_combo.currentIndex.return_value = 0
+    mock_combo.itemData.return_value = "test_curve"
+    widget.curveBox = mock_combo
+
+    # Mock updateBasicMathInfo to avoid side effects
+    widget.updateBasicMathInfo = MagicMock()
+
+    # Mock getSelectedCurveID to return the curve ID
+    widget.getSelectedCurveID = MagicMock(return_value="test_curve")
+
+    # Test derivative toggle
+    widget.onDerivativeToggled(True)
+    widget.curveManager.updateCurveDerivative.assert_called_with(
+        "test_curve", derivative=True
+    )
+    widget.updateBasicMathInfo.assert_called_with("test_curve")
+
+    # Test untoggle
+    widget.onDerivativeToggled(False)
+    assert widget.curveManager.updateCurveDerivative.call_count == 2
+    widget.curveManager.updateCurveDerivative.assert_called_with(
+        "test_curve", derivative=False
+    )
+
+
+def test_chartview_derivative_checkbox_sync(qtbot):
+    """Test that derivative checkbox syncs with curve selection."""
+    # Mock the parent and required attributes
+    parent = MagicMock()
+    parent.mda_file_viz.curveBox = MagicMock()
+    parent.mda_file_viz.clearAll = MagicMock()
+    parent.mda_file_viz.curveRemove = MagicMock()
+    parent.mda_file_viz.cursor1_remove = MagicMock()
+    parent.mda_file_viz.cursor2_remove = MagicMock()
+    parent.mda_file_viz.offset_value = MagicMock()
+    parent.mda_file_viz.factor_value = MagicMock()
+    parent.mda_file.tabManager.tabRemoved = MagicMock()
+    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
+    parent.detRemoved = MagicMock()
+
+    # Patch settings.getKey to avoid config issues
+    import mdaviz.user_settings
+
+    mdaviz.user_settings.settings.getKey = lambda key: 800
+
+    widget = ChartView(parent)
+    qtbot.addWidget(widget)
+
+    # Mock the curve manager
+    widget.curveManager = MagicMock()
+    widget.curveManager.curves.return_value = {"curve1": {}, "curve2": {}}
+
+    # Mock getCurveData to return different derivative states
+    def mock_get_curve_data(curve_id):
+        if curve_id == "curve1":
+            return {
+                "derivative": True,
+                "offset": 0,
+                "factor": 1,
+                "file_path": "/tmp/test.mda",
+                "row": 0,
+            }
+        elif curve_id == "curve2":
+            return {
+                "derivative": False,
+                "offset": 5,
+                "factor": 2,
+                "file_path": "/tmp/test.mda",
+                "row": 1,
+            }
+        return None
+
+    widget.curveManager.getCurveData.side_effect = mock_get_curve_data
+
+    # Mock plotObjects
+    widget.plotObjects = {"curve1": MagicMock(), "curve2": MagicMock()}
+
+    # Mock mda_mvc
+    widget.mda_mvc = MagicMock()
+    widget.mda_mvc.mda_file = MagicMock()
+    widget.mda_mvc.mda_file.highlightRowInTab = MagicMock()
+    widget.mda_mvc.mda_file_viz = MagicMock()
+    widget.mda_mvc.mda_file_viz.updatePlotControls = MagicMock()
+
+    # Mock UI elements
+    from PyQt6.QtWidgets import QCheckBox, QLineEdit
+
+    widget.derivativeCheckBox = QCheckBox()
+    widget.offset_value = QLineEdit()
+    widget.factor_value = QLineEdit()
+
+    # Mock update methods to avoid side effects
+    widget.updateBasicMathInfo = MagicMock()
+    widget.updateFitUI = MagicMock()
+    widget.updatePlot = MagicMock()
+
+    # Mock combo box
+    mock_combo = MagicMock()
+
+    def mock_item_data(index, role):
+        if index == 0:
+            return "curve1"
+        elif index == 1:
+            return "curve2"
+        return None
+
+    mock_combo.itemData.side_effect = mock_item_data
+    widget.curveBox = mock_combo
+
+    # Test 1: Select curve1 (derivative=True)
+    widget.onCurveSelected(0)
+    assert widget.derivativeCheckBox.isChecked() is True
+    assert widget.derivative is True
+
+    # Test 2: Select curve2 (derivative=False)
+    widget.onCurveSelected(1)
+    assert widget.derivativeCheckBox.isChecked() is False
+    assert widget.derivative is False
+
+    # Test 3: Deselect (index < 0)
+    widget.onCurveSelected(-1)
+    assert widget.derivativeCheckBox.isChecked() is False
+    assert widget.derivative is False
+
+
 def test_chartview_curve_removal_signals(qtbot):
     """Test curve removal signal handling."""
     # Mock the parent and required attributes
