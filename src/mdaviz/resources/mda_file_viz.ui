@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>799</width>
-    <height>497</height>
+    <height>469</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,7 +46,7 @@
         <x>0</x>
         <y>0</y>
         <width>797</width>
-        <height>495</height>
+        <height>467</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -550,7 +550,7 @@
                       </widget>
                      </item>
                      <item row="0" column="2">
-                      <widget class="QCheckBox" name="checkBox">
+                      <widget class="QCheckBox" name="derivativeCheckBox">
                        <property name="text">
                         <string>Derivative</string>
                        </property>
@@ -756,7 +756,7 @@
                     <x>0</x>
                     <y>0</y>
                     <width>478</width>
-                    <height>216</height>
+                    <height>206</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="fitContentLayout">

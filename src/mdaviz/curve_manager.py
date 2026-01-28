@@ -415,6 +415,23 @@ class CurveManager(QObject):
                 curve_data["factor"] = new_factor
                 self.updateCurve(curveID, curve_data, recompute_y=True)
 
+    def updateCurveDerivative(self, curveID, derivative):
+        """Update the derivative flag for a specific curve.
+
+        Parameters:
+            curveID: The unique identifier of the curve
+            derivative: bool
+
+        Returns:
+            None: Updates curve data and emits curveUpdated signal if changed
+        """
+        curve_data = self.getCurveData(curveID)
+        if curve_data:
+            old_derivative = curve_data.get("derivative", False)
+            if old_derivative != derivative:
+                curve_data["derivative"] = derivative
+                self.updateCurve(curveID, curve_data, recompute_y=True)
+
     # =====================================
     # Remove curves
     # =====================================

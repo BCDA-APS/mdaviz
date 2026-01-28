@@ -258,6 +258,12 @@ class ChartView(QWidget):
         self.offset_value.editingFinished.connect(self.onOffsetFactorUpdated)
         self.factor_value.editingFinished.connect(self.onOffsetFactorUpdated)
 
+        # Connect derivative checkbox
+        self.derivative = False
+        self.derivativeCheckBox = self.mda_mvc.mda_file_viz.derivativeCheckBox
+        self.derivativeCheckBox.setChecked(self.derivative)
+        self.derivativeCheckBox.toggled.connect(self.onDerivativeToggled)
+
         # Connect the click event to a handler
         self.cid = self.figure.canvas.mpl_connect("button_press_event", self.onclick)
         self.alt_pressed = False
@@ -269,8 +275,6 @@ class ChartView(QWidget):
 
         # Initialize snap to curve setting (default to False for free cursor placement)
         self._snap_to_curve = False
-
-        # Connect the snap cursors checkbox
         self.snapCursors = self.mda_mvc.mda_file_viz.snapCursors
         self.snapCursors.setChecked(self._snap_to_curve)
         self.snapCursors.toggled.connect(self.onSnapCursorsToggled)
@@ -849,8 +853,16 @@ class ChartView(QWidget):
             curve_data = self.curveManager.getCurveData(curveID)
             file_path = curve_data["file_path"]
             row = curve_data["row"]
+            # Update derivative checkbox
+            derivative_state = curve_data.get("derivative", False)
+            self.derivativeCheckBox.blockSignals(True)
+            self.derivativeCheckBox.setChecked(derivative_state)
+            self.derivative = derivative_state
+            self.derivativeCheckBox.blockSignals(False)
+            # Update offset & factor
             self.offset_value.setText(str(curve_data["offset"]))
             self.factor_value.setText(str(curve_data["factor"]))
+            # Update tooltip & highlight row
             self.curveBox.setToolTip(file_path)
             try:
                 self.mda_mvc.mda_file.highlightRowInTab(file_path, row)
@@ -860,6 +872,10 @@ class ChartView(QWidget):
         else:
             self.offset_value.setText("0")
             self.factor_value.setText("1")
+            self.derivativeCheckBox.blockSignals(True)
+            self.derivative = False
+            self.derivativeCheckBox.setChecked(False)
+            self.derivativeCheckBox.blockSignals(False)
             self.curveBox.setToolTip("Selected curve")
 
         # Update basic math info:
@@ -941,6 +957,8 @@ class ChartView(QWidget):
 
     def onOffsetFactorUpdated(self):
         curveID = self.getSelectedCurveID()
+        if curveID is None:
+            return
         try:
             offset = float(self.offset_value.text())
             factor = float(self.factor_value.text())
@@ -953,6 +971,19 @@ class ChartView(QWidget):
                 self.factor_value.setText(str(factor))
             return
         self.curveManager.updateCurveOffsetFactor(curveID, offset, factor)
+        self.updateBasicMathInfo(curveID)
+
+    def onDerivativeToggled(self, checked):
+        """Handle derivative checkbox toggle.
+
+        Parameters:
+            checked (bool): True if checkbox is checked (derivative enabled), False if unchecked (derivative disabled)
+        """
+        self.derivative = checked
+        curveID = self.getSelectedCurveID()
+        if curveID is None:
+            return
+        self.curveManager.updateCurveDerivative(curveID, derivative=checked)
         self.updateBasicMathInfo(curveID)
 
     def updateBasicMathInfo(self, curveID):

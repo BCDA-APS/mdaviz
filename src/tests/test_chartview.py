@@ -373,7 +373,7 @@ def test_chartview_offset_factor_updates(qtbot):
     widget.factor_value = mock_factor
 
     # Test offset and factor update (now combined)
-    widget.onFactorOffsetUpdated()
+    widget.onOffsetFactorUpdated()
     widget.curveManager.updateCurveOffsetFactor.assert_called()
 
 
