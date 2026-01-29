@@ -268,15 +268,6 @@ class ChartView(QWidget):
         self.derivativeCheckBox.setChecked(self.derivative)
         self.derivativeCheckBox.toggled.connect(self.onDerivativeToggled)
 
-        # Connect the click event to a handler
-        self.cid = self.figure.canvas.mpl_connect("button_press_event", self.onclick)
-        self.alt_pressed = False
-
-        # Set up a timer to check modifier key state
-        self.key_check_timer = QTimer()
-        self.key_check_timer.timeout.connect(self.check_modifier_keys)
-        self.key_check_timer.start(50)  # Check every 50ms
-
         # Initialize snap to curve setting (default to False for free cursor placement)
         self._snap_to_curve = False
         self.snapCursors = self.mda_mvc.mda_file_viz.snapCursors
@@ -293,6 +284,15 @@ class ChartView(QWidget):
             "diff": "n/a",
             "midpoint": "n/a",
         }
+
+        # Connect the click event to a handler
+        self.cid = self.figure.canvas.mpl_connect("button_press_event", self.onclick)
+        self.alt_pressed = False
+
+        # Set up a timer to check modifier key state
+        self.key_check_timer = QTimer()
+        self.key_check_timer.timeout.connect(self.check_modifier_keys)
+        self.key_check_timer.start(50)  # Check every 50ms
 
     def check_modifier_keys(self):
         """Check for modifier keys using Qt's global state."""
@@ -321,7 +321,7 @@ class ChartView(QWidget):
         self.main_axes.set_xlabel(text, fontsize=FONTSIZE, labelpad=10)
 
     def setLeftAxisText(self, text):
-        self.main_axes.set_ylabel(text, fontsize=FONTSIZE, labelpad=20)
+        self.main_axes.set_ylabel(text, fontsize=FONTSIZE, labelpad=10)
 
     def title(self):
         return self._title
@@ -462,17 +462,6 @@ class ChartView(QWidget):
             - Line styles: "-", "--", ":", "-."
             - Markers: "o" (circles), "s" (squares), "^" (triangles), "D" (diamonds), "." (points)
             - Combined styles: "o-" (line with circles), "s--" (dashed line with squares), etc.
-
-        Data Transformations:
-            - Applies factor multiplication: y_new = y * factor
-            - Applies offset addition: y_new = y + offset
-            - These transformations are applied before plotting
-
-        UI Integration:
-            - Adds curve to combo box with display label and tooltip
-            - Stores curve ID as UserRole data for reliable identification
-            - Automatically selects the first curve added
-            - Updates plot title and legend
         """
         # Add to graph
         curveData = self.curveManager.getCurveData(curveID)
@@ -513,8 +502,10 @@ class ChartView(QWidget):
             self.plotObjects[curveID] = plot_obj
         except Exception as exc:
             logger.error(str(exc))
-        # Update plot
+
+        # Refresh axis labels, legend, limits, and redraw the plot:
         self.updatePlot(update_title=True)
+
         # Add to the comboBox
         index = self.curveBox.count()  # Get the next index
         # Use the user-friendly label for display, but store curveID as data
@@ -522,8 +513,10 @@ class ChartView(QWidget):
         self.curveBox.addItem(display_label)
         # Store the curveID as item data for later retrieval
         self.curveBox.setItemData(index, curveID, QtCore.Qt.ItemDataRole.UserRole)
+        # Add tooltip withh file path
         file_path = curveData.get("file_path", "No file path available")
         self.curveBox.setItemData(index, file_path, QtCore.Qt.ItemDataRole.ToolTipRole)
+
         # Only select the new curve if it's the first one
         if self.curveBox.count() == 1:
             self.curveBox.setCurrentIndex(0)
@@ -547,7 +540,7 @@ class ChartView(QWidget):
         )
         curve_data = self.curveManager.getCurveData(curveID)
 
-        # Apply transformation
+        # Apply transformations
         if curve_data and recompute_y:
             x_data, y_transformed = self.curveManager.getTransformedCurveXYData(curveID)
             if (
@@ -614,18 +607,19 @@ class ChartView(QWidget):
             else:
                 ds_options["marker"] = ""
 
-            # Apply offset and factor
+            # Apply transformations
             x_data, y_transformed = self.curveManager.getTransformedCurveXYData(curveID)
             if x_data is not None and y_transformed is not None:
                 ds = [x_data, y_transformed]
 
-            # Create new plot object
+            # Plot and store the new plot object associated with curveID:
             try:
                 plot_obj = self.main_axes.plot(*ds, **ds_options)[0]
                 self.plotObjects[curveID] = plot_obj
             except Exception as exc:
                 logger.error(str(exc))
 
+        # Refresh axis labels, legend, limits, and redraw the plot:
         self.updatePlot(update_title=False)
 
     def onRemoveButtonClicked(self):
@@ -661,19 +655,16 @@ class ChartView(QWidget):
             2. Manages checkbox state based on data type (1D vs 2D)
             3. Removes curve from the combo box selection
             4. Updates plot display (labels, legend)
-            5. Removes file tab if no curves remain (Auto-add mode)
+            5. Removes file tab if no curves remain for that file (Auto-add mode)
 
         Checkbox Logic:
             - 1D data: Always uncheck the detector checkbox
             - 2D data: Only uncheck if no curves remain for that detector
                        (allows multiple curves per detector for 2D data)
-
-        UI Synchronization:
-            - Updates combo box to remove the curve option
-            - Updates plot labels and legend
-            - Removes file tab if it was the last curve for that file
         """
+
         curveID, curveData, count = arg
+
         # Remove curve from graph & plotObject dict
         if curveID in self.plotObjects:
             curve_obj = self.plotObjects[curveID]
@@ -732,6 +723,7 @@ class ChartView(QWidget):
             self.mda_mvc.mda_file.tabManager.removeTab(file_path)
 
     def onAllCurvesRemoved(self, doNotClearCheckboxes=True):
+        """Clear plot, fits, and curves; optionally clear checkboxes. Preserves log scale."""
         # Store current log scale state before clearing
         current_log_x = self._log_x
         current_log_y = self._log_y
@@ -783,6 +775,8 @@ class ChartView(QWidget):
         self.canvas.draw()
 
     def updatePlot(self, update_title=True):
+        """Refresh axis labels, legend, limits, and redraw the plot."""
+
         # Collect positioner PVs from all curves and update x label:
         x_label_set = set()
         for curveID in self.curveManager.curves():
@@ -818,6 +812,7 @@ class ChartView(QWidget):
         if update_title:
             now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             self.setTitle(f"Plot Date & Time: {now}")
+
         # Recompute the axes limits and autoscale:
         self.main_axes.relim()
         self.main_axes.autoscale_view()
