@@ -92,7 +92,7 @@ def test_curve_manager_add_update_remove(qtbot):
     assert curve_added[-1] == curve_id
 
     # Update the curve with different data to trigger update
-    # The CurveManager only updates if the x data is different, not y data
+    # CurveManager updates if x_data, y_data, or label changed
     x2 = np.array([1, 2, 4])  # Different x data
     y2 = np.array([7, 8, 9])
     manager.addCurve(row, x2, y2, plot_options=plot_options, ds_options=ds_options)
@@ -110,6 +110,67 @@ def test_curve_manager_add_update_remove(qtbot):
     manager.removeAllCurves()
     assert all_curves_removed[-1] is True
     assert len(manager.curves()) == 0
+
+
+def test_curve_manager_y_data_change_detection():
+    """Test that Y data changes are detected and trigger recompute_y (e.g. normalization/unscaling)."""
+    manager = CurveManager()
+    curve_updated = []
+    manager.curveUpdated.connect(
+        lambda cid, recompute_y, update_x: curve_updated.append(
+            (cid, recompute_y, update_x)
+        )
+    )
+    row = 0
+    x = np.array([1, 2, 3])
+    y1 = np.array([4, 5, 6])
+    y2 = np.array([7, 8, 9])  # Different Y data
+    label = "test_curve"  # Same label
+    file_path = "/tmp/test.mda"
+    plot_options = {"filePath": file_path, "fileName": "test"}
+    ds_options = {"label": label}
+
+    # Add curve with y1
+    manager.addCurve(row, x, y1, plot_options=plot_options, ds_options=ds_options)
+    curve_id = manager.generateCurveID(label, file_path, row)
+    assert curve_id in manager.curves()
+
+    # Add same curve with different Y data but same X and label (e.g. normalization)
+    manager.addCurve(row, x, y2, plot_options=plot_options, ds_options=ds_options)
+
+    # Should trigger update with recompute_y=True, update_x=False
+    assert len(curve_updated) == 1
+    assert curve_updated[0][0] == curve_id
+    assert curve_updated[0][1] is True  # recompute_y
+    assert curve_updated[0][2] is False  # update_x
+    np.testing.assert_array_equal(manager.getCurveData(curve_id)["ds"][1], y2)
+
+
+def test_curve_manager_no_update_when_data_unchanged():
+    """Test that addCurve does not update when x, y, and label are identical."""
+    manager = CurveManager()
+    row = 0
+    x = np.array([1, 2, 3])
+    y = np.array([4, 5, 6])
+    label = "test_curve"
+    file_path = "/tmp/test.mda"
+    plot_options = {"filePath": file_path, "fileName": "test"}
+    ds_options = {"label": label}
+
+    curve_updated = []
+    manager.curveUpdated.connect(
+        lambda cid, recompute_y, update_x: curve_updated.append(
+            (cid, recompute_y, update_x)
+        )
+    )
+
+    manager.addCurve(row, x, y, plot_options=plot_options, ds_options=ds_options)
+    assert len(curve_updated) == 0
+
+    # Call addCurve again with identical data and label
+    manager.addCurve(row, x, y, plot_options=plot_options, ds_options=ds_options)
+    # Should not trigger update
+    assert len(curve_updated) == 0
 
 
 def test_curve_manager_persistent_properties():

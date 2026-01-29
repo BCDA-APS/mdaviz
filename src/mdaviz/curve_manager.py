@@ -210,29 +210,33 @@ class CurveManager(QObject):
         logger.debug(f"Current curves in manager: {list(self._curves.keys())}")
 
         x_data = ds[0]
+        y_data = ds[1]
 
         if curveID in self._curves:
             logger.debug(f"Curve {curveID} already exists")
             # Check if x_data is the same
-            existing_x_data = self._curves[curveID]["ds"][0]
-            existing_label = (
-                self._curves[curveID].get("ds_options", {}).get("label", "")
-            )
+            existing_curve_data = self._curves[curveID]
+            existing_x_data = existing_curve_data["ds"][0]
+            existing_y_data = existing_curve_data["ds"][1]
+            existing_label = existing_curve_data.get("ds_options", {}).get("label", "")
 
-            # Update the curve if x_data is different OR if the label has changed (I0 normalization)
-            if numpy.array_equal(x_data, existing_x_data) and label == existing_label:
+            x_data_equal = numpy.array_equal(x_data, existing_x_data)
+            y_data_equal = numpy.array_equal(y_data, existing_y_data)
+            label_equal = label == existing_label
+
+            if x_data_equal and y_data_equal and label_equal:
+                # All data and metadata are identical - no update needed
                 logger.debug(
-                    " x_data and label are the same, do not add or update the curve"
+                    " x_data, y_data, and label are the same, do not add or update the curve"
                 )
-                # x_data and label are the same, do not add or update the curve
                 return
+
             else:
                 logger.debug(
-                    " x_data is different OR label has changed, update the curve"
+                    f" x_data changed: {not x_data_equal}, y_data changed: {not y_data_equal}, label changed: {not label_equal}, update the curve"
                 )
-                # x_data is different or label has changed, update the curve:
+                # Data or label has changed, update the curve:
                 # Create updated curve data, preserving existing properties (style, offset, factor, etc.)
-                existing_curve_data = self._curves[curveID]
                 updated_curve_data = {
                     **existing_curve_data,  # Preserve all existing properties
                     "ds": ds,  # Update with new data
@@ -240,14 +244,15 @@ class CurveManager(QObject):
                     "ds_options": ds_options,  # Update label and other ds options
                     "original_y": numpy.array(ds[1]).copy(),
                 }
-                # Check if x_data actually changed (requires plot object recreation)
-                x_data_changed = not numpy.array_equal(x_data, existing_x_data)
-                # If update_x=True, recompute_y is redundant (recreation already applies offset/factor)
-                # If only label changed, recompute_y ensures offset/factor are applied to existing plot
+                # Determine what changed to set appropriate update flags
+                x_data_changed = not x_data_equal
+                y_data_changed = not y_data_equal
+                # If update_x=True, recompute_y is redundant (recreation already applies transformations)
+                # If only y_data changed (X same), recompute_y ensures transformations are applied to existing plot
                 self.updateCurve(
                     curveID,
                     updated_curve_data,
-                    recompute_y=not x_data_changed,
+                    recompute_y=y_data_changed and not x_data_changed,
                     update_x=x_data_changed,
                 )
                 return
@@ -283,7 +288,7 @@ class CurveManager(QObject):
         Parameters:
             curveID: The unique identifier of the curve to update
             curveData: Complete curve data dictionary containing ds, plot_options, ds_options, etc.
-            recompute_y: If True, recalculate Y data with current offset/factor
+            recompute_y: If True, recalculate Y data with current transformations
             update_x: If True, update X data (requires plot object recreation)
 
         Returns:
