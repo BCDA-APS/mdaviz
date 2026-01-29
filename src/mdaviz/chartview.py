@@ -719,6 +719,8 @@ class ChartView(QWidget):
 
         # Remove curve from comboBox
         self.removeItemCurveBox(curveID)
+        # Remove curve from fitManager
+        self.fitManager.removeFit(curveID)
         # Update plot labels, legend and title
         self.updatePlot(update_title=False)
 
@@ -736,6 +738,7 @@ class ChartView(QWidget):
 
         # Clears the plot completely, removing all curve representations.
         self.clearPlot()
+        self.fitManager.clearAllFits()
         for curveID in self.curveManager.curves().keys():
             self.curveManager.removeCurve(curveID)
         if not doNotClearCheckboxes:
