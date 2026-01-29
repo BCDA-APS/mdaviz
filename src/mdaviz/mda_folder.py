@@ -129,6 +129,7 @@ class MDA_MVC(QWidget):
         self.setSelectionField()
         self.setSelectionModel()
         self.setCurrentFileTableview()
+        self._last_plotted_file_path = None
 
         # Set Selection Model & Focus for keyboard arrow keys to Folder Table View:
         model = self.mda_folder_tableview.tableView.model()
@@ -608,9 +609,15 @@ class MDA_MVC(QWidget):
                 if hasattr(self.mda_file_viz, "getLogScaleState"):
                     stored_log_x, stored_log_y = self.mda_file_viz.getLogScaleState()
                     widgetMpl.setLogScales(stored_log_x, stored_log_y)
+            current_file_path = self.mda_file.tabIndex2Path(
+                self.mda_file.tabWidget.currentIndex()
+            )
 
             if action in ("replace"):
                 widgetMpl.curveManager.removeAllCurves()
+                if current_file_path != self._last_plotted_file_path:
+                    widgetMpl.curveManager.clearPersistentProperties()
+                    self._last_plotted_file_path = current_file_path
             for i, (ds, ds_options) in zip(y_index, datasets):
                 # ds: [x_data, y_data]
                 # ds_options: {"label":y_label} (for legend)

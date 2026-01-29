@@ -266,10 +266,10 @@ class CurveManager(QObject):
         self._curves[curveID] = {
             "ds": ds,  # ds = [x_data, y_data]
             "original_y": numpy.array(ds[1]).copy(),
-            "offset": 0,  # default offset
-            "factor": 1,  # default factor
-            "derivative": False,  # default
-            "style": persistent_props.get("style", "-"),  # restore style
+            "offset": persistent_props.get("offset", 0),
+            "factor": persistent_props.get("factor", 1),
+            "derivative": persistent_props.get("derivative", False),
+            "style": persistent_props.get("style", "-"),
             "row": row,  # DET checkbox row in the file tableview
             "file_path": file_path,
             "file_name": plot_options.get("fileName", ""),  # without ext
@@ -456,8 +456,9 @@ class CurveManager(QObject):
         if curveID in self._curves:
             curveData = self._curves[curveID]
             file_path = curveData["file_path"]
-            # Remove curve entry from self.curves & emit signal:
+            # Remove curve entry from self.curves & persistent props:
             del self._curves[curveID]
+            self._persistent_properties.pop(curveID, None)
             # How many curves are left for this file:
             count = 0
             for curve_data in self._curves.values():
@@ -478,5 +479,22 @@ class CurveManager(QObject):
         Returns:
             None: Emits allCurvesRemoved signal with doNotClearCheckboxes parameter
         """
+        for curveID in self._curves.keys():
+            if doNotClearCheckboxes:
+                curve_data = self.getCurveData(curveID)
+                props = self._persistent_properties.setdefault(curveID, {})
+                props["offset"] = curve_data.get("offset", 0)
+                props["factor"] = curve_data.get("factor", 1)
+                props["derivative"] = curve_data.get("derivative", False)
+            else:
+                self._persistent_properties.pop(curveID, None)
         self._curves.clear()
         self.allCurvesRemoved.emit(doNotClearCheckboxes)
+
+    def clearPersistentProperties(self):
+        """Clear all persistent curve properties (offset, factor, derivative, style).
+
+        Call when the file we're plotting changes so that when the user
+        returns to a file, curves are shown with default properties.
+        """
+        self._persistent_properties.clear()

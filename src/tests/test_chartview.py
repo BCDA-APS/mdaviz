@@ -611,6 +611,33 @@ def test_curve_manager_update_derivative():
     assert len(curve_updated_calls) == 0
 
 
+def test_curve_manager_clear_persistent_properties():
+    """Test clearPersistentProperties: after clear, re-added curves get defaults."""
+    manager = CurveManager()
+    row = 0
+    x = np.array([1, 2, 3])
+    y = np.array([4, 5, 6])
+    label = "test_curve"
+    file_path = "/tmp/test.mda"
+    plot_options = {"filePath": file_path, "fileName": "test"}
+    ds_options = {"label": label}
+
+    manager.addCurve(row, x, y, plot_options=plot_options, ds_options=ds_options)
+    curve_id = manager.generateCurveID(label, file_path, row)
+    manager.updateCurveDerivative(curve_id, True)
+    manager.updateCurveOffset(curve_id, 10)
+
+    # Same-file re-plot: removeAllCurves(True) saves props, then we clear (file changed)
+    manager.removeAllCurves(doNotClearCheckboxes=True)
+    manager.clearPersistentProperties()
+
+    # Re-add same curve: should get defaults, not saved values
+    manager.addCurve(row, x, y, plot_options=plot_options, ds_options=ds_options)
+    curve_data = manager.getCurveData(curve_id)
+    assert curve_data["derivative"] is False
+    assert curve_data["offset"] == 0
+
+
 def test_chartview_derivative_toggle(qtbot):
     """Test derivative checkbox toggle in ChartView."""
     # Mock the parent and required attributes
