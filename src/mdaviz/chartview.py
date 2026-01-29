@@ -1105,29 +1105,35 @@ class ChartView(QWidget):
         if not curveID or curveID not in self.curveManager.curves():
             return None
 
-        curve_data = self.curveManager.getCurveData(curveID)
-        if not curve_data:
-            return None
-
         # Apply transformations
         x_data, y_data = self.curveManager.getTransformedCurveXYData(curveID)
+        if x_data is None or y_data is None:
+            return None
 
-        if x_data is not None and y_data is not None:
-            # Ensure data are numpy arrays
-            if not isinstance(x_data, numpy.ndarray):
-                x_data = numpy.array(x_data, dtype=float)
-            if not isinstance(y_data, numpy.ndarray):
-                y_data = numpy.array(y_data, dtype=float)
+        # Ensure data are numpy arrays
+        if not isinstance(x_data, numpy.ndarray):
+            x_data = numpy.array(x_data, dtype=float)
+        if not isinstance(y_data, numpy.ndarray):
+            y_data = numpy.array(y_data, dtype=float)
 
-            # Calculate distances to all points
-            distances = numpy.sqrt((x_data - x_click) ** 2 + (y_data - y_click) ** 2)
+        if len(x_data) == 0 or len(y_data) == 0:
+            return None
 
-            # Find the index of the nearest point
-            nearest_index = numpy.argmin(distances)
+        # Normalize by axis ranges to account for different scales
+        x_range = self.main_axes.get_xlim()
+        y_range = self.main_axes.get_ylim()
+        x_scale = x_range[1] - x_range[0] if x_range[1] != x_range[0] else 1.0
+        y_scale = y_range[1] - y_range[0] if y_range[1] != y_range[0] else 1.0
 
-            return (float(x_data[nearest_index]), float(y_data[nearest_index]))
+        # Calculate normalized distances
+        dx = (x_data - x_click) / x_scale
+        dy = (y_data - y_click) / y_scale
+        distances = numpy.sqrt(dx**2 + dy**2)
 
-        return None
+        # Find the index of the nearest point
+        nearest_index = numpy.argmin(distances)
+
+        return (float(x_data[nearest_index]), float(y_data[nearest_index]))
 
     def onclick(self, event):
         # Check if the click was in the main_axes
