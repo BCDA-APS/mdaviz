@@ -455,12 +455,13 @@ class MDAFile(QWidget):
                 self.currentHighlightedModel = None
 
     def onClearGraphRequested(self):
-        """Clear only the graph area in the visualization panel."""
+        """Clear only the graph area in the visualization panel. Reset log scale."""
         # Get the chart view and clear all curves with checkboxes
         layout = self.mda_mvc.mda_file_viz.plotPageMpl.layout()
         if layout.count() > 0:
             plot_widget = layout.itemAt(0).widget()
             if hasattr(plot_widget, "curveManager"):
+                self.mda_mvc.mda_file_viz.setLogScaleState(False, False)
                 plot_widget.curveManager.removeAllCurves(doNotClearCheckboxes=False)
         self.setStatus("Graph cleared.")
 

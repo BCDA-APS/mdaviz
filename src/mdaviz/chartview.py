@@ -247,7 +247,7 @@ class ChartView(QWidget):
         self.removeCursor2 = self.mda_mvc.mda_file_viz.cursor2_remove
 
         # Remove button connections:
-        utils.reconnect(self.clearAll.clicked, self.curveManager.allCurvesRemoved)
+        utils.reconnect(self.clearAll.clicked, self.onClearAllClicker)
         utils.reconnect(self.removeButton.clicked, self.onRemoveButtonClicked)
         self.removeCursor1.clicked.connect(partial(self.onRemoveCursor, cursor_num=1))
         self.removeCursor2.clicked.connect(partial(self.onRemoveCursor, cursor_num=2))
@@ -632,6 +632,7 @@ class ChartView(QWidget):
         curveID = self.getSelectedCurveID()
         if curveID in self.curveManager.curves():
             if len(self.curveManager.curves()) == 1:
+                self.mda_mvc.mda_file_viz.setLogScaleState(False, False)
                 self.curveManager.removeAllCurves(doNotClearCheckboxes=False)
             else:
                 self.curveManager.removeCurve(curveID)
@@ -642,7 +643,8 @@ class ChartView(QWidget):
 
         This slot method is called when a curve is removed from the curve manager.
         It performs cleanup operations including plot object removal, UI updates,
-        and checkbox management based on data type.
+        and checkbox management based on data type. If no curve remains, reset the
+        log scales.
 
         Parameters:
             *arg: Tuple containing (curveID, curveData, count)
@@ -722,8 +724,15 @@ class ChartView(QWidget):
             )
             self.mda_mvc.mda_file.tabManager.removeTab(file_path)
 
+        # If no curves left on the graph, reset log scale
+        if len(self.curveManager.curves()) == 0:
+            self.mda_mvc.mda_file_viz.setLogScaleState(False, False)
+
     def onAllCurvesRemoved(self, doNotClearCheckboxes=True):
-        """Clear plot, fits, and curves; optionally clear checkboxes. Preserves log scale."""
+        """Clear plot, fits, and curves; optionally clear checkboxes. Preserve log scale.
+        onAllCurvesRemoved preserves the log scale because it is called in auto-replace
+        (we want to be able to "browse" between files in the same conditions)."""
+
         # Store current log scale state before clearing
         current_log_x = self._log_x
         current_log_y = self._log_y
@@ -745,15 +754,22 @@ class ChartView(QWidget):
         self.setLogScales(current_log_x, current_log_y)
 
     def onDetRemoved(self, file_path, row):
+        """Remove curve for a given det & file."""
         curveID = self.curveManager.findCurveID(file_path, row)
         if curveID:
             self.curveManager.removeCurve(curveID)
 
     def onTabRemoved(self, file_path):
-        if self.mda_mvc.mda_file.mode() in ["Auto-add"]:
+        """Remove curve(s) for a given tab ie file."""
+        if self.mda_mvc.mda_file.mode() in ["Auto-add", "Auto-replace"]:
             for curveID in self.curveManager.curves().keys():
                 if self.curveManager.curves()[curveID]["file_path"] == file_path:
                     self.curveManager.removeCurve(curveID)
+
+    def onClearAllClicker(self):
+        """Clear plot, fits, curves and checkboxes. Reset log scale."""
+        self.mda_mvc.mda_file_viz.setLogScaleState(False, False)
+        self.curveManager.allCurvesRemoved.emit(False)
 
     # ==========================================
     #   UI methods
@@ -841,7 +857,7 @@ class ChartView(QWidget):
         self.curveBox.clear()
 
     def hasDataItems(self):
-        # Return whether any artists have been added to the Axes (bool)
+        """Return whether any artists have been added to the Axes (bool)"""
         return self.main_axes.has_data()
 
     # ==========================================

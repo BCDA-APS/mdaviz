@@ -885,6 +885,7 @@ class MDA_MVC(QWidget):
         # If no DET and there is only 1 tab open, clear the graph
         new_y_selection = selection.get("Y", [])
         if not new_y_selection and self.mda_file.tabWidget.count() == 1:
+            self.mda_file_viz.setLogScaleState(False, False)
             widgetMpl.curveManager.removeAllCurves()
             return
 

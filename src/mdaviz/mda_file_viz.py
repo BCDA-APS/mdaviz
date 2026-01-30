@@ -834,6 +834,7 @@ class MDAFileVisualization(QWidget):
                 plot_widget = layout.itemAt(0).widget()
                 if isinstance(plot_widget, ChartView):
                     plot_widget.clearPlot()
+                    self.setLogScaleState(False, False)
                     plot_widget.curveManager.removeAllCurves()
         # Clear Metadata
         if metadata:

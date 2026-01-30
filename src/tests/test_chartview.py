@@ -1235,3 +1235,149 @@ def test_chartview_error_handling_on_invalid_curve(qtbot: "FixtureRequest") -> N
         widget.curveManager.removeCurve(non_existent_id)
     except Exception as e:
         pytest.fail(f"CurveManager raised an exception on invalid curve id: {e}")
+
+
+def test_onAllCurvesRemoved_preserves_log_scale(qtbot: "FixtureRequest") -> None:
+    """When onAllCurvesRemoved runs (e.g. browse/replace), log scale is preserved."""
+    parent = MagicMock()
+    parent.mda_file_viz.curveBox = MagicMock()
+    parent.mda_file_viz.clearAll = MagicMock()
+    parent.mda_file_viz.curveRemove = MagicMock()
+    parent.mda_file_viz.cursor1_remove = MagicMock()
+    parent.mda_file_viz.cursor2_remove = MagicMock()
+    parent.mda_file_viz.offset_value = MagicMock()
+    parent.mda_file_viz.factor_value = MagicMock()
+    parent.mda_file.tabManager.tabRemoved = MagicMock()
+    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
+    parent.detRemoved = MagicMock()
+
+    import mdaviz.user_settings
+
+    mdaviz.user_settings.settings.getKey = lambda key: 800
+
+    widget = ChartView(parent)
+    qtbot.addWidget(widget)
+
+    widget._log_x = True
+    widget._log_y = True
+    widget.clearPlot = MagicMock()
+    widget.fitManager.clearAllFits = MagicMock()
+    widget.setLogScales = MagicMock()
+    # Mock curveManager so curves() returns empty (loop does nothing)
+    widget.curveManager = MagicMock()
+    widget.curveManager.curves.return_value = {}
+    widget.curveManager.removeCurve = MagicMock()
+
+    widget.onAllCurvesRemoved(doNotClearCheckboxes=True)
+
+    # Log scale should be reapplied (preserved)
+    widget.setLogScales.assert_called_with(True, True)
+
+
+def test_onCurveRemoved_resets_log_scale_when_last_curve(
+    qtbot: "FixtureRequest",
+) -> None:
+    """When the last curve is removed (e.g. last DET or last tab), log scale is reset."""
+    parent = MagicMock()
+    parent.mda_file_viz.curveBox = MagicMock()
+    parent.mda_file_viz.clearAll = MagicMock()
+    parent.mda_file_viz.curveRemove = MagicMock()
+    parent.mda_file_viz.cursor1_remove = MagicMock()
+    parent.mda_file_viz.cursor2_remove = MagicMock()
+    parent.mda_file_viz.offset_value = MagicMock()
+    parent.mda_file_viz.factor_value = MagicMock()
+    parent.mda_file.tabManager.tabRemoved = MagicMock()
+    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
+    parent.detRemoved = MagicMock()
+    parent.mda_file_viz.setLogScaleState = MagicMock()
+
+    import mdaviz.user_settings
+
+    mdaviz.user_settings.settings.getKey = lambda key: 800
+
+    widget = ChartView(parent)
+    qtbot.addWidget(widget)
+
+    widget.plotObjects = {}
+    widget.removeItemCurveBox = MagicMock()
+    widget.updatePlot = MagicMock()
+    widget.fitManager.removeFit = MagicMock()
+    # Mock curveManager so curves() returns {} (0 curves left)
+    widget.curveManager = MagicMock()
+    widget.curveManager.curves.return_value = {}
+    parent.mda_file.tabPath2Tableview.return_value = None  # skip checkbox logic
+    parent.mda_file.mode.return_value = "Auto-add"
+    parent.mda_file.tabManager.removeTab = MagicMock()
+
+    curveID = "test_curve"
+    curveData = {"row": 0, "file_path": "/tmp/test.mda"}
+    count = 0
+
+    widget.onCurveRemoved(curveID, curveData, count)
+
+    parent.mda_file_viz.setLogScaleState.assert_called_once_with(False, False)
+
+
+def test_onClearAllClicker_resets_log_scale(qtbot: "FixtureRequest") -> None:
+    """When Clear All is clicked, log scale is reset and allCurvesRemoved is emitted."""
+    parent = MagicMock()
+    parent.mda_file_viz.curveBox = MagicMock()
+    parent.mda_file_viz.clearAll = MagicMock()
+    parent.mda_file_viz.curveRemove = MagicMock()
+    parent.mda_file_viz.cursor1_remove = MagicMock()
+    parent.mda_file_viz.cursor2_remove = MagicMock()
+    parent.mda_file_viz.offset_value = MagicMock()
+    parent.mda_file_viz.factor_value = MagicMock()
+    parent.mda_file.tabManager.tabRemoved = MagicMock()
+    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
+    parent.detRemoved = MagicMock()
+    parent.mda_file_viz.setLogScaleState = MagicMock()
+
+    import mdaviz.user_settings
+
+    mdaviz.user_settings.settings.getKey = lambda key: 800
+
+    widget = ChartView(parent)
+    qtbot.addWidget(widget)
+
+    widget.onClearAllClicker()
+
+    # Clear All click should reset log scale (emit is a Qt signal, not mocked)
+    parent.mda_file_viz.setLogScaleState.assert_called_once_with(False, False)
+
+
+def test_onDetRemoved_resets_log_scale_when_last_curve(qtbot: "FixtureRequest") -> None:
+    """When the last curve is removed via detector removal (onDetRemoved), log scale is reset."""
+    parent = MagicMock()
+    parent.mda_file_viz.curveBox = MagicMock()
+    parent.mda_file_viz.clearAll = MagicMock()
+    parent.mda_file_viz.curveRemove = MagicMock()
+    parent.mda_file_viz.cursor1_remove = MagicMock()
+    parent.mda_file_viz.cursor2_remove = MagicMock()
+    parent.mda_file_viz.offset_value = MagicMock()
+    parent.mda_file_viz.factor_value = MagicMock()
+    parent.mda_file.tabManager.tabRemoved = MagicMock()
+    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
+    parent.detRemoved = MagicMock()
+    parent.mda_file_viz.setLogScaleState = MagicMock()
+
+    import mdaviz.user_settings
+
+    mdaviz.user_settings.settings.getKey = lambda key: 800
+
+    widget = ChartView(parent)
+    qtbot.addWidget(widget)
+
+    # One curve for this (file_path, row); after removeCurve, no curves left
+    widget.curveManager = MagicMock()
+    widget.curveManager.findCurveID.return_value = "last_curve_id"
+    widget.curveManager.curves.return_value = {}  # empty after removal
+    widget.curveManager.removeCurve = MagicMock()
+
+    file_path = "/tmp/test.mda"
+    row = 0
+
+    widget.onDetRemoved(file_path, row)
+
+    widget.curveManager.removeCurve.assert_called_once_with("last_curve_id")
+    parent.mda_file_viz.setLogScaleState.assert_called_once_with(False, False)
