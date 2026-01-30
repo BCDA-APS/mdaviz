@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>799</width>
-    <height>469</height>
+    <height>441</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,7 +46,7 @@
         <x>0</x>
         <y>0</y>
         <width>797</width>
-        <height>467</height>
+        <height>439</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -503,7 +503,34 @@
                      <property name="verticalSpacing">
                       <number>0</number>
                      </property>
-                     <item row="1" column="0">
+                     <item row="3" column="0">
+                      <widget class="QLabel" name="offset_label">
+                       <property name="toolTip">
+                        <string>Enter a number to offset the y-values of the selected curve</string>
+                       </property>
+                       <property name="text">
+                        <string>Offset</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="2">
+                      <widget class="QCheckBox" name="derivativeCheckBox">
+                       <property name="text">
+                        <string>Derivative</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="2">
+                      <widget class="QLineEdit" name="factor_value">
+                       <property name="toolTip">
+                        <string>offset + (factor *y)</string>
+                       </property>
+                       <property name="text">
+                        <string>1</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="0">
                       <widget class="QLabel" name="factor_label">
                        <property name="maximumSize">
                         <size>
@@ -519,27 +546,7 @@
                        </property>
                       </widget>
                      </item>
-                     <item row="2" column="0">
-                      <widget class="QLabel" name="offset_label">
-                       <property name="toolTip">
-                        <string>Enter a number to offset the y-values of the selected curve</string>
-                       </property>
-                       <property name="text">
-                        <string>Offset</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="2">
-                      <widget class="QLineEdit" name="factor_value">
-                       <property name="toolTip">
-                        <string>offset + (factor *y)</string>
-                       </property>
-                       <property name="text">
-                        <string>1</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="2">
+                     <item row="3" column="2">
                       <widget class="QLineEdit" name="offset_value">
                        <property name="toolTip">
                         <string>offset + (factor *y)</string>
@@ -549,10 +556,10 @@
                        </property>
                       </widget>
                      </item>
-                     <item row="0" column="2">
-                      <widget class="QCheckBox" name="derivativeCheckBox">
+                     <item row="1" column="2">
+                      <widget class="QCheckBox" name="unscaleCheckBox">
                        <property name="text">
-                        <string>Derivative</string>
+                        <string>Unscale</string>
                        </property>
                       </widget>
                      </item>
@@ -755,8 +762,8 @@
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>478</width>
-                    <height>206</height>
+                    <width>317</width>
+                    <height>188</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="fitContentLayout">
