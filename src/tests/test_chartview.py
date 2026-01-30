@@ -886,38 +886,6 @@ def test_chartview_tab_and_det_removal(qtbot):
     widget.curveManager.removeCurve.assert_called()
 
 
-def test_chartview_has_data_items(qtbot):
-    """Test checking if chart has data items."""
-    # Mock the parent and required attributes
-    parent = MagicMock()
-    parent.mda_file_viz.curveBox = MagicMock()
-    parent.mda_file_viz.clearAll = MagicMock()
-    parent.mda_file_viz.curveRemove = MagicMock()
-    parent.mda_file_viz.cursor1_remove = MagicMock()
-    parent.mda_file_viz.cursor2_remove = MagicMock()
-    parent.mda_file_viz.offset_value = MagicMock()
-    parent.mda_file_viz.factor_value = MagicMock()
-    parent.mda_file.tabManager.tabRemoved = MagicMock()
-    parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
-    parent.detRemoved = MagicMock()
-
-    # Patch settings.getKey to avoid config issues
-    import mdaviz.user_settings
-
-    mdaviz.user_settings.settings.getKey = lambda key: 800
-
-    widget = ChartView(parent)
-    qtbot.addWidget(widget)
-
-    # Test with no data
-    widget.main_axes.has_data = MagicMock(return_value=False)
-    assert not widget.hasDataItems()
-
-    # Test with data
-    widget.main_axes.has_data = MagicMock(return_value=True)
-    assert widget.hasDataItems()
-
-
 def test_chartview_clear_plot(qtbot):
     """Test clearing the plot."""
     # Mock the parent and required attributes
@@ -1346,8 +1314,8 @@ def test_onClearAllClicker_resets_log_scale(qtbot: "FixtureRequest") -> None:
     parent.mda_file_viz.setLogScaleState.assert_called_once_with(False, False)
 
 
-def test_onDetRemoved_resets_log_scale_when_last_curve(qtbot: "FixtureRequest") -> None:
-    """When the last curve is removed via detector removal (onDetRemoved), log scale is reset."""
+def test_onDetRemoved_removes_curve(qtbot: "FixtureRequest") -> None:
+    """When a detector is removed, onDetRemoved removes its curve from the manager."""
     parent = MagicMock()
     parent.mda_file_viz.curveBox = MagicMock()
     parent.mda_file_viz.clearAll = MagicMock()
@@ -1359,7 +1327,6 @@ def test_onDetRemoved_resets_log_scale_when_last_curve(qtbot: "FixtureRequest") 
     parent.mda_file.tabManager.tabRemoved = MagicMock()
     parent.mda_file_viz.curveBox.currentIndexChanged = MagicMock()
     parent.detRemoved = MagicMock()
-    parent.mda_file_viz.setLogScaleState = MagicMock()
 
     import mdaviz.user_settings
 
@@ -1368,10 +1335,8 @@ def test_onDetRemoved_resets_log_scale_when_last_curve(qtbot: "FixtureRequest") 
     widget = ChartView(parent)
     qtbot.addWidget(widget)
 
-    # One curve for this (file_path, row); after removeCurve, no curves left
     widget.curveManager = MagicMock()
-    widget.curveManager.findCurveID.return_value = "last_curve_id"
-    widget.curveManager.curves.return_value = {}  # empty after removal
+    widget.curveManager.findCurveID.return_value = "curve_id"
     widget.curveManager.removeCurve = MagicMock()
 
     file_path = "/tmp/test.mda"
@@ -1379,5 +1344,4 @@ def test_onDetRemoved_resets_log_scale_when_last_curve(qtbot: "FixtureRequest") 
 
     widget.onDetRemoved(file_path, row)
 
-    widget.curveManager.removeCurve.assert_called_once_with("last_curve_id")
-    parent.mda_file_viz.setLogScaleState.assert_called_once_with(False, False)
+    widget.curveManager.removeCurve.assert_called_once_with("curve_id")

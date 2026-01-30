@@ -139,7 +139,6 @@ class ChartView(QWidget):
         ~ChartView.configPlot
         ~ChartView.getCursorRange
         ~ChartView.getSelectedCurveID
-        ~ChartView.hasDataItems
         ~ChartView.performFit
         ~ChartView.plot
         ~ChartView.setBottomAxisText
@@ -159,7 +158,16 @@ class ChartView(QWidget):
     """
 
     def __init__(self, parent, **kwargs):
-        # parent=<mdaviz.mda_folder.MDA_MVC object at 0x10e7ff520>
+        """Build the 1D plot widget and wire it to the MDA MVC.
+
+        Parameters
+        ----------
+        parent : MDA_MVC
+            Parent MVC widget (provides mda_file_viz, mda_file, etc.).
+        **kwargs
+            Optional plot_options (e.g. title, x/y labels) applied to the axes.
+        """
+
         self.mda_mvc = parent
         super().__init__()
 
@@ -315,31 +323,47 @@ class ChartView(QWidget):
     # ==========================================
 
     def setPlotTitle(self, txt=""):
+        """Set the axes title text on the plot."""
         self.main_axes.set_title(txt, fontsize=FONTSIZE)
 
     def setBottomAxisText(self, text):
+        """Set the x-axis label on the axes."""
         self.main_axes.set_xlabel(text, fontsize=FONTSIZE, labelpad=10)
 
     def setLeftAxisText(self, text):
+        """Set the y-axis label on the axes."""
         self.main_axes.set_ylabel(text, fontsize=FONTSIZE, labelpad=10)
 
     def title(self):
+        """Return the stored plot title."""
         return self._title
 
     def xlabel(self):
+        """Return the stored x-axis label."""
         return self._xlabel
 
     def ylabel(self):
+        """Return the stored y-axis label."""
         return self._ylabel
 
     def setTitle(self, txt=""):
+        """Store the plot title (use setPlotTitle to draw it)."""
         self._title = txt
 
     def setXlabel(self, txt=""):
+        """Store the x-axis label (use setBottomAxisText to draw it)."""
         self._xlabel = txt
 
     def setYlabel(self, txt=""):
+        """Store the y-axis label (use setLeftAxisText to draw it)."""
         self._ylabel = txt
+
+    def setDerivative(self, checked):
+        """Set derivative checkbox and internal state without emitting toggled (for sync, e.g. on curve selection)."""
+        self.derivativeCheckBox.blockSignals(True)
+        self.derivativeCheckBox.setChecked(checked)
+        self.derivative = checked
+        self.derivativeCheckBox.blockSignals(False)
 
     def getSelectedCurveID(self):
         """
@@ -781,6 +805,7 @@ class ChartView(QWidget):
         self.curveManager.addCurve(row, *ds, **options)
 
     def configPlot(self, grid=True):
+        """Apply axis labels, title, and grid; redraw canvas."""
         self.setLeftAxisText(self.ylabel())
         self.setBottomAxisText(self.xlabel())
         self.setPlotTitle(self.title())
@@ -791,7 +816,7 @@ class ChartView(QWidget):
         self.canvas.draw()
 
     def updatePlot(self, update_title=True):
-        """Refresh axis labels, legend, limits, and redraw the plot."""
+        """Refresh axis labels, legend, limits, selected curve stats and redraw the plot."""
 
         # Collect positioner PVs from all curves and update x label:
         x_label_set = set()
@@ -802,16 +827,15 @@ class ChartView(QWidget):
                 x_label_set.add(x_label)
         self.setXlabel(", ".join(list(x_label_set)))
 
-        # Simple y-axis label logic: match combo box text and add /I0 if I0 is toggled
-        curveID = self.getSelectedCurveID()
-        if curveID in self.curveManager.curves():
-            self.updateBasicMathInfo(curveID)
+        # Y-axis label: use selected curve's combo box text (detector name, minus file prefix)
+        selected_curveID = self.getSelectedCurveID()
+        if selected_curveID in self.curveManager.curves():
+            self.updateBasicMathInfo(selected_curveID)
 
             # Get the combo box text for the selected curve
-            current_index = self.curveBox.currentIndex()
-            if current_index >= 0:
+            selected_index = self.curveBox.currentIndex()
+            if selected_index >= 0:
                 combo_text = self.curveBox.currentText()
-
                 # Extract detector name from combo box text (remove file name)
                 if ": " in combo_text:
                     detector_name = combo_text.split(": ", 1)[1]
@@ -837,12 +861,14 @@ class ChartView(QWidget):
         self.canvas.draw()
 
     def updateLegend(self):
+        """Refresh the axes legend from current curve labels (excluding internal ones)."""
         labels = self.main_axes.get_legend_handles_labels()[1]
         valid_labels = [label for label in labels if not label.startswith("_")]
         if valid_labels:
             self.main_axes.legend()
 
     def clearPlot(self):
+        """Clear axes, labels, cursors, plot objects, and curve combo box; redraw canvas."""
         self.main_axes.clear()
         self.main_axes.axis("off")
         self.main_axes.set_title("")
@@ -856,20 +882,25 @@ class ChartView(QWidget):
         self.plotObjects = {}
         self.curveBox.clear()
 
-    def hasDataItems(self):
-        """Return whether any artists have been added to the Axes (bool)"""
-        return self.main_axes.has_data()
-
     # ==========================================
     #   Interaction with UI elements
     # ==========================================
 
     def onCurveSelected(self, index):
+        """Sync UI to the curve selected in the combo box: derivative, offset/factor, tooltip,
+        row highlight, basic math, plot controls, fit UI, and plot labels.
+
+        Parameters
+        ----------
+        index : int
+            Current index of the curve combo box (or -1 if none selected).
+        """
         # Get the curve ID from the combo box item data
         curveID = None
         if index >= 0:
             curveID = self.curveBox.itemData(index, QtCore.Qt.ItemDataRole.UserRole)
 
+        has_curve = curveID in self.curveManager.curves()
         # Update QLineEdit & QLabel widgets with the values for the selected curve
         if (
             curveID
@@ -881,10 +912,7 @@ class ChartView(QWidget):
             row = curve_data["row"]
             # Update derivative checkbox
             derivative_state = curve_data.get("derivative", False)
-            self.derivativeCheckBox.blockSignals(True)
-            self.derivativeCheckBox.setChecked(derivative_state)
-            self.derivative = derivative_state
-            self.derivativeCheckBox.blockSignals(False)
+            self.setDerivative(derivative_state)
             # Update offset & factor
             self.offset_value.setText(str(curve_data["offset"]))
             self.factor_value.setText(str(curve_data["factor"]))
@@ -898,23 +926,22 @@ class ChartView(QWidget):
         else:
             self.offset_value.setText("0")
             self.factor_value.setText("1")
-            self.derivativeCheckBox.blockSignals(True)
-            self.derivative = False
-            self.derivativeCheckBox.setChecked(False)
-            self.derivativeCheckBox.blockSignals(False)
+            self.setDerivative(False)
             self.curveBox.setToolTip("Selected curve")
+
+        # Update plot controls
+        self.mda_mvc.mda_file_viz.updatePlotControls(has_curve)
 
         # Update basic math info:
         self.updateBasicMathInfo(curveID)
 
-        # Update plot controls
-        has_curve = curveID in self.curveManager.curves()
-        self.mda_mvc.mda_file_viz.updatePlotControls(has_curve)
+        # Update curve style combo box to show current curve's style
+        self.updateCurveStyleComboBox(curveID)
 
         # Update fit UI
         self.updateFitUI(curveID)
 
-        # Update plot labels (including y-axis label)
+        # Update axis labels, legend, limits, selected curve stats and redraw the plot
         self.updatePlot(update_title=False)
 
     def updateFitUI(self, curveID: str) -> None:
@@ -926,13 +953,6 @@ class ChartView(QWidget):
         """
         # Update fit controls state
         has_curve = curveID in self.curveManager.curves()
-
-        # Update fit list
-        self.updateFitList(curveID)
-
-        # Update curve style combo box to show current curve's style
-        if has_curve:
-            self.updateCurveStyleComboBox(curveID)
 
         # Clear fit details if no curve selected or if switching to a different curve
         if not has_curve:
@@ -947,10 +967,18 @@ class ChartView(QWidget):
 
             # If we're switching to a different curve than the one with the fit, clear the fit
             if current_fitted_curve and current_fitted_curve != curveID:
-                self.fitManager.removeFit(current_fitted_curve)
                 self.mda_mvc.mda_file_viz.fitDetails.clear()
+            if current_fitted_curve and self.fitManager.hasFits(current_fitted_curve):
+                self.updateFitDetails(curveID)
 
     def removeItemCurveBox(self, curveID):
+        """Remove the combo box item for the given curveID.
+
+        Parameters
+        ----------
+        curveID : str
+            ID of the curve whose combo box entry to remove.
+        """
         # Find the item by curve ID stored in item data
         for i in range(self.curveBox.count()):
             if self.curveBox.itemData(i, QtCore.Qt.ItemDataRole.UserRole) == curveID:
@@ -958,7 +986,7 @@ class ChartView(QWidget):
                 break
 
     def updateComboBoxCurveIDs(self):
-        """Update combo box items to use new curve ID format."""
+        """Update combo box items to use new curve ID format. Likely OBSOLETE."""
         for i in range(self.curveBox.count()):
             old_curve_id = self.curveBox.itemData(i, QtCore.Qt.ItemDataRole.UserRole)
             display_text = self.curveBox.itemText(i)
@@ -982,6 +1010,7 @@ class ChartView(QWidget):
     # ==========================================
 
     def onOffsetFactorUpdated(self):
+        """Apply offset and factor from the line edits to the selected curve; refresh basic math stats."""
         curveID = self.getSelectedCurveID()
         if curveID is None:
             return
@@ -992,7 +1021,8 @@ class ChartView(QWidget):
             # Reset to default if conversion fails
             offset = 0
             factor = 1
-            self.offset_value.setText(str(offset))
+            if self.offset_value:
+                self.offset_value.setText(str(offset))
             if self.factor_value:
                 self.factor_value.setText(str(factor))
             return
@@ -1013,6 +1043,7 @@ class ChartView(QWidget):
         self.updateBasicMathInfo(curveID)
 
     def updateBasicMathInfo(self, curveID):
+        """Update min/max/COM/mean labels from the curve's transformed data, or clear them if no valid curve."""
         if curveID and curveID in self.curveManager.curves():
             try:
                 x, y = self.curveManager.getTransformedCurveXYData(curveID)
@@ -1038,10 +1069,18 @@ class ChartView(QWidget):
             self.clearBasicMath()
 
     def clearBasicMath(self):
+        """Clear min/max/COM/mean labels (set to 'n/a')"""
         for txt in ["min_text", "max_text", "com_text", "mean_text"]:
             self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText("n/a")
 
     def calculateBasicMath(self, x_data, y_data):
+        """Compute min/max (x,y), center-of-mass x, and mean y from the curve data.
+
+        Returns
+        -------
+        tuple
+            ((x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean).
+        """
         x_array = numpy.array(x_data, dtype=float)
         y_array = numpy.array(y_data, dtype=float)
         # Find y_min and y_max
@@ -1067,6 +1106,13 @@ class ChartView(QWidget):
     # ==========================================
 
     def onRemoveCursor(self, cursor_num):
+        """Remove the cursor from the plot and clear its state; refresh cursor info and redraw.
+
+        Parameters
+        ----------
+        cursor_num : int
+            1 or 2 (cursor 1 or 2).
+        """
         cross = self.cursors.get(cursor_num)
         if cross is not None:
             try:
@@ -1088,6 +1134,7 @@ class ChartView(QWidget):
         self.canvas.draw()
 
     def clearCursors(self):
+        """Remove both cursors from the plot and clear their state."""
         self.onRemoveCursor(1)
         self.onRemoveCursor(2)
 
@@ -1333,18 +1380,6 @@ class ChartView(QWidget):
             # Clear fit details display
             self.mda_mvc.mda_file_viz.fitDetails.clear()
 
-    def updateFitList(self, curveID: str) -> None:
-        """
-        Update the fit list in the UI for a given curve.
-        Note: This method is kept for compatibility but no longer needed with single-fit system.
-
-        Parameters:
-        - curveID: ID of the curve
-        """
-        # With single-fit system, we don't need a fit list
-        # The fit details are shown directly when a fit exists
-        pass
-
     def performFit(self, model_name: str, use_range: bool = False) -> None:
         """
         Perform a fit on the currently selected curve.
@@ -1389,16 +1424,7 @@ class ChartView(QWidget):
             x_range = None
             if use_range:
                 x_range = self.getCursorRange()
-
             try:
-                # Clear all existing fits from other curves before performing new fit
-                all_curves = list(self.curveManager.curves().keys())
-                for other_curve_id in all_curves:
-                    if other_curve_id != curveID and self.fitManager.hasFits(
-                        other_curve_id
-                    ):
-                        self.fitManager.removeFit(other_curve_id)
-
                 # Perform the fit (this will replace any existing fit for the current curve)
                 self.fitManager.addFit(curveID, model_name, x_data, y_data, x_range)
 
