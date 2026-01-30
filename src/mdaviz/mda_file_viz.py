@@ -600,7 +600,7 @@ class MDAFileVisualization(QWidget):
     def onClearFitsButtonClicked(self):
         """Handle clear fits button click."""
         if hasattr(self, "chart_view") and self.chart_view:
-            self.chart_view.clearAllFits()
+            self.chart_view.clearSelectedFit()
 
     def updatePlotControls(self, curve_selected: bool):
         """

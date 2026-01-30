@@ -255,7 +255,7 @@ class ChartView(QWidget):
         self.removeCursor2 = self.mda_mvc.mda_file_viz.cursor2_remove
 
         # Remove button connections:
-        utils.reconnect(self.clearAll.clicked, self.onClearAllClicker)
+        utils.reconnect(self.clearAll.clicked, self.onClearAllClicked)
         utils.reconnect(self.removeButton.clicked, self.onRemoveButtonClicked)
         self.removeCursor1.clicked.connect(partial(self.onRemoveCursor, cursor_num=1))
         self.removeCursor2.clicked.connect(partial(self.onRemoveCursor, cursor_num=2))
@@ -748,9 +748,10 @@ class ChartView(QWidget):
             )
             self.mda_mvc.mda_file.tabManager.removeTab(file_path)
 
-        # If no curves left on the graph, reset log scale
+        # If no curves left on the graph, reset log scale and clear plot
         if len(self.curveManager.curves()) == 0:
             self.mda_mvc.mda_file_viz.setLogScaleState(False, False)
+            self.clearPlot()
 
     def onAllCurvesRemoved(self, doNotClearCheckboxes=True):
         """Clear plot, fits, and curves; optionally clear checkboxes. Preserve log scale.
@@ -763,7 +764,6 @@ class ChartView(QWidget):
 
         # Clears the plot completely, removing all curve representations.
         self.clearPlot()
-        self.fitManager.clearAllFits()
         for curveID in self.curveManager.curves().keys():
             self.curveManager.removeCurve(curveID)
         if not doNotClearCheckboxes:
@@ -790,7 +790,7 @@ class ChartView(QWidget):
                 if self.curveManager.curves()[curveID]["file_path"] == file_path:
                     self.curveManager.removeCurve(curveID)
 
-    def onClearAllClicker(self):
+    def onClearAllClicked(self):
         """Clear plot, fits, curves and checkboxes. Reset log scale."""
         self.mda_mvc.mda_file_viz.setLogScaleState(False, False)
         self.curveManager.allCurvesRemoved.emit(False)
@@ -872,12 +872,12 @@ class ChartView(QWidget):
         self.main_axes.clear()
         self.main_axes.axis("off")
         self.main_axes.set_title("")
-        # Clear axis labels
         self.setXlabel("")
         self.setYlabel("")
         self.clearCursors()
         self.clearCursorInfo()
         self.clearBasicMath()
+        self.clearAllFits()
         self.figure.canvas.draw()
         self.plotObjects = {}
         self.curveBox.clear()
@@ -1188,6 +1188,14 @@ class ChartView(QWidget):
         return (float(x_data[nearest_index]), float(y_data[nearest_index]))
 
     def onclick(self, event):
+        """Handle mouse click on the plot: place cursor 1 (middle or Alt+right) or cursor 2 (right)
+        at click position or nearest point on curve if snap is on; refresh cursor info and redraw.
+
+        Parameters
+        ----------
+        event : matplotlib.backend_bases.MouseEvent
+            The mouse click event (button, axes, xdata, ydata).
+        """
         # Check if the click was in the main_axes
         if event.inaxes is self.main_axes:
             # Determine cursor position based on snap setting
@@ -1210,13 +1218,15 @@ class ChartView(QWidget):
             ):
                 if self.cursors[1] is not None:
                     try:
-                        self.cursors[1].remove()  # Remove existing red cursor
+                        # Remove existing red cursor
+                        self.cursors[1].remove()
                     except (NotImplementedError, AttributeError):
                         # Handle case where artist cannot be removed
                         pass
-                (self.cursors[1],) = self.main_axes.plot(
+                # Assign artist to self.cursors dictionary (matplotlib returns a 1-element list)
+                self.cursors[1] = self.main_axes.plot(
                     x_cursor, y_cursor, "r+", markersize=15, linewidth=2
-                )
+                )[0]
                 # Update cursor position
                 self.cursors["pos1"] = (x_cursor, y_cursor)
 
@@ -1224,13 +1234,14 @@ class ChartView(QWidget):
             elif event.button == RIGHT_BUTTON and not self.alt_pressed:
                 if self.cursors[2] is not None:
                     try:
-                        self.cursors[2].remove()  # Remove existing blue cursor
+                        # Remove existing blue cursor
+                        self.cursors[2].remove()
                     except (NotImplementedError, AttributeError):
                         # Handle case where artist cannot be removed
                         pass
-                (self.cursors[2],) = self.main_axes.plot(
+                self.cursors[2] = self.main_axes.plot(
                     x_cursor, y_cursor, "b+", markersize=15, linewidth=2
-                )
+                )[0]
 
                 # Update cursor position
                 self.cursors["pos2"] = (x_cursor, y_cursor)
@@ -1243,7 +1254,7 @@ class ChartView(QWidget):
 
     def calculateCursors(self):
         """
-        Update cursor information in info panel widget.
+        Calculate diff and midpoint, update cursor dictionary and information in info panel widget.
         """
         # Check for the first cursor and update text accordingly
         if self.cursors[1]:
@@ -1268,12 +1279,14 @@ class ChartView(QWidget):
         self.updateCursorInfo()
 
     def updateCursorInfo(self):
+        """Update cursor information in info panel widget."""
         self.mda_mvc.mda_file_viz.pos1_text.setText(self.cursors["text1"])
         self.mda_mvc.mda_file_viz.pos2_text.setText(self.cursors["text2"])
         self.mda_mvc.mda_file_viz.diff_text.setText(self.cursors["diff"])
         self.mda_mvc.mda_file_viz.midpoint_text.setText(self.cursors["midpoint"])
 
     def clearCursorInfo(self):
+        """Clear cursor information in info panel widget."""
         self.mda_mvc.mda_file_viz.pos1_text.setText("middle click or alt+right click")
         self.mda_mvc.mda_file_viz.pos2_text.setText("right click")
         self.mda_mvc.mda_file_viz.diff_text.setText("n/a")
@@ -1336,21 +1349,7 @@ class ChartView(QWidget):
                 pass
             del self.fitObjects[curveID]
 
-        # Add new fit line
-        fit_data = self.fitManager.getFitCurveData(curveID)
-        if fit_data:
-            x_fit, y_fit = fit_data
-            # Plot fit curve with dashed line style and higher z-order to ensure it's on top
-            fit_line = self.main_axes.plot(
-                x_fit, y_fit, "--", alpha=0.8, linewidth=2, zorder=10
-            )[0]
-            self.fitObjects[curveID] = fit_line
-
-            # Update plot
-            self.updatePlot(update_title=False)
-
-            # Update fit details display
-            self.updateFitDetails(curveID)
+        self.onFitAdded(curveID)
 
     def onFitRemoved(self, curveID: str) -> None:
         """
@@ -1470,12 +1469,17 @@ class ChartView(QWidget):
 
         fit_details.setText(details_text)
 
-    def clearAllFits(self) -> None:
+    def clearSelectedFit(self) -> None:
         """Clear the fit from the currently selected curve."""
         curveID = self.getSelectedCurveID()
         if curveID:
             self.fitManager.removeFit(curveID)
             self.mda_mvc.mda_file_viz.fitDetails.clear()
+
+    def clearAllFits(self) -> None:
+        """Clear all fits from all curves."""
+        self.fitManager.clearAllFits()
+        self.mda_mvc.mda_file_viz.fitDetails.clear()
 
     # ======================================================
     #  Curve styling methods
