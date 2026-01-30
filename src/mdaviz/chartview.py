@@ -1676,7 +1676,6 @@ class ChartView2D(ChartView):
         self._set_2d_labels(plot_options)
 
         # Update the plot
-
         self.canvas.draw()
 
         # Force a repaint
@@ -1702,17 +1701,20 @@ class ChartView2D(ChartView):
         # If so, flip the Y data vertically to match the expected orientation
         if len(x2_data) > 1 and x2_data[0] > x2_data[-1]:
             y_data = y_data[::-1, :]  # Flip vertically
-
-        # Create meshgrid for proper axis scaling
-        X, Y = numpy.meshgrid(x_data, x2_data)
+        # Check if X data is in descending order; flip horizontally to match
+        if len(x_data) > 1 and x_data[0] > x_data[-1]:
+            y_data = y_data[:, ::-1]  # Flip horizontally
 
         # Apply log scale normalization if enabled
         norm = None
         if hasattr(self, "_log_y_2d") and self._log_y_2d:
-            from matplotlib.colors import LogNorm
+            # Only apply log if all values are positive
+            vmin, vmax = y_data.min(), y_data.max()
+            if vmin > 0:
+                from matplotlib.colors import LogNorm
 
-            # Use LogNorm for proper log color scaling
-            norm = LogNorm(vmin=y_data.min(), vmax=y_data.max())
+                # Use LogNorm for proper log color scaling
+                norm = LogNorm(vmin, vmax)
 
         # Plot heatmap
         im = self.main_axes.imshow(
@@ -1752,11 +1754,12 @@ class ChartView2D(ChartView):
         norm = None
         levels = 20
         if hasattr(self, "_log_y_2d") and self._log_y_2d:
-            # For contour plots with log scale, use LogNorm for color normalization
+            # Only apply log if all values are positive
             vmin, vmax = y_data.min(), y_data.max()
             if vmin > 0:  # Only apply log if all values are positive
                 from matplotlib.colors import LogNorm
 
+                # Use LogNorm for proper log color scaling
                 norm = LogNorm(vmin=vmin, vmax=vmax)
 
         # Plot contour
@@ -1840,23 +1843,8 @@ class ChartView2D(ChartView):
         Parameters:
         - log_y (bool): Whether to use logarithmic scale for Y-axis (color scale)
         """
-        try:
-            # Store the log scale state
-            self._log_y_2d = log_y
-
-            # For 2D plots, log_y affects the color scale normalization
-            # This would need to be handled in the plotting methods
-            # For now, we'll store the state for potential future use
-            self._log_y_2d = log_y
-
-            # Redraw the canvas to apply changes
-            self.canvas.draw()
-
-        except Exception as exc:
-            logger.error(f"Error setting 2D log scales: {exc}")
-            # If setting log scale fails (e.g., negative values), revert to linear
-            self._log_y_2d = False
-            self.canvas.draw()
+        # Store the log scale state
+        self._log_y_2d = log_y
 
     def showMessage(self, message: str):
         """
