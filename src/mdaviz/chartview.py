@@ -958,18 +958,12 @@ class ChartView(QWidget):
         if not has_curve:
             self.mda_mvc.mda_file_viz.fitDetails.clear()
         else:
-            # Clear fit when switching to a different curve
-            current_fitted_curve = None
-            for curve_id in self.curveManager.curves():
-                if self.fitManager.hasFits(curve_id):
-                    current_fitted_curve = curve_id
-                    break
-
-            # If we're switching to a different curve than the one with the fit, clear the fit
-            if current_fitted_curve and current_fitted_curve != curveID:
-                self.mda_mvc.mda_file_viz.fitDetails.clear()
-            if current_fitted_curve and self.fitManager.hasFits(current_fitted_curve):
+            if curveID and self.fitManager.hasFits(curveID):
+                # If we're switching to a curve that has a fit, update fit details in UI
                 self.updateFitDetails(curveID)
+            else:
+                # If we're switching to a curve that does not have a fit, clear fit details
+                self.mda_mvc.mda_file_viz.fitDetails.clear()
 
     def removeItemCurveBox(self, curveID):
         """Remove the combo box item for the given curveID.
