@@ -276,6 +276,12 @@ class ChartView(QWidget):
         self.derivativeCheckBox.setChecked(self.derivative)
         self.derivativeCheckBox.toggled.connect(self.onDerivativeToggled)
 
+        # Connect unscale checkbox
+        self.unscale = False
+        self.unscaleCheckBox = self.mda_mvc.mda_file_viz.unscaleCheckBox
+        self.unscaleCheckBox.setChecked(self.unscale)
+        self.unscaleCheckBox.toggled.connect(self.onUnscaleToggled)
+
         # Initialize snap to curve setting (default to False for free cursor placement)
         self._snap_to_curve = False
         self.snapCursors = self.mda_mvc.mda_file_viz.snapCursors
@@ -364,6 +370,13 @@ class ChartView(QWidget):
         self.derivativeCheckBox.setChecked(checked)
         self.derivative = checked
         self.derivativeCheckBox.blockSignals(False)
+
+    def setUnscale(self, checked):
+        """Set unscale checkbox and internal state without emitting toggled (for sync, e.g. on curve selection)."""
+        self.unscaleCheckBox.blockSignals(True)
+        self.unscaleCheckBox.setChecked(checked)
+        self.unscale = checked
+        self.unscaleCheckBox.blockSignals(False)
 
     def getSelectedCurveID(self):
         """
@@ -910,9 +923,11 @@ class ChartView(QWidget):
             curve_data = self.curveManager.getCurveData(curveID)
             file_path = curve_data["file_path"]
             row = curve_data["row"]
-            # Update derivative checkbox
+            # Update derivative and unscale checkbox
             derivative_state = curve_data.get("derivative", False)
             self.setDerivative(derivative_state)
+            unscale_state = curve_data.get("unscale", False)
+            self.setUnscale(unscale_state)
             # Update offset & factor
             self.offset_value.setText(str(curve_data["offset"]))
             self.factor_value.setText(str(curve_data["factor"]))
@@ -927,6 +942,7 @@ class ChartView(QWidget):
             self.offset_value.setText("0")
             self.factor_value.setText("1")
             self.setDerivative(False)
+            self.setUnscale(False)
             self.curveBox.setToolTip("Selected curve")
 
         # Update plot controls
@@ -1034,6 +1050,19 @@ class ChartView(QWidget):
         if curveID is None:
             return
         self.curveManager.updateCurveDerivative(curveID, derivative=checked)
+        self.updateBasicMathInfo(curveID)
+
+    def onUnscaleToggled(self, checked):
+        """Handle unscale checkbox toggle.
+
+        Parameters:
+            checked (bool): True if checkbox is checked (unscale enabled), False if unchecked (unscale disabled)
+        """
+        self.unscale = checked
+        curveID = self.getSelectedCurveID()
+        if curveID is None:
+            return
+        self.curveManager.updateCurveUnscale(curveID, unscale=checked)
         self.updateBasicMathInfo(curveID)
 
     def updateBasicMathInfo(self, curveID):

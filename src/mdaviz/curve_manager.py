@@ -37,7 +37,7 @@ Key Features:
     ~CurveManager.updateCurveOffset
 """
 
-import numpy
+import numpy as np
 from PyQt6.QtCore import QObject, pyqtSignal
 from mdaviz.logger import get_logger
 
@@ -220,8 +220,8 @@ class CurveManager(QObject):
             existing_y_data = existing_curve_data["ds"][1]
             existing_label = existing_curve_data.get("ds_options", {}).get("label", "")
 
-            x_data_equal = numpy.array_equal(x_data, existing_x_data)
-            y_data_equal = numpy.array_equal(y_data, existing_y_data)
+            x_data_equal = np.array_equal(x_data, existing_x_data)
+            y_data_equal = np.array_equal(y_data, existing_y_data)
             label_equal = label == existing_label
 
             if x_data_equal and y_data_equal and label_equal:
@@ -242,7 +242,7 @@ class CurveManager(QObject):
                     "ds": ds,  # Update with new data
                     "plot_options": plot_options,  # Update plot options
                     "ds_options": ds_options,  # Update label and other ds options
-                    "original_y": numpy.array(ds[1]).copy(),
+                    "original_y": np.array(ds[1]).copy(),
                 }
                 # Determine what changed to set appropriate update flags
                 x_data_changed = not x_data_equal
@@ -265,10 +265,11 @@ class CurveManager(QObject):
 
         self._curves[curveID] = {
             "ds": ds,  # ds = [x_data, y_data]
-            "original_y": numpy.array(ds[1]).copy(),
+            "original_y": np.array(ds[1]).copy(),
             "offset": persistent_props.get("offset", 0),
             "factor": persistent_props.get("factor", 1),
             "derivative": persistent_props.get("derivative", False),
+            "unscale": persistent_props.get("unscale", False),
             "style": persistent_props.get("style", "-"),
             "row": row,  # DET checkbox row in the file tableview
             "file_path": file_path,
@@ -314,7 +315,7 @@ class CurveManager(QObject):
     def getTransformedCurveXYData(self, curveID):
         """Get transformed (x, y) data for plotting.
 
-        Returns the x_data and transformed y_data (with offset/factor/derivative applied).
+        Returns the x_data and transformed y_data (with offset/factor/derivative/unscale applied).
 
         Parameters:
             curveID: The unique identifier of the curve
@@ -347,7 +348,7 @@ class CurveManager(QObject):
             original_y (array-like): Raw y data to transform
 
         Returns:
-            numpy.ndarray: Transformed y data
+            np.ndarray: Transformed y data
         """
         curve_data = self._curves.get(curveID)
         if not curve_data:
@@ -356,16 +357,57 @@ class CurveManager(QObject):
         offset = curve_data.get("offset", 0.0)
         factor = curve_data.get("factor", 1.0)
         derivative = curve_data.get("derivative", False)
+        unscale = curve_data.get("unscale", False)
 
-        original_y_array = numpy.array(original_y)
-
+        original_y_array = np.array(original_y)
         if derivative:
-            grad = numpy.gradient(original_y_array, x_data)
+            grad = np.gradient(original_y_array, x_data)
             transformed_y = offset + factor * grad
         else:
             transformed_y = offset + factor * original_y_array
 
+        if unscale:
+            transformed_y = self.unscaleCurve(curveID, transformed_y)
+
         return transformed_y
+
+    def unscaleCurve(self, curveID, y_data):
+        """Rescale y_data into the min/max range of non-unscaled curves.
+
+        Parameters:
+            curveID: Curve identifier
+            y_data: Transformed y array to rescale
+
+        Returns:
+            np.ndarray: y_data rescaled into reference range, or unchanged if constant
+        """
+        # Calculate global min/max for unscaling (from regular Y curves only)
+        global_min = float("inf")
+        global_max = float("-inf")
+        for curve in self.curves():
+            curve_data = self.getCurveData(curve)
+            if curve != curveID and not curve_data["unscale"]:
+                curve_x_data, curve_y_data = self.getTransformedCurveXYData(curve)
+                if curve_x_data is not None and curve_y_data is not None:
+                    global_min = min(global_min, np.min(curve_y_data))
+                    global_max = max(global_max, np.max(curve_y_data))
+        # If reference curve is a constant, use cst +/- 0.5
+        if global_max == global_min:
+            constant_value = global_min
+            global_min = constant_value - 0.5
+            global_max = constant_value + 0.5
+        # If there is no reference curve, use 0 to 1 scale
+        if global_min == float("inf") or global_max == float("-inf"):
+            global_min = 0.0
+            global_max = 1.0
+
+        # Map y_data from [local_min, local_max] into [global_min, global_max]
+        local_min, local_max = np.min(y_data), np.max(y_data)
+        if local_min != local_max:
+            y_data = ((y_data - local_min) / (local_max - local_min)) * (
+                global_max - global_min
+            ) + global_min
+        return y_data
 
     def updateCurveOffsetFactor(self, curveID, offset=None, factor=None):
         """Update offset and/or factor for a curve.
@@ -437,6 +479,23 @@ class CurveManager(QObject):
                 curve_data["derivative"] = derivative
                 self.updateCurve(curveID, curve_data, recompute_y=True)
 
+    def updateCurveUnscale(self, curveID, unscale):
+        """Update the unscale flag for a specific curve.
+
+        Parameters:
+            curveID: The unique identifier of the curve
+            unscale: bool
+
+        Returns:
+            None: Updates curve data and emits curveUpdated signal if changed
+        """
+        curve_data = self.getCurveData(curveID)
+        if curve_data:
+            old_unscale = curve_data.get("unscale", False)
+            if old_unscale != unscale:
+                curve_data["unscale"] = unscale
+                self.updateCurve(curveID, curve_data, recompute_y=True)
+
     # =====================================
     # Remove curves
     # =====================================
@@ -486,13 +545,15 @@ class CurveManager(QObject):
                 props["offset"] = curve_data.get("offset", 0)
                 props["factor"] = curve_data.get("factor", 1)
                 props["derivative"] = curve_data.get("derivative", False)
+                props["unscale"] = curve_data.get("unscale", False)
+                props["style"] = curve_data.get("style", "-")
             else:
                 self._persistent_properties.pop(curveID, None)
         self._curves.clear()
         self.allCurvesRemoved.emit(doNotClearCheckboxes)
 
     def clearPersistentProperties(self):
-        """Clear all persistent curve properties (offset, factor, derivative, style).
+        """Clear all persistent curve properties (offset, factor, derivative, unscale, style).
 
         Call when the file we're plotting changes so that when the user
         returns to a file, curves are shown with default properties.
