@@ -632,6 +632,7 @@ class MDA_MVC(QWidget):
                 else:
                     logger.debug("doPlot - No x2_index in plot_options")
                 widgetMpl.plot(i, *ds, **options)
+            widgetMpl.refreshAllUnscaledCurves()
             self.mda_file_viz.setPlot(widgetMpl)
 
     def doPlot2D(self, action, selection):
@@ -886,7 +887,7 @@ class MDA_MVC(QWidget):
         new_y_selection = selection.get("Y", [])
         if not new_y_selection and self.mda_file.tabWidget.count() == 1:
             self.mda_file_viz.setLogScaleState(False, False)
-            widgetMpl.curveManager.removeAllCurves()
+            widgetMpl.curveManager.removeAllCurves(savePersistentProperties=False)
             return
 
         # Handle detector removal - emit signals but don't return early

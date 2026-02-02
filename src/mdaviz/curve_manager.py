@@ -161,14 +161,21 @@ class CurveManager(QObject):
         Returns:
         - str: The curveID if a matching curve is found; otherwise, None.
         """
-        for curveID, curveData in self._curves.items():
-            if (
-                curveData["file_path"] == file_path
-                and curveData["row"] == row
-                and curveData.get("x2_index") == x2_index
-            ):
-                return curveID
-        return None
+        if x2_index is not None:
+            for curveID, curveData in self._curves.items():
+                if (
+                    curveData["file_path"] == file_path
+                    and curveData["row"] == row
+                    and curveData.get("x2_index") == x2_index
+                ):
+                    return [curveID]
+        else:
+            return [
+                curveID
+                for curveID, curveData in self._curves.items()
+                if curveData["file_path"] == file_path and curveData["row"] == row
+            ]
+        return []
 
     # =====================================
     # Add & update curves
@@ -526,7 +533,7 @@ class CurveManager(QObject):
             # Emit signal:
             self.curveRemoved.emit(curveID, curveData, count)
 
-    def removeAllCurves(self, doNotClearCheckboxes=True):
+    def removeAllCurves(self, doNotClearCheckboxes=True, savePersistentProperties=True):
         """Remove all curves from the manager.
 
         Clears all curves from internal storage and emits a signal indicating
@@ -534,12 +541,15 @@ class CurveManager(QObject):
 
         Parameters:
             doNotClearCheckboxes: If True, preserves checkbox states in the UI
+            savePersistentProperties: If True and doNotClearCheckboxes, save
+                current curve props so re-plotting restores them. If False,
+                clear persistent props (e.g. when user unchecked all).
 
         Returns:
             None: Emits allCurvesRemoved signal with doNotClearCheckboxes parameter
         """
-        for curveID in self._curves.keys():
-            if doNotClearCheckboxes:
+        for curveID in list(self._curves.keys()):
+            if savePersistentProperties and doNotClearCheckboxes:
                 curve_data = self.getCurveData(curveID)
                 props = self._persistent_properties.setdefault(curveID, {})
                 props["offset"] = curve_data.get("offset", 0)

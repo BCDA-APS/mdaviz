@@ -540,17 +540,15 @@ class ChartView(QWidget):
         except Exception as exc:
             logger.error(str(exc))
 
-        # Refresh axis labels, legend, limits, and redraw the plot:
-        self.updatePlot(update_title=True)
-
         # Add to the comboBox
         index = self.curveBox.count()  # Get the next index
+        prev_index = self.curveBox.currentIndex()
         # Use the user-friendly label for display, but store curveID as data
         display_label = curveData.get("ds_options", {}).get("label", curveID)
         self.curveBox.addItem(display_label)
         # Store the curveID as item data for later retrieval
         self.curveBox.setItemData(index, curveID, QtCore.Qt.ItemDataRole.UserRole)
-        # Add tooltip withh file path
+        # Add tooltip with file path
         file_path = curveData.get("file_path", "No file path available")
         self.curveBox.setItemData(index, file_path, QtCore.Qt.ItemDataRole.ToolTipRole)
 
@@ -562,6 +560,20 @@ class ChartView(QWidget):
 
         # Update any existing combo box items to use new curve ID format
         self.updateComboBoxCurveIDs()
+
+        # Refresh unscaled curves with the new global_min/max
+        self.refreshAllUnscaledCurves()
+
+        # Refresh axis labels, legend, limits, and redraw the plot:
+        self.updatePlot(update_title=True)
+
+        # Force the UI back to the previously selected curve and refresh it from the curve manager:
+        # syncs UI to the curve selected: derivative, offset/factor, tooltip, basic maths, fits...
+        if self.curveBox.count() > 1:
+            self.curveBox.blockSignals(True)
+            self.curveBox.setCurrentIndex(prev_index)
+            self.curveBox.blockSignals(False)
+            self.onCurveSelected(prev_index)
 
     def onCurveUpdated(self, curveID, recompute_y=False, update_x=False):
         """
@@ -579,13 +591,19 @@ class ChartView(QWidget):
 
         # Apply transformations
         if curve_data and recompute_y:
-            x_data, y_transformed = self.curveManager.getTransformedCurveXYData(curveID)
-            if (
-                x_data is not None
-                and y_transformed is not None
-                and curveID in self.plotObjects
-            ):
-                self.plotObjects[curveID].set_ydata(y_transformed)
+            if curve_data.get("unscale", False):
+                # Defer so bulk I0/Add updates finish first; then reference set is correct
+                QTimer.singleShot(0, self.refreshAllUnscaledCurves)
+            else:
+                x_data, y_transformed = self.curveManager.getTransformedCurveXYData(
+                    curveID
+                )
+                if (
+                    x_data is not None
+                    and y_transformed is not None
+                    and curveID in self.plotObjects
+                ):
+                    self.plotObjects[curveID].set_ydata(y_transformed)
 
         # Handle label changes (e.g., I0 normalization)
         # Only if we're not recreating the plot object (i.e. not update_x)
@@ -753,6 +771,10 @@ class ChartView(QWidget):
         self.fitManager.removeFit(curveID)
         # Update plot labels, legend and title
         self.updatePlot(update_title=False)
+        if count > 0:
+            # Refresh unscaled curves with the new global_min/max
+            self.refreshAllUnscaledCurves()
+            self.onCurveSelected(self.curveBox.currentIndex())
 
         # If this was the last curve for this file, remove the tab
         if count == 0 and self.mda_mvc.mda_file.mode() == "Auto-add":
@@ -792,8 +814,9 @@ class ChartView(QWidget):
 
     def onDetRemoved(self, file_path, row):
         """Remove curve for a given det & file."""
-        curveID = self.curveManager.findCurveID(file_path, row)
-        if curveID:
+        curveIDs = self.curveManager.findCurveID(file_path, row)
+        for curveID in curveIDs:
+            self.curveManager._persistent_properties.pop(curveID, None)
             self.curveManager.removeCurve(curveID)
 
     def onTabRemoved(self, file_path):
@@ -807,6 +830,17 @@ class ChartView(QWidget):
         """Clear plot, fits, curves and checkboxes. Reset log scale."""
         self.mda_mvc.mda_file_viz.setLogScaleState(False, False)
         self.curveManager.allCurvesRemoved.emit(False)
+
+    def refreshAllUnscaledCurves(self):
+        """Recompute and redraw y-data for all curves with unscale=True using
+        the current reference range, then redraw the plot."""
+        for cid in self.curveManager.curves():
+            curve_data = self.curveManager.getCurveData(cid)
+            if curve_data.get("unscale", False) and cid in self.plotObjects:
+                x_data, y_transformed = self.curveManager.getTransformedCurveXYData(cid)
+                if y_transformed is not None:
+                    self.plotObjects[cid].set_ydata(y_transformed)
+        self.updatePlot(update_title=False)
 
     # ==========================================
     #   UI methods

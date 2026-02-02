@@ -207,8 +207,8 @@ def test_curve_manager_find_curve_id():
     y = np.array([4, 5, 6])
     manager.addCurve(row, x, y, plot_options=plot_options, ds_options=ds_options)
     curve_id = manager.generateCurveID(label, file_path, row)
-    found_id = manager.findCurveID(file_path, row)
-    assert found_id == curve_id
+    found_ids = manager.findCurveID(file_path, row)
+    assert found_ids == [curve_id]
 
 
 def test_chartview_plotting_methods(qtbot):
@@ -881,7 +881,7 @@ def test_chartview_tab_and_det_removal(qtbot):
     widget.curveManager.removeCurve.assert_called()
 
     # Test detector removal
-    widget.curveManager.findCurveID.return_value = "test_curve"
+    widget.curveManager.findCurveID.return_value = ["test_curve"]
     widget.onDetRemoved("/path/to/file.mda", 0)
     widget.curveManager.removeCurve.assert_called()
 
@@ -1336,8 +1336,9 @@ def test_onDetRemoved_removes_curve(qtbot: "FixtureRequest") -> None:
     qtbot.addWidget(widget)
 
     widget.curveManager = MagicMock()
-    widget.curveManager.findCurveID.return_value = "curve_id"
+    widget.curveManager.findCurveID.return_value = ["curve_id"]
     widget.curveManager.removeCurve = MagicMock()
+    widget.curveManager._persistent_properties = {}
 
     file_path = "/tmp/test.mda"
     row = 0
