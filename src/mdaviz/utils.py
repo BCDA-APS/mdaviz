@@ -584,7 +584,7 @@ def mda2ftm(selection: dict | None) -> dict:
                 # Handle unique selections (X and I0)
                 ftm_selection[vals] = k
             else:
-                # Handle multiple selections (Y and Un)
+                # Handle multiple selections (Y)
                 for v in vals:
                     if v in ftm_selection:
                         # If this row already has a selection, convert to multiple selection
@@ -622,12 +622,12 @@ def ftm2mda(selection: dict | None) -> dict:
                         # These should be unique, so we take the last one
                         mda_selection[column_name] = key
                     else:
-                        # For Y and Un, append to list
+                        # For Y, append to list
                         if column_name not in mda_selection:
                             mda_selection[column_name] = []
                         mda_selection[column_name].append(key)
             else:
-                # Handle single selection (backward compatibility)
+                # Handle single selection
                 if value in ["X", "I0"]:
                     # Directly assign the value for 'X' and 'I0' since they are always unique
                     mda_selection[value] = key

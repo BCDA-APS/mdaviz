@@ -14,10 +14,6 @@ Data Field Selection Rules:
 2. Only zero or one data field can be selected as `"X"`.
 3. Only zero or one data field can be selected as `"I0"`.
 4. One or more data fields can be selected as `"Y"`.
-5. "Un" cannot be with X on the same row
-6. "Un" cannot be with I0 on the same row
-7. "Un" requires Y on the same row (validation handled elsewhere)
-8. Multiple "Un" selections allowed (across rows)
 
 When Model/View is created, the view should call 'model.setFields(fields)' with
 the list of field names for selection.  (If 'fields' is a different structure,
@@ -209,8 +205,6 @@ class MDAFileTableModel(QAbstractTableModel):
                     return "Select this field as a Y-axis (dependent variable). Multiple Y selections allowed."
                 elif column_name == "I0":
                     return "Select this field for normalization (divide Y data by this field). Only one I0 selection allowed."
-                elif column_name == "Un":
-                    return "Unscale this curve to match the range of other Y curves. Requires Y selection on same row. Multiple Un selections allowed."
 
         return None
 
@@ -433,99 +427,47 @@ class MDAFileTableModel(QAbstractTableModel):
         logger.debug(f"applySelectionRules - row={row}, column_name={column_name}")
         logger.debug(f"applySelectionRules - current selections={self.selections}")
 
-        # Handle "Un" column special rules
-        if column_name == "Un":
-            logger.debug("applySelectionRules - handling Un column")
-            # Rule 1: Cannot be same as X
-            if isinstance(
-                self.selections.get(row), list
-            ) and "X" in self.selections.get(row, []):
-                if "Un" in self.selections.get(row, []):
-                    logger.debug(
-                        "applySelectionRules - removing Un because X is selected"
-                    )
-                    self.selections[row].remove("Un")
-                    changes = True
-            elif self.selections.get(row) == "X":
-                if "Un" in self.selections.get(row, []):
-                    logger.debug("applySelectionRules - keeping only X, removing Un")
-                    self.selections[row] = "X"  # Keep only X
-                    changes = True
-            # Rule 2: Cannot be same as I0
-            if isinstance(
-                self.selections.get(row), list
-            ) and "I0" in self.selections.get(row, []):
-                if "Un" in self.selections.get(row, []):
-                    logger.debug(
-                        "applySelectionRules - removing Un because I0 is selected"
-                    )
-                    self.selections[row].remove("Un")
-                    changes = True
-            elif self.selections.get(row) == "I0":
-                if "Un" in self.selections.get(row, []):
-                    logger.debug("applySelectionRules - keeping only I0, removing Un")
-                    self.selections[row] = "I0"  # Keep only I0
-                    changes = True
-            # Rule 3: Requires Y selection (handled in data2Plot)
-            # Rule 4: Multiple allowed (no special handling needed)
-        else:
-            # Handle unique selection columns (X, I0)
-            if current_column_number in self.uniqueSelectionColumns:
-                for r, v in sorted(self.selections.items()):
-                    if v is not None:
-                        # Handle both single selection (string) and multiple selection (list)
-                        if isinstance(v, list):
-                            # For multiple selections, check if any of them conflict
-                            for single_v in v:
-                                if single_v in ["X", "I0"]:
-                                    v_column_number = self.columnNumber(single_v)
-                                    if (
-                                        v_column_number in self.uniqueSelectionColumns
-                                        and current_column_number
-                                        in self.uniqueSelectionColumns
-                                        and single_v
-                                        == column_name  # Only conflict if same column type
-                                    ):
-                                        if r != row:
-                                            logger.debug(
-                                                f"applySelectionRules - removing {single_v} from row {r} because {column_name} selected"
-                                            )
-                                            # Remove the conflicting selection from the list
-                                            v.remove(single_v)
-                                            if not v:  # If list is empty, set to None
-                                                self.selections[r] = None
-                                            else:
-                                                self.selections[r] = v
-                                            changes = True
-                            # Also check for conflicts within the same row (e.g., X and Un, I0 and Un)
-                            if r == row and isinstance(v, list):
-                                # Remove "Un" if "X" is also selected
-                                if "X" in v and "Un" in v:
-                                    logger.debug(
-                                        "applySelectionRules - removing Un because X is selected on same row"
-                                    )
-                                    v.remove("Un")
-                                    changes = True
-                                # Remove "Un" if "I0" is also selected
-                                if "I0" in v and "Un" in v:
-                                    logger.debug(
-                                        "applySelectionRules - removing Un because I0 is selected on same row"
-                                    )
-                                    v.remove("Un")
-                                    changes = True
-                        else:
-                            # Handle single selection (backward compatibility)
-                            v_column_number = self.columnNumber(v)
-                            if (
-                                v_column_number in self.uniqueSelectionColumns
-                                and current_column_number in self.uniqueSelectionColumns
-                            ):
-                                if r != row and column_name == v:
-                                    logger.debug(
-                                        f"applySelectionRules - removing {v} from row {r} because {column_name} selected"
-                                    )
-                                    self.selections[r] = None
-                                    changes = True
+        # Handle unique selection columns (X, I0)
+        if current_column_number in self.uniqueSelectionColumns:
+            for r, v in sorted(self.selections.items()):
+                if v is not None:
+                    # Handle both single selection (string) and multiple selection (list)
+                    if isinstance(v, list):
+                        # For multiple selections, check if any of them conflict
+                        for single_v in v:
+                            if single_v in ["X", "I0"]:
+                                v_column_number = self.columnNumber(single_v)
+                                if (
+                                    v_column_number in self.uniqueSelectionColumns
+                                    and current_column_number
+                                    in self.uniqueSelectionColumns
+                                    and single_v
+                                    == column_name  # Only conflict if same column type
+                                ):
+                                    if r != row:
+                                        logger.debug(
+                                            f"applySelectionRules - removing {single_v} from row {r} because {column_name} selected"
+                                        )
+                                        # Remove the conflicting selection from the list
+                                        v.remove(single_v)
+                                        if not v:  # If list is empty, set to None
+                                            self.selections[r] = None
+                                        else:
+                                            self.selections[r] = v
+                                        changes = True
+                    else:
+                        # Handle single selection
+                        v_column_number = self.columnNumber(v)
+                        if (
+                            v_column_number in self.uniqueSelectionColumns
+                            and current_column_number in self.uniqueSelectionColumns
+                        ):
+                            if r != row and column_name == v:
+                                logger.debug(
+                                    f"applySelectionRules - removing {v} from row {r} because {column_name} selected"
+                                )
+                                self.selections[r] = None
+                                changes = True
 
         logger.debug(
             f"applySelectionRules - final selections={self.selections}, changes={changes}"
@@ -664,7 +606,7 @@ class MDAFileTableModel(QAbstractTableModel):
 
         key=column_name, value= row_number(s)
         """
-        choices = dict(Y=[], Un=[])
+        choices = dict(Y=[])
         for row, selection in self.selections.items():
             if selection is None:
                 continue

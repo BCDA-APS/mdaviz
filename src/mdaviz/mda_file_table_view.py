@@ -6,7 +6,7 @@ data fields with checkboxes for selection. It supports both 1D and 2D data visua
 with specialized controls for 2D plotting including X2 slice selection, X1/X2 positioner
 selection, Y detector selection, and I0 normalization.
 
-For 1D data, users can select X, Y, I0, and Unscaled fields for plotting.
+For 1D data, users can select X, Y, I0 fields for plotting.
 For 2D data, additional controls are available for:
 - X2 slice selection (spinbox)
 - X1/X2 positioner selection (comboboxes)
@@ -38,14 +38,13 @@ from mdaviz.logger import get_logger
 # Get logger for this module
 logger = get_logger("mda_file_table_view")
 
-HEADERS = "Field", "X", "Y", "I0", "Un", "PV", "DESC", "Unit"
+HEADERS = "Field", "X", "Y", "I0", "PV", "DESC", "Unit"
 
 COLUMNS = [
     TableColumn("Field", ColumnDataType.text),
     TableColumn("X", ColumnDataType.checkbox, rule=FieldRuleType.unique),  # type: ignore[arg-type]
     TableColumn("Y", ColumnDataType.checkbox, rule=FieldRuleType.multiple),  # type: ignore[arg-type]
     TableColumn("I0", ColumnDataType.checkbox, rule=FieldRuleType.unique),  # type: ignore[arg-type]
-    TableColumn("Un", ColumnDataType.checkbox, rule=FieldRuleType.multiple),  # type: ignore[arg-type]
     TableColumn("PV", ColumnDataType.text),
     TableColumn("DESC", ColumnDataType.text),
     TableColumn("Unit", ColumnDataType.text),
@@ -939,15 +938,14 @@ class MDAFileTableView(QWidget):
     def data2Plot(self, selections):
         """
         Extracts selected datasets for plotting from scanDict based on user selections.
-        Slice (if multidimensional), normalize and/or unscale the data as needed.
+        Slice (if multidimensional) and/or normalize the data as needed.
 
         Parameters:
             - selections: A dictionary with keys:
                 - "X": The index for the x-axis data
                 - "Y": A list of indices for the y-axis data
                 - "I0" (optional): The index for normalization data
-                - "Un" (optional): A list of indices for unscaled data (rows that will be unscaled when both Y and Un are selected)
-                - e.g. selections = {"X": 1, "Y": [2, 3, 5], "I0": 4, "Un": [3, 5]}
+                - e.g. selections = {"X": 1, "Y": [2, 3, 5], "I0": 4}
         Returns:
             - A tuple of (datasets, plot_options), where datasets is a list of tuples containing the
               data and options (label) for each dataset, and plot_options contains overall plotting configurations.
@@ -1015,49 +1013,7 @@ class MDAFileTableView(QWidget):
 
             # ------ extract y(s) data:
             y_index = selections.get("Y", [])
-            un_index = selections.get("Un", [])
             y_first_unit = y_first_name = ""
-
-            # Identify rows that need unscaling (have both Y and Un selected)
-            unscaled_rows = set(y_index) & set(un_index)
-            regular_y_rows = set(y_index) - unscaled_rows
-
-            # Calculate global min/max for unscaling (from regular Y curves only)
-            global_min = float("inf")
-            global_max = float("-inf")
-            if unscaled_rows and regular_y_rows:
-                for y in regular_y_rows:
-                    if y in scanDict:
-                        y_data = scanDict[y].get("data")
-                        if y_data is not None:
-                            # Apply I0 normalization if I0 is selected
-                            if i0_data is not None:
-                                i0_data_safe = np.array(i0_data)
-                                i0_data_safe[i0_data_safe == 0] = 1
-                                y_data = np.array(y_data) / i0_data_safe
-                            else:
-                                y_data = np.array(y_data)
-                            global_min = min(global_min, np.min(y_data))
-                            global_max = max(global_max, np.max(y_data))
-
-            # If reference curve is constant (global_max == global_min), create a range around it
-            if (
-                unscaled_rows
-                and global_min != float("inf")
-                and global_max != float("-inf")
-            ):
-                if global_max == global_min:
-                    # Reference is constant, use constant ± 0.5 as the target range
-                    constant_value = global_min
-                    global_min = constant_value - 0.5
-                    global_max = constant_value + 0.5
-
-            # If no regular Y curves to reference, use 0 to 1 scale for unscaling
-            if unscaled_rows and (
-                global_min == float("inf") or global_max == float("-inf")
-            ):
-                global_min = 0.0
-                global_max = 1.0
 
             # Process all Y curves
             for i, y in enumerate(y_index):
@@ -1075,11 +1031,7 @@ class MDAFileTableView(QWidget):
                     # Add bounds checking to prevent IndexError
                     y_data_array = np.array(y_data)
                     if x2_slice >= y_data_array.shape[0]:
-                        logger.debug(
-                            f"data2Plot - X2 slice {x2_slice} out of bounds for data shape {y_data_array.shape}, using last available slice"
-                        )
                         x2_slice = y_data_array.shape[0] - 1  # Use last available slice
-
                     y_data = y_data[x2_slice]  # Take the selected X2 slice
 
                 # Apply I0 normalization if I0 is selected
@@ -1103,41 +1055,10 @@ class MDAFileTableView(QWidget):
                     x2_index = self.getX2Value()
                     y_label = f"{y_label} [{x2_index}]"
 
-                # Apply unscaling if this row has both Y and Un selected
-                if (
-                    y in unscaled_rows
-                    and global_min != float("inf")
-                    and global_max != float("-inf")
-                ):
-                    # Calculate min/max of this curve
-                    m1, M1 = np.min(y_data), np.max(y_data)
-                    # Apply unscaling formula: g(x) = ((f1(x) - m1) / (M1 - m1)) * (M23 - m23) + m23
-                    if M1 != m1:  # Avoid division by zero
-                        y_data = ((y_data - m1) / (M1 - m1)) * (
-                            global_max - global_min
-                        ) + global_min
-                        y_label = f"{fileName}: {y_name} [unscaled]"
-                        if i0_data is not None:
-                            y_label = f"{fileName}: {y_name} [norm, unscaled]"
-
-                        # Add X2 index to unscaled label for 2D data
-                        if fileInfo.get("isMultidimensional", False):
-                            x2_index = self.getX2Value()
-                            y_label = f"{y_label} [{x2_index}]"
-
                 if i == 0:
                     y_first_unit = y_unit
-                    # y_first_name is used for y-axis label and shows normalization/unscaling status
-                    if (
-                        y in unscaled_rows
-                        and global_min != float("inf")
-                        and global_max != float("-inf")
-                    ):
-                        if i0_data is not None:
-                            y_first_name = f"{y_name} [norm, unscaled]"
-                        else:
-                            y_first_name = f"{y_name} [unscaled]"
-                    elif i0_data is not None:
+                    # y_first_name is used for y-axis label and shows normalization status
+                    if i0_data is not None:
                         y_first_name = f"{y_name} [norm]"
                     else:
                         y_first_name = f"{y_name} {y_unit}"

@@ -1286,7 +1286,7 @@ def test_onCurveRemoved_resets_log_scale_when_last_curve(
     parent.mda_file_viz.setLogScaleState.assert_called_once_with(False, False)
 
 
-def test_onClearAllClicker_resets_log_scale(qtbot: "FixtureRequest") -> None:
+def test_onClearAllClicked_resets_log_scale(qtbot: "FixtureRequest") -> None:
     """When Clear All is clicked, log scale is reset and allCurvesRemoved is emitted."""
     parent = MagicMock()
     parent.mda_file_viz.curveBox = MagicMock()
@@ -1308,7 +1308,7 @@ def test_onClearAllClicker_resets_log_scale(qtbot: "FixtureRequest") -> None:
     widget = ChartView(parent)
     qtbot.addWidget(widget)
 
-    widget.onClearAllClicker()
+    widget.onClearAllClicked()
 
     # Clear All click should reset log scale (emit is a Qt signal, not mocked)
     parent.mda_file_viz.setLogScaleState.assert_called_once_with(False, False)
