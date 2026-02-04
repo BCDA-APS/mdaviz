@@ -613,7 +613,10 @@ class MDA_MVC(QWidget):
                 self.mda_file.tabWidget.currentIndex()
             )
 
+            last_selected_curve_index = -1
             if action in ("replace"):
+                if widgetMpl.curveBox.count() > 0:
+                    last_selected_curve_index = widgetMpl.curveBox.currentIndex()
                 widgetMpl.curveManager.removeAllCurves()
                 if current_file_path != self._last_plotted_file_path:
                     widgetMpl.curveManager.clearPersistentProperties()
@@ -634,6 +637,16 @@ class MDA_MVC(QWidget):
                 widgetMpl.plot(i, *ds, **options)
             widgetMpl.refreshAllUnscaledCurves()
             self.mda_file_viz.setPlot(widgetMpl)
+            if (
+                last_selected_curve_index >= 0
+                and last_selected_curve_index < widgetMpl.curveBox.count()
+                and action in ("replace")
+            ):
+                restore_index = min(
+                    last_selected_curve_index, widgetMpl.curveBox.count() - 1
+                )
+                widgetMpl.curveBox.setCurrentIndex(restore_index)
+                widgetMpl.onCurveSelected(restore_index)
 
     def doPlot2D(self, action, selection):
         """
@@ -908,7 +921,10 @@ class MDA_MVC(QWidget):
                 stored_log_x, stored_log_y = self.mda_file_viz.getLogScaleState()
                 widgetMpl.setLogScales(stored_log_x, stored_log_y)
 
+        last_selected_curve_index = -1
         if mode in ("Auto-replace"):
+            if widgetMpl.curveBox.count() > 0:
+                last_selected_curve_index = widgetMpl.curveBox.currentIndex()
             widgetMpl.curveManager.removeAllCurves()
         for row, (ds, ds_options) in zip(new_y_selection, datasets):
             # ds_options: label (for legend)
@@ -922,6 +938,16 @@ class MDA_MVC(QWidget):
                 logger.debug("doPlot - No x2_index in plot_options")
             widgetMpl.plot(row, *ds, **options)
         self.mda_file_viz.setPlot(widgetMpl)
+        if (
+            last_selected_curve_index >= 0
+            and last_selected_curve_index < widgetMpl.curveBox.count()
+            and mode in ("Auto-replace")
+        ):
+            restore_index = min(
+                last_selected_curve_index, widgetMpl.curveBox.count() - 1
+            )
+            widgetMpl.curveBox.setCurrentIndex(restore_index)
+            widgetMpl.onCurveSelected(restore_index)
 
     # # ------------ splitter methods
 
