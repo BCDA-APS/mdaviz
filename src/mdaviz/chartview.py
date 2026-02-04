@@ -542,7 +542,7 @@ class ChartView(QWidget):
 
         # Add to the comboBox
         index = self.curveBox.count()  # Get the next index
-        prev_index = self.curveBox.currentIndex()
+        # prev_index = self.curveBox.currentIndex()
         # Use the user-friendly label for display, but store curveID as data
         display_label = curveData.get("ds_options", {}).get("label", curveID)
         self.curveBox.addItem(display_label)
@@ -567,13 +567,14 @@ class ChartView(QWidget):
         # Refresh axis labels, legend, limits, and redraw the plot:
         self.updatePlot(update_title=True)
 
-        # Force the UI back to the previously selected curve and refresh it from the curve manager:
-        # syncs UI to the curve selected: derivative, offset/factor, tooltip, basic maths, fits...
+        # Select the last plotted curve in the comboBox and syncs UI to the curve selected:
+        # derivative, offset/factor, tooltip, basic maths, fits...
         if self.curveBox.count() > 1:
+            new_index = self.curveBox.count() - 1
             self.curveBox.blockSignals(True)
-            self.curveBox.setCurrentIndex(prev_index)
+            self.curveBox.setCurrentIndex(new_index)
             self.curveBox.blockSignals(False)
-            self.onCurveSelected(prev_index)
+            self.onCurveSelected(new_index)
 
     def onCurveUpdated(self, curveID, recompute_y=False, update_x=False):
         """

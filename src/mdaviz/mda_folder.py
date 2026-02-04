@@ -130,6 +130,7 @@ class MDA_MVC(QWidget):
         self.setSelectionModel()
         self.setCurrentFileTableview()
         self._last_plotted_file_path = None
+        self._last_selection = None
 
         # Set Selection Model & Focus for keyboard arrow keys to Folder Table View:
         model = self.mda_folder_tableview.tableView.model()
@@ -613,10 +614,7 @@ class MDA_MVC(QWidget):
                 self.mda_file.tabWidget.currentIndex()
             )
 
-            last_selected_curve_index = -1
             if action in ("replace"):
-                if widgetMpl.curveBox.count() > 0:
-                    last_selected_curve_index = widgetMpl.curveBox.currentIndex()
                 widgetMpl.curveManager.removeAllCurves()
                 if current_file_path != self._last_plotted_file_path:
                     widgetMpl.curveManager.clearPersistentProperties()
@@ -637,16 +635,6 @@ class MDA_MVC(QWidget):
                 widgetMpl.plot(i, *ds, **options)
             widgetMpl.refreshAllUnscaledCurves()
             self.mda_file_viz.setPlot(widgetMpl)
-            if (
-                last_selected_curve_index >= 0
-                and last_selected_curve_index < widgetMpl.curveBox.count()
-                and action in ("replace")
-            ):
-                restore_index = min(
-                    last_selected_curve_index, widgetMpl.curveBox.count() - 1
-                )
-                widgetMpl.curveBox.setCurrentIndex(restore_index)
-                widgetMpl.onCurveSelected(restore_index)
 
     def doPlot2D(self, action, selection):
         """
@@ -878,6 +866,11 @@ class MDA_MVC(QWidget):
         mode = self.mda_file.mode()
         tableview = self.currentFileTableview()
 
+        if self._last_selection is not None:
+            i0_toggled = selection.get("I0") != self._last_selection.get("I0")
+        else:
+            i0_toggled = False
+
         # Get the matplotlib chartview widget, if exists:
         layoutMpl = self.mda_file_viz.plotPageMpl.layout()
         if layoutMpl.count() != 1:  # in case something changes ...
@@ -888,6 +881,7 @@ class MDA_MVC(QWidget):
 
         # In auto-off mode: no synchronisation - user needs to push a button.
         if mode in ("Auto-off"):
+            self._last_selection = dict(selection)
             return
 
         # If no POS, default to index:
@@ -901,6 +895,7 @@ class MDA_MVC(QWidget):
         if not new_y_selection and self.mda_file.tabWidget.count() == 1:
             self.mda_file_viz.setLogScaleState(False, False)
             widgetMpl.curveManager.removeAllCurves(savePersistentProperties=False)
+            self._last_selection = dict(selection)
             return
 
         # Handle detector removal - emit signals but don't return early
@@ -938,16 +933,19 @@ class MDA_MVC(QWidget):
                 logger.debug("doPlot - No x2_index in plot_options")
             widgetMpl.plot(row, *ds, **options)
         self.mda_file_viz.setPlot(widgetMpl)
+        # Restore last selected curve in comboBox
         if (
             last_selected_curve_index >= 0
             and last_selected_curve_index < widgetMpl.curveBox.count()
             and mode in ("Auto-replace")
+            and i0_toggled
         ):
             restore_index = min(
                 last_selected_curve_index, widgetMpl.curveBox.count() - 1
             )
             widgetMpl.curveBox.setCurrentIndex(restore_index)
             widgetMpl.onCurveSelected(restore_index)
+        self._last_selection = dict(selection)
 
     # # ------------ splitter methods
 
