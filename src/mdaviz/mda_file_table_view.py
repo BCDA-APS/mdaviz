@@ -411,6 +411,10 @@ class MDAFileTableView(QWidget):
                 f"get2DSelections - Empty color palette, using default: {color_palette}"
             )
 
+        plot_type = self.plotTypeComboBox.currentText().lower()
+        if not plot_type or plot_type.strip() == "":
+            plot_type = "heatmap"
+
         selections = {
             "X1": self.x1ComboBox.currentData(),
             "X2": self.x2ComboBox.currentData(),
@@ -420,7 +424,7 @@ class MDAFileTableView(QWidget):
                 else []
             ),
             "I0": self.i0ComboBox.currentData(),
-            "plot_type": self.plotTypeComboBox.currentText().lower(),
+            "plot_type": plot_type,
             "color_palette": color_palette,
             "log_y": self.logYCheckBox.isChecked(),
         }
