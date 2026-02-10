@@ -36,6 +36,7 @@ Usage:
 """
 
 from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6.QtCore import QTimer
 from PyQt6.QtGui import QFont, QKeySequence
 from PyQt6.QtWidgets import QWidget, QDialog, QSizePolicy
 from PyQt6.QtGui import QShortcut
@@ -79,6 +80,9 @@ class MDAFileVisualization(QWidget):
         self._last_control_update = None
         self._last_control_update_value = None
         self._control_update_delay = 100  # milliseconds
+
+        # Initialize last tab index
+        self._last_viz_tab_index = 0
 
     def setup(self):
         """Setup the UI components and connections."""
@@ -128,8 +132,6 @@ class MDAFileVisualization(QWidget):
 
         # Connect to file tab changes to update 2D plot when switching files
         # Use a timer to delay connection until widget is fully initialized
-        from PyQt6.QtCore import QTimer
-
         QTimer.singleShot(100, self.connectToFileTabChanges)
 
     def connectToFileTabChanges(self):
@@ -159,6 +161,13 @@ class MDAFileVisualization(QWidget):
         """
         logger.debug(f"File tab changed to {file_path}")
 
+        if tab_index == -1:
+            return
+
+        # Capture before update2DTabVisibility; hiding 2D tab triggers onTabChanged
+        # and overwrites _last_viz_tab_index
+        viz_tab_to_restore = self._last_viz_tab_index
+
         # Update 2D tab visibility based on the active file's data
         current_tableview = self.getCurrentFileTableview()
         if (
@@ -173,15 +182,29 @@ class MDAFileVisualization(QWidget):
         else:
             logger.debug("No current tableview or file data available")
             self.update2DTabVisibility(False)
+            is_2d_data = False
+
+        # Restore viz tab: use stored index if valid, else switch to 1D (0)
+        if is_2d_data:
+            self.tabWidget.setCurrentIndex(viz_tab_to_restore)
+        else:
+            desired = 0 if viz_tab_to_restore == 3 else viz_tab_to_restore
+            self.tabWidget.setCurrentIndex(desired)
 
         # Always update control visibility to ensure correct controls are shown
         current_tab_index = self.tabWidget.currentIndex()
         logger.debug(f"Current viz tab index: {current_tab_index}")
-        self.updateControlVisibility(current_tab_index)
+        QTimer.singleShot(0, lambda: self.deferredUpdateControlVisibility())
 
         # Update 2D plot if we're currently on the 2D tab
         if current_tab_index == 3:  # 2D tab
             logger.debug("On 2D tab, updating 2D plot")
+            self.update2DPlot()
+
+    def deferredUpdateControlVisibility(self):
+        tab_index = self.tabWidget.currentIndex()
+        self.updateControlVisibility(tab_index)
+        if tab_index == 3:
             self.update2DPlot()
 
     def update2DTabVisibility(self, show_2d_tab=False):
@@ -206,28 +229,23 @@ class MDAFileVisualization(QWidget):
             # tab_count >= 4, just show/hide as needed
             self.tabWidget.setTabVisible(3, show_2d_tab)
 
-            # If hiding 2D tab and it's currently selected, switch to 1D tab
-            if not show_2d_tab and self.tabWidget.currentIndex() == 3:
-                self.tabWidget.setCurrentIndex(0)
-
     def set2DData(self, data):
         """
         Set 2D data for visualization and manage 2D tab visibility.
 
-        Switches to the 1D plot tab (index 0) when called. If data is multidimensional,
-        shows the 2D tab and stores the data; otherwise hides the 2D tab and clears stored data.
+        If data is multidimensional, shows the 2D tab and stores the data; otherwise hides the
+        2D tab and clears stored data.
 
         Parameters:
             data (dict or None): 2D data dictionary with scanDict2D and metadata, or None to clear
         """
-        # Force switch to 1D tab when switching files (for both 2D and 1D files)
-        self.tabWidget.setCurrentIndex(0)
 
         if not data or not data.get("isMultidimensional", False):
             self.update2DTabVisibility(False)
             # Clear 2D data
             if hasattr(self, "_2d_data"):
                 delattr(self, "_2d_data")
+            self.updateControlVisibility(self.tabWidget.currentIndex())
             return
 
         # Show 2D tab for multidimensional data
@@ -239,6 +257,9 @@ class MDAFileVisualization(QWidget):
         # Update 2D plot if tab is visible
         if self.tabWidget.currentIndex() == 3:  # 2D tab
             self.update2DPlot()
+
+        # Update control (tableview vs 2D/Ydet control)
+        self.updateControlVisibility(self.tabWidget.currentIndex())
 
     def update2DPlot(self):
         """Update the 2D plot with current data."""
@@ -406,6 +427,10 @@ class MDAFileVisualization(QWidget):
         """
         logger.debug(f"Tab changed to index: {index}")
 
+        # Store new tab index
+        if index >= 0:
+            self._last_viz_tab_index = index
+
         # Get current tab structure
         tab_count = self.tabWidget.count()
         is_2d_visible = tab_count >= 4 and self.tabWidget.isTabVisible(3)
@@ -448,6 +473,7 @@ class MDAFileVisualization(QWidget):
             tab_index (int): Index of the selected tab
         """
         # Get the current file table view
+
         current_tableview = self.getCurrentFileTableview()
         if not current_tableview:
             logger.debug("updateControlVisibility No current tableview found")
