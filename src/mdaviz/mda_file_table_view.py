@@ -365,6 +365,11 @@ class MDAFileTableView(QWidget):
         if hasattr(self.mda_file, "x2ValueChanged"):
             self.mda_file.x2ValueChanged.emit(value)
 
+        # Save selection
+        selection_by_pv = self.get2DSelectionsByPV()
+        if selection_by_pv:
+            self.mda_file.setLast2DSelection(selection_by_pv)
+
     def _updateX2ValueLabel(self, x2_index, x2_positioner_info):
         """
         Update the X2 value label with the current positioner value.
@@ -431,6 +436,169 @@ class MDAFileTableView(QWidget):
         logger.debug(f"get2DSelections - {selections}")
         return selections
 
+    def get2DSelectionsByPV(self):
+        """
+        Return current 2D selection using PV/field names instead of internal ids.
+
+        Structure:
+            {
+                "X1_pv": str | None,
+                "X2_pv": str | None,
+                "Y_pv": str | None,
+                "I0_pv": str | None,
+                "plot_type": str | None,
+                "color_palette": str | None,
+                "log_y": bool,
+                "x2_slice": int,
+            }
+        """
+        selection = self.get2DSelections()
+        data = self.data()
+        if not data:
+            return {}
+
+        fileInfo = data.get("fileInfo", {})
+        if not fileInfo.get("isMultidimensional", False):
+            return {}
+
+        scanDict = fileInfo.get("scanDict", {})  # outer (for X2)
+        scanDictInner = fileInfo.get("scanDictInner", {})  # inner (for X1)
+        scanDict2D = fileInfo.get("scanDict2D", {})  # detectors for 2D
+
+        def _pv_name_from_dict(d, key):
+            if key is None:
+                return None
+            entry = d.get(key)
+            if not entry:
+                return None
+            return entry.get("name")
+
+        x1_id = selection.get("X1")
+        x2_id = selection.get("X2")
+        y_list = selection.get("Y", [])
+        y_id = y_list[0] if y_list else None
+        i0_id = selection.get("I0")
+
+        # *_id is the key in scanDict*
+        x1_pv = _pv_name_from_dict(scanDictInner, x1_id)
+        x2_pv = _pv_name_from_dict(scanDict, x2_id)
+        y_pv = _pv_name_from_dict(scanDict2D, y_id)
+
+        # Special-case: I0 "None" option → store I0_pv as None
+        if i0_id is None:
+            i0_pv = None
+        else:
+            i0_pv = _pv_name_from_dict(scanDict2D, i0_id)
+
+        plot_type = selection.get("plot_type")
+        color_palette = selection.get("color_palette")
+        log_y = selection.get("log_y", False)
+        x2_slice = self.getX2Value()
+
+        return {
+            "X1_pv": x1_pv,
+            "X2_pv": x2_pv,
+            "Y_pv": y_pv,
+            "I0_pv": i0_pv,
+            "plot_type": plot_type,
+            "color_palette": color_palette,
+            "log_y": log_y,
+            "x2_slice": x2_slice,
+        }
+
+    def apply2DSelection(self, selection_by_pv):
+        """Apply PV-based 2D selection to this file's controls; use defaults when a PV is missing."""
+
+        if not selection_by_pv:
+            return
+
+        data = self.data()
+        if not data:
+            return
+
+        fileInfo = data.get("fileInfo", {})
+
+        if not fileInfo.get("isMultidimensional", False):
+            return
+
+        scanDict = fileInfo.get("scanDict", {})  # outer (for X2)
+        scanDictInner = fileInfo.get("scanDictInner", {})  # inner (for X1)
+        scanDict2D = fileInfo.get("scanDict2D", {})  # detectors for 2D
+
+        def _pv_name_to_index(combo, d, pv):
+            if pv is None:
+                return None
+            for i in range(combo.count()):
+                field_id = combo.itemData(i)
+                entry = d.get(field_id)
+                if entry and entry.get("name") == pv:
+                    return i
+            return None
+
+        _2d_controls = (
+            self.x1ComboBox,
+            self.x2ComboBox,
+            self.yDetComboBox,
+            self.i0ComboBox,
+            self.plotTypeComboBox,
+            self.colorPaletteComboBox,
+            self.logYCheckBox,
+            self.x2SpinBox,
+        )
+        for w in _2d_controls:
+            w.blockSignals(True)
+
+        x1_pv = selection_by_pv.get("X1_pv")
+        x1_idx = _pv_name_to_index(self.x1ComboBox, scanDictInner, x1_pv)
+        if x1_idx is not None:
+            self.x1ComboBox.setCurrentIndex(x1_idx)
+
+        x2_pv = selection_by_pv.get("X2_pv")
+        x2_idx = _pv_name_to_index(self.x2ComboBox, scanDict, x2_pv)
+        if x2_idx is not None:
+            self.x2ComboBox.setCurrentIndex(x2_idx)
+
+        y_pv = selection_by_pv.get("Y_pv")
+        y_idx = _pv_name_to_index(self.yDetComboBox, scanDict2D, y_pv)
+        if y_idx is not None:
+            self.yDetComboBox.setCurrentIndex(y_idx)
+
+        i0_pv = selection_by_pv.get("I0_pv")
+        if i0_pv is None:
+            self.i0ComboBox.setCurrentIndex(0)
+        else:
+            i0_idx = _pv_name_to_index(self.i0ComboBox, scanDict2D, i0_pv)
+            if i0_idx is not None:
+                self.i0ComboBox.setCurrentIndex(i0_idx)
+
+        plotType = selection_by_pv.get("plot_type")
+        if plotType:
+            for i in range(self.plotTypeComboBox.count()):
+                if self.plotTypeComboBox.itemText(i).lower() == plotType.lower():
+                    self.plotTypeComboBox.setCurrentIndex(i)
+                    break
+
+        palette = selection_by_pv.get("color_palette")
+        if palette:
+            for i in range(self.colorPaletteComboBox.count()):
+                if self.colorPaletteComboBox.itemText(i) == palette:
+                    self.colorPaletteComboBox.setCurrentIndex(i)
+                    break
+
+        self.logYCheckBox.setChecked(bool(selection_by_pv.get("log_y", False)))
+
+        x2_slice = selection_by_pv.get("x2_slice")
+        if isinstance(x2_slice, int):
+            min_val = self.x2SpinBox.minimum()
+            max_val = self.x2SpinBox.maximum()
+            x2_slice = max(min_val, min(max_val, x2_slice))  # clamp
+            self.x2SpinBox.setValue(x2_slice)
+
+        for w in _2d_controls:
+            w.blockSignals(False)
+
+        self._trigger2DPlot()
+
     # Y DET Controls Signal Handlers
     def _trigger2DPlot(self):
         """Helper method to trigger 2D plotting with current selections."""
@@ -485,33 +653,57 @@ class MDAFileTableView(QWidget):
         """Handle X1 positioner selection change."""
         logger.debug(f"onX1SelectionChanged - index: {index}")
         self._trigger2DPlot()
+        # Save selection
+        selection_by_pv = self.get2DSelectionsByPV()
+        if selection_by_pv:
+            self.mda_file.setLast2DSelection(selection_by_pv)
 
     def onX2SelectionChanged(self, index):
         """Handle X2 positioner selection change."""
         logger.debug(f"onX2SelectionChanged - index: {index}")
         self._trigger2DPlot()
+        # Save selection
+        selection_by_pv = self.get2DSelectionsByPV()
+        if selection_by_pv:
+            self.mda_file.setLast2DSelection(selection_by_pv)
 
     def onYDetSelectionChanged(self, index):
         """Handle Y detector selection change."""
         logger.debug(f"onYDetSelectionChanged - index: {index}")
         self._trigger2DPlot()
+        # Save selection
+        selection_by_pv = self.get2DSelectionsByPV()
+        if selection_by_pv:
+            self.mda_file.setLast2DSelection(selection_by_pv)
 
     def onI0SelectionChanged(self, index):
         """Handle I0 detector selection change."""
         logger.debug(f"onI0SelectionChanged - index: {index}")
         self._trigger2DPlot()
+        # Save selection
+        selection_by_pv = self.get2DSelectionsByPV()
+        if selection_by_pv:
+            self.mda_file.setLast2DSelection(selection_by_pv)
 
     def onPlotTypeChanged(self, index):
         """Handle plot type selection change."""
         plot_type = self.plotTypeComboBox.currentText().lower()
         logger.debug(f"onPlotTypeChanged - plot_type: {plot_type}")
         self._trigger2DPlot()
+        # Save selection
+        selection_by_pv = self.get2DSelectionsByPV()
+        if selection_by_pv:
+            self.mda_file.setLast2DSelection(selection_by_pv)
 
     def onColorPaletteChanged(self, index):
         """Handle color palette selection change."""
         palette_name = self.colorPaletteComboBox.currentText()
         logger.debug(f"onColorPaletteChanged - palette_name: {palette_name}")
         self._trigger2DPlot()
+        # Save selection
+        selection_by_pv = self.get2DSelectionsByPV()
+        if selection_by_pv:
+            self.mda_file.setLast2DSelection(selection_by_pv)
 
     def onLogScaleChanged(self, checked):
         """Handle log scale checkbox changes."""
@@ -519,6 +711,10 @@ class MDAFileTableView(QWidget):
         if sender == self.logYCheckBox:
             logger.debug(f"onLogScaleChanged - LogY: {checked}")
         self._trigger2DPlot()
+        # Save selection
+        selection_by_pv = self.get2DSelectionsByPV()
+        if selection_by_pv:
+            self.mda_file.setLast2DSelection(selection_by_pv)
 
     def onPlotButtonClicked(self):
         """Handle plot button click."""

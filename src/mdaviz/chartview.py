@@ -1693,6 +1693,10 @@ class ChartView2D(ChartView):
         self._plot_type = "heatmap"  # "heatmap" or "contour"
         self._current_colorbar = None  # Store reference to current colorbar
 
+    def configPlot(self, grid=False):
+        """Apply axis labels and title; no grid for 2D plots."""
+        super().configPlot(grid=grid)
+
     def plot2D(self, y_data, x_data, x2_data, plot_options=None):
         """
         Plot 2D data as heatmap or contour.

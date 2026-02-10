@@ -73,6 +73,7 @@ class MDAFile(QWidget):
         self.currentHighlightedModel = (
             None  # To store the current highlighted's row model
         )
+        self._last_2d_selection = {}
 
         # Buttons handling:
         self.addButton.hide()
@@ -279,6 +280,16 @@ class MDAFile(QWidget):
                 "acquiredDimensions": acquired_dimensions,
             }
 
+    def setLast2DSelection(self, selection_by_pv):
+        """Store last 2D selection (by PV) so it can be applied when switching to any file."""
+        if not selection_by_pv:
+            return
+        self._last_2d_selection = selection_by_pv.copy()
+
+    def getLast2DSelection(self):
+        """Return the last 2D selection (by PV) for restore when switching files."""
+        return self._last_2d_selection.copy()
+
     def handle2DMode(self):
         """
         Configure 2D data controls in the current table view when multidimensional data is detected.
@@ -348,6 +359,10 @@ class MDAFile(QWidget):
                     acquired_dimensions=acquired_dimensions,
                     x2_positioner_info=x2_positioner_info,
                 )
+
+                selection = self.getLast2DSelection()
+                if selection:
+                    table_view.apply2DSelection(selection)
 
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
