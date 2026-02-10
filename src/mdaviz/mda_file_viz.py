@@ -557,8 +557,8 @@ class MDAFileVisualization(QWidget):
                 self.graphInfo.setVisible(show)
 
             # Hide/show cursorInfo panel for 2D tab
-            if hasattr(self, "cursorInfo"):
-                self.cursorInfo.setVisible(show)
+            # if hasattr(self, "cursorInfo"):
+            #     self.cursorInfo.setVisible(show)
 
             # If showing 1D controls, restore their state based on current curve selection
             if show and hasattr(self, "chart_view") and self.chart_view:
