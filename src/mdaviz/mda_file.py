@@ -688,8 +688,13 @@ class MDAFile(QWidget):
         self.buttonPushed.emit(action)
 
     def updateButtonVisibility(self):
-        """Check the current text in "mode" pull down and show/hide buttons accordingly"""
-        if self.autoBox.currentText() == "Auto-off":
+        """Check the current text in "mode" pull down and show/hide buttons accordingly.
+        On the 2D viz tab, add/replace are always hidden."""
+        current_viz_tab = self.mda_mvc.mda_file_viz.tabWidget.currentIndex()
+        if current_viz_tab == 3:
+            self.addButton.hide()
+            self.replaceButton.hide()
+        elif self.autoBox.currentText() == "Auto-off":
             self.addButton.show()
             self.replaceButton.show()
         else:

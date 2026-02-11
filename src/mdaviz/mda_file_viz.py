@@ -531,9 +531,9 @@ class MDAFileVisualization(QWidget):
                 # Found MDA_MVC, access controls through mda_file
                 mda_file = parent.mda_file
                 if hasattr(mda_file, "autoBox"):
-                    mda_file.autoBox.setVisible(show)
+                    mda_file.autoBox.setVisible(True)
                 if hasattr(mda_file, "clearButton"):
-                    mda_file.clearButton.setVisible(show)
+                    mda_file.clearButton.setVisible(True)
                 if hasattr(mda_file, "clearGraphButton"):
                     mda_file.clearGraphButton.setVisible(show)
 
