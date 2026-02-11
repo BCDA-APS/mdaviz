@@ -611,6 +611,8 @@ class MDAFileTableView(QWidget):
             max_val = self.x2SpinBox.maximum()
             x2_slice = max(min_val, min(max_val, x2_slice))  # clamp
             self.x2SpinBox.setValue(x2_slice)
+            if hasattr(self, "_x2_positioner_info") and self._x2_positioner_info:
+                self._updateX2ValueLabel(x2_slice, self._x2_positioner_info)
 
         for w in _2d_controls:
             w.blockSignals(False)
