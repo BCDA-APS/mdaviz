@@ -25,6 +25,7 @@ Uses :class:`mda_file_table_model.MDAFileTableModel` for data display.
     ~COLUMNS
 """
 
+from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import QWidget, QHeaderView
 import numpy as np
 
@@ -114,10 +115,22 @@ class MDAFileTableView(QWidget):
         # Connect log scale controls
         self.logYCheckBox.toggled.connect(self.onLogScaleChanged)
 
+        # Populate plot type and color palette comboboxes
+        if self.plotTypeComboBox.count() == 0 or self.colorPaletteComboBox.count() == 0:
+            self._populatePlotStyleComboBox()
+
+        # Initially hide Y DET controls
+        self.yDetControls.setVisible(False)
+
+    def _populatePlotStyleComboBox(self):
+        """Populate the plot type and color palette comboboxes"""
         # Populate plot type combobox
+        self.plotTypeComboBox.blockSignals(True)
         self.plotTypeComboBox.addItems(["Heatmap", "Contour"])
+        self.plotTypeComboBox.blockSignals(False)
 
         # Populate color palette combobox
+        self.colorPaletteComboBox.blockSignals(True)
         self.colorPaletteComboBox.addItems(
             [
                 "viridis",
@@ -135,9 +148,7 @@ class MDAFileTableView(QWidget):
                 "terrain",
             ]
         )
-
-        # Initially hide Y DET controls
-        self.yDetControls.setVisible(False)
+        self.colorPaletteComboBox.blockSignals(False)
 
     # ==========================================
     # Populate 2D-data comboBoxes
@@ -529,13 +540,17 @@ class MDAFileTableView(QWidget):
         self._applying_2d_selection = True
         try:
             self._apply2DSelectionImpl(selection_by_pv, fileInfo)
+            if (
+                self.plotTypeComboBox.count() == 0
+                or self.colorPaletteComboBox.count() == 0
+            ):
+                self._populatePlotStyleComboBox()
+            self._apply2DPlotStyle(selection_by_pv)
         finally:
             self._applying_2d_selection = False
             # Defer plot update to next event loop so we don't run update2DPlot() during
             # handle2DMode/addFileTab; that can trigger layout/tab changes and
             # updateControlVisibility(0), leaving the new file's panel in wrong state.
-            from PyQt6.QtCore import QTimer
-
             QTimer.singleShot(0, self._trigger2DPlot)
 
     def _apply2DSelectionImpl(self, selection_by_pv, fileInfo):
@@ -559,8 +574,6 @@ class MDAFileTableView(QWidget):
             self.x2ComboBox,
             self.yDetComboBox,
             self.i0ComboBox,
-            self.plotTypeComboBox,
-            self.colorPaletteComboBox,
             self.logYCheckBox,
             self.x2SpinBox,
         )
@@ -590,6 +603,28 @@ class MDAFileTableView(QWidget):
             if i0_idx is not None:
                 self.i0ComboBox.setCurrentIndex(i0_idx)
 
+        self.logYCheckBox.setChecked(bool(selection_by_pv.get("log_y", False)))
+
+        x2_slice = selection_by_pv.get("x2_slice")
+        if isinstance(x2_slice, int):
+            min_val = self.x2SpinBox.minimum()
+            max_val = self.x2SpinBox.maximum()
+            x2_slice = max(min_val, min(max_val, x2_slice))  # clamp
+            self.x2SpinBox.setValue(x2_slice)
+
+        for w in _2d_controls:
+            w.blockSignals(False)
+
+    def _apply2DPlotStyle(self, selection_by_pv):
+        """Apply plot style selection to controls."""
+
+        _2d_controls = (
+            self.plotTypeComboBox,
+            self.colorPaletteComboBox,
+        )
+        for w in _2d_controls:
+            w.blockSignals(True)
+
         plotType = selection_by_pv.get("plot_type")
         if plotType:
             for i in range(self.plotTypeComboBox.count()):
@@ -603,15 +638,6 @@ class MDAFileTableView(QWidget):
                 if self.colorPaletteComboBox.itemText(i) == palette:
                     self.colorPaletteComboBox.setCurrentIndex(i)
                     break
-
-        self.logYCheckBox.setChecked(bool(selection_by_pv.get("log_y", False)))
-
-        x2_slice = selection_by_pv.get("x2_slice")
-        if isinstance(x2_slice, int):
-            min_val = self.x2SpinBox.minimum()
-            max_val = self.x2SpinBox.maximum()
-            x2_slice = max(min_val, min(max_val, x2_slice))  # clamp
-            self.x2SpinBox.setValue(x2_slice)
 
         for w in _2d_controls:
             w.blockSignals(False)
