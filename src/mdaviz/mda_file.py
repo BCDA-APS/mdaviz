@@ -364,6 +364,11 @@ class MDAFile(QWidget):
                 if selection:
                     table_view.apply2DSelection(selection)
 
+                # Set this file's control panel to 2D style (hide X2 spinbox, show comboBoxes)
+                # so when we switch to this file later on 2D tab, we don't get a flash of X2 spinbox.
+                if self.mda_mvc.mda_file_viz.tabWidget.currentIndex() == 3:
+                    self.mda_mvc.mda_file_viz.updateControlVisibility(3)
+
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
 

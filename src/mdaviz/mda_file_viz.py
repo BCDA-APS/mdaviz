@@ -194,7 +194,12 @@ class MDAFileVisualization(QWidget):
         # Always update control visibility to ensure correct controls are shown
         current_tab_index = self.tabWidget.currentIndex()
         logger.debug(f"Current viz tab index: {current_tab_index}")
-        QTimer.singleShot(0, lambda: self.deferredUpdateControlVisibility())
+        # When switching to a 2D file on 2D tab, set visibility immediately so the
+        # control panel (comboBoxes) appears without a brief empty frame
+        if is_2d_data and current_tab_index == 3:
+            self.updateControlVisibility(current_tab_index)
+        else:
+            QTimer.singleShot(0, lambda: self.deferredUpdateControlVisibility())
 
         # Update 2D plot if we're currently on the 2D tab
         if current_tab_index == 3:  # 2D tab
@@ -480,7 +485,7 @@ class MDAFileVisualization(QWidget):
             return
 
         # Tab indices: 0=1D, 1=Data, 2=Metadata, 3=2D(if visible)
-        if tab_index == 0:  # 1D tab
+        if tab_index in [0, 1, 2]:  # 1D, data & metadata tabs
             # Show table view, hide Y DET controls
             current_tableview.tableView.setVisible(True)
             current_tableview.yDetControls.setVisible(False)
@@ -498,6 +503,7 @@ class MDAFileVisualization(QWidget):
 
             # Show analysis controls (curves, graphInfo, cursorInfo)
             self.showAnalysisControls(True)
+
         elif tab_index == 3:  # 2D tab
             # Hide table view and X2 controls, show Y DET controls
             current_tableview.tableView.setVisible(False)
