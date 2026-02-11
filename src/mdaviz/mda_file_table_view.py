@@ -357,6 +357,8 @@ class MDAFileTableView(QWidget):
 
     def onX2ValueChanged(self, value):
         """Handle X2 spinbox value changes."""
+        if getattr(self, "_applying_2d_selection", False):
+            return
         # Update the X2 value label if we have X2 positioner info
         if hasattr(self, "_x2_positioner_info") and self._x2_positioner_info:
             self._updateX2ValueLabel(value, self._x2_positioner_info)
@@ -521,6 +523,23 @@ class MDAFileTableView(QWidget):
         if not fileInfo.get("isMultidimensional", False):
             return
 
+        # Prevent 2D handlers from firing during programmatic apply (avoids cascade of
+        # _trigger2DPlot/update2DPlot that can trigger updateControlVisibility(0) and
+        # hide the control panel, causing flicker when switching files).
+        self._applying_2d_selection = True
+        try:
+            self._apply2DSelectionImpl(selection_by_pv, fileInfo)
+        finally:
+            self._applying_2d_selection = False
+            # Defer plot update to next event loop so we don't run update2DPlot() during
+            # handle2DMode/addFileTab; that can trigger layout/tab changes and
+            # updateControlVisibility(0), leaving the new file's panel in wrong state.
+            from PyQt6.QtCore import QTimer
+
+            QTimer.singleShot(0, self._trigger2DPlot)
+
+    def _apply2DSelectionImpl(self, selection_by_pv, fileInfo):
+        """Apply PV-based selection to controls (called with _applying_2d_selection True)."""
         scanDict = fileInfo.get("scanDict", {})  # outer (for X2)
         scanDictInner = fileInfo.get("scanDictInner", {})  # inner (for X1)
         scanDict2D = fileInfo.get("scanDict2D", {})  # detectors for 2D
@@ -597,8 +616,6 @@ class MDAFileTableView(QWidget):
         for w in _2d_controls:
             w.blockSignals(False)
 
-        self._trigger2DPlot()
-
     # Y DET Controls Signal Handlers
     def _trigger2DPlot(self):
         """Helper method to trigger 2D plotting with current selections."""
@@ -651,6 +668,8 @@ class MDAFileTableView(QWidget):
 
     def onX1SelectionChanged(self, index):
         """Handle X1 positioner selection change."""
+        if getattr(self, "_applying_2d_selection", False):
+            return
         logger.debug(f"onX1SelectionChanged - index: {index}")
         self._trigger2DPlot()
         # Save selection
@@ -660,6 +679,8 @@ class MDAFileTableView(QWidget):
 
     def onX2SelectionChanged(self, index):
         """Handle X2 positioner selection change."""
+        if getattr(self, "_applying_2d_selection", False):
+            return
         logger.debug(f"onX2SelectionChanged - index: {index}")
         self._trigger2DPlot()
         # Save selection
@@ -669,6 +690,8 @@ class MDAFileTableView(QWidget):
 
     def onYDetSelectionChanged(self, index):
         """Handle Y detector selection change."""
+        if getattr(self, "_applying_2d_selection", False):
+            return
         logger.debug(f"onYDetSelectionChanged - index: {index}")
         self._trigger2DPlot()
         # Save selection
@@ -678,6 +701,8 @@ class MDAFileTableView(QWidget):
 
     def onI0SelectionChanged(self, index):
         """Handle I0 detector selection change."""
+        if getattr(self, "_applying_2d_selection", False):
+            return
         logger.debug(f"onI0SelectionChanged - index: {index}")
         self._trigger2DPlot()
         # Save selection
@@ -687,6 +712,8 @@ class MDAFileTableView(QWidget):
 
     def onPlotTypeChanged(self, index):
         """Handle plot type selection change."""
+        if getattr(self, "_applying_2d_selection", False):
+            return
         plot_type = self.plotTypeComboBox.currentText().lower()
         logger.debug(f"onPlotTypeChanged - plot_type: {plot_type}")
         self._trigger2DPlot()
@@ -697,6 +724,8 @@ class MDAFileTableView(QWidget):
 
     def onColorPaletteChanged(self, index):
         """Handle color palette selection change."""
+        if getattr(self, "_applying_2d_selection", False):
+            return
         palette_name = self.colorPaletteComboBox.currentText()
         logger.debug(f"onColorPaletteChanged - palette_name: {palette_name}")
         self._trigger2DPlot()
@@ -707,6 +736,8 @@ class MDAFileTableView(QWidget):
 
     def onLogScaleChanged(self, checked):
         """Handle log scale checkbox changes."""
+        if getattr(self, "_applying_2d_selection", False):
+            return
         sender = self.sender()
         if sender == self.logYCheckBox:
             logger.debug(f"onLogScaleChanged - LogY: {checked}")
