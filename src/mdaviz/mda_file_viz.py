@@ -481,7 +481,10 @@ class MDAFileVisualization(QWidget):
 
         current_tableview = self.getCurrentFileTableview()
         if not current_tableview:
-            logger.debug("updateControlVisibility No current tableview found")
+            logger.debug(
+                "updateControlVisibility No current tableview found, deferring retry"
+            )
+            QTimer.singleShot(0, lambda: self.updateControlVisibility(tab_index))
             return
 
         # Tab indices: 0=1D, 1=Data, 2=Metadata, 3=2D(if visible)
