@@ -119,8 +119,12 @@ class MDAFileTableView(QWidget):
         if self.plotTypeComboBox.count() == 0 or self.colorPaletteComboBox.count() == 0:
             self._populatePlotStyleComboBox()
 
-        # Initially hide Y DET controls
-        self.yDetControls.setVisible(False)
+        # Initialize Y DET controls
+        current_tab = self.mda_file.mda_mvc.mda_file_viz.tabWidget.currentIndex()
+        if current_tab == 3:
+            self.yDetControls.setVisible(True)
+        else:
+            self.yDetControls.setVisible(False)
 
     def _populatePlotStyleComboBox(self):
         """Populate the plot type and color palette comboboxes"""
