@@ -18,9 +18,9 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture
-def app(qtbot: "QtBot") -> QApplication:
+def app(qapp: QApplication) -> QApplication:
     """Create a QApplication instance for testing."""
-    return qtbot.qapp
+    return qapp
 
 
 class TestMDAFile:

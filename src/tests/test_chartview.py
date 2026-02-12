@@ -16,7 +16,7 @@ from PyQt6.QtWidgets import QComboBox
 
 
 if TYPE_CHECKING:
-    from _pytest.fixtures import FixtureRequest
+    from pytest_qt.qtbot import QtBot
 
 
 def test_auto_color_and_symbol() -> None:
@@ -27,7 +27,7 @@ def test_auto_color_and_symbol() -> None:
     assert len(set(symbols)) > 1
 
 
-def test_chartview_instantiation(qtbot: "FixtureRequest") -> None:
+def test_chartview_instantiation(qtbot: "QtBot") -> None:
     """Test that ChartView can be instantiated with a mock parent."""
     # Mock the parent and required attributes
     parent = MagicMock()
@@ -1078,7 +1078,7 @@ def test_chartview_log_scale_functionality(qtbot):
     widget.canvas.draw.assert_called()
 
 
-def test_chartview_log_scale_toggling(qtbot: "FixtureRequest") -> None:
+def test_chartview_log_scale_toggling(qtbot: "QtBot") -> None:
     """Test toggling log scale for X and Y axes in ChartView."""
     parent = MagicMock()
     parent.mda_file_viz.curveBox = MagicMock()
@@ -1114,7 +1114,7 @@ def test_chartview_log_scale_toggling(qtbot: "FixtureRequest") -> None:
     assert widget._log_y is False
 
 
-def test_chartview_curve_style_changes(qtbot: "FixtureRequest") -> None:
+def test_chartview_curve_style_changes(qtbot: "QtBot") -> None:
     """Test changing curve style in ChartView and error handling for invalid styles."""
     parent = MagicMock()
     parent.mda_file_viz.curveBox = QComboBox()
@@ -1175,7 +1175,7 @@ def test_chartview_curve_style_changes(qtbot: "FixtureRequest") -> None:
         pytest.fail(f"updateCurveStyle raised an exception: {e}")
 
 
-def test_chartview_error_handling_on_invalid_curve(qtbot: "FixtureRequest") -> None:
+def test_chartview_error_handling_on_invalid_curve(qtbot: "QtBot") -> None:
     """Test error handling when updating/removing a non-existent curve in ChartView."""
     parent = MagicMock()
     parent.mda_file_viz.curveBox = MagicMock()
@@ -1205,7 +1205,7 @@ def test_chartview_error_handling_on_invalid_curve(qtbot: "FixtureRequest") -> N
         pytest.fail(f"CurveManager raised an exception on invalid curve id: {e}")
 
 
-def test_onAllCurvesRemoved_preserves_log_scale(qtbot: "FixtureRequest") -> None:
+def test_onAllCurvesRemoved_preserves_log_scale(qtbot: "QtBot") -> None:
     """When onAllCurvesRemoved runs (e.g. browse/replace), log scale is preserved."""
     parent = MagicMock()
     parent.mda_file_viz.curveBox = MagicMock()
@@ -1243,7 +1243,7 @@ def test_onAllCurvesRemoved_preserves_log_scale(qtbot: "FixtureRequest") -> None
 
 
 def test_onCurveRemoved_resets_log_scale_when_last_curve(
-    qtbot: "FixtureRequest",
+    qtbot: "QtBot",
 ) -> None:
     """When the last curve is removed (e.g. last DET or last tab), log scale is reset."""
     parent = MagicMock()
@@ -1286,7 +1286,7 @@ def test_onCurveRemoved_resets_log_scale_when_last_curve(
     parent.mda_file_viz.setLogScaleState.assert_called_once_with(False, False)
 
 
-def test_onClearAllClicked_resets_log_scale(qtbot: "FixtureRequest") -> None:
+def test_onClearAllClicked_resets_log_scale(qtbot: "QtBot") -> None:
     """When Clear All is clicked, log scale is reset and allCurvesRemoved is emitted."""
     parent = MagicMock()
     parent.mda_file_viz.curveBox = MagicMock()
@@ -1314,7 +1314,7 @@ def test_onClearAllClicked_resets_log_scale(qtbot: "FixtureRequest") -> None:
     parent.mda_file_viz.setLogScaleState.assert_called_once_with(False, False)
 
 
-def test_onDetRemoved_removes_curve(qtbot: "FixtureRequest") -> None:
+def test_onDetRemoved_removes_curve(qtbot: "QtBot") -> None:
     """When a detector is removed, onDetRemoved removes its curve from the manager."""
     parent = MagicMock()
     parent.mda_file_viz.curveBox = MagicMock()
