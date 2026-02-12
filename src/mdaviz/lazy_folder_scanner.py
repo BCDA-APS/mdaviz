@@ -374,6 +374,7 @@ class LazyFolderScanner(QObject):
         self.scanner_worker.error.connect(self._on_scan_error)
         self.scanner_worker.progressive_update.connect(self.progressive_scan_update)
         self.scanner_worker.finished.connect(self.scanner_thread.quit)
+        self.scanner_thread.finished.connect(self._on_scan_thread_finished)
         self.scanner_thread.finished.connect(self.scanner_worker.deleteLater)
         self.scanner_thread.finished.connect(self.scanner_thread.deleteLater)
 
@@ -387,10 +388,13 @@ class LazyFolderScanner(QObject):
                 current, total, f"Scanning files: {current}/{total}"
             )
 
-    def _on_scan_complete(self, result: FolderScanResult) -> None:
-        """Handle scan completion."""
+    def _on_scan_thread_finished(self) -> None:
+        """Called when the scan thread has actually finished (avoids race on refresh)."""
         self._scanning = False
         self._current_scan_path = None
+
+    def _on_scan_complete(self, result: FolderScanResult) -> None:
+        """Handle scan completion."""
         # Close progress dialog
         if hasattr(self, "_progress_dialog") and self._progress_dialog:
             self._progress_dialog.complete_async()
@@ -398,8 +402,6 @@ class LazyFolderScanner(QObject):
 
     def _on_scan_error(self, error_message: str) -> None:
         """Handle scan error."""
-        self._scanning = False
-        self._current_scan_path = None
         # Close progress dialog on error
         if hasattr(self, "_progress_dialog") and self._progress_dialog:
             self._progress_dialog.fail_async(error_message)
