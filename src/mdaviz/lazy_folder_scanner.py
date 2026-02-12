@@ -23,6 +23,10 @@ from mdaviz.lazy_loading_config import get_config
 # Get logger for this module
 logger = get_logger("lazy_folder_scanner")
 
+# Emit progress at most every N files to avoid flooding the event queue (RecursionError
+# when setStatus/statusbar triggers event processing and re-enters progress handler).
+PROGRESS_EMIT_INTERVAL = 100
+
 
 # Cache key: resolved path str; value: (mtime, file_info dict)
 FileInfoCache = dict[str, tuple[float, dict[str, Any]]]
@@ -85,9 +89,7 @@ class LazyFolderScanner(QObject):
         self.progressive_loading = progressive_loading
         self._scanning = False
         self._current_scan_path: Optional[Path] = None
-        self._file_info_cache: FileInfoCache = (
-            {}
-        )  # path -> (mtime, file_info); reused on refresh
+        self._file_info_cache: FileInfoCache = {}  # path -> (mtime, file_info); reused on refresh
         self.scanner_thread: Optional[QThread] = None
         self.scanner_worker: Optional[FolderScanWorker] = None
         self._progress_dialog: Optional[AsyncProgressDialog] = None
@@ -553,8 +555,12 @@ class FolderScanWorker(QObject):
                         file_info_list.append(file_info)
                         scanned_files += 1
 
-                        # Emit progress signal
-                        self.progress.emit(scanned_files, total_files)
+                        # Emit progress throttled to avoid event-queue flood and RecursionError
+                        if (
+                            scanned_files % PROGRESS_EMIT_INTERVAL == 0
+                            or scanned_files == total_files
+                        ):
+                            self.progress.emit(scanned_files, total_files)
 
                     except Exception as e:
                         logger.error(f"Error scanning {file_path}: {e}")
@@ -614,7 +620,11 @@ class FolderScanWorker(QObject):
                 file_info_list.append(file_info)
                 scanned_files += 1
 
-                self.progress.emit(scanned_files, total_files)
+                if (
+                    scanned_files % PROGRESS_EMIT_INTERVAL == 0
+                    or scanned_files == total_files
+                ):
+                    self.progress.emit(scanned_files, total_files)
 
             except Exception as e:
                 logger.error(f"Error scanning {file_path}: {e}")
@@ -649,8 +659,8 @@ class FolderScanWorker(QObject):
             cache (dict): File info cache (path -> (mtime, file_info)); updated in place.
         """
         total_files = len(mda_files)
-        file_list = []
-        file_info_list = []
+        file_list: list[str] = []
+        file_info_list: list[dict[str, Any]] = []
         scanned_files = start_index
 
         # Continue scanning from where we left off; reuse cache when mtime unchanged
@@ -682,7 +692,11 @@ class FolderScanWorker(QObject):
                     file_info_list.append(file_info)
                     scanned_files += 1
 
-                    self.progress.emit(scanned_files, total_files)
+                    if (
+                        scanned_files % PROGRESS_EMIT_INTERVAL == 0
+                        or scanned_files == total_files
+                    ):
+                        self.progress.emit(scanned_files, total_files)
 
                 except Exception as e:
                     logger.error(f"Error scanning {file_path}: {e}")

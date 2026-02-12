@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING, Dict, Any
 from unittest.mock import Mock, patch
 
 from PyQt6 import QtCore
+from PyQt6.QtWidgets import QApplication
 
 from mdaviz.lazy_folder_scanner import (
     LazyFolderScanner,
@@ -141,9 +142,7 @@ class TestLazyFolderScanner:
         assert not scanner.is_scanning()
 
     @pytest.mark.skip(reason="Skip in CI/headless: uses Qt/QThread")
-    def test_refresh_reuses_cache(
-        self, temp_folder: Path, qapp: "QApplication"
-    ) -> None:
+    def test_refresh_reuses_cache(self, temp_folder: Path, qapp: QApplication) -> None:
         """On a second scan with previous_cache, unchanged files are not re-read."""
         # Create a few MDA files (touch is enough; get_file_info_lightweight returns minimal info)
         for i in range(3):
