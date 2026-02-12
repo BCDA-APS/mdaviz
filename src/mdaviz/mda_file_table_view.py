@@ -1274,6 +1274,25 @@ class MDAFileTableView(QWidget):
                     x2_slice = i0_data_array.shape[0] - 1  # Use last available slice
                 i0_data = i0_data[x2_slice]  # Take the selected X2 slice
 
+            # Check acquired points - if none, return empty to prevent crashes
+            acquired_dim = fileInfo.get("acquiredDimensions", [])
+            acquired_points = None
+            if fileInfo.get("isMultidimensional", False):
+                # 2D scan: after slicing, truncate based on inner dimension (X1)
+                if len(acquired_dim) >= 2:
+                    acquired_points = acquired_dim[1]
+            else:
+                # 1D scan: truncate based on single dimension
+                if len(acquired_dim) >= 1:
+                    acquired_points = acquired_dim[0]
+
+            # If no acquired points, return early to prevent zero-size array errors
+            if acquired_points is not None and acquired_points <= 0:
+                logger.warning(
+                    "data2Plot - No acquired points for this scan; returning empty datasets"
+                )
+                return [], {}
+
             # ------ extract y(s) data:
             y_index = selections.get("Y", [])
             y_first_unit = y_first_name = ""
@@ -1327,47 +1346,29 @@ class MDAFileTableView(QWidget):
                         y_first_name = f"{y_name} {y_unit}"
 
                 # Truncate arrays to acquiredDimensions to remove unacquired points
-                if x_data is not None and y_data is not None:
-                    acquired_dim = fileInfo.get("acquiredDimensions", [])
+                if (
+                    x_data is not None
+                    and y_data is not None
+                    and acquired_points is not None
+                ):
+                    x_array = np.array(x_data)
+                    y_array = np.array(y_data)
 
-                    # Get the relevant dimension index for truncation
-                    if fileInfo.get("isMultidimensional", False):
-                        # 2D scan: after slicing, truncate based on inner dimension (X1)
-                        # acquiredDimensions = [X2_points, X1_points]
-                        acquired_points = (
-                            acquired_dim[1] if len(acquired_dim) >= 2 else None
+                    if len(y_array) > acquired_points:
+                        x_array = x_array[:acquired_points]
+                        y_array = y_array[:acquired_points]
+                        logger.debug(
+                            f"data2Plot - Truncated arrays from {len(np.array(y_data))} to "
+                            f"{acquired_points} acquired points"
                         )
-                    else:
-                        # 1D scan: truncate based on single dimension
-                        # acquiredDimensions = [X1_points]
-                        acquired_points = (
-                            acquired_dim[0] if len(acquired_dim) >= 1 else None
+
+                        # Convert back to original type
+                        x_data = (
+                            x_array.tolist() if isinstance(x_data, list) else x_array
                         )
-
-                    # Truncate to acquired points if arrays are longer
-                    if acquired_points is not None:
-                        x_array = np.array(x_data)
-                        y_array = np.array(y_data)
-
-                        if len(y_array) > acquired_points:
-                            x_array = x_array[:acquired_points]
-                            y_array = y_array[:acquired_points]
-                            logger.debug(
-                                f"data2Plot - Truncated arrays from {len(np.array(y_data))} to "
-                                f"{acquired_points} acquired points"
-                            )
-
-                            # Convert back to original type
-                            x_data = (
-                                x_array.tolist()
-                                if isinstance(x_data, list)
-                                else x_array
-                            )
-                            y_data = (
-                                y_array.tolist()
-                                if isinstance(y_data, list)
-                                else y_array
-                            )
+                        y_data = (
+                            y_array.tolist() if isinstance(y_data, list) else y_array
+                        )
 
                 # append to dataset:
                 ds, ds_options = [], {}
