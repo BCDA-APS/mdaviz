@@ -101,8 +101,14 @@ def main() -> None:  # for future command-line options
             "".join(traceback.format_exception(exc_type, exc_value, exc_tb)),
             exc_info=False,
         )
-        for h in logging.getLogger("mdaviz").handlers:
-            h.flush()
+        try:
+            for h in logging.getLogger("mdaviz").handlers:
+                try:
+                    h.flush()
+                except Exception:
+                    pass
+        except Exception:
+            pass
         sys.__excepthook__(exc_type, exc_value, exc_tb)
 
     sys.excepthook = _excepthook

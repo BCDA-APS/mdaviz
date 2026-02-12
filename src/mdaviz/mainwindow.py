@@ -392,8 +392,12 @@ class MainWindow(QMainWindow):
         Args:
             folder_list (list, optional): the current list of recent folders. Defaults to None.
         """
-        if folder_list != "":
-            folder_list = self._buildFolderList(folder_list)
+        # Ensure we always pass a list or None to _buildFolderList; never store a string in _folderList
+        if folder_list is not None and (
+            folder_list == "" or not isinstance(folder_list, list)
+        ):
+            folder_list = []
+        folder_list = self._buildFolderList(folder_list)
         self._fillFolderBox(folder_list)
         self._folderList = folder_list
 
