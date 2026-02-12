@@ -24,6 +24,10 @@ from mdaviz.lazy_loading_config import get_config
 logger = get_logger("lazy_folder_scanner")
 
 
+# Cache key: resolved path str; value: (mtime, file_info dict)
+FileInfoCache = dict[str, tuple[float, dict[str, Any]]]
+
+
 @dataclass
 class FolderScanResult:
     """Result of a folder scan operation."""
@@ -35,6 +39,7 @@ class FolderScanResult:
     is_complete: bool
     error_message: Optional[str] = None
     is_progressive: bool = False  # Whether this is a progressive scan
+    file_info_cache: Optional[FileInfoCache] = None  # For incremental refresh
 
 
 class LazyFolderScanner(QObject):
@@ -80,6 +85,9 @@ class LazyFolderScanner(QObject):
         self.progressive_loading = progressive_loading
         self._scanning = False
         self._current_scan_path: Optional[Path] = None
+        self._file_info_cache: FileInfoCache = (
+            {}
+        )  # path -> (mtime, file_info); reused on refresh
         self.scanner_thread: Optional[QThread] = None
         self.scanner_worker: Optional[FolderScanWorker] = None
         self._progress_dialog: Optional[AsyncProgressDialog] = None
@@ -342,7 +350,17 @@ class LazyFolderScanner(QObject):
                 return
 
         self._scanning = True
+        resolved_folder = Path(folder_path).resolve()
+        # Clear cache when switching to a different folder so we don't mix or grow unbounded
+        if (
+            self._current_scan_path is not None
+            and resolved_folder != self._current_scan_path.resolve()
+        ):
+            self._file_info_cache = {}
         self._current_scan_path = folder_path
+
+        # Copy of cache for worker (same folder: reuse unchanged file info on refresh)
+        previous_cache: FileInfoCache = dict(self._file_info_cache)
 
         # Create progress dialog if enabled
         if get_config().enable_progress_dialogs:
@@ -361,6 +379,7 @@ class LazyFolderScanner(QObject):
             self.max_files,
             self.use_lightweight_scan,
             self.progressive_loading,
+            previous_cache=previous_cache,
         )
 
         # Move worker to thread
@@ -372,7 +391,7 @@ class LazyFolderScanner(QObject):
         self.scanner_worker.progress.connect(self._update_progress)
         self.scanner_worker.complete.connect(self._on_scan_complete)
         self.scanner_worker.error.connect(self._on_scan_error)
-        self.scanner_worker.progressive_update.connect(self.progressive_scan_update)
+        self.scanner_worker.progressive_update.connect(self._on_progressive_update)
         self.scanner_worker.finished.connect(self.scanner_thread.quit)
         self.scanner_thread.finished.connect(self._on_scan_thread_finished)
         self.scanner_thread.finished.connect(self.scanner_worker.deleteLater)
@@ -395,10 +414,18 @@ class LazyFolderScanner(QObject):
 
     def _on_scan_complete(self, result: FolderScanResult) -> None:
         """Handle scan completion."""
+        if result.file_info_cache is not None:
+            self._file_info_cache = result.file_info_cache
         # Close progress dialog
         if hasattr(self, "_progress_dialog") and self._progress_dialog:
             self._progress_dialog.complete_async()
         self.scan_complete.emit(result)
+
+    def _on_progressive_update(self, result: FolderScanResult) -> None:
+        """Handle progressive scan update; keep cache in sync before re-emitting."""
+        if result.file_info_cache is not None:
+            self._file_info_cache = result.file_info_cache
+        self.progressive_scan_update.emit(result)
 
     def _on_scan_error(self, error_message: str) -> None:
         """Handle scan error."""
@@ -438,6 +465,7 @@ class FolderScanWorker(QObject):
         max_files: int,
         use_lightweight_scan: bool,
         progressive_loading: bool = True,
+        previous_cache: Optional[FileInfoCache] = None,
     ):
         """
         Initialize the folder scan worker.
@@ -448,6 +476,8 @@ class FolderScanWorker(QObject):
             max_files (int): Maximum number of files to scan before warning
             use_lightweight_scan (bool): Whether to use lightweight scanning
             progressive_loading (bool): Whether to use progressive loading
+            previous_cache (dict, optional): Cache from last scan (path -> (mtime, file_info))
+                to avoid re-reading unchanged files on refresh.
         """
         super().__init__()
         self.folder_path = folder_path
@@ -455,6 +485,7 @@ class FolderScanWorker(QObject):
         self.max_files = max_files
         self.use_lightweight_scan = use_lightweight_scan
         self.progressive_loading = progressive_loading
+        self._previous_cache = dict(previous_cache) if previous_cache else {}
         self._cancelled = False
 
     def scan(self) -> None:
@@ -490,9 +521,10 @@ class FolderScanWorker(QObject):
                 self.complete.emit(result)
                 return
 
-            # Regular batch scanning
+            # Regular batch scanning; reuse cached file_info when mtime unchanged
             file_list = []
             file_info_list = []
+            cache: FileInfoCache = dict(self._previous_cache)
             scanned_files = 0
 
             for i in range(0, total_files, self.batch_size):
@@ -506,10 +538,16 @@ class FolderScanWorker(QObject):
                         break
 
                     try:
-                        if self.use_lightweight_scan:
-                            file_info = get_file_info_lightweight(file_path)
+                        key = str(file_path.resolve())
+                        st = file_path.stat()
+                        if key in cache and cache[key][0] == st.st_mtime:
+                            file_info = cache[key][1]
                         else:
-                            file_info = get_file_info_full(file_path)
+                            if self.use_lightweight_scan:
+                                file_info = get_file_info_lightweight(file_path)
+                            else:
+                                file_info = get_file_info_full(file_path)
+                            cache[key] = (st.st_mtime, file_info)
 
                         file_list.append(file_path.name)
                         file_info_list.append(file_info)
@@ -529,6 +567,7 @@ class FolderScanWorker(QObject):
                     total_files=total_files,
                     scanned_files=scanned_files,
                     is_complete=True,
+                    file_info_cache=cache,
                 )
                 self.complete.emit(result)
 
@@ -545,6 +584,7 @@ class FolderScanWorker(QObject):
             mda_files (list[Path]): List of MDA files to scan
         """
         total_files = len(mda_files)
+        cache: FileInfoCache = dict(self._previous_cache)
 
         # Initial batch
         initial_batch_size = min(self.batch_size * 2, total_files)
@@ -552,17 +592,23 @@ class FolderScanWorker(QObject):
         file_info_list = []
         scanned_files = 0
 
-        # Scan initial batch
+        # Scan initial batch (reuse cache when mtime unchanged)
         for i in range(initial_batch_size):
             if self._cancelled:
                 break
 
             file_path = mda_files[i]
             try:
-                if self.use_lightweight_scan:
-                    file_info = get_file_info_lightweight(file_path)
+                key = str(file_path.resolve())
+                st = file_path.stat()
+                if key in cache and cache[key][0] == st.st_mtime:
+                    file_info = cache[key][1]
                 else:
-                    file_info = get_file_info_full(file_path)
+                    if self.use_lightweight_scan:
+                        file_info = get_file_info_lightweight(file_path)
+                    else:
+                        file_info = get_file_info_full(file_path)
+                    cache[key] = (st.st_mtime, file_info)
 
                 file_list.append(file_path.name)
                 file_info_list.append(file_info)
@@ -583,15 +629,16 @@ class FolderScanWorker(QObject):
                 scanned_files=scanned_files,
                 is_complete=False,
                 is_progressive=True,
+                file_info_cache=cache,
             )
             self.progressive_update.emit(result)
 
         # Continue scanning in background
         if not self._cancelled:
-            self._continue_progressive_scan(mda_files, scanned_files)
+            self._continue_progressive_scan(mda_files, scanned_files, cache)
 
     def _continue_progressive_scan(
-        self, mda_files: list[Path], start_index: int
+        self, mda_files: list[Path], start_index: int, cache: FileInfoCache
     ) -> None:
         """
         Continue progressive scanning from a given index.
@@ -599,28 +646,37 @@ class FolderScanWorker(QObject):
         Parameters:
             mda_files (list[Path]): List of MDA files to scan
             start_index (int): Index to start scanning from
+            cache (dict): File info cache (path -> (mtime, file_info)); updated in place.
         """
         total_files = len(mda_files)
         file_list = []
         file_info_list = []
         scanned_files = start_index
 
-        # Continue scanning from where we left off
+        # Continue scanning from where we left off; reuse cache when mtime unchanged
         for i in range(start_index, total_files, self.batch_size):
             if self._cancelled:
                 break
 
             batch_files = mda_files[i : i + self.batch_size]
+            file_list.clear()
+            file_info_list.clear()
 
             for file_path in batch_files:
                 if self._cancelled:
                     break
 
                 try:
-                    if self.use_lightweight_scan:
-                        file_info = get_file_info_lightweight(file_path)
+                    key = str(file_path.resolve())
+                    st = file_path.stat()
+                    if key in cache and cache[key][0] == st.st_mtime:
+                        file_info = cache[key][1]
                     else:
-                        file_info = get_file_info_full(file_path)
+                        if self.use_lightweight_scan:
+                            file_info = get_file_info_lightweight(file_path)
+                        else:
+                            file_info = get_file_info_full(file_path)
+                        cache[key] = (st.st_mtime, file_info)
 
                     file_list.append(file_path.name)
                     file_info_list.append(file_info)
@@ -641,6 +697,7 @@ class FolderScanWorker(QObject):
                     scanned_files=scanned_files,
                     is_complete=(scanned_files >= total_files),
                     is_progressive=True,
+                    file_info_cache=cache,
                 )
                 self.progressive_update.emit(result)
 
@@ -653,6 +710,7 @@ class FolderScanWorker(QObject):
                 scanned_files=scanned_files,
                 is_complete=True,
                 is_progressive=True,
+                file_info_cache=cache,
             )
             self.complete.emit(final_result)
 

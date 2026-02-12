@@ -19,7 +19,11 @@ from unittest.mock import Mock, patch
 
 from PyQt6 import QtCore
 
-from mdaviz.lazy_folder_scanner import LazyFolderScanner
+from mdaviz.lazy_folder_scanner import (
+    LazyFolderScanner,
+    FolderScanWorker,
+    FolderScanResult,
+)
 from mdaviz.data_cache import DataCache, CachedFileData, get_global_cache
 from mdaviz.virtual_table_model import (
     VirtualTableModel,
@@ -135,6 +139,55 @@ class TestLazyFolderScanner:
 
         # Should not be scanning anymore
         assert not scanner.is_scanning()
+
+    @pytest.mark.skip(reason="Skip in CI/headless: uses Qt/QThread")
+    def test_refresh_reuses_cache(
+        self, temp_folder: Path, qapp: "QApplication"
+    ) -> None:
+        """On a second scan with previous_cache, unchanged files are not re-read."""
+        # Create a few MDA files (touch is enough; get_file_info_lightweight returns minimal info)
+        for i in range(3):
+            (temp_folder / f"test_{i}.mda").touch()
+
+        # First scan: no cache
+        worker1 = FolderScanWorker(
+            temp_folder,
+            batch_size=10,
+            max_files=100,
+            use_lightweight_scan=True,
+            progressive_loading=False,
+            previous_cache=None,
+        )
+        results1: list[FolderScanResult] = []
+        worker1.complete.connect(results1.append)
+        worker1.scan()
+        assert len(results1) == 1
+        first = results1[0]
+        assert first.is_complete
+        assert first.file_info_cache is not None
+        assert len(first.file_list) == 3
+
+        # Second scan: pass cache; get_file_info_lightweight must not be called (cache hit)
+        with patch(
+            "mdaviz.lazy_folder_scanner.get_file_info_lightweight"
+        ) as mock_light:
+            worker2 = FolderScanWorker(
+                temp_folder,
+                batch_size=10,
+                max_files=100,
+                use_lightweight_scan=True,
+                progressive_loading=False,
+                previous_cache=first.file_info_cache,
+            )
+            results2: list[FolderScanResult] = []
+            worker2.complete.connect(results2.append)
+            worker2.scan()
+            assert len(results2) == 1
+            second = results2[0]
+            assert second.is_complete
+            assert len(second.file_list) == 3
+            # All 3 files should be served from cache
+            mock_light.assert_not_called()
 
 
 class TestDataCache:
