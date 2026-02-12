@@ -1288,7 +1288,7 @@ class MDAFileTableView(QWidget):
 
             # If no acquired points, return early to prevent zero-size array errors
             if acquired_points is not None and acquired_points <= 0:
-                logger.warning(
+                logger.debug(
                     "data2Plot - No acquired points for this scan; returning empty datasets"
                 )
                 return [], {}

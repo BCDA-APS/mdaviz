@@ -311,12 +311,35 @@ class LazyFolderScanner(QObject):
         Parameters:
             folder_path (Path): Path to the folder to scan
         """
-        # Cancel any existing scan and wait for it to finish
+        # Ignore duplicate refresh: same folder already scanning
+        if self._scanning and self._current_scan_path is not None:
+            if self._current_scan_path.resolve() == Path(folder_path).resolve():
+                return
+
+        # Cancel any existing scan and wait for the thread to actually finish
+        # so we never destroy a QThread while it is still running (avoids crash).
+        old_thread = None
         if self._scanning:
             self.cancel_scan()
-            # Wait a bit for the thread to finish
-            if self.scanner_thread is not None and self.scanner_thread.isRunning():
-                self.scanner_thread.wait(1000)  # Wait up to 1 second
+            old_thread = self.scanner_thread
+            self.scanner_thread = None
+            self.scanner_worker = None
+
+        if old_thread is not None and old_thread.isRunning():
+            max_wait_ms = 10000  # 10 seconds max
+            waited_ms = 0
+            while old_thread.isRunning() and waited_ms < max_wait_ms:
+                old_thread.wait(100)
+                waited_ms += 100
+            if old_thread.isRunning():
+                logger.warning(
+                    "Previous scan thread did not finish within %d ms; skipping new scan",
+                    max_wait_ms,
+                )
+                self.scan_error.emit(
+                    "Previous scan did not finish in time. Please try again in a moment."
+                )
+                return
 
         self._scanning = True
         self._current_scan_path = folder_path
