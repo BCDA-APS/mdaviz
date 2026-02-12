@@ -340,7 +340,6 @@ def get_det(mda_file_data):
     """
 
     d = {}
-    logger.debug(f"\n\n{mda_file_data=}\n\n")
 
     p_list = mda_file_data.p  # list of scanDetector instances
     d_list = mda_file_data.d  # list of scanPositioner instances
@@ -693,7 +692,6 @@ def myLoadUi(ui_file, baseinstance=None, **kw):
     if isinstance(ui_file, str):
         ui_file = UI_DIR / ui_file
 
-    logger.debug(f"myLoadUi({ui_file=})")
     return uic.loadUi(ui_file, baseinstance=baseinstance, **kw)
 
 

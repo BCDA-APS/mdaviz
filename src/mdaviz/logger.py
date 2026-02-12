@@ -86,7 +86,7 @@ class MDALogger:
         return self._logger
 
     def set_level(self, level: str):
-        """Set the logging level for all handlers."""
+        """Set the logging level: console uses the given level, file always uses DEBUG."""
         level_map = {
             "DEBUG": logging.DEBUG,
             "INFO": logging.INFO,
@@ -100,9 +100,14 @@ class MDALogger:
             if self._logger is None:
                 self._setup_logger()
             assert self._logger is not None  # Type checker assertion
-            self._logger.setLevel(level_map[level.upper()])
+            requested_level = level_map[level.upper()]
+            # Logger level DEBUG so all messages reach handlers; each handler filters
+            self._logger.setLevel(logging.DEBUG)
             for handler in self._logger.handlers:
-                handler.setLevel(level_map[level.upper()])
+                if isinstance(handler, logging.FileHandler):
+                    handler.setLevel(logging.DEBUG)
+                else:
+                    handler.setLevel(requested_level)
 
 
 # Global logger instance

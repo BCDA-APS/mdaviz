@@ -159,7 +159,8 @@ class MDAFileVisualization(QWidget):
             file_data (dict): Contains metadata and table data for the file
             selection_field (dict): Specifies the fields (POS/DET) selected for plotting
         """
-        logger.debug(f"File tab changed to {file_path}")
+        if file_path:
+            logger.debug(f"File tab changed to {file_path}")
 
         if tab_index == -1:
             return
@@ -177,10 +178,8 @@ class MDAFileVisualization(QWidget):
         ):
             active_file_data = current_tableview.mda_file.data()
             is_2d_data = active_file_data.get("isMultidimensional", False)
-            logger.debug(f"Active file data isMultidimensional: {is_2d_data}")
             self.update2DTabVisibility(is_2d_data)
         else:
-            logger.debug("No current tableview or file data available")
             self.update2DTabVisibility(False)
             is_2d_data = False
 
@@ -193,7 +192,6 @@ class MDAFileVisualization(QWidget):
 
         # Always update control visibility to ensure correct controls are shown
         current_tab_index = self.tabWidget.currentIndex()
-        logger.debug(f"Current viz tab index: {current_tab_index}")
         # When switching to a 2D file on 2D tab, set visibility immediately so the
         # control panel (comboBoxes) appears without a brief empty frame
         if is_2d_data and current_tab_index == 3:
@@ -203,7 +201,6 @@ class MDAFileVisualization(QWidget):
 
         # Update 2D plot if we're currently on the 2D tab
         if current_tab_index == 3:  # 2D tab
-            logger.debug("On 2D tab, updating 2D plot")
             self.update2DPlot()
 
     def deferredUpdateControlVisibility(self):
@@ -571,13 +568,10 @@ class MDAFileVisualization(QWidget):
 
             # If showing 1D controls, restore their state based on current curve selection
             if show and hasattr(self, "chart_view") and self.chart_view:
-                logger.debug("Restoring control state for 1D tab")
-
                 # Reconnect the curveRemove button signal
                 if hasattr(self, "curveRemove") and hasattr(
                     self.chart_view, "onRemoveButtonClicked"
                 ):
-                    logger.debug("Reconnecting curveRemove signal")
                     from mdaviz import utils
 
                     utils.reconnect(
@@ -646,8 +640,6 @@ class MDAFileVisualization(QWidget):
         """
         from PyQt6.QtCore import QTimer
 
-        logger.debug(f"updatePlotControls called with curve_selected={curve_selected}")
-
         # Prevent rapid successive calls that would disable controls
         if (
             hasattr(self, "_last_control_update")
@@ -656,8 +648,6 @@ class MDAFileVisualization(QWidget):
             and self._last_control_update_value is True
             and curve_selected is False
         ):
-            # If this is called too soon after enabling controls, and trying to disable them, ignore it
-            logger.debug("Skipping rapid disable call")
             return
 
         # Set a timer to allow the next call after a delay
@@ -806,21 +796,8 @@ class MDAFileVisualization(QWidget):
         # Update tab widget max height to match the chart view
         self._updateTabWidgetMaxHeight()
 
-        # # Debug output for 2D plotting
-        if hasattr(plot_widget, "_plot_type"):
-            logger.debug("setPlot - Added ChartView2D widget to layout")
-            logger.debug(f"  Widget type: {type(plot_widget)}")
-            logger.debug(f"  Widget visible: {plot_widget.isVisible()}")
-            logger.debug(f"  Widget size: {plot_widget.size()}")
-            logger.debug(f"  Layout count: {layout.count()}")
-            logger.debug(f"  Layout item widget: {layout.itemAt(0).widget()}")
-        else:
-            logger.debug("setPlot - Added regular ChartView widget to layout")
-            logger.debug(f"  Widget type: {type(plot_widget)}")
-            logger.debug(f"  Widget visible: {plot_widget.isVisible()}")
-            logger.debug(f"  Widget size: {plot_widget.size()}")
-            logger.debug(f"  Layout count: {layout.count()}")
-            logger.debug(f"  Layout item widget: {layout.itemAt(0).widget()}")
+        kind = "ChartView2D" if hasattr(plot_widget, "_plot_type") else "ChartView"
+        logger.debug(f"setPlot - added {kind} to layout")
 
     def _updateTabWidgetMaxHeight(self):
         """Update the tab widget's maximum height to match the plot height setting."""

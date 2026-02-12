@@ -544,19 +544,12 @@ class MDA_MVC(QWidget):
             if mode == "Auto-add":
                 action = "add"
             elif mode == "Auto-off":
-                # Do nothing in auto-off mode - user must manually add/replace
-                logger.debug(
-                    f"\ndoPlot called for X2 value change: X2={args[0]}, mode={mode}, action=ignore"
-                )
                 return
             else:
                 action = "replace"  # Default for Auto-replace
-            logger.debug(
-                f"\ndoPlot called for X2 value change: X2={args[0]}, mode={mode}, action={action}"
-            )
         else:
             action = args[0]
-            logger.debug(f"\ndoPlot called: action={action}")
+        logger.debug(f"doPlot action={action}")
 
         tableview = self.currentFileTableview()
 
@@ -567,12 +560,10 @@ class MDA_MVC(QWidget):
             and "X1" in args[1]
             and "X2" in args[1]
         )
-        logger.debug(f"doPlot - is_2d_selection: {is_2d_selection}")
 
         if is_2d_selection:
             # Handle 2D plotting - use the passed selection
             selection = args[1]
-            logger.debug("doPlot - Handling 2D plotting")
             self.doPlot2D(action, selection)
             return
 
@@ -581,7 +572,6 @@ class MDA_MVC(QWidget):
 
         # Clear all content from the file table view & viz panel:
         if action in ("clear"):
-            logger.debug("\n\nPushButton Clear...")
             self.mda_file.removeAllFileTabs()
             return
 
@@ -589,8 +579,6 @@ class MDA_MVC(QWidget):
         if not tableview or not selection or not selection.get("Y"):
             self.setStatus("Nothing to plot.")
             return
-
-        logger.debug(f"\ndoPlot called: {action=}, {selection=}")
 
         # Handle 1D plotting (existing logic)
         # Get the matplotlib chartview widget, if exists:
@@ -602,7 +590,6 @@ class MDA_MVC(QWidget):
         if action in ("replace", "add"):
             # Get dataset for the positioner/detector selection:
             datasets, plot_options = tableview.data2Plot(selection)
-            logger.debug(f"doPlot - Received plot_options: {plot_options}")
             y_index = selection.get("Y", [])
             if not isinstance(widgetMpl, ChartView):  # Make a blank chart.
                 widgetMpl = ChartView(self, **plot_options)
@@ -627,11 +614,6 @@ class MDA_MVC(QWidget):
                 # Add X2 index to options if available
                 if "x2_index" in plot_options:
                     options["x2_index"] = plot_options["x2_index"]
-                    logger.debug(
-                        f"doPlot - Passing x2_index: {plot_options['x2_index']}"
-                    )
-                else:
-                    logger.debug("doPlot - No x2_index in plot_options")
                 widgetMpl.plot(i, *ds, **options)
             widgetMpl.refreshAllUnscaledCurves()
             self.mda_file_viz.setPlot(widgetMpl)
@@ -907,7 +889,6 @@ class MDA_MVC(QWidget):
 
         # Get dataset for the positioner/detector selection:
         datasets, plot_options = tableview.data2Plot(selection)
-        logger.debug(f"doPlot - Received plot_options: {plot_options}")
 
         if not isinstance(widgetMpl, ChartView):
             widgetMpl = ChartView(self, **plot_options)  # Make a blank chart.
@@ -928,9 +909,6 @@ class MDA_MVC(QWidget):
             # Add X2 index to options if available
             if "x2_index" in plot_options:
                 options["x2_index"] = plot_options["x2_index"]
-                logger.debug(f"doPlot - Passing x2_index: {plot_options['x2_index']}")
-            else:
-                logger.debug("doPlot - No x2_index in plot_options")
             widgetMpl.plot(row, *ds, **options)
         self.mda_file_viz.setPlot(widgetMpl)
         # Restore last selected curve in comboBox

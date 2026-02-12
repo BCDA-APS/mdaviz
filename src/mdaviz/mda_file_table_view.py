@@ -92,8 +92,6 @@ class MDAFileTableView(QWidget):
 
     def setup2DControls(self):
         """Setup Y DET selection controls for 2D plotting."""
-        logger.debug("setup2DControls - Starting setup")
-
         # Use QTimer to ensure UI is fully loaded
         from PyQt6.QtCore import QTimer
 
@@ -250,9 +248,6 @@ class MDAFileTableView(QWidget):
                 unit = value.get("unit", "")
                 display_text = f"{name} ({unit})" if unit else name
                 self.yDetComboBox.addItem(display_text, key)
-                logger.debug(
-                    f"populateYDetComboBox - Added detector: {name} (key={key})"
-                )
 
         logger.debug(
             f"populateYDetComboBox - Added {self.yDetComboBox.count()} Y detectors"
@@ -281,7 +276,6 @@ class MDAFileTableView(QWidget):
                 unit = value.get("unit", "")
                 display_text = f"{name} ({unit})" if unit else name
                 self.i0ComboBox.addItem(display_text, key)
-                logger.debug(f"populateI0ComboBox - Added detector: {name} (key={key})")
 
         logger.debug(
             f"populateI0ComboBox - Added {self.i0ComboBox.count()} I0 detectors"
@@ -294,8 +288,6 @@ class MDAFileTableView(QWidget):
         self.populateX2ComboBox()
         self.populateYDetComboBox()
         self.populateI0ComboBox()
-
-        logger.debug("populate2DControls - All 2D controls populated")
 
     # ==========================================
     # x2 controls & spinBox
@@ -317,11 +309,6 @@ class MDAFileTableView(QWidget):
             acquired_dimensions (list): List of actual acquired dimensions [X2_points, X1_points, ...]
             x2_positioner_info (dict): Information about the X2 positioner (name, unit, data)
         """
-        logger.debug(
-            f"update2DControls - is_multidimensional: {is_multidimensional}, dimensions: {dimensions}"
-        )
-        logger.debug(f"update2DControls - acquired_dimensions: {acquired_dimensions}")
-        logger.debug(f"update2DControls - x2_positioner_info: {x2_positioner_info}")
         if is_multidimensional and dimensions and len(dimensions) >= 2:
             # Show 2D controls
             self.dimensionControls.setVisible(True)
@@ -330,19 +317,10 @@ class MDAFileTableView(QWidget):
             # Use acquired_dimensions if available, otherwise fall back to intended dimensions
             if acquired_dimensions and len(acquired_dimensions) >= 2:
                 x2_max = acquired_dimensions[0] - 1  # Use actual acquired points
-                logger.debug(
-                    f"update2DControls - using acquired_dimensions, x2_max: {x2_max}"
-                )
             elif dimensions and len(dimensions) >= 2:
                 x2_max = dimensions[0] - 1  # Fallback to intended dimensions
-                logger.debug(
-                    f"update2DControls - using intended dimensions, x2_max: {x2_max}"
-                )
             else:
                 x2_max = 0  # Default fallback
-                logger.debug(
-                    f"update2DControls - using default fallback, x2_max: {x2_max}"
-                )
 
             self.x2SpinBox.setMaximum(max(0, x2_max))
             self.x2SpinBox.setValue(0)  # Start at first X2 position
@@ -822,22 +800,16 @@ class MDAFileTableView(QWidget):
             fileInfo = self.mda_file.data()
 
             # For table display, use inner dimension data for 2D files, 1D data for 1D files
-            logger.debug(
-                f"isMultidimensional: {fileInfo.get('isMultidimensional', False)}"
-            )
-            logger.debug(f"scanDictInner exists: {'scanDictInner' in fileInfo}")
             if fileInfo.get("isMultidimensional", False) and fileInfo.get(
                 "scanDictInner"
             ):
                 scanDict = fileInfo["scanDictInner"]
-                logger.debug(
-                    f"Using scanDictInner for 2D data, keys: {list(scanDict.keys())}"
-                )
             else:
                 scanDict = fileInfo["scanDict"]
-                logger.debug(
-                    f"Using scanDict for 1D data, keys: {list(scanDict.keys())}"
-                )
+            logger.debug(
+                f"setData is_2d={fileInfo.get('isMultidimensional', False)}, "
+                f"fields={len(scanDict)}"
+            )
 
             fields = [
                 TableField(
@@ -1231,20 +1203,7 @@ class MDAFileTableView(QWidget):
                 # Use inner dimension data for 1D plotting (matches table display)
                 scanDict = fileInfo["scanDictInner"]
                 x2_slice = 0  # Initial value
-
-                # Debug: Print field mappings
-                logger.debug(
-                    f"Using scanDictInner for 2D plotting, keys: {list(scanDict.keys())}"
-                )
-                logger.debug(f"selections: {selections}")
-
-                # Debug: Print data shapes for first few fields
-                for i in range(min(3, len(scanDict))):
-                    if i in scanDict:
-                        data = scanDict[i].get("data")
-                        logger.debug(
-                            f"Field {i} data shape: {np.array(data).shape if data else 'None'}"
-                        )
+                logger.debug(f"data2Plot file={fileName} selections={selections}")
             else:
                 # Use 1D data structure
                 scanDict = fileInfo["scanDict"]
@@ -1392,10 +1351,5 @@ class MDAFileTableView(QWidget):
             # Add X2 index to plot options for 2D data
             if fileInfo.get("isMultidimensional", False):
                 plot_options["x2_index"] = self.getX2Value()
-                logger.debug(
-                    f"data2Plot - Added x2_index to plot_options: {plot_options['x2_index']}"
-                )
-            else:
-                logger.debug("data2Plot - Not multidimensional, x2_index not added")
 
         return datasets, plot_options

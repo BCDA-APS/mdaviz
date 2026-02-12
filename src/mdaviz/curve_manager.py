@@ -140,8 +140,6 @@ class CurveManager(QObject):
         else:
             curve_id = f"{file_path}_{row}"
 
-        logger.debug(f"generateCurveID - curve_id={curve_id}")
-
         # Check if this curve ID already exists
         if curve_id in self._curves:
             # If it exists, return the existing curve ID (this should not happen in normal usage)
@@ -205,22 +203,16 @@ class CurveManager(QObject):
         file_path = plot_options.get("filePath", "unknown path")
         x2_index = options.get("x2_index")
 
-        logger.debug(f"addCurve - Received x2_index: {x2_index}")
-
         # Generate unique curve ID & update options:
         curveID = self.generateCurveID(label, file_path, row, x2_index)
+        logger.debug(f"addCurve curve_id={curveID}")
 
         ds_options["label"] = label  # Keep the original label for display purposes
-        logger.debug(
-            f"Adding curve with ID: {curveID}, label: {label}, file_path: {file_path}"
-        )
-        logger.debug(f"Current curves in manager: {list(self._curves.keys())}")
 
         x_data = ds[0]
         y_data = ds[1]
 
         if curveID in self._curves:
-            logger.debug(f"Curve {curveID} already exists")
             # Check if x_data is the same
             existing_curve_data = self._curves[curveID]
             existing_x_data = existing_curve_data["ds"][0]
@@ -232,16 +224,9 @@ class CurveManager(QObject):
             label_equal = label == existing_label
 
             if x_data_equal and y_data_equal and label_equal:
-                # All data and metadata are identical - no update needed
-                logger.debug(
-                    " x_data, y_data, and label are the same, do not add or update the curve"
-                )
                 return
 
             else:
-                logger.debug(
-                    f" x_data changed: {not x_data_equal}, y_data changed: {not y_data_equal}, label changed: {not label_equal}, update the curve"
-                )
                 # Data or label has changed, update the curve:
                 # Create updated curve data, preserving existing properties (style, offset, factor, etc.)
                 updated_curve_data = {
@@ -265,8 +250,6 @@ class CurveManager(QObject):
                 return
 
         # Curve does not exist, create new curve
-        logger.debug(f"Curve {curveID} does NOT exist, creating new curve")
-
         # Check for persistent properties first
         persistent_props = self._persistent_properties.get(curveID, {})
 
@@ -285,9 +268,6 @@ class CurveManager(QObject):
             "ds_options": ds_options,
             "x2_index": x2_index,  # Store X2 index for 2D data
         }
-        logger.debug(
-            f"Created curve {curveID} with persistent properties: {persistent_props}"
-        )
         self.curveAdded.emit(curveID)
 
     def updateCurve(self, curveID, curveData, recompute_y=False, update_x=False):

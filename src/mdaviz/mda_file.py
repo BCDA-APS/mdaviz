@@ -173,11 +173,9 @@ class MDAFile(QWidget):
         file_name = self.mdaFileList()[index]
         file_path = self.dataPath() / file_name
 
-        # Debug: print the paths to see what's happening
-        logger.debug(f"folder_path: {folder_path}")
-        logger.debug(f"file_name: {file_name}")
-        logger.debug(f"file_path: {file_path}")
-        logger.debug(f"file_path.exists(): {file_path.exists()}")
+        logger.debug(
+            f"setData loading file={file_path.name} exists={file_path.exists()}"
+        )
 
         # Use data cache for better performance
         cache = get_global_cache()
@@ -322,24 +320,13 @@ class MDAFile(QWidget):
             if table_view:
                 dimensions = self._data.get("dimensions", [])
                 acquired_dimensions = self._data.get("acquiredDimensions", [])
-                logger.debug(f"handle2DMode - dimensions: {dimensions}")
-                logger.debug(
-                    f"handle2DMode - acquired_dimensions: {acquired_dimensions}"
-                )
 
                 # Extract X2 positioner information from scanDict2D
                 x2_positioner_info = None
                 scan_dict_2d = self._data.get("scanDict2D", {})
-                logger.debug(
-                    f"handle2DMode - scanDict2D keys: {list(scan_dict_2d.keys())}"
-                )
                 if scan_dict_2d:
                     # Find the X2 positioner (first positioner in 2D data)
-                    # In 2D data, the first positioner (index 0) is typically X2
                     for key, value in scan_dict_2d.items():
-                        logger.debug(
-                            f"handle2DMode - Field {key}: type={value.get('type')}, name={value.get('name')}"
-                        )
                         if (
                             value.get("type") == "POS" and key == 0
                         ):  # First positioner is X2
@@ -348,10 +335,9 @@ class MDAFile(QWidget):
                                 "unit": value.get("unit", ""),
                                 "data": value.get("data", []),
                             }
-                            logger.debug(
-                                f"handle2DMode - X2 positioner found: {x2_positioner_info['name']}"
-                            )
                             break
+                x2_name = x2_positioner_info["name"] if x2_positioner_info else None
+                logger.debug(f"handle2DMode dims={dimensions} x2={x2_name}")
 
                 table_view.update2DControls(
                     is_multidimensional=self._data.get("isMultidimensional", False),
