@@ -47,7 +47,7 @@ class LazyLoadingConfig:
     virtual_table_preload_pages: int = 2
 
     # Performance settings
-    enable_progress_dialogs: bool = False
+    enable_progress_dialogs: bool = True
     enable_memory_monitoring: bool = True
     memory_warning_threshold_mb: float = 1000.0
 
