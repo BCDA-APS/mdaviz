@@ -11,6 +11,7 @@ mdaviz: Python Qt5 application to visualize mda data.
 """
 
 import sys
+import traceback
 from PyQt6 import QtWidgets
 from mdaviz.mainwindow import MainWindow
 import argparse
@@ -91,6 +92,20 @@ def main() -> None:  # for future command-line options
         logger.info("Starting mdaviz application")
 
     logger.info("Logging level: %s", options.log)
+
+    # Capture unhandled exceptions to log file
+    def _excepthook(exc_type, exc_value, exc_tb):
+        log = get_logger("app")
+        log.critical(
+            "Unhandled exception:\n%s",
+            "".join(traceback.format_exception(exc_type, exc_value, exc_tb)),
+            exc_info=False,
+        )
+        for h in logging.getLogger("mdaviz").handlers:
+            h.flush()
+        sys.__excepthook__(exc_type, exc_value, exc_tb)
+
+    sys.excepthook = _excepthook
 
     gui()
 
