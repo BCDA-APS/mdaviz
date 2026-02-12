@@ -1326,6 +1326,49 @@ class MDAFileTableView(QWidget):
                     else:
                         y_first_name = f"{y_name} {y_unit}"
 
+                # Truncate arrays to acquiredDimensions to remove unacquired points
+                if x_data is not None and y_data is not None:
+                    acquired_dim = fileInfo.get("acquiredDimensions", [])
+
+                    # Get the relevant dimension index for truncation
+                    if fileInfo.get("isMultidimensional", False):
+                        # 2D scan: after slicing, truncate based on inner dimension (X1)
+                        # acquiredDimensions = [X2_points, X1_points]
+                        acquired_points = (
+                            acquired_dim[1] if len(acquired_dim) >= 2 else None
+                        )
+                    else:
+                        # 1D scan: truncate based on single dimension
+                        # acquiredDimensions = [X1_points]
+                        acquired_points = (
+                            acquired_dim[0] if len(acquired_dim) >= 1 else None
+                        )
+
+                    # Truncate to acquired points if arrays are longer
+                    if acquired_points is not None:
+                        x_array = np.array(x_data)
+                        y_array = np.array(y_data)
+
+                        if len(y_array) > acquired_points:
+                            x_array = x_array[:acquired_points]
+                            y_array = y_array[:acquired_points]
+                            logger.debug(
+                                f"data2Plot - Truncated arrays from {len(np.array(y_data))} to "
+                                f"{acquired_points} acquired points"
+                            )
+
+                            # Convert back to original type
+                            x_data = (
+                                x_array.tolist()
+                                if isinstance(x_data, list)
+                                else x_array
+                            )
+                            y_data = (
+                                y_array.tolist()
+                                if isinstance(y_data, list)
+                                else y_array
+                            )
+
                 # append to dataset:
                 ds, ds_options = [], {}
                 ds_options["label"] = y_label
