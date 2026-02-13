@@ -670,7 +670,9 @@ def removeAllLayoutWidgets(layout) -> None:
         layout: QLayout object to clear
     """
     for i in reversed(range(layout.count())):
-        layout.itemAt(i).widget().setParent(None)
+        w = layout.itemAt(i).widget()
+        if w is not None:
+            w.setParent(None)
 
 
 def myLoadUi(ui_file, baseinstance=None, **kw):

@@ -207,6 +207,12 @@ class CurveManager(QObject):
         curveID = self.generateCurveID(label, file_path, row, x2_index)
         logger.debug(f"addCurve curve_id={curveID}")
 
+        if len(ds) < 2:
+            logger.warning(
+                f"addCurve: ds must have at least 2 elements (x_data, y_data), got {len(ds)}"
+            )
+            return
+
         ds_options["label"] = label  # Keep the original label for display purposes
 
         x_data = ds[0]
