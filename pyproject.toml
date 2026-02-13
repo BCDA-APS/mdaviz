@@ -22,7 +22,7 @@ maintainers = [
 ]
 dynamic = ["version"]
 readme = "README.md"
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.10,<3.15"
 keywords = ["mda", "multidimensional-data", "visualization", "synchrotron", "beamline", "EPICS"]
 # https://packaging.python.org/en/latest/specifications/declaring-project-metadata/?highlight=license
 license = {file = "LICENSE"}
@@ -48,6 +48,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 
 dependencies = [
