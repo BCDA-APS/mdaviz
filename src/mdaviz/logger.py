@@ -7,8 +7,13 @@ file output, and consistent formatting across all modules.
 
 import logging
 import sys
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Optional
+
+# Max size per log file (5 MB) and number of backup files to keep
+LOG_MAX_BYTES = 5 * 1024 * 1024
+LOG_BACKUP_COUNT = 3
 
 
 class MDALogger:
@@ -48,11 +53,16 @@ class MDALogger:
         console_handler.setFormatter(simple_formatter)
         self._logger.addHandler(console_handler)
 
-        # File handler (DEBUG level and above)
+        # File handler: WARNING by default so crashes (CRITICAL) and errors are captured
         log_file = self._get_log_file_path()
         if log_file:
-            file_handler = logging.FileHandler(log_file)
-            file_handler.setLevel(logging.DEBUG)
+            file_handler = RotatingFileHandler(
+                log_file,
+                maxBytes=LOG_MAX_BYTES,
+                backupCount=LOG_BACKUP_COUNT,
+                encoding="utf-8",
+            )
+            file_handler.setLevel(logging.WARNING)
             file_handler.setFormatter(detailed_formatter)
             self._logger.addHandler(file_handler)
 
@@ -86,7 +96,7 @@ class MDALogger:
         return self._logger
 
     def set_level(self, level: str):
-        """Set the logging level: console uses the given level, file always uses DEBUG."""
+        """Set the logging level for both console and file (e.g. WARNING captures crashes)."""
         level_map = {
             "DEBUG": logging.DEBUG,
             "INFO": logging.INFO,
@@ -104,10 +114,7 @@ class MDALogger:
             # Logger level DEBUG so all messages reach handlers; each handler filters
             self._logger.setLevel(logging.DEBUG)
             for handler in self._logger.handlers:
-                if isinstance(handler, logging.FileHandler):
-                    handler.setLevel(logging.DEBUG)
-                else:
-                    handler.setLevel(requested_level)
+                handler.setLevel(requested_level)
 
 
 # Global logger instance
