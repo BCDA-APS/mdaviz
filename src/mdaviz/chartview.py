@@ -502,6 +502,8 @@ class ChartView(QWidget):
         """
         # Add to graph
         curveData = self.curveManager.getCurveData(curveID)
+        if curveData is None:
+            return
         ds = curveData["ds"]
         ds_options = curveData["ds_options"].copy()  # Copy to avoid modifying original
 
@@ -837,6 +839,8 @@ class ChartView(QWidget):
         the current reference range, then redraw the plot."""
         for cid in self.curveManager.curves():
             curve_data = self.curveManager.getCurveData(cid)
+            if curve_data is None:
+                continue
             if curve_data.get("unscale", False) and cid in self.plotObjects:
                 x_data, y_transformed = self.curveManager.getTransformedCurveXYData(cid)
                 if y_transformed is not None:
@@ -869,7 +873,10 @@ class ChartView(QWidget):
         # Collect positioner PVs from all curves and update x label:
         x_label_set = set()
         for curveID in self.curveManager.curves():
-            plot_options = self.curveManager.getCurveData(curveID).get("plot_options")
+            curve_data = self.curveManager.getCurveData(curveID)
+            if curve_data is None:
+                continue
+            plot_options = curve_data.get("plot_options") or {}
             x_label = plot_options.get("x", "")
             if x_label:
                 x_label_set.add(x_label)
@@ -956,23 +963,30 @@ class ChartView(QWidget):
             and curveID in self.curveManager.curves()
         ):
             curve_data = self.curveManager.getCurveData(curveID)
-            file_path = curve_data["file_path"]
-            row = curve_data["row"]
-            # Update derivative and unscale checkbox
-            derivative_state = curve_data.get("derivative", False)
-            self.setDerivative(derivative_state)
-            unscale_state = curve_data.get("unscale", False)
-            self.setUnscale(unscale_state)
-            # Update offset & factor
-            self.offset_value.setText(str(curve_data["offset"]))
-            self.factor_value.setText(str(curve_data["factor"]))
-            # Update tooltip & highlight row
-            self.curveBox.setToolTip(file_path)
-            try:
-                self.mda_mvc.mda_file.highlightRowInTab(file_path, row)
-            except Exception as exc:
-                logger.error(str(exc))
-                logger.error("highlightRowInTab failed; ignoring exception.")
+            if curve_data is None:
+                self.offset_value.setText("0")
+                self.factor_value.setText("1")
+                self.setDerivative(False)
+                self.setUnscale(False)
+                self.curveBox.setToolTip("Selected curve")
+            else:
+                file_path = curve_data["file_path"]
+                row = curve_data["row"]
+                # Update derivative and unscale checkbox
+                derivative_state = curve_data.get("derivative", False)
+                self.setDerivative(derivative_state)
+                unscale_state = curve_data.get("unscale", False)
+                self.setUnscale(unscale_state)
+                # Update offset & factor
+                self.offset_value.setText(str(curve_data["offset"]))
+                self.factor_value.setText(str(curve_data["factor"]))
+                # Update tooltip & highlight row
+                self.curveBox.setToolTip(file_path)
+                try:
+                    self.mda_mvc.mda_file.highlightRowInTab(file_path, row)
+                except Exception as exc:
+                    logger.error(str(exc))
+                    logger.error("highlightRowInTab failed; ignoring exception.")
         else:
             self.offset_value.setText("0")
             self.factor_value.setText("1")
@@ -1709,6 +1723,29 @@ class ChartView2D(ChartView):
         """
         if plot_options is None:
             plot_options = {}
+
+        # Validate 2D data and axes
+        y_data = numpy.asarray(y_data)
+        x_data = numpy.asarray(x_data)
+        x2_data = numpy.asarray(x2_data)
+
+        if y_data.ndim != 2 or y_data.size == 0:
+            logger.warning("plot2D: y_data must be non-empty 2D array")
+            self.showMessage("Invalid or empty 2D data")
+            return
+        if x_data.size == 0 or x2_data.size == 0:
+            logger.warning("plot2D: x_data and x2_data must be non-empty")
+            self.showMessage("Invalid or empty X/X2 data")
+            return
+        if y_data.shape[0] != x2_data.size or y_data.shape[1] != x_data.size:
+            logger.warning(
+                "plot2D: y_data shape %s does not match x_data len %s, x2_data len %s",
+                y_data.shape,
+                x_data.size,
+                x2_data.size,
+            )
+            self.showMessage("2D data shape mismatch")
+            return
 
         logger.debug("ChartView2D.plot2D - Plotting 2D data")
         logger.debug(f"  Y data shape: {y_data.shape}")

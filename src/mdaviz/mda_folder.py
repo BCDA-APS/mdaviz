@@ -586,6 +586,9 @@ class MDA_MVC(QWidget):
         if layoutMpl.count() != 1:  # in case something changes ...
             raise RuntimeError("Expected exactly one widget in this layout!")
         widgetMpl = layoutMpl.itemAt(0).widget()
+        if widgetMpl is None:
+            logger.warning("Plot layout has no widget at index 0")
+            return
 
         if action in ("replace", "add"):
             # Get dataset for the positioner/detector selection:
@@ -858,6 +861,9 @@ class MDA_MVC(QWidget):
         if layoutMpl.count() != 1:  # in case something changes ...
             raise RuntimeError("Expected exactly one widget in this layout!")
         widgetMpl = layoutMpl.itemAt(0).widget()
+        if widgetMpl is None:
+            logger.warning("Plot layout has no widget at index 0")
+            return
 
         # ----------- Exceptions:
 

@@ -466,6 +466,9 @@ class MDAFile(QWidget):
         layout = self.mda_mvc.mda_file_viz.plotPageMpl.layout()
         if layout.count() > 0:
             plot_widget = layout.itemAt(0).widget()
+            if plot_widget is None:
+                logger.warning("Plot layout has no widget at index 0")
+                return
             if hasattr(plot_widget, "curveManager"):
                 self.mda_mvc.mda_file_viz.setLogScaleState(False, False)
                 plot_widget.curveManager.removeAllCurves(doNotClearCheckboxes=False)

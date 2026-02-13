@@ -312,9 +312,12 @@ class MDAFileVisualization(QWidget):
                 return
 
             widgetMpl2D = layoutMpl2D.itemAt(0).widget()
-
-            # Create ChartView2D if needed
-            if not isinstance(widgetMpl2D, ChartView2D):
+            if widgetMpl2D is None:
+                logger.warning("2D layout has no widget at index 0")
+                widgetMpl2D = ChartView2D(parent, **plot_options)
+                widgetMpl2D.setVisible(True)
+                layoutMpl2D.addWidget(widgetMpl2D)
+            elif not isinstance(widgetMpl2D, ChartView2D):
                 logger.debug("Creating new ChartView2D widget for 2D tab")
 
                 # Remove the existing widget from the layout
@@ -345,7 +348,7 @@ class MDAFileVisualization(QWidget):
                 x_data = dataset_options.get("x_data")
                 x2_data = dataset_options.get("x2_data")
 
-                if x_data is not None and x2_data is not None:
+                if x_data is not None and x2_data is not None and y_data is not None:
                     logger.debug("Plotting 2D data in 2D tab")
 
                     # Set the plot type from current selections
@@ -368,7 +371,7 @@ class MDAFileVisualization(QWidget):
 
                     widgetMpl2D.plot2D(y_data, x_data, x2_data, plot_options)
                 else:
-                    logger.warning("Missing X or X2 data for 2D plotting")
+                    logger.warning("Missing Y, X or X2 data for 2D plotting")
 
             # Store reference to 2D chart view
             self.chart_view_2d = widgetMpl2D
@@ -384,7 +387,10 @@ class MDAFileVisualization(QWidget):
                 return
 
             widgetMpl2D = layoutMpl2D.itemAt(0).widget()
-
+            if widgetMpl2D is None:
+                logger.warning("2D layout has no widget at index 0")
+                widgetMpl2D = ChartView2D(parent, **{})
+                layoutMpl2D.addWidget(widgetMpl2D)
             # Use the showMessage method if the widget supports it
             if hasattr(widgetMpl2D, "showMessage"):
                 widgetMpl2D.showMessage("Nothing to plot")
@@ -833,7 +839,9 @@ class MDAFileVisualization(QWidget):
             layout = self.plotPageMpl.layout()
             if layout.count() > 0:
                 plot_widget = layout.itemAt(0).widget()
-                if isinstance(plot_widget, ChartView):
+                if plot_widget is None:
+                    logger.warning("Plot layout has no widget at index 0")
+                elif isinstance(plot_widget, ChartView):
                     plot_widget.clearPlot()
                     self.setLogScaleState(False, False)
                     plot_widget.curveManager.removeAllCurves()

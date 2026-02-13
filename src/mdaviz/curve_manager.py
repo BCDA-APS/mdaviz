@@ -373,6 +373,8 @@ class CurveManager(QObject):
         global_max = float("-inf")
         for curve in self.curves():
             curve_data = self.getCurveData(curve)
+            if curve_data is None:
+                continue
             if curve != curveID and not curve_data["unscale"]:
                 curve_x_data, curve_y_data = self.getTransformedCurveXYData(curve)
                 if curve_x_data is not None and curve_y_data is not None:
@@ -531,12 +533,13 @@ class CurveManager(QObject):
         for curveID in list(self._curves.keys()):
             if savePersistentProperties and doNotClearCheckboxes:
                 curve_data = self.getCurveData(curveID)
-                props = self._persistent_properties.setdefault(curveID, {})
-                props["offset"] = curve_data.get("offset", 0)
-                props["factor"] = curve_data.get("factor", 1)
-                props["derivative"] = curve_data.get("derivative", False)
-                props["unscale"] = curve_data.get("unscale", False)
-                props["style"] = curve_data.get("style", "-")
+                if curve_data is not None:
+                    props = self._persistent_properties.setdefault(curveID, {})
+                    props["offset"] = curve_data.get("offset", 0)
+                    props["factor"] = curve_data.get("factor", 1)
+                    props["derivative"] = curve_data.get("derivative", False)
+                    props["unscale"] = curve_data.get("unscale", False)
+                    props["style"] = curve_data.get("style", "-")
             else:
                 self._persistent_properties.pop(curveID, None)
         self._curves.clear()

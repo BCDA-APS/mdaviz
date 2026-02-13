@@ -1212,6 +1212,9 @@ class MDAFileTableView(QWidget):
             # ------ extract x data:
             x_index = selections.get("X")
             x_data = scanDict[x_index].get("data") if x_index in scanDict else None
+            if x_data is None and 0 in scanDict:
+                x_index = 0
+                x_data = scanDict[0].get("data")
 
             # For 2D data in scanDictInner, slice to get 1D data
             if x_data is not None and len(np.array(x_data).shape) > 1:
@@ -1274,6 +1277,9 @@ class MDAFileTableView(QWidget):
                     if x2_slice >= y_data_array.shape[0]:
                         x2_slice = y_data_array.shape[0] - 1  # Use last available slice
                     y_data = y_data[x2_slice]  # Take the selected X2 slice
+
+                if y_data is None:
+                    continue
 
                 # Apply I0 normalization if I0 is selected
                 if i0_data is not None:
