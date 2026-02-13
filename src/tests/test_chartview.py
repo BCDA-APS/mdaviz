@@ -173,6 +173,29 @@ def test_curve_manager_no_update_when_data_unchanged():
     assert len(curve_updated) == 0
 
 
+def test_addCurve_rejects_single_element_ds():
+    """addCurve with len(ds) < 2 does not add curve and does not crash."""
+    manager = CurveManager()
+    curve_added = []
+    manager.curveAdded.connect(curve_added.append)
+    row = 0
+    file_path = "/tmp/test.mda"
+    plot_options = {"filePath": file_path, "fileName": "test"}
+    ds_options = {"label": "single"}
+
+    # ds with only one element (e.g. y_data only) -> should return early, no curve added
+    manager.addCurve(
+        row, np.array([1.0, 2.0, 3.0]), plot_options=plot_options, ds_options=ds_options
+    )
+    assert len(curve_added) == 0
+    assert len(manager.curves()) == 0
+
+    # ds with zero elements -> should return early
+    manager.addCurve(row, plot_options=plot_options, ds_options=ds_options)
+    assert len(curve_added) == 0
+    assert len(manager.curves()) == 0
+
+
 def test_curve_manager_persistent_properties():
     """Test persistent style properties in CurveManager (offset/factor are not persistent)."""
     manager = CurveManager()
