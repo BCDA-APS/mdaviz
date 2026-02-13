@@ -18,9 +18,9 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture
-def app(qtbot: "QtBot") -> QApplication:
+def app(qapp: QApplication) -> QApplication:
     """Create a QApplication instance for testing."""
-    return qtbot.qapp
+    return qapp
 
 
 class TestMDAFile:
@@ -75,32 +75,36 @@ class TestMDAFile:
         # Should still set the file name even if file doesn't exist
         assert mda_file._data["fileName"] == "nonexistent_file"
 
-    @pytest.mark.skip(reason="Mock data path issue - needs proper mock setup")
     def test_mda_file_set_data_with_read_error(
         self, qapp: QApplication, qtbot: "QtBot"
     ) -> None:
-        """Test setting data when file read fails."""
-        mda_file = MDAFile()
+        """Test setting data when file read fails (returns None)."""
+        from pathlib import Path
+
+        # Create a test directory and file path
+        test_dir = Path("/test/path")
+        test_file = "test.mda"
+
+        # Create a mock parent with dataPath and mdaFileList methods
+        mock_parent = Mock()
+        mock_parent.dataPath.return_value = test_dir
+        mock_parent.mdaFileList.return_value = [test_file]
+
+        mda_file = MDAFile(parent=mock_parent)
         qtbot.addWidget(mda_file)
 
-        # Mock the data path and file
-        with patch("mdaviz.mda_file.settings") as mock_settings:
-            mock_settings.dataPath.return_value = "/test/path"
-            mock_settings.mdaFileList.return_value = ["test.mda"]
+        # Mock cache to return None (cache miss) and readMDA to return None (read error)
+        with patch("mdaviz.mda_file.get_global_cache") as mock_cache:
+            # Mock cache to return None (cache miss)
+            mock_cache.return_value.get_or_load.return_value = None
 
-            # Mock file path
-            mock_path = Mock()
-            mock_path.exists.return_value = True
-            mock_path.stem = "test"
-            mock_settings.dataPath.return_value.__truediv__.return_value = mock_path
-
-            # Mock read error
-            with patch(
-                "mdaviz.synApps_mdalib.mda.readMDA", side_effect=Exception("Read error")
-            ):
+            # Mock readMDA to return None (read error)
+            with patch("mdaviz.synApps_mdalib.mda.readMDA", return_value=None):
                 mda_file.setData(0)
 
+                # Should still populate basic file info even if data can't be read
                 assert mda_file._data["fileName"] == "test"
+                assert mda_file._data["filePath"] == str(test_dir / test_file)
 
     def test_mda_file_cache_integration(
         self, qapp: QApplication, qtbot: "QtBot", single_mda_file: Path
@@ -241,7 +245,7 @@ class TestTabManager:
 
         # Try to get data from nonexistent tab
         data = tab_manager.getTabData("Nonexistent Tab")
-        assert data is None
+        assert data == {}
 
     def test_tab_manager_tabs_list(self, qapp: QApplication, qtbot: "QtBot") -> None:
         """Test getting the list of all tabs."""

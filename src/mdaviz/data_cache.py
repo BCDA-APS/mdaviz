@@ -183,9 +183,6 @@ class DataCache(QObject):
             # Check if file has been modified since caching
             try:
                 current_mtime = Path(file_path).stat().st_mtime
-                logger.debug(
-                    f"🔍 CACHE CHECK: {file_path}: cached_mtime={cached_data.file_mtime}, current_mtime={current_mtime}"
-                )
                 if current_mtime > cached_data.file_mtime:
                     # File has been modified, cache is stale
                     logger.info(
@@ -193,10 +190,6 @@ class DataCache(QObject):
                     )
                     self.cache_miss.emit(file_path)
                     return None
-                else:
-                    logger.debug(
-                        f"✅ CACHE VALID: File {file_path} not modified, using cached data"
-                    )
             except (OSError, FileNotFoundError):
                 # File no longer exists or can't be accessed
                 logger.warning(
@@ -296,7 +289,7 @@ class DataCache(QObject):
                     file_data_dim2 = result[2]
                     scan_dict_2d, _, _ = get_scan_2d(file_data_dim1, file_data_dim2)
                     # Also store inner dimension data for 1D plotting
-                    scan_dict_inner, _, _ = get_scan(file_data_dim2)
+                    scan_dict_inner, _, first_det = get_scan(file_data_dim2)
                 except Exception as e:
                     logger.warning(f"Warning: Could not process 2D data: {e}")
                     scan_dict_2d = {}
@@ -373,7 +366,7 @@ class DataCache(QObject):
                     file_data_dim2 = result[2]
                     scan_dict_2d, _, _ = get_scan_2d(file_data_dim1, file_data_dim2)
                     # Also store inner dimension data for 1D plotting
-                    scan_dict_inner, _, _ = get_scan(file_data_dim2)
+                    scan_dict_inner, _, first_det = get_scan(file_data_dim2)
                 except Exception as e:
                     logger.warning(f"Warning: Could not process 2D data: {e}")
                     scan_dict_2d = {}
@@ -459,23 +452,12 @@ class DataCache(QObject):
         folder_path = str(Path(folder_path).resolve())
         files_to_remove = []
 
-        logger.info(
-            f"🔄 CACHE INVALIDATE: Starting invalidation for folder: {folder_path}"
-        )
-        logger.debug(
-            f"🔄 CACHE INVALIDATE: Current cache contains {len(self._cache)} files"
-        )
-
         for file_path in self._cache.keys():
             if str(Path(file_path).parent.resolve()) == folder_path:
                 files_to_remove.append(file_path)
-                logger.debug(
-                    f"🔄 CACHE INVALIDATE: Marking for invalidation: {file_path}"
-                )
 
         for file_path in files_to_remove:
             self.remove(file_path)
-            logger.debug(f"🔄 CACHE INVALIDATE: Invalidated cache for: {file_path}")
 
         logger.info(
             f"🔄 CACHE INVALIDATE: Invalidated cache for {len(files_to_remove)} files in folder {folder_path}"

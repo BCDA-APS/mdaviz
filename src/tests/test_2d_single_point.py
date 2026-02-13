@@ -9,6 +9,36 @@ import numpy as np
 import pytest
 
 
+def test_chartview2d_plot2d_invalid_data_shows_message(qtbot, mock_chartview_parent):
+    """ChartView2D.plot2D with invalid data (1D, empty, or shape mismatch) shows message and does not crash."""
+    from mdaviz.chartview import ChartView2D
+
+    widget = ChartView2D(mock_chartview_parent)
+    qtbot.addWidget(widget)
+
+    # 1D y_data -> should show "Invalid or empty 2D data" and return
+    y_1d = np.array([1.0, 2.0, 3.0])
+    x_1d = np.array([0.0, 1.0, 2.0])
+    x2_1d = np.array([0.0, 1.0, 2.0])
+    widget.plot2D(y_1d, x_1d, x2_1d, {})
+    assert widget.figure is not None
+    assert widget.canvas is not None
+
+    # Empty y_data -> should show message and return
+    y_empty = np.array([[]]).reshape(0, 0)
+    x_1 = np.array([0.0])
+    x2_1 = np.array([0.0])
+    widget.plot2D(y_empty, x_1, x2_1, {})
+    assert widget.figure is not None
+
+    # Shape mismatch (y rows != x2 length) -> should show "2D data shape mismatch"
+    y_2x3 = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+    x_len2 = np.array([0.0, 1.0])
+    x2_len3 = np.array([0.0, 1.0, 2.0])  # length 3 != y_2x3.shape[0] (2)
+    widget.plot2D(y_2x3, x_len2, x2_len3, {})
+    assert widget.figure is not None
+
+
 class Test2DSinglePoint:
     """Test cases for 2D single point handling functionality."""
 

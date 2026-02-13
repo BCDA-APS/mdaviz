@@ -34,28 +34,6 @@ def test_auto_load_setting_default():
         assert main_window.get_auto_load_setting() is True
 
 
-def test_auto_load_setting_toggle():
-    """Test that auto-load setting can be toggled."""
-    # Reset the setting to ensure clean state
-    settings.setKey("auto_load_folder", True)
-
-    # Create a mock main window to test the setting
-    with patch("mdaviz.mainwindow.MainWindow.__init__", return_value=None):
-        main_window = MainWindow()
-        main_window.settings = settings
-        main_window.setStatus = Mock()
-
-        # Test toggling from True to False
-        result = main_window.toggle_auto_load()
-        assert result is False
-        assert main_window.get_auto_load_setting() is False
-
-        # Test toggling from False to True
-        result = main_window.toggle_auto_load()
-        assert result is True
-        assert main_window.get_auto_load_setting() is True
-
-
 def test_auto_load_first_folder_with_valid_folder():
     """Test auto-load with a valid folder in recent folders."""
     # Set up a valid folder path

@@ -35,7 +35,6 @@ class MainWindow(QMainWindow):
 
     .. autosummary::
 
-        ~connect
         ~status
         ~setStatus
         ~doAboutDialog
@@ -53,8 +52,11 @@ class MainWindow(QMainWindow):
         ~setFolderList
         ~onFolderSelected
         ~onRefresh
-        ~_buildFolderList
-        ~_updateRecentFolders
+        ~doPreferences
+        ~doPopUp
+        ~proceed
+        ~cancel
+        ~get_auto_load_setting
     """
 
     # ==========================================
@@ -71,9 +73,6 @@ class MainWindow(QMainWindow):
         self._setup_scanner()
         self._connect()
         self._setup_window_geometry()
-
-        # Create tab widget and fit data components if they don't exist
-        self._setup_fit_data_tab()
 
         # Auto-load the first valid folder from recent folders (delayed to preserve startup message)
         QTimer.singleShot(100, self._auto_load_first_folder)
@@ -113,10 +112,14 @@ class MainWindow(QMainWindow):
         geometry_restored = settings.restoreWindowGeometry(self, "mainwindow_geometry")
         logger.info(f"Settings are saved in: {settings.fileName()}")
 
-        # Calculate screen size constraints
-        screen = QApplication.primaryScreen().geometry()
-        max_width = screen.width() * 0.8  # Max 80% of screen width
-        max_height = screen.height() * 0.8  # Max 80% of screen height
+        # Get the maximum dimensions across all screens
+        max_width = 0
+        max_height = 0
+        for screen in QApplication.screens():
+            max_width = max(max_width, screen.geometry().width())
+            max_height = max(max_height, screen.geometry().height())
+        max_width = int(max_width * 0.8)
+        max_height = int(max_height * 0.8)
 
         # Only apply size constraints and centering if no geometry was previously saved
         if not geometry_restored:
@@ -128,7 +131,6 @@ class MainWindow(QMainWindow):
                 )
             elif self.width() < 400 or self.height() < 300:
                 self.resize(720, 500)  # Reasonable default size
-
             # Center the window on the screen only if no geometry was restored
             self._center_window()
         else:
@@ -160,45 +162,17 @@ class MainWindow(QMainWindow):
         # Ensure the window is resizable
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
-        # Ensure central widget and main content area are resizable
-        self._setup_resizable_layout()
+    def _center_window(self):
+        """Center the window on the screen."""
+        screen = QtWidgets.QApplication.primaryScreen().geometry()
+        window_geometry = self.geometry()
+        x = (screen.width() - window_geometry.width()) // 2
+        y = (screen.height() - window_geometry.height()) // 2
+        self.move(x, y)
 
-    def _setup_resizable_layout(self) -> None:
-        """Set up proper size policies for resizable layout."""
-        # Ensure central widget is resizable
-        if hasattr(self, "centralwidget"):
-            self.centralwidget.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding,
-                QtWidgets.QSizePolicy.Policy.Expanding,
-            )
-
-        # Ensure the main content area (groupbox) is resizable
-        if hasattr(self, "groupbox"):
-            self.groupbox.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding,
-                QtWidgets.QSizePolicy.Policy.Expanding,
-            )
-
-        # Ensure the tab widget is resizable
-        if hasattr(self, "mainTabWidget"):
-            self.mainTabWidget.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding,
-                QtWidgets.QSizePolicy.Policy.Expanding,
-            )
-
-        # Ensure the fit data tab is resizable
-        if hasattr(self, "fitDataTab"):
-            self.fitDataTab.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding,
-                QtWidgets.QSizePolicy.Policy.Expanding,
-            )
-
-        # Ensure the fit data text widget is resizable
-        if hasattr(self, "fitDataText"):
-            self.fitDataText.setSizePolicy(
-                QtWidgets.QSizePolicy.Policy.Expanding,
-                QtWidgets.QSizePolicy.Policy.Expanding,
-            )
+    # ==========================================
+    # Status & Dialog Management
+    # ==========================================
 
     @property
     def status(self):
@@ -222,106 +196,52 @@ class MainWindow(QMainWindow):
         about.open()
 
     def doPreferences(self, *args, **kw):
-        """
-        Show the Preferences dialog
-        """
-        from PyQt6.QtWidgets import (
-            QDialog,
-            QVBoxLayout,
-            QLabel,
-            QSpinBox,
-            QDialogButtonBox,
-            QCheckBox,
-        )
+        """Show the Preferences dialog."""
+        from mdaviz.preferences_dialog import PreferencesDialog
+        from PyQt6.QtWidgets import QDialog
 
-        # Create preferences dialog
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Preferences")
-        dialog.setModal(True)
-        dialog.resize(400, 200)
-
-        layout = QVBoxLayout(dialog)
-
-        # Auto-load setting (first)
-        auto_load_checkbox = QCheckBox("Auto-load first folder on startup")
-        auto_load_val = settings.getKey("auto_load_folder")
-        if auto_load_val is None:
-            auto_load_val = True
-        elif isinstance(auto_load_val, str):
-            auto_load_val = auto_load_val.lower() in ("true", "1", "yes", "on")
-        auto_load_checkbox.setChecked(bool(auto_load_val))
-        layout.addWidget(auto_load_checkbox)
-
-        # Add some spacing
-        layout.addStretch()
-
-        # Plot height setting (second)
-        plot_label = QLabel("Maximum Plot Height (pixels):")
-        plot_spinbox = QSpinBox()
-        plot_spinbox.setRange(200, 2000)
-        plot_spinbox.setSingleStep(100)  # Change step size to 100 pixels
-        plot_height_val = settings.getKey("plot_max_height")
-        try:
-            plot_height_val = int(plot_height_val)
-        except (TypeError, ValueError):
-            plot_height_val = 800
-        plot_spinbox.setValue(plot_height_val)
-        plot_spinbox.setSuffix(" px")
-        layout.addWidget(plot_label)
-        layout.addWidget(plot_spinbox)
-
-        # Add helpful caption for plot height setting
-        plot_caption = QLabel(
-            "Use this setting if plot areas expand vertically unexpectedly due to UI bugs."
-        )
-        plot_caption.setWordWrap(True)
-        plot_caption.setStyleSheet("color: gray; font-size: 10px;")
-        layout.addWidget(plot_caption)
-
-        # Add some spacing
-        layout.addStretch()
-
-        # Buttons
-        button_box = QDialogButtonBox(
-            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
-        )
-        button_box.accepted.connect(dialog.accept)
-        button_box.rejected.connect(dialog.reject)
-        layout.addWidget(button_box)
-
-        # Show dialog
+        dialog = PreferencesDialog(self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            # Save the new plot height setting
-            new_height = plot_spinbox.value()
-            settings.setKey("plot_max_height", new_height)
+            new_settings = dialog.get_settings()
+            self._apply_preferences(new_settings)
 
-            # Save the new auto-load setting
-            new_auto_load = auto_load_checkbox.isChecked()
-            settings.setKey("auto_load_folder", new_auto_load)
+    def _apply_preferences(self, settings_dict):
+        """Apply preference changes to the application."""
+        # Save settings
+        settings.setKey("plot_max_height", settings_dict["plot_max_height"])
+        settings.setKey("auto_load_folder", settings_dict["auto_load_folder"])
 
-            # Update any existing ChartView widgets
-            if hasattr(self, "mvc_folder") and self.mvc_folder:
+        # Update UI components
+        self._update_plot_height(settings_dict["plot_max_height"])
+
+        self.setStatus(
+            f"Settings updated: plot height {settings_dict['plot_max_height']}px, "
+            f"auto-load {'enabled' if settings_dict['auto_load_folder'] else 'disabled'}"
+        )
+
+    def _update_plot_height(self, new_height):
+        """Update plot height in existing components."""
+        if hasattr(self, "mvc_folder") and self.mvc_folder:
+            if (
+                hasattr(self.mvc_folder, "mda_file_viz")
+                and self.mvc_folder.mda_file_viz
+            ):
                 if (
-                    hasattr(self.mvc_folder, "mda_file_viz")
-                    and self.mvc_folder.mda_file_viz
+                    hasattr(self.mvc_folder.mda_file_viz, "chart_view")
+                    and self.mvc_folder.mda_file_viz.chart_view
                 ):
-                    if (
-                        hasattr(self.mvc_folder.mda_file_viz, "chart_view")
-                        and self.mvc_folder.mda_file_viz.chart_view
-                    ):
-                        self.mvc_folder.mda_file_viz.chart_view.setMaximumPlotHeight(
-                            new_height
-                        )
+                    self.mvc_folder.mda_file_viz.chart_view.setMaximumPlotHeight(
+                        new_height
+                    )
 
-                    # Update tab widget max height to match
                     if hasattr(
                         self.mvc_folder.mda_file_viz, "_updateTabWidgetMaxHeight"
                     ):
                         self.mvc_folder.mda_file_viz._updateTabWidgetMaxHeight()
 
-            self.setStatus(
-                f"Settings updated: plot height {new_height}px, auto-load {'enabled' if new_auto_load else 'disabled'}"
-            )
+    # ==========================================
+    # Window Lifecycle
+    # ==========================================
 
     def closeEvent(self, event):
         """
@@ -343,51 +263,6 @@ class MainWindow(QMainWindow):
         settings.saveWindowGeometry(self, "mainwindow_geometry")
         self.close()
 
-    def doOpen(self, *args, **kw):
-        """
-        User chose to open a file or folder dialog.
-        """
-        from mdaviz.opendialog import OpenDialog
-        from PyQt6.QtWidgets import QFileDialog
-
-        self.setStatus("Please select a file...")
-        open_dialog = OpenDialog(self)
-        open_dialog.setWindowTitle("Select a File")
-
-        # Use exec() to show the dialog and get the result
-        if open_dialog.exec() == QFileDialog.DialogCode.Accepted:
-            # Get the selected files
-            selected_files = open_dialog.selectedFiles()
-            if selected_files:
-                selected_path = selected_files[0]
-                if selected_path:
-                    # Convert file selection to folder selection
-                    path_obj = Path(selected_path)
-
-                    if path_obj.is_file():
-                        # If a file was selected, get its parent directory
-                        folder_path = path_obj.parent
-                        selected_file_name = path_obj.name
-                        self.setStatus(
-                            f"Selected file: {selected_file_name}, loading folder: {folder_path}"
-                        )
-                    else:
-                        # If a directory was selected, use it directly
-                        folder_path = path_obj
-                        selected_file_name = None
-                        self.setStatus(f"Selected folder: {folder_path}")
-
-                    # Store the selected file name for highlighting
-                    self._selected_file_name = selected_file_name
-
-                    # Add to folder list and load
-                    folder_list = self.folderList()
-                    folder_list.insert(0, str(folder_path))
-                    self.setFolderList(folder_list)
-
-                    # Set the combobox selection to the new folder
-                    self.folder.setCurrentText(str(folder_path))
-
     def doPopUp(self, message):
         """
         User chose to show a popup dialog with a message.
@@ -404,6 +279,72 @@ class MainWindow(QMainWindow):
     def cancel(self):
         """Handle the logic when the user clicks 'Cancel'."""
         return False
+
+    # ==========================================
+    # File Operations
+    # ==========================================
+
+    def doOpen(self, *args, **kw):
+        """User chose to open a file or folder dialog."""
+        result = self._show_open_dialog()
+        if result:
+            folder_path, selected_file_name = result
+            self._handle_folder_selection(folder_path, selected_file_name)
+
+    def _show_open_dialog(self):
+        """Show the open dialog and return selected path info."""
+        from mdaviz.opendialog import OpenDialog
+        from PyQt6.QtWidgets import QFileDialog
+
+        self.setStatus("Please select a file...")
+        open_dialog = OpenDialog(self)
+        open_dialog.setWindowTitle("Select a File")
+
+        # Use exec() to show the dialog and get the result
+        if open_dialog.exec() == QFileDialog.DialogCode.Accepted:
+            # Get the selected files
+            selected_files = open_dialog.selectedFiles()
+            if selected_files:
+                return self._process_selected_path(selected_files[0])
+        return None
+
+    def _process_selected_path(self, selected_path: str):
+        """Process the selected path and return folder/file info."""
+        path_obj = Path(selected_path)
+
+        if path_obj.is_file():
+            # If a file was selected, get its parent directory
+            folder_path = path_obj.parent
+            selected_file_name = path_obj.name
+            self.setStatus(
+                f"Selected file: {selected_file_name}, loading folder: {folder_path}"
+            )
+            return folder_path, selected_file_name
+        else:
+            # If a directory was selected, use it directly
+            folder_path = path_obj
+            selected_file_name = None
+            self.setStatus(f"Selected folder: {folder_path}")
+            return folder_path, selected_file_name
+
+    def _handle_folder_selection(
+        self, folder_path: Path, selected_file_name: Optional[str]
+    ):
+        """Handle the selected folder and file."""
+        # Store the selected file name for highlighting
+        self._selected_file_name = selected_file_name
+
+        # Add to folder list and load
+        folder_list = self.folderList()
+        folder_list.insert(0, str(folder_path))
+        self.setFolderList(folder_list)
+
+        # Set the combobox selection to the new folder
+        self.folder.setCurrentText(str(folder_path))  # type: ignore[attr-defined]
+
+    # ==========================================
+    # Data Management
+    # ==========================================
 
     def reset_mainwindow(self):
         self.setDataPath()
@@ -434,6 +375,10 @@ class MainWindow(QMainWindow):
     def setMdaInfoList(self, infoList=None):
         self._mdaInfoList = infoList if infoList else []
 
+    # ==========================================
+    # Folder Operations
+    # ==========================================
+
     def folderList(self):
         return self._folderList
 
@@ -447,8 +392,12 @@ class MainWindow(QMainWindow):
         Args:
             folder_list (list, optional): the current list of recent folders. Defaults to None.
         """
-        if folder_list != "":
-            folder_list = self._buildFolderList(folder_list)
+        # Ensure we always pass a list or None to _buildFolderList; never store a string in _folderList
+        if folder_list is not None and (
+            folder_list == "" or not isinstance(folder_list, list)
+        ):
+            folder_list = []
+        folder_list = self._buildFolderList(folder_list)
         self._fillFolderBox(folder_list)
         self._folderList = folder_list
 
@@ -676,9 +625,7 @@ class MainWindow(QMainWindow):
                             if self.mvc_folder and hasattr(
                                 self.mvc_folder, "mda_folder_tableview"
                             ):
-                                model = (
-                                    self.mvc_folder.mda_folder_tableview.tableView.model()
-                                )
+                                model = self.mvc_folder.mda_folder_tableview.tableView.model()
                                 if model and selected_index < model.rowCount():
                                     index = model.index(selected_index, 0)
                                     self.mvc_folder.selectAndShowIndex(index)
@@ -766,25 +713,6 @@ class MainWindow(QMainWindow):
         else:
             self.setStatus("No recent folders available for auto-loading")
 
-    def toggle_auto_load(self) -> bool:
-        """
-        Toggle the auto-load folder setting.
-
-        Returns:
-            bool: The new state of the auto-load setting (True if enabled, False if disabled)
-        """
-        current_setting = settings.getKey("auto_load_folder")
-        if current_setting is None:
-            current_setting = True
-
-        new_setting = not current_setting
-        settings.setKey("auto_load_folder", new_setting)
-
-        status_text = "Auto-loading enabled" if new_setting else "Auto-loading disabled"
-        self.setStatus(status_text)
-
-        return new_setting
-
     def get_auto_load_setting(self) -> bool:
         """
         Get the current auto-load folder setting.
@@ -801,123 +729,3 @@ class MainWindow(QMainWindow):
             # Convert string to boolean
             setting = setting.lower() in ("true", "1", "yes", "on")
         return bool(setting)
-
-    def _center_window(self):
-        """Center the window on the screen."""
-        screen = QtWidgets.QApplication.primaryScreen().geometry()
-        window_geometry = self.geometry()
-        x = (screen.width() - window_geometry.width()) // 2
-        y = (screen.height() - window_geometry.height()) // 2
-        self.move(x, y)
-
-    def showFitDataTab(self):
-        """Show the fit data tab and switch to it."""
-        self.mainTabWidget.setTabVisible(0, True)  # Show fit data tab
-        self.mainTabWidget.setCurrentIndex(0)  # Switch to fit data tab
-
-    def updateFitData(self, fit_data: str):
-        """
-        Update the fit data tab with new fit information.
-
-        Parameters:
-        - fit_data: String containing formatted fit data to display
-        """
-        self.fitDataText.setPlainText(fit_data)
-        self.fitDataLabel.setText("Fit Data Available")
-        self.showFitDataTab()
-
-    def connectToFitSignals(self, chart_view):
-        """
-        Connect to fit signals from a chart view.
-
-        Parameters:
-        - chart_view: ChartView instance that emits fit signals
-        """
-        if hasattr(chart_view, "fitAdded"):
-            chart_view.fitAdded.connect(self._on_fit_added)
-        if hasattr(chart_view, "fitUpdated"):
-            chart_view.fitUpdated.connect(self._on_fit_updated)
-
-    def _on_fit_added(self, curve_id: str, fit_id: str):
-        """Handle when a new fit is added."""
-        if hasattr(self, "mvc_folder") and self.mvc_folder:
-            # Get fit data from the fit manager
-            fit_manager = getattr(self.mvc_folder, "fit_manager", None)
-            if fit_manager:
-                fit_data = fit_manager.getFitData(curve_id)
-                if fit_data:
-                    self._display_fit_data(fit_data, curve_id)
-
-    def _on_fit_updated(self, curve_id: str, fit_id: str):
-        """Handle when a fit is updated."""
-        self._on_fit_added(curve_id, fit_id)
-
-    def _display_fit_data(self, fit_data, curve_id: str):
-        """Display fit data in the fit data tab."""
-        try:
-            # Format the fit data for display
-            formatted_data = f"Curve ID: {curve_id}\n"
-            formatted_data += f"Model: {fit_data.model_name}\n"
-            formatted_data += f"Fit Range: {fit_data.x_range}\n\n"
-
-            # Add fit parameters
-            if fit_data.fit_result and hasattr(fit_data.fit_result, "parameters"):
-                formatted_data += "Parameters:\n"
-                for param, value in fit_data.fit_result.parameters.items():
-                    formatted_data += f"  {param}: {value:.6f}\n"
-
-            # Add fit quality metrics if available
-            if fit_data.fit_result and hasattr(fit_data.fit_result, "quality_metrics"):
-                formatted_data += "\nQuality Metrics:\n"
-                for metric, value in fit_data.fit_result.quality_metrics.items():
-                    formatted_data += f"  {metric}: {value:.6f}\n"
-
-            self.updateFitData(formatted_data)
-
-        except Exception as e:
-            error_msg = f"Error displaying fit data: {str(e)}"
-            self.updateFitData(error_msg)
-
-    def _setup_fit_data_tab(self):
-        """Set up the fit data tab widget and components."""
-        # Check if mainTabWidget exists, if not create it
-        if not hasattr(self, "mainTabWidget"):
-            # Create a tab widget and add it to the groupbox layout
-            self.mainTabWidget = QtWidgets.QTabWidget()
-
-            # Create fit data tab
-            self.fitDataTab = QtWidgets.QWidget()
-            fit_layout = QtWidgets.QVBoxLayout(self.fitDataTab)
-
-            # Create fit data label
-            self.fitDataLabel = QtWidgets.QLabel("No Fit Data Available")
-            fit_layout.addWidget(self.fitDataLabel)
-
-            # Create fit data text widget
-            self.fitDataText = QtWidgets.QTextEdit()
-            self.fitDataText.setReadOnly(True)
-            fit_layout.addWidget(self.fitDataText)
-
-            # Add fit data tab to main tab widget
-            self.mainTabWidget.addTab(self.fitDataTab, "Fit Data")
-
-            # Add the tab widget to the groupbox layout
-            if hasattr(self, "groupbox") and self.groupbox.layout():
-                self.groupbox.layout().addWidget(self.mainTabWidget)
-
-            # Initially hide the fit data tab until a fit is performed
-            self.mainTabWidget.setTabVisible(0, False)
-        else:
-            # If mainTabWidget exists, ensure fit data components exist
-            if not hasattr(self, "fitDataTab"):
-                self.fitDataTab = QtWidgets.QWidget()
-                fit_layout = QtWidgets.QVBoxLayout(self.fitDataTab)
-                self.fitDataLabel = QtWidgets.QLabel("No Fit Data Available")
-                fit_layout.addWidget(self.fitDataLabel)
-                self.fitDataText = QtWidgets.QTextEdit()
-                self.fitDataText.setReadOnly(True)
-                fit_layout.addWidget(self.fitDataText)
-                self.mainTabWidget.addTab(self.fitDataTab, "Fit Data")
-
-            # Initially hide the fit data tab until a fit is performed
-            self.mainTabWidget.setTabVisible(0, False)

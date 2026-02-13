@@ -17,8 +17,6 @@ User: clearButton.clicked (emit: no data)
 
     --> onClearAllTabsRequested()
     --> tabManager.removeAllTabs()
-    --> tabManager.allTabsRemoved.emit()
-    --> onAllTabsRemoved()
     --> removeAllFileTabs()
 
 
@@ -75,6 +73,7 @@ class MDAFile(QWidget):
         self.currentHighlightedModel = (
             None  # To store the current highlighted's row model
         )
+        self._last_2d_selection = {}
 
         # Buttons handling:
         self.addButton.hide()
@@ -92,10 +91,7 @@ class MDAFile(QWidget):
         self.autoBox.currentTextChanged.connect(self.updateButtonVisibility)
 
         # Connect TabManager signals:
-        # DESIGN NOTE: Implement proper signal/slot tab management via tabManager for tabAdded and allTabsRemoved if needed.
-        self.tabManager.tabAdded.connect(self.onTabAdded)
         self.tabManager.tabRemoved.connect(self.onTabRemoved)
-        self.tabManager.allTabsRemoved.connect(self.onAllTabsRemoved)
 
         # Tab handling:
         self.tabWidget.currentChanged.connect(self.updateCurrentTabInfo)
@@ -123,7 +119,9 @@ class MDAFile(QWidget):
         """List of mda file (name only) in the selected folder."""
         return self.mda_mvc.mdaFileList()
 
-    # ------ Get & set methods:
+    # =============================================
+    # Get & set methods
+    # =============================================
 
     def mode(self):
         """
@@ -175,11 +173,9 @@ class MDAFile(QWidget):
         file_name = self.mdaFileList()[index]
         file_path = self.dataPath() / file_name
 
-        # Debug: print the paths to see what's happening
-        logger.debug(f"folder_path: {folder_path}")
-        logger.debug(f"file_name: {file_name}")
-        logger.debug(f"file_path: {file_path}")
-        logger.debug(f"file_path.exists(): {file_path.exists()}")
+        logger.debug(
+            f"setData loading file={file_path.name} exists={file_path.exists()}"
+        )
 
         # Use data cache for better performance
         cache = get_global_cache()
@@ -249,7 +245,7 @@ class MDAFile(QWidget):
                     file_data_dim2 = result[2]
                     scanDict2D, _, _ = utils.get_scan_2d(file_data_dim1, file_data_dim2)
                     # Also store inner dimension data for 1D plotting
-                    scan_dict_inner, _, _ = utils.get_scan(file_data_dim2)
+                    scan_dict_inner, _, first_det = utils.get_scan(file_data_dim2)
                 except Exception as e:
                     logger.warning(f"Warning: Could not process 2D data: {e}")
                     scanDict2D = {}
@@ -282,32 +278,55 @@ class MDAFile(QWidget):
                 "acquiredDimensions": acquired_dimensions,
             }
 
+    def setLast2DSelection(self, selection_by_pv):
+        """Store last 2D selection (by PV) so it can be applied when switching to any file."""
+        if not selection_by_pv:
+            return
+        self._last_2d_selection = selection_by_pv.copy()
+
+    def getLast2DSelection(self):
+        """Return the last 2D selection (by PV) for restore when switching files."""
+        return self._last_2d_selection.copy()
+
     def handle2DMode(self):
-        """Handle 2D data setup - update controls but don't change mode."""
+        """
+        Configure 2D data controls in the current table view when multidimensional data is detected.
+
+        This method is called after a file tab is added/updated and the data is identified as
+        multidimensional (2D). It extracts 2D-specific information from the data structure and
+        updates the table view's 2D controls (X2 spinBox) accordingly.
+
+        The method:
+        - Retrieves the currently active table view from the tab widget
+        - Extracts dimension information (planned and acquired) from the data
+        - Identifies the X2 positioner from scanDict2D (the first positioner at key 0)
+        - Updates the table view's 2D controls with the extracted information
+
+        Note: This method only updates UI controls; it does not change the application's
+        mode (Auto-replace, Auto-add, Auto-off). The mode remains unchanged.
+
+        Data sources (from self._data):
+        - dimensions: Planned dimensions for the 2D scan
+        - acquiredDimensions: Actual dimensions acquired (may differ if scan incomplete)
+        - scanDict2D: Dictionary containing 2D scan data, where key 0 is the X2 positioner
+
+        Side effects:
+        - Updates the current table view's 2D controls via update2DControls()
+        - No effect if data is not multidimensional or no table view is available
+        """
         if self._data.get("isMultidimensional", False):
             # Update 2D controls in table view
             table_view = self.tabIndex2Tableview(self.tabWidget.currentIndex())
             if table_view:
                 dimensions = self._data.get("dimensions", [])
                 acquired_dimensions = self._data.get("acquiredDimensions", [])
-                logger.debug(f"handle2DMode - dimensions: {dimensions}")
-                logger.debug(
-                    f"handle2DMode - acquired_dimensions: {acquired_dimensions}"
-                )
 
                 # Extract X2 positioner information from scanDict2D
                 x2_positioner_info = None
                 scan_dict_2d = self._data.get("scanDict2D", {})
-                logger.debug(
-                    f"handle2DMode - scanDict2D keys: {list(scan_dict_2d.keys())}"
-                )
                 if scan_dict_2d:
                     # Find the X2 positioner (first positioner in 2D data)
-                    # In 2D data, the first positioner (index 0) is typically X2
                     for key, value in scan_dict_2d.items():
-                        logger.debug(
-                            f"handle2DMode - Field {key}: type={value.get('type')}, name={value.get('name')}"
-                        )
                         if (
                             value.get("type") == "POS" and key == 0
                         ):  # First positioner is X2
@@ -316,10 +335,9 @@ class MDAFile(QWidget):
                                 "unit": value.get("unit", ""),
                                 "data": value.get("data", []),
                             }
-                            logger.debug(
-                                f"handle2DMode - X2 positioner found: {x2_positioner_info['name']}"
-                            )
                             break
+                x2_name = x2_positioner_info["name"] if x2_positioner_info else None
+                logger.debug(f"handle2DMode dims={dimensions} x2={x2_name}")
 
                 table_view.update2DControls(
                     is_multidimensional=self._data.get("isMultidimensional", False),
@@ -328,10 +346,21 @@ class MDAFile(QWidget):
                     x2_positioner_info=x2_positioner_info,
                 )
 
+                selection = self.getLast2DSelection()
+                if selection:
+                    table_view.apply2DSelection(selection)
+
+                # Set this file's control panel to 2D style (hide X2 spinbox, show comboBoxes)
+                # so when we switch to this file later on 2D tab, we don't get a flash of X2 spinbox.
+                if self.mda_mvc.mda_file_viz.tabWidget.currentIndex() == 3:
+                    self.mda_mvc.mda_file_viz.updateControlVisibility(3)
+
     def setStatus(self, text):
         self.mda_mvc.setStatus(text)
 
-    # ------ Tab utilities:
+    # =============================================
+    # Tab utilities
+    # =============================================
 
     def tabPath2Index(self, file_path):
         """Finds and returns the index of a tab based on its associated file path."""
@@ -365,7 +394,9 @@ class MDAFile(QWidget):
             return tab_tableview
         return None  # Return None if the index is out of range.
 
-    # ------ Populating UIs with selected file content:
+    # =============================================
+    # Populating UIs with selected file content
+    # =============================================
 
     def displayMetadata(self, metadata):
         """Display metadata in the vizualization panel."""
@@ -375,11 +406,12 @@ class MDAFile(QWidget):
         metadata = yaml.dump(metadata, default_flow_style=False)
         self.mda_mvc.mda_file_viz.setMetadata(metadata)
 
-    def displayData(self, tabledata):
+    def displayData(self, tabledata=None):
         """Display pos(s) & det(s) values as a tableview in the vizualization panel."""
         if not self.data():
             return
         # Pass full data structure instead of just scanDict for 2D support
+        # Note: tabledata parameter is kept for backward compatibility but not used
         self.mda_mvc.mda_file_viz.setTableData(self.data())
 
     def defaultSelection(self, first_pos, first_det, selection_field):
@@ -400,7 +432,9 @@ class MDAFile(QWidget):
         self.mda_mvc.setSelectionField(default)
         return default
 
-    # ------ Slots (UI):
+    # =============================================
+    # Slots (UI)
+    # =============================================
 
     def onTabCloseRequested(self, index):
         """
@@ -409,10 +443,6 @@ class MDAFile(QWidget):
         file_path = self.tabIndex2Path(index)
         if file_path:
             self.tabManager.removeTab(file_path)
-
-    def onTabAdded(self, file_path):
-        """To be implemented"""
-        pass
 
     def onTabRemoved(self, file_path):
         """
@@ -424,22 +454,29 @@ class MDAFile(QWidget):
             self.removeAllFileTabs()
         elif index is not None and index < self.tabWidget.count():
             self.tabWidget.removeTab(index)
-
-    def onAllTabsRemoved(self):
-        """To be implemented"""
-        pass
+            # Clear highlighted row references if the removed tab was the highlighted one
+            if self.currentHighlightedFilePath == file_path:
+                self.currentHighlightedRow = None
+                self.currentHighlightedFilePath = None
+                self.currentHighlightedModel = None
 
     def onClearGraphRequested(self):
-        """Clear only the graph area in the visualization panel."""
+        """Clear only the graph area in the visualization panel. Reset log scale."""
         # Get the chart view and clear all curves with checkboxes
         layout = self.mda_mvc.mda_file_viz.plotPageMpl.layout()
         if layout.count() > 0:
             plot_widget = layout.itemAt(0).widget()
+            if plot_widget is None:
+                logger.warning("Plot layout has no widget at index 0")
+                return
             if hasattr(plot_widget, "curveManager"):
+                self.mda_mvc.mda_file_viz.setLogScaleState(False, False)
                 plot_widget.curveManager.removeAllCurves(doNotClearCheckboxes=False)
         self.setStatus("Graph cleared.")
 
-    # ------ Tabs management:
+    # =============================================
+    # Tab management
+    # =============================================
 
     def addFileTab(self, index, selection_field):
         """
@@ -487,7 +524,8 @@ class MDAFile(QWidget):
             else:
                 # In auto-add/auto-off mode, just switch to existing tab
                 tab_index = self.tabPath2Index(file_path)
-                self.tabWidget.setCurrentIndex(tab_index)
+                if tab_index is not None:
+                    self.tabWidget.setCurrentIndex(tab_index)
         else:
             # File is new
             if mode in ("Auto-add", "Auto-off"):
@@ -533,7 +571,7 @@ class MDAFile(QWidget):
         - selection_field (dict): Specifies the data fields (positioners/detectors) for display in the table view.
         """
         tableview = MDAFileTableView(self)
-        tab_index = self.tabWidget.addTab(tableview, file_name)
+        tab_index = self.tabWidget.addTab(tableview, file_name)  # addTab(widget, label)
         self.tabWidget.setCurrentIndex(tab_index)
         tableview.displayTable(selection_field)
         tableview.filePath.setText(file_path)
@@ -548,6 +586,10 @@ class MDAFile(QWidget):
             self.tabWidget.removeTab(self.tabWidget.count() - 1)
         # Clear all data associated with the tabs from the TabManager.
         self.tabManager.removeAllTabs()
+        # Clear highlighted row references
+        self.currentHighlightedRow = None
+        self.currentHighlightedFilePath = None
+        self.currentHighlightedModel = None
         # Clear all content from the visualization panel except for graph, if no tabs are open.
         self.mda_mvc.mda_file_viz.clearContents(plot=False)
         # Update the status to reflect that all tabs have been closed.
@@ -560,7 +602,7 @@ class MDAFile(QWidget):
             new_tab_index, new_file_path, new_tab_data, new_selection_field
         """
         new_file_path = self.tabIndex2Path(new_tab_index)
-        new_tab_data = self.tabManager.getTabData(new_file_path) or {}
+        new_tab_data = self.tabManager.getTabData(new_file_path)
         new_tab_tableview = self.tabWidget.widget(new_tab_index)
         if new_tab_tableview and new_tab_tableview.tableView.model():
             new_selection_field = new_tab_tableview.tableView.model().plotFields()
@@ -579,6 +621,9 @@ class MDAFile(QWidget):
             row (int): _description_
         """
         tab_index = self.tabPath2Index(file_path)
+        if tab_index is None:
+            # Tab not found, cannot highlight row
+            return
         self.tabWidget.setCurrentIndex(tab_index)
         tableview = self.tabWidget.widget(tab_index)
         model = tableview.tableView.model()
@@ -619,7 +664,9 @@ class MDAFile(QWidget):
         index = model.index(row, 0)
         tableview.tableView.scrollTo(index, scrollHint)
 
-    # ------ Button methods:
+    # =============================================
+    # Button methods
+    # =============================================
 
     def responder(self, action):
         """Modify the plot with the described action.
@@ -630,8 +677,13 @@ class MDAFile(QWidget):
         self.buttonPushed.emit(action)
 
     def updateButtonVisibility(self):
-        """Check the current text in "mode" pull down and show/hide buttons accordingly"""
-        if self.autoBox.currentText() == "Auto-off":
+        """Check the current text in "mode" pull down and show/hide buttons accordingly.
+        On the 2D viz tab, add/replace are always hidden."""
+        current_viz_tab = self.mda_mvc.mda_file_viz.tabWidget.currentIndex()
+        if current_viz_tab == 3:
+            self.addButton.hide()
+            self.replaceButton.hide()
+        elif self.autoBox.currentText() == "Auto-off":
             self.addButton.show()
             self.replaceButton.show()
         else:
@@ -639,7 +691,9 @@ class MDAFile(QWidget):
             self.replaceButton.hide()
 
 
-# ------ Tabs management (data):
+# =============================================
+# Tab management (data)
+# =============================================
 
 
 class TabManager(QObject):
@@ -655,14 +709,10 @@ class TabManager(QObject):
     - Emits signals to notify other components of tab-related changes.
 
     Signals:
-    - tabAdded: Emitted when a new tab is added. Passes the file path of the added tab.
     - tabRemoved: Emitted when a tab is removed. Passes the file path of the removed tab.
-    - allTabRemoved: Emitted when all tabs are removed. No parameters.
     """
 
-    tabAdded = pyqtSignal(str)  # Signal emitting file path of removed tab
     tabRemoved = pyqtSignal(str)  # Signal emitting file path of removed tab
-    allTabsRemoved = pyqtSignal()  # Signal indicating all tabs have been removed
 
     def __init__(self):
         super().__init__()
@@ -672,7 +722,6 @@ class TabManager(QObject):
         """Adds a new tab with specified metadata and table data."""
         if file_path not in self._tabs:
             self._tabs[file_path] = {"metadata": metadata, "tabledata": tabledata}
-            self.tabAdded.emit(file_path)
 
     def removeTab(self, file_path):
         """
@@ -686,116 +735,11 @@ class TabManager(QObject):
     def removeAllTabs(self):
         """Removes all tabs."""
         self._tabs.clear()
-        self.allTabsRemoved.emit()
 
     def getTabData(self, file_path):
         """Returns the metatdata & data for the tab associated with the given file path."""
-        return self._tabs.get(file_path)
+        return self._tabs.get(file_path, {})
 
     def tabs(self):
         """Returns a read-only view of the currently managed tabs."""
         return dict(self._tabs)
-
-
-# chatGPT review:
-# Your implementation of addFileTab and createNewTab seems well thought out with
-# a clear workflow. Here are some considerations to ensure the TabManager's
-# state aligns with the UI:
-
-#     Synchronization Between Data and UI: Every action that affects tabs
-#         (adding, removing, switching) should reflect both in the UI and the
-#         data managed by TabManager. It looks like you're adding and removing
-#         tabs through the TabManager correctly. Just ensure that every UI
-#         action triggers the corresponding data update in TabManager.
-
-#     Error Handling for Tab Operations: Consider adding error handling or
-#         checks for situations where tab operations might fail or behave
-#         unexpectedly. For example, what happens if createNewTab is called with
-#         a file_path that already exists in TabManager? Although your logic
-#         should prevent this, defensive programming can help catch unexpected
-#         issues.
-
-#     Consistent State After Operations: After operations like adding a new tab
-#         or removing all tabs, verify that the application's state is
-#         consistent (e.g., no dangling references to removed tabs, UI elements
-#         are enabled/disabled appropriately).
-
-#     Update UI Responsively: Make sure the UI updates are responsive to changes
-#         in the TabManager. For instance, when a tab is added or removed, any
-#         UI elements depending on the number of open tabs (like "Close All
-#         Tabs" button) should update accordingly.
-
-#     onTabRemoved and onAllTabsRemoved Slots: You've mentioned placeholders for
-#         these methods but haven't detailed their implementations. These are
-#         crucial for handling UI updates or cleanup when tabs are removed.
-#         Ensure they're implemented to handle any necessary UI adjustments when
-#         tabs change.
-
-#     Removal of Tabs and Associated Data: In removeTabUI, you handle the
-#         removal process properly by checking if the tab exists in TabManager
-#         before attempting to remove it. Just make sure this also covers any
-#         associated data cleanup that might be needed to prevent memory leaks
-#         or stale data.
-
-#     Switching Tabs: When switching tabs (updateCurrentTabInfo), ensure that any
-#         context-sensitive UI elements (like metadata display, data tables,
-#         etc.) update to reflect the content of the newly active tab.
-
-# Overall, your methods for handling tab addition and removal appear to be on
-# the right track. Thorough testing, especially with scenarios involving rapid
-# addition/removal of tabs and switching between tabs, will help ensure that the
-# UI and TabManager remain in sync.
-
-
-# For MDA_MVC:
-
-#     Your MDA_MVC class implementation appears comprehensive and
-#     well-organized. You've covered a broad range of functionalities essential
-#     for the MVC architecture in managing MDA files. Here are a few points to
-#     consider, focusing on ensuring coherence and functionality:
-
-#     Signal and Slot Connections: Ensure all signal connections are correctly
-#         established, especially for newly introduced signals related to
-#         TabManager. It's crucial that all parts of your MVC architecture
-#         communicate as intended.
-
-#     UI and Data Synchronization: Given your use of TabManager for managing tab
-#         data, verify that UI changes (e.g., tab switches, adds, and removes)
-#         are always in sync with the data model. This includes handling of
-#         signals like onTabRemoved and onAllTabsRemoved effectively to update
-#         the UI accordingly.
-
-#     Error Handling: Consider adding error handling for cases where operations
-#         might not go as expected. For example, what happens if doFileSelected
-#         is triggered but the file cannot be processed for some reason?
-#         Providing feedback or ensuring the application can gracefully handle
-#         such scenarios is important.
-
-#     Refreshing and Updating UI: The method doRefresh should ensure that the UI
-#         correctly reflects the current state of the file system or data source
-#         it's representing. This might involve more than just updating the
-#         table views, such as resetting selections or clearing data
-#         visualizations if necessary.
-
-#     Responsiveness to User Actions: Methods like goToFirst, goToLast,
-#         goToNext, and goToPrevious are crucial for navigating through files.
-#         Ensure these actions feel responsive to the user and that any
-#         associated data visualization updates occur without noticeable delay.
-
-#     Consistency in UI Updates: When tabs are changed via onCurrentTabChanged,
-#         ensure that the displayed metadata and data are always consistent with
-#         the selected tab. This includes proper handling of cases where a tab
-#         might not contain the expected data (e.g., if the file has been moved
-#         or deleted outside the application).
-
-#     Field Selection and Plotting Logic: The logic handling field selection for
-#         plotting and subsequent plot updates (in methods like
-#         onCheckboxStateChanged and doPlot) should be robust against changes in
-#         the underlying data model. Ensure that selections are valid and that
-#         the plotting functionality reacts correctly to changes in selected
-#         fields.
-
-#     Documentation and Code Comments: Your documentation and comments provide a
-#         good overview of each method's purpose. Continuing to maintain this
-#         level of documentation as your code evolves will be beneficial for
-#         both your future self and others who may work with your code.

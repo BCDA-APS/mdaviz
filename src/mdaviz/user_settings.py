@@ -182,13 +182,13 @@ class ApplicationQSettings(QSettings):
         width = self.getKey(f"{label}/width")
         height = self.getKey(f"{label}/height")
         if width is None or height is None:
-            return
+            return False
         window.resize(QSize(int(width), int(height)))
 
         x = self.getKey(f"{label}/x")
         y = self.getKey(f"{label}/y")
         if x is None or y is None:
-            return
+            return False
 
         # is this window on any available screen?
         app = QApplication.instance()
@@ -226,6 +226,7 @@ class ApplicationQSettings(QSettings):
             height = min(int(height), available_rect.height())
 
         window.setGeometry(QRect(int(x), int(y), int(width), int(height)))
+        return True
 
     def saveSplitter(self, splitter, label):
         """

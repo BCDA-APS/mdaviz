@@ -21,7 +21,7 @@ especially for GUI testing with pytest-qt.
     ~nested_mda_files
 """
 
-from typing import TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Generator, cast
 import pytest
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -47,7 +47,7 @@ def qapp() -> "QApplication":
     app = QApplication.instance()
     if app is None:
         app = QApplication([])
-    return app
+    return cast(QApplication, app)
 
 
 @pytest.fixture

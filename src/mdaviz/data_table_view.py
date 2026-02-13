@@ -49,6 +49,7 @@ class DataTableView(QWidget):
                     data_model = MultiDimensionalDataTableModel(
                         scan_data, x2_points, x1_points
                     )
+                    self.mda_viz.tableView.verticalHeader().show()
                 else:
                     # Fallback to regular DataTableModel with scanDict
                     scanDict = data.get("scanDict", {})

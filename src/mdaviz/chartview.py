@@ -8,12 +8,11 @@ Charting and visualization module for MDA data analysis.
 
 Classes:
     ChartView: Main 1D plotting widget with interactive features
-    CurveManager: Manages curve data, properties, and persistence
     ChartView2D: 2D plotting widget for heatmaps and contour plots
 
 Key Features:
     - Interactive 1D and 2D plotting with Matplotlib backend
-    - Curve management with persistent properties (style, offset, factor)
+    - Curve management with persistent style properties
     - Real-time data fitting with multiple model support
     - Interactive cursors for data analysis
     - Logarithmic scale support for both 1D and 2D plots
@@ -36,7 +35,7 @@ Usage:
 
     ~ChartView
     ~ChartView2D
-    ~CurveManager
+
 """
 
 import datetime
@@ -45,12 +44,13 @@ from itertools import cycle
 from typing import Optional
 import numpy
 from PyQt6 import QtCore, QtWidgets
-from PyQt6.QtCore import QObject, QTimer, Qt, pyqtSignal
+from PyQt6.QtCore import QTimer, Qt
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QApplication
 from mdaviz import utils
 from mdaviz.fit_manager import FitManager
 from mdaviz.user_settings import settings
 from mdaviz.logger import get_logger
+from mdaviz.curve_manager import CurveManager
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
@@ -119,11 +119,6 @@ class ChartView(QWidget):
         fitManager: FitManager instance for curve fitting
         cursors: Dictionary storing cursor positions and information
 
-    Signals:
-        fitAdded: Emitted when a fit is added (curveID, fitID)
-        fitUpdated: Emitted when a fit is updated (curveID, fitID)
-        fitRemoved: Emitted when a fit is removed (curveID, fitID)
-
     Key Features:
         - Interactive plotting with Matplotlib backend
         - Curve selection and management via combo box
@@ -144,7 +139,6 @@ class ChartView(QWidget):
         ~ChartView.configPlot
         ~ChartView.getCursorRange
         ~ChartView.getSelectedCurveID
-        ~ChartView.hasDataItems
         ~ChartView.performFit
         ~ChartView.plot
         ~ChartView.setBottomAxisText
@@ -163,13 +157,17 @@ class ChartView(QWidget):
         ~ChartView.ylabel
     """
 
-    # Fit signals for main window connection
-    fitAdded = pyqtSignal(str, str)  # curveID, fitID
-    fitUpdated = pyqtSignal(str, str)  # curveID, fitID
-    fitRemoved = pyqtSignal(str, str)  # curveID, fitID
-
     def __init__(self, parent, **kwargs):
-        # parent=<mdaviz.mda_folder.MDA_MVC object at 0x10e7ff520>
+        """Build the 1D plot widget and wire it to the MDA MVC.
+
+        Parameters
+        ----------
+        parent : MDA_MVC
+            Parent MVC widget (provides mda_file_viz, mda_file, etc.).
+        **kwargs
+            Optional plot_options (e.g. title, x/y labels) applied to the axes.
+        """
+
         self.mda_mvc = parent
         super().__init__()
 
@@ -177,7 +175,9 @@ class ChartView(QWidget):
         self._log_x = False
         self._log_y = False
 
-        ############# UI initialization:
+        # ==========================================
+        #   UI initialization
+        # ==========================================
 
         # Set size policy to prevent unwanted expansion
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -225,7 +225,9 @@ class ChartView(QWidget):
         self.setYlabel(plot_options.get("x", ""))
         self.configPlot()
 
-        ############# Signals & slots:
+        # ==========================================
+        #   Signals & slots
+        # ==========================================
 
         # Track curves and display in QComboBox:
         self.plotObjects = {}  # all the Line2D on the graph, key = curveID
@@ -245,7 +247,6 @@ class ChartView(QWidget):
         self.fitManager.fitAdded.connect(self.onFitAdded)
         self.fitManager.fitUpdated.connect(self.onFitUpdated)
         self.fitManager.fitRemoved.connect(self.onFitRemoved)
-        self.fitManager.fitVisibilityChanged.connect(self.onFitVisibilityChanged)
 
         # Remove buttons definitions:
         self.clearAll = self.mda_mvc.mda_file_viz.clearAll
@@ -254,7 +255,7 @@ class ChartView(QWidget):
         self.removeCursor2 = self.mda_mvc.mda_file_viz.cursor2_remove
 
         # Remove button connections:
-        utils.reconnect(self.clearAll.clicked, self.curveManager.allCurvesRemoved)
+        utils.reconnect(self.clearAll.clicked, self.onClearAllClicked)
         utils.reconnect(self.removeButton.clicked, self.onRemoveButtonClicked)
         self.removeCursor1.clicked.connect(partial(self.onRemoveCursor, cursor_num=1))
         self.removeCursor2.clicked.connect(partial(self.onRemoveCursor, cursor_num=2))
@@ -266,22 +267,23 @@ class ChartView(QWidget):
         # Connect offset & factor QLineEdit:
         self.offset_value = self.mda_mvc.mda_file_viz.offset_value
         self.factor_value = self.mda_mvc.mda_file_viz.factor_value
-        self.offset_value.editingFinished.connect(self.onOffsetUpdated)
-        self.factor_value.editingFinished.connect(self.onFactorUpdated)
+        self.offset_value.editingFinished.connect(self.onOffsetFactorUpdated)
+        self.factor_value.editingFinished.connect(self.onOffsetFactorUpdated)
 
-        # Connect the click event to a handler
-        self.cid = self.figure.canvas.mpl_connect("button_press_event", self.onclick)
-        self.alt_pressed = False
+        # Connect derivative checkbox
+        self.derivative = False
+        self.derivativeCheckBox = self.mda_mvc.mda_file_viz.derivativeCheckBox
+        self.derivativeCheckBox.setChecked(self.derivative)
+        self.derivativeCheckBox.toggled.connect(self.onDerivativeToggled)
 
-        # Set up a timer to check modifier key state
-        self.key_check_timer = QTimer()
-        self.key_check_timer.timeout.connect(self.check_modifier_keys)
-        self.key_check_timer.start(50)  # Check every 50ms
+        # Connect unscale checkbox
+        self.unscale = False
+        self.unscaleCheckBox = self.mda_mvc.mda_file_viz.unscaleCheckBox
+        self.unscaleCheckBox.setChecked(self.unscale)
+        self.unscaleCheckBox.toggled.connect(self.onUnscaleToggled)
 
         # Initialize snap to curve setting (default to False for free cursor placement)
         self._snap_to_curve = False
-
-        # Connect the snap cursors checkbox
         self.snapCursors = self.mda_mvc.mda_file_viz.snapCursors
         self.snapCursors.setChecked(self._snap_to_curve)
         self.snapCursors.toggled.connect(self.onSnapCursorsToggled)
@@ -296,6 +298,15 @@ class ChartView(QWidget):
             "diff": "n/a",
             "midpoint": "n/a",
         }
+
+        # Connect the click event to a handler
+        self.cid = self.figure.canvas.mpl_connect("button_press_event", self.onclick)
+        self.alt_pressed = False
+
+        # Set up a timer to check modifier key state
+        self.key_check_timer = QTimer()
+        self.key_check_timer.timeout.connect(self.check_modifier_keys)
+        self.key_check_timer.start(50)  # Check every 50ms
 
     def check_modifier_keys(self):
         """Check for modifier keys using Qt's global state."""
@@ -313,34 +324,59 @@ class ChartView(QWidget):
             self.key_check_timer.stop()
         super().closeEvent(event)
 
-    ########################################## Set & get methods:
+    # ==========================================
+    #   Set & get methods
+    # ==========================================
 
     def setPlotTitle(self, txt=""):
+        """Set the axes title text on the plot."""
         self.main_axes.set_title(txt, fontsize=FONTSIZE)
 
     def setBottomAxisText(self, text):
+        """Set the x-axis label on the axes."""
         self.main_axes.set_xlabel(text, fontsize=FONTSIZE, labelpad=10)
 
     def setLeftAxisText(self, text):
-        self.main_axes.set_ylabel(text, fontsize=FONTSIZE, labelpad=20)
+        """Set the y-axis label on the axes."""
+        self.main_axes.set_ylabel(text, fontsize=FONTSIZE, labelpad=10)
 
     def title(self):
+        """Return the stored plot title."""
         return self._title
 
     def xlabel(self):
+        """Return the stored x-axis label."""
         return self._xlabel
 
     def ylabel(self):
+        """Return the stored y-axis label."""
         return self._ylabel
 
     def setTitle(self, txt=""):
+        """Store the plot title (use setPlotTitle to draw it)."""
         self._title = txt
 
     def setXlabel(self, txt=""):
+        """Store the x-axis label (use setBottomAxisText to draw it)."""
         self._xlabel = txt
 
     def setYlabel(self, txt=""):
+        """Store the y-axis label (use setLeftAxisText to draw it)."""
         self._ylabel = txt
+
+    def setDerivative(self, checked):
+        """Set derivative checkbox and internal state without emitting toggled (for sync, e.g. on curve selection)."""
+        self.derivativeCheckBox.blockSignals(True)
+        self.derivativeCheckBox.setChecked(checked)
+        self.derivative = checked
+        self.derivativeCheckBox.blockSignals(False)
+
+    def setUnscale(self, checked):
+        """Set unscale checkbox and internal state without emitting toggled (for sync, e.g. on curve selection)."""
+        self.unscaleCheckBox.blockSignals(True)
+        self.unscaleCheckBox.setChecked(checked)
+        self.unscale = checked
+        self.unscaleCheckBox.blockSignals(False)
 
     def getSelectedCurveID(self):
         """
@@ -434,7 +470,9 @@ class ChartView(QWidget):
             self.main_axes.set_yscale("linear")
             self.canvas.draw()
 
-    ########################################## Slot methods:
+    # ==========================================
+    #   Slot methods
+    # ==========================================
 
     def onCurveAdded(self, curveID):
         """
@@ -461,20 +499,11 @@ class ChartView(QWidget):
             - Line styles: "-", "--", ":", "-."
             - Markers: "o" (circles), "s" (squares), "^" (triangles), "D" (diamonds), "." (points)
             - Combined styles: "o-" (line with circles), "s--" (dashed line with squares), etc.
-
-        Data Transformations:
-            - Applies factor multiplication: y_new = y * factor
-            - Applies offset addition: y_new = y + offset
-            - These transformations are applied before plotting
-
-        UI Integration:
-            - Adds curve to combo box with display label and tooltip
-            - Stores curve ID as UserRole data for reliable identification
-            - Automatically selects the first curve added
-            - Updates plot title and legend
         """
         # Add to graph
         curveData = self.curveManager.getCurveData(curveID)
+        if curveData is None:
+            return
         ds = curveData["ds"]
         ds_options = curveData["ds_options"].copy()  # Copy to avoid modifying original
 
@@ -501,16 +530,10 @@ class ChartView(QWidget):
         else:
             ds_options["marker"] = ""
 
-        # Apply offset and factor to the data
-        factor = curveData.get("factor", 1)
-        offset = curveData.get("offset", 0)
-        style = curveData.get("style", "-")
-        logger.debug(
-            f"onCurveAdded - curve {curveID}: style={style}, offset={offset}, factor={factor}"
-        )
-        if factor != 1 or offset != 0:
-            new_y = numpy.multiply(ds[1], factor) + offset
-            ds = [ds[0], new_y]
+        # Apply transformation to the data
+        x_data, y_transformed = self.curveManager.getTransformedCurveXYData(curveID)
+        if x_data is not None and y_transformed is not None:
+            ds = [x_data, y_transformed]
 
         # Plot and store the plot object associated with curveID:
         try:
@@ -518,17 +541,19 @@ class ChartView(QWidget):
             self.plotObjects[curveID] = plot_obj
         except Exception as exc:
             logger.error(str(exc))
-        # Update plot
-        self.updatePlot(update_title=True)
+
         # Add to the comboBox
         index = self.curveBox.count()  # Get the next index
+        # prev_index = self.curveBox.currentIndex()
         # Use the user-friendly label for display, but store curveID as data
         display_label = curveData.get("ds_options", {}).get("label", curveID)
         self.curveBox.addItem(display_label)
         # Store the curveID as item data for later retrieval
         self.curveBox.setItemData(index, curveID, QtCore.Qt.ItemDataRole.UserRole)
+        # Add tooltip with file path
         file_path = curveData.get("file_path", "No file path available")
         self.curveBox.setItemData(index, file_path, QtCore.Qt.ItemDataRole.ToolTipRole)
+
         # Only select the new curve if it's the first one
         if self.curveBox.count() == 1:
             self.curveBox.setCurrentIndex(0)
@@ -537,6 +562,21 @@ class ChartView(QWidget):
 
         # Update any existing combo box items to use new curve ID format
         self.updateComboBoxCurveIDs()
+
+        # Refresh unscaled curves with the new global_min/max
+        self.refreshAllUnscaledCurves()
+
+        # Refresh axis labels, legend, limits, and redraw the plot:
+        self.updatePlot(update_title=True)
+
+        # Select the last plotted curve in the comboBox and syncs UI to the curve selected:
+        # derivative, offset/factor, tooltip, basic maths, fits...
+        if self.curveBox.count() > 1:
+            new_index = self.curveBox.count() - 1
+            self.curveBox.blockSignals(True)
+            self.curveBox.setCurrentIndex(new_index)
+            self.curveBox.blockSignals(False)
+            self.onCurveSelected(new_index)
 
     def onCurveUpdated(self, curveID, recompute_y=False, update_x=False):
         """
@@ -551,15 +591,47 @@ class ChartView(QWidget):
             f"onCurveUpdated called for {curveID}, recompute_y={recompute_y}, update_x={update_x}"
         )
         curve_data = self.curveManager.getCurveData(curveID)
+
+        # Apply transformations
         if curve_data and recompute_y:
-            factor = curve_data.get("factor", 1)
-            offset = curve_data.get("offset", 0)
-            ds = curve_data["ds"]
-            new_y = numpy.multiply(ds[1], factor) + offset
+            if curve_data.get("unscale", False):
+                # Defer so bulk I0/Add updates finish first; then reference set is correct
+                QTimer.singleShot(0, self.refreshAllUnscaledCurves)
+            else:
+                x_data, y_transformed = self.curveManager.getTransformedCurveXYData(
+                    curveID
+                )
+                if (
+                    x_data is not None
+                    and y_transformed is not None
+                    and curveID in self.plotObjects
+                ):
+                    self.plotObjects[curveID].set_ydata(y_transformed)
+
+        # Handle label changes (e.g., I0 normalization)
+        # Only if we're not recreating the plot object (i.e. not update_x)
+        if curve_data and not update_x:
+            new_label = curve_data.get("ds_options", {}).get("label", "")
             if curveID in self.plotObjects:
-                self.plotObjects[curveID].set_ydata(new_y)
+                plot_obj = self.plotObjects[curveID]
+                old_label = (
+                    plot_obj.get_label() if hasattr(plot_obj, "get_label") else ""
+                )
+                if new_label and new_label != old_label:
+                    # Update plot object label for legend
+                    plot_obj.set_label(new_label)
+
+                    # Update combo box text
+                    for i in range(self.curveBox.count()):
+                        if (
+                            self.curveBox.itemData(i, QtCore.Qt.ItemDataRole.UserRole)
+                            == curveID
+                        ):
+                            self.curveBox.setItemText(i, new_label)
+                            break
+
+        # For x-data updates, we need to recreate the plot object to maintain style
         if curve_data and update_x:
-            # For x-data updates, we need to recreate the plot object to maintain style
             if curveID in self.plotObjects:
                 # Remove the old plot object
                 old_plot_obj = self.plotObjects[curveID]
@@ -593,20 +665,19 @@ class ChartView(QWidget):
             else:
                 ds_options["marker"] = ""
 
-            # Apply offset and factor
-            factor = curve_data.get("factor", 1)
-            offset = curve_data.get("offset", 0)
-            if factor != 1 or offset != 0:
-                new_y = numpy.multiply(ds[1], factor) + offset
-                ds = [ds[0], new_y]
+            # Apply transformations
+            x_data, y_transformed = self.curveManager.getTransformedCurveXYData(curveID)
+            if x_data is not None and y_transformed is not None:
+                ds = [x_data, y_transformed]
 
-            # Create new plot object
+            # Plot and store the new plot object associated with curveID:
             try:
                 plot_obj = self.main_axes.plot(*ds, **ds_options)[0]
                 self.plotObjects[curveID] = plot_obj
             except Exception as exc:
                 logger.error(str(exc))
 
+        # Refresh axis labels, legend, limits, and redraw the plot:
         self.updatePlot(update_title=False)
 
     def onRemoveButtonClicked(self):
@@ -619,6 +690,7 @@ class ChartView(QWidget):
         curveID = self.getSelectedCurveID()
         if curveID in self.curveManager.curves():
             if len(self.curveManager.curves()) == 1:
+                self.mda_mvc.mda_file_viz.setLogScaleState(False, False)
                 self.curveManager.removeAllCurves(doNotClearCheckboxes=False)
             else:
                 self.curveManager.removeCurve(curveID)
@@ -629,7 +701,8 @@ class ChartView(QWidget):
 
         This slot method is called when a curve is removed from the curve manager.
         It performs cleanup operations including plot object removal, UI updates,
-        and checkbox management based on data type.
+        and checkbox management based on data type. If no curve remains, reset the
+        log scales.
 
         Parameters:
             *arg: Tuple containing (curveID, curveData, count)
@@ -642,19 +715,16 @@ class ChartView(QWidget):
             2. Manages checkbox state based on data type (1D vs 2D)
             3. Removes curve from the combo box selection
             4. Updates plot display (labels, legend)
-            5. Removes file tab if no curves remain (Auto-add mode)
+            5. Removes file tab if no curves remain for that file (Auto-add mode)
 
         Checkbox Logic:
             - 1D data: Always uncheck the detector checkbox
             - 2D data: Only uncheck if no curves remain for that detector
                        (allows multiple curves per detector for 2D data)
-
-        UI Synchronization:
-            - Updates combo box to remove the curve option
-            - Updates plot labels and legend
-            - Removes file tab if it was the last curve for that file
         """
+
         curveID, curveData, count = arg
+
         # Remove curve from graph & plotObject dict
         if curveID in self.plotObjects:
             curve_obj = self.plotObjects[curveID]
@@ -700,8 +770,14 @@ class ChartView(QWidget):
 
         # Remove curve from comboBox
         self.removeItemCurveBox(curveID)
+        # Remove curve from fitManager
+        self.fitManager.removeFit(curveID)
         # Update plot labels, legend and title
         self.updatePlot(update_title=False)
+        if count > 0:
+            # Refresh unscaled curves with the new global_min/max
+            self.refreshAllUnscaledCurves()
+            self.onCurveSelected(self.curveBox.currentIndex())
 
         # If this was the last curve for this file, remove the tab
         if count == 0 and self.mda_mvc.mda_file.mode() == "Auto-add":
@@ -710,7 +786,16 @@ class ChartView(QWidget):
             )
             self.mda_mvc.mda_file.tabManager.removeTab(file_path)
 
+        # If no curves left on the graph, reset log scale and clear plot
+        if len(self.curveManager.curves()) == 0:
+            self.mda_mvc.mda_file_viz.setLogScaleState(False, False)
+            self.clearPlot()
+
     def onAllCurvesRemoved(self, doNotClearCheckboxes=True):
+        """Clear plot, fits, and curves; optionally clear checkboxes. Preserve log scale.
+        onAllCurvesRemoved preserves the log scale because it is called in auto-replace
+        (we want to be able to "browse" between files in the same conditions)."""
+
         # Store current log scale state before clearing
         current_log_x = self._log_x
         current_log_y = self._log_y
@@ -731,17 +816,40 @@ class ChartView(QWidget):
         self.setLogScales(current_log_x, current_log_y)
 
     def onDetRemoved(self, file_path, row):
-        curveID = self.curveManager.findCurveID(file_path, row)
-        if curveID:
+        """Remove curve for a given det & file."""
+        curveIDs = self.curveManager.findCurveID(file_path, row)
+        for curveID in curveIDs:
+            self.curveManager._persistent_properties.pop(curveID, None)
             self.curveManager.removeCurve(curveID)
 
     def onTabRemoved(self, file_path):
-        if self.mda_mvc.mda_file.mode() in ["Auto-add"]:
+        """Remove curve(s) for a given tab ie file."""
+        if self.mda_mvc.mda_file.mode() in ["Auto-add", "Auto-replace"]:
             for curveID in self.curveManager.curves().keys():
                 if self.curveManager.curves()[curveID]["file_path"] == file_path:
                     self.curveManager.removeCurve(curveID)
 
-    ########################################## UI methods:
+    def onClearAllClicked(self):
+        """Clear plot, fits, curves and checkboxes. Reset log scale."""
+        self.mda_mvc.mda_file_viz.setLogScaleState(False, False)
+        self.curveManager.allCurvesRemoved.emit(False)
+
+    def refreshAllUnscaledCurves(self):
+        """Recompute and redraw y-data for all curves with unscale=True using
+        the current reference range, then redraw the plot."""
+        for cid in self.curveManager.curves():
+            curve_data = self.curveManager.getCurveData(cid)
+            if curve_data is None:
+                continue
+            if curve_data.get("unscale", False) and cid in self.plotObjects:
+                x_data, y_transformed = self.curveManager.getTransformedCurveXYData(cid)
+                if y_transformed is not None:
+                    self.plotObjects[cid].set_ydata(y_transformed)
+        self.updatePlot(update_title=False)
+
+    # ==========================================
+    #   UI methods
+    # ==========================================
 
     def plot(self, row, *ds, **options):
         """The main method called by MDA_MVC"""
@@ -749,6 +857,7 @@ class ChartView(QWidget):
         self.curveManager.addCurve(row, *ds, **options)
 
     def configPlot(self, grid=True):
+        """Apply axis labels, title, and grid; redraw canvas."""
         self.setLeftAxisText(self.ylabel())
         self.setBottomAxisText(self.xlabel())
         self.setPlotTitle(self.title())
@@ -759,25 +868,29 @@ class ChartView(QWidget):
         self.canvas.draw()
 
     def updatePlot(self, update_title=True):
+        """Refresh axis labels, legend, limits, selected curve stats and redraw the plot."""
+
         # Collect positioner PVs from all curves and update x label:
         x_label_set = set()
         for curveID in self.curveManager.curves():
-            plot_options = self.curveManager.getCurveData(curveID).get("plot_options")
+            curve_data = self.curveManager.getCurveData(curveID)
+            if curve_data is None:
+                continue
+            plot_options = curve_data.get("plot_options") or {}
             x_label = plot_options.get("x", "")
             if x_label:
                 x_label_set.add(x_label)
         self.setXlabel(", ".join(list(x_label_set)))
 
-        # Simple y-axis label logic: match combo box text and add /I0 if I0 is toggled
-        curveID = self.getSelectedCurveID()
-        if curveID in self.curveManager.curves():
-            self.updateBasicMathInfo(curveID)
+        # Y-axis label: use selected curve's combo box text (detector name, minus file prefix)
+        selected_curveID = self.getSelectedCurveID()
+        if selected_curveID in self.curveManager.curves():
+            self.updateBasicMathInfo(selected_curveID)
 
             # Get the combo box text for the selected curve
-            current_index = self.curveBox.currentIndex()
-            if current_index >= 0:
+            selected_index = self.curveBox.currentIndex()
+            if selected_index >= 0:
                 combo_text = self.curveBox.currentText()
-
                 # Extract detector name from combo box text (remove file name)
                 if ": " in combo_text:
                     detector_name = combo_text.split(": ", 1)[1]
@@ -794,6 +907,7 @@ class ChartView(QWidget):
         if update_title:
             now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             self.setTitle(f"Plot Date & Time: {now}")
+
         # Recompute the axes limits and autoscale:
         self.main_axes.relim()
         self.main_axes.autoscale_view()
@@ -802,37 +916,46 @@ class ChartView(QWidget):
         self.canvas.draw()
 
     def updateLegend(self):
+        """Refresh the axes legend from current curve labels (excluding internal ones)."""
         labels = self.main_axes.get_legend_handles_labels()[1]
         valid_labels = [label for label in labels if not label.startswith("_")]
         if valid_labels:
             self.main_axes.legend()
 
     def clearPlot(self):
+        """Clear axes, labels, cursors, plot objects, and curve combo box; redraw canvas."""
         self.main_axes.clear()
         self.main_axes.axis("off")
         self.main_axes.set_title("")
-        # Clear axis labels
         self.setXlabel("")
         self.setYlabel("")
         self.clearCursors()
         self.clearCursorInfo()
         self.clearBasicMath()
+        self.clearAllFits()
         self.figure.canvas.draw()
         self.plotObjects = {}
         self.curveBox.clear()
 
-    def hasDataItems(self):
-        # Return whether any artists have been added to the Axes (bool)
-        return self.main_axes.has_data()
-
-    ########################################## Interaction with UI elements:
+    # ==========================================
+    #   Interaction with UI elements
+    # ==========================================
 
     def onCurveSelected(self, index):
+        """Sync UI to the curve selected in the combo box: derivative, offset/factor, tooltip,
+        row highlight, basic math, plot controls, fit UI, and plot labels.
+
+        Parameters
+        ----------
+        index : int
+            Current index of the curve combo box (or -1 if none selected).
+        """
         # Get the curve ID from the combo box item data
         curveID = None
         if index >= 0:
             curveID = self.curveBox.itemData(index, QtCore.Qt.ItemDataRole.UserRole)
 
+        has_curve = curveID in self.curveManager.curves()
         # Update QLineEdit & QLabel widgets with the values for the selected curve
         if (
             curveID
@@ -840,32 +963,50 @@ class ChartView(QWidget):
             and curveID in self.curveManager.curves()
         ):
             curve_data = self.curveManager.getCurveData(curveID)
-            file_path = curve_data["file_path"]
-            row = curve_data["row"]
-            self.offset_value.setText(str(curve_data["offset"]))
-            self.factor_value.setText(str(curve_data["factor"]))
-            self.curveBox.setToolTip(file_path)
-            try:
-                self.mda_mvc.mda_file.highlightRowInTab(file_path, row)
-            except Exception as exc:
-                logger.error(str(exc))
-                logger.error("highlightRowInTab failed; ignoring exception.")
+            if curve_data is None:
+                self.offset_value.setText("0")
+                self.factor_value.setText("1")
+                self.setDerivative(False)
+                self.setUnscale(False)
+                self.curveBox.setToolTip("Selected curve")
+            else:
+                file_path = curve_data["file_path"]
+                row = curve_data["row"]
+                # Update derivative and unscale checkbox
+                derivative_state = curve_data.get("derivative", False)
+                self.setDerivative(derivative_state)
+                unscale_state = curve_data.get("unscale", False)
+                self.setUnscale(unscale_state)
+                # Update offset & factor
+                self.offset_value.setText(str(curve_data["offset"]))
+                self.factor_value.setText(str(curve_data["factor"]))
+                # Update tooltip & highlight row
+                self.curveBox.setToolTip(file_path)
+                try:
+                    self.mda_mvc.mda_file.highlightRowInTab(file_path, row)
+                except Exception as exc:
+                    logger.error(str(exc))
+                    logger.error("highlightRowInTab failed; ignoring exception.")
         else:
             self.offset_value.setText("0")
             self.factor_value.setText("1")
+            self.setDerivative(False)
+            self.setUnscale(False)
             self.curveBox.setToolTip("Selected curve")
+
+        # Update plot controls
+        self.mda_mvc.mda_file_viz.updatePlotControls(has_curve)
 
         # Update basic math info:
         self.updateBasicMathInfo(curveID)
 
-        # Update plot controls
-        has_curve = curveID in self.curveManager.curves()
-        self.mda_mvc.mda_file_viz.updatePlotControls(has_curve)
+        # Update curve style combo box to show current curve's style
+        self.updateCurveStyleComboBox(curveID)
 
         # Update fit UI
         self.updateFitUI(curveID)
 
-        # Update plot labels (including y-axis label)
+        # Update axis labels, legend, limits, selected curve stats and redraw the plot
         self.updatePlot(update_title=False)
 
     def updateFitUI(self, curveID: str) -> None:
@@ -878,30 +1019,25 @@ class ChartView(QWidget):
         # Update fit controls state
         has_curve = curveID in self.curveManager.curves()
 
-        # Update fit list
-        self.updateFitList(curveID)
-
-        # Update curve style combo box to show current curve's style
-        if has_curve:
-            self.updateCurveStyleComboBox(curveID)
-
         # Clear fit details if no curve selected or if switching to a different curve
         if not has_curve:
             self.mda_mvc.mda_file_viz.fitDetails.clear()
         else:
-            # Clear fit when switching to a different curve
-            current_fitted_curve = None
-            for curve_id in self.curveManager.curves():
-                if self.fitManager.hasFits(curve_id):
-                    current_fitted_curve = curve_id
-                    break
-
-            # If we're switching to a different curve than the one with the fit, clear the fit
-            if current_fitted_curve and current_fitted_curve != curveID:
-                self.fitManager.removeFit(current_fitted_curve)
+            if curveID and self.fitManager.hasFits(curveID):
+                # If we're switching to a curve that has a fit, update fit details in UI
+                self.updateFitDetails(curveID)
+            else:
+                # If we're switching to a curve that does not have a fit, clear fit details
                 self.mda_mvc.mda_file_viz.fitDetails.clear()
 
     def removeItemCurveBox(self, curveID):
+        """Remove the combo box item for the given curveID.
+
+        Parameters
+        ----------
+        curveID : str
+            ID of the curve whose combo box entry to remove.
+        """
         # Find the item by curve ID stored in item data
         for i in range(self.curveBox.count()):
             if self.curveBox.itemData(i, QtCore.Qt.ItemDataRole.UserRole) == curveID:
@@ -909,7 +1045,7 @@ class ChartView(QWidget):
                 break
 
     def updateComboBoxCurveIDs(self):
-        """Update combo box items to use new curve ID format."""
+        """Update combo box items to use new curve ID format. Likely OBSOLETE."""
         for i in range(self.curveBox.count()):
             old_curve_id = self.curveBox.itemData(i, QtCore.Qt.ItemDataRole.UserRole)
             display_text = self.curveBox.itemText(i)
@@ -928,36 +1064,66 @@ class ChartView(QWidget):
                         )
                     break
 
-    def onOffsetUpdated(self):
+    # ==========================================
+    #   Basic maths methods
+    # ==========================================
+
+    def onOffsetFactorUpdated(self):
+        """Apply offset and factor from the line edits to the selected curve; refresh basic math stats."""
         curveID = self.getSelectedCurveID()
+        if curveID is None:
+            return
         try:
             offset = float(self.offset_value.text())
-        except ValueError:
-            offset = 0
-            # Reset to default if conversion fails
-            self.offset_value.setText(str(offset))
-            return
-        self.curveManager.updateCurveOffset(curveID, offset)
-
-    def onFactorUpdated(self):
-        curveID = self.getSelectedCurveID()
-        try:
             factor = float(self.factor_value.text())
         except ValueError:
+            # Reset to default if conversion fails
+            offset = 0
             factor = 1
-            # Reset to default if conversion fails or zero
-            self.factor_value.setText(str(factor))
+            if self.offset_value:
+                self.offset_value.setText(str(offset))
+            if self.factor_value:
+                self.factor_value.setText(str(factor))
             return
-        self.curveManager.updateCurveFactor(curveID, factor)
+        self.curveManager.updateCurveOffsetFactor(curveID, offset, factor)
+        self.updateBasicMathInfo(curveID)
 
-    ########################################## Basic maths methods:
+    def onDerivativeToggled(self, checked):
+        """Handle derivative checkbox toggle.
+
+        Parameters:
+            checked (bool): True if checkbox is checked (derivative enabled), False if unchecked (derivative disabled)
+        """
+        self.derivative = checked
+        curveID = self.getSelectedCurveID()
+        if curveID is None:
+            return
+        self.curveManager.updateCurveDerivative(curveID, derivative=checked)
+        self.updateBasicMathInfo(curveID)
+
+    def onUnscaleToggled(self, checked):
+        """Handle unscale checkbox toggle.
+
+        Parameters:
+            checked (bool): True if checkbox is checked (unscale enabled), False if unchecked (unscale disabled)
+        """
+        self.unscale = checked
+        curveID = self.getSelectedCurveID()
+        if curveID is None:
+            return
+        self.curveManager.updateCurveUnscale(curveID, unscale=checked)
+        self.updateBasicMathInfo(curveID)
 
     def updateBasicMathInfo(self, curveID):
+        """Update min/max/COM/mean labels from the curve's transformed data, or clear them if no valid curve."""
         if curveID and curveID in self.curveManager.curves():
             try:
-                curve_data = self.curveManager.getCurveData(curveID)
-                x = curve_data["ds"][0]
-                y = curve_data["ds"][1]
+                x, y = self.curveManager.getTransformedCurveXYData(curveID)
+
+                if x is None or y is None:
+                    self.clearBasicMath()
+                    return
+
                 stats = self.calculateBasicMath(x, y)
                 for i, txt in zip(
                     stats, ["min_text", "max_text", "com_text", "mean_text"]
@@ -967,6 +1133,7 @@ class ChartView(QWidget):
                     else:
                         result = f"{utils.num2fstr(i)}" if i else "n/a"
                     self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText(result)
+
             except Exception as exc:
                 logger.error(str(exc))
                 self.clearBasicMath()
@@ -974,10 +1141,18 @@ class ChartView(QWidget):
             self.clearBasicMath()
 
     def clearBasicMath(self):
+        """Clear min/max/COM/mean labels (set to 'n/a')"""
         for txt in ["min_text", "max_text", "com_text", "mean_text"]:
             self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText("n/a")
 
     def calculateBasicMath(self, x_data, y_data):
+        """Compute min/max (x,y), center-of-mass x, and mean y from the curve data.
+
+        Returns
+        -------
+        tuple
+            ((x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean).
+        """
         x_array = numpy.array(x_data, dtype=float)
         y_array = numpy.array(y_data, dtype=float)
         # Find y_min and y_max
@@ -998,9 +1173,18 @@ class ChartView(QWidget):
         y_mean = numpy.mean(y_array)
         return (x_at_y_min, y_min), (x_at_y_max, y_max), x_com, y_mean
 
-    ########################################## Cursors methods:
+    # ==========================================
+    #   Cursors methods
+    # ==========================================
 
     def onRemoveCursor(self, cursor_num):
+        """Remove the cursor from the plot and clear its state; refresh cursor info and redraw.
+
+        Parameters
+        ----------
+        cursor_num : int
+            1 or 2 (cursor 1 or 2).
+        """
         cross = self.cursors.get(cursor_num)
         if cross is not None:
             try:
@@ -1022,6 +1206,7 @@ class ChartView(QWidget):
         self.canvas.draw()
 
     def clearCursors(self):
+        """Remove both cursors from the plot and clear their state."""
         self.onRemoveCursor(1)
         self.onRemoveCursor(2)
 
@@ -1050,16 +1235,10 @@ class ChartView(QWidget):
         if not curveID or curveID not in self.curveManager.curves():
             return None
 
-        curve_data = self.curveManager.getCurveData(curveID)
-        if not curve_data:
+        # Apply transformations
+        x_data, y_data = self.curveManager.getTransformedCurveXYData(curveID)
+        if x_data is None or y_data is None:
             return None
-
-        ds = curve_data.get("ds")
-        if not ds or len(ds) < 2:
-            return None
-
-        x_data = ds[0]
-        y_data = ds[1]
 
         # Ensure data are numpy arrays
         if not isinstance(x_data, numpy.ndarray):
@@ -1067,13 +1246,19 @@ class ChartView(QWidget):
         if not isinstance(y_data, numpy.ndarray):
             y_data = numpy.array(y_data, dtype=float)
 
-        # Apply offset and factor to y_data to match what's displayed
-        factor = curve_data.get("factor", 1)
-        offset = curve_data.get("offset", 0)
-        y_data = numpy.multiply(y_data, factor) + offset
+        if len(x_data) == 0 or len(y_data) == 0:
+            return None
 
-        # Calculate distances to all points
-        distances = numpy.sqrt((x_data - x_click) ** 2 + (y_data - y_click) ** 2)
+        # Normalize by axis ranges to account for different scales
+        x_range = self.main_axes.get_xlim()
+        y_range = self.main_axes.get_ylim()
+        x_scale = x_range[1] - x_range[0] if x_range[1] != x_range[0] else 1.0
+        y_scale = y_range[1] - y_range[0] if y_range[1] != y_range[0] else 1.0
+
+        # Calculate normalized distances
+        dx = (x_data - x_click) / x_scale
+        dy = (y_data - y_click) / y_scale
+        distances = numpy.sqrt(dx**2 + dy**2)
 
         # Find the index of the nearest point
         nearest_index = numpy.argmin(distances)
@@ -1081,6 +1266,14 @@ class ChartView(QWidget):
         return (float(x_data[nearest_index]), float(y_data[nearest_index]))
 
     def onclick(self, event):
+        """Handle mouse click on the plot: place cursor 1 (middle or Alt+right) or cursor 2 (right)
+        at click position or nearest point on curve if snap is on; refresh cursor info and redraw.
+
+        Parameters
+        ----------
+        event : matplotlib.backend_bases.MouseEvent
+            The mouse click event (button, axes, xdata, ydata).
+        """
         # Check if the click was in the main_axes
         if event.inaxes is self.main_axes:
             # Determine cursor position based on snap setting
@@ -1103,13 +1296,15 @@ class ChartView(QWidget):
             ):
                 if self.cursors[1] is not None:
                     try:
-                        self.cursors[1].remove()  # Remove existing red cursor
+                        # Remove existing red cursor
+                        self.cursors[1].remove()
                     except (NotImplementedError, AttributeError):
                         # Handle case where artist cannot be removed
                         pass
-                (self.cursors[1],) = self.main_axes.plot(
+                # Assign artist to self.cursors dictionary (matplotlib returns a 1-element list)
+                self.cursors[1] = self.main_axes.plot(
                     x_cursor, y_cursor, "r+", markersize=15, linewidth=2
-                )
+                )[0]
                 # Update cursor position
                 self.cursors["pos1"] = (x_cursor, y_cursor)
 
@@ -1117,13 +1312,14 @@ class ChartView(QWidget):
             elif event.button == RIGHT_BUTTON and not self.alt_pressed:
                 if self.cursors[2] is not None:
                     try:
-                        self.cursors[2].remove()  # Remove existing blue cursor
+                        # Remove existing blue cursor
+                        self.cursors[2].remove()
                     except (NotImplementedError, AttributeError):
                         # Handle case where artist cannot be removed
                         pass
-                (self.cursors[2],) = self.main_axes.plot(
+                self.cursors[2] = self.main_axes.plot(
                     x_cursor, y_cursor, "b+", markersize=15, linewidth=2
-                )
+                )[0]
 
                 # Update cursor position
                 self.cursors["pos2"] = (x_cursor, y_cursor)
@@ -1136,7 +1332,7 @@ class ChartView(QWidget):
 
     def calculateCursors(self):
         """
-        Update cursor information in info panel widget.
+        Calculate diff and midpoint, update cursor dictionary and information in info panel widget.
         """
         # Check for the first cursor and update text accordingly
         if self.cursors[1]:
@@ -1161,18 +1357,36 @@ class ChartView(QWidget):
         self.updateCursorInfo()
 
     def updateCursorInfo(self):
+        """Update cursor information in info panel widget."""
         self.mda_mvc.mda_file_viz.pos1_text.setText(self.cursors["text1"])
         self.mda_mvc.mda_file_viz.pos2_text.setText(self.cursors["text2"])
         self.mda_mvc.mda_file_viz.diff_text.setText(self.cursors["diff"])
         self.mda_mvc.mda_file_viz.midpoint_text.setText(self.cursors["midpoint"])
 
     def clearCursorInfo(self):
+        """Clear cursor information in info panel widget."""
         self.mda_mvc.mda_file_viz.pos1_text.setText("middle click or alt+right click")
         self.mda_mvc.mda_file_viz.pos2_text.setText("right click")
         self.mda_mvc.mda_file_viz.diff_text.setText("n/a")
         self.mda_mvc.mda_file_viz.midpoint_text.setText("n/a")
 
-    ########################################## Fit methods:
+    def getCursorRange(self) -> Optional[tuple[float, float]]:
+        """
+        Get the range defined by cursors.
+
+        Returns:
+        - Tuple of (x_min, x_max) if both cursors are set, None otherwise
+        """
+        if "pos1" in self.cursors and "pos2" in self.cursors:
+            if self.cursors["pos1"] is not None and self.cursors["pos2"] is not None:
+                x1, y1 = self.cursors["pos1"]
+                x2, y2 = self.cursors["pos2"]
+                return (min(x1, x2), max(x1, x2))
+        return None
+
+    # ==========================================
+    #   Fit methods
+    # ==========================================
 
     def onFitAdded(self, curveID: str) -> None:
         """
@@ -1197,9 +1411,6 @@ class ChartView(QWidget):
             # Update fit details display
             self.updateFitDetails(curveID)
 
-            # Emit signal for main window
-            self.fitAdded.emit(curveID, "single_fit")
-
     def onFitUpdated(self, curveID: str) -> None:
         """
         Handle when a fit is updated.
@@ -1216,24 +1427,7 @@ class ChartView(QWidget):
                 pass
             del self.fitObjects[curveID]
 
-        # Add new fit line
-        fit_data = self.fitManager.getFitCurveData(curveID)
-        if fit_data:
-            x_fit, y_fit = fit_data
-            # Plot fit curve with dashed line style and higher z-order to ensure it's on top
-            fit_line = self.main_axes.plot(
-                x_fit, y_fit, "--", alpha=0.8, linewidth=2, zorder=10
-            )[0]
-            self.fitObjects[curveID] = fit_line
-
-            # Update plot
-            self.updatePlot(update_title=False)
-
-            # Update fit details display
-            self.updateFitDetails(curveID)
-
-            # Emit signal for main window
-            self.fitUpdated.emit(curveID, "single_fit")
+        self.onFitAdded(curveID)
 
     def onFitRemoved(self, curveID: str) -> None:
         """
@@ -1257,47 +1451,6 @@ class ChartView(QWidget):
             # Clear fit details display
             self.mda_mvc.mda_file_viz.fitDetails.clear()
 
-            # Emit signal for main window
-            self.fitRemoved.emit(curveID, "single_fit")
-
-    def onFitVisibilityChanged(self, curveID: str, visible: bool) -> None:
-        """
-        Handle when fit visibility changes.
-
-        Parameters:
-        - curveID: ID of the curve
-        - visible: Whether the fit should be visible
-        """
-        if curveID in self.fitObjects:
-            self.fitObjects[curveID].set_visible(visible)
-            self.canvas.draw()
-
-    def updateFitList(self, curveID: str) -> None:
-        """
-        Update the fit list in the UI for a given curve.
-        Note: This method is kept for compatibility but no longer needed with single-fit system.
-
-        Parameters:
-        - curveID: ID of the curve
-        """
-        # With single-fit system, we don't need a fit list
-        # The fit details are shown directly when a fit exists
-        pass
-
-    def getCursorRange(self) -> Optional[tuple[float, float]]:
-        """
-        Get the range defined by cursors.
-
-        Returns:
-        - Tuple of (x_min, x_max) if both cursors are set, None otherwise
-        """
-        if "pos1" in self.cursors and "pos2" in self.cursors:
-            if self.cursors["pos1"] is not None and self.cursors["pos2"] is not None:
-                x1, y1 = self.cursors["pos1"]
-                x2, y2 = self.cursors["pos2"]
-                return (min(x1, x2), max(x1, x2))
-        return None
-
     def performFit(self, model_name: str, use_range: bool = False) -> None:
         """
         Perform a fit on the currently selected curve.
@@ -1315,53 +1468,40 @@ class ChartView(QWidget):
         if not curve_data:
             return
 
-        x_data = curve_data["ds"][0]
-        y_data = curve_data["ds"][1]
+        # Apply transformation
+        x_data, y_data = self.curveManager.getTransformedCurveXYData(curveID)
 
-        # Ensure data are numpy arrays with proper types
-        if not isinstance(x_data, numpy.ndarray):
-            x_data = numpy.array(x_data, dtype=float)
-        if not isinstance(y_data, numpy.ndarray):
-            y_data = numpy.array(y_data, dtype=float)
+        if x_data is not None and y_data is not None:
+            # Ensure data are numpy arrays with proper types
+            if not isinstance(x_data, numpy.ndarray):
+                x_data = numpy.array(x_data, dtype=float)
+            if not isinstance(y_data, numpy.ndarray):
+                y_data = numpy.array(y_data, dtype=float)
 
-        # Check for valid data
-        if len(x_data) == 0 or len(y_data) == 0:
-            QtWidgets.QMessageBox.warning(
-                self, "Fit Error", "No data available for fitting"
-            )
-            return
+            # Check for valid data
+            if len(x_data) == 0 or len(y_data) == 0:
+                QtWidgets.QMessageBox.warning(
+                    self, "Fit Error", "No data available for fitting"
+                )
+                return
 
-        if len(x_data) != len(y_data):
-            QtWidgets.QMessageBox.warning(
-                self, "Fit Error", "X and Y data have different lengths"
-            )
-            return
+            if len(x_data) != len(y_data):
+                QtWidgets.QMessageBox.warning(
+                    self, "Fit Error", "X and Y data have different lengths"
+                )
+                return
 
-        # Apply offset and factor
-        factor = curve_data.get("factor", 1)
-        offset = curve_data.get("offset", 0)
-        y_data = numpy.multiply(y_data, factor) + offset
+            # Determine fit range
+            x_range = None
+            if use_range:
+                x_range = self.getCursorRange()
+            try:
+                # Perform the fit (this will replace any existing fit for the current curve)
+                self.fitManager.addFit(curveID, model_name, x_data, y_data, x_range)
 
-        # Determine fit range
-        x_range = None
-        if use_range:
-            x_range = self.getCursorRange()
-
-        try:
-            # Clear all existing fits from other curves before performing new fit
-            all_curves = list(self.curveManager.curves().keys())
-            for other_curve_id in all_curves:
-                if other_curve_id != curveID and self.fitManager.hasFits(
-                    other_curve_id
-                ):
-                    self.fitManager.removeFit(other_curve_id)
-
-            # Perform the fit (this will replace any existing fit for the current curve)
-            self.fitManager.addFit(curveID, model_name, x_data, y_data, x_range)
-
-        except ValueError as e:
-            # Show error message
-            QtWidgets.QMessageBox.warning(self, "Fit Error", str(e))
+            except ValueError as e:
+                # Show error message
+                QtWidgets.QMessageBox.warning(self, "Fit Error", str(e))
 
     def updateFitDetails(self, curveID: str) -> None:
         """
@@ -1383,24 +1523,45 @@ class ChartView(QWidget):
         details_text = ""
 
         # Parameters
-        details_text += "Parameters:\n"
+        details_text += "Fitting results:\n"
         for param_name, param_value in result.parameters.items():
-            details_text += f"  {param_name}: {utils.num2fstr(param_value)}\n"
+            uncertainty = result.uncertainties.get(param_name, 0.0)
+            details_text += f"  {param_name}: {utils.num2fstr(param_value, 3)}"
+            if uncertainty > 0:
+                details_text += f" ± {utils.num2fstr(uncertainty, 3)}"
+            details_text += "\n"
+            if fit_data.model_name == "Gaussian" and param_name == "sigma":
+                details_text += f"  FWHM: {utils.num2fstr(2.35482 * param_value, 3)}"
+                details_text += f" ± {utils.num2fstr(2.35482 * uncertainty, 3)}\n"
+            if fit_data.model_name == "Lorentzian" and param_name == "gamma":
+                details_text += f"  FWHM: {utils.num2fstr(2 * param_value, 3)}"
+                details_text += f" ± {utils.num2fstr(2 * uncertainty, 3)}\n"
 
         # Quality metrics
         details_text += "\nQuality Metrics:\n"
-        details_text += f"  R²: {utils.num2fstr(result.r_squared)}\n"
-        details_text += f"  χ²: {utils.num2fstr(result.chi_squared)}\n"
-        details_text += f"  Reduced χ²: {utils.num2fstr(result.reduced_chi_squared)}\n"
+        details_text += f"  R²: {utils.num2fstr(result.r_squared, 3)}\n"
+        details_text += f"  χ²: {utils.num2fstr(result.chi_squared, 3)}\n"
+        details_text += (
+            f"  Reduced χ²: {utils.num2fstr(result.reduced_chi_squared, 3)}\n"
+        )
 
         fit_details.setText(details_text)
 
-    def clearAllFits(self) -> None:
+    def clearSelectedFit(self) -> None:
         """Clear the fit from the currently selected curve."""
         curveID = self.getSelectedCurveID()
         if curveID:
             self.fitManager.removeFit(curveID)
             self.mda_mvc.mda_file_viz.fitDetails.clear()
+
+    def clearAllFits(self) -> None:
+        """Clear all fits from all curves."""
+        self.fitManager.clearAllFits()
+        self.mda_mvc.mda_file_viz.fitDetails.clear()
+
+    # ======================================================
+    #  Curve styling methods
+    # ======================================================
 
     def updateCurveStyle(self, style_name: str) -> None:
         """
@@ -1425,16 +1586,9 @@ class ChartView(QWidget):
         if curve_data:
             curve_data["style"] = format_string
             # Save to persistent storage
-            persistent_key = (
-                curve_data["file_path"],
-                curve_data["row"],
-                curve_data.get("x2_index"),
-            )
-            if persistent_key not in self.curveManager._persistent_properties:
-                self.curveManager._persistent_properties[persistent_key] = {}
-            self.curveManager._persistent_properties[persistent_key]["style"] = (
-                format_string
-            )
+            if curveID not in self.curveManager._persistent_properties:
+                self.curveManager._persistent_properties[curveID] = {}
+            self.curveManager._persistent_properties[curveID]["style"] = format_string
             self.curveManager.updateCurve(curveID, curve_data)
 
             # Update the plot object with the new style
@@ -1503,378 +1657,9 @@ class ChartView(QWidget):
         self.mda_mvc.mda_file_viz.curveStyle.blockSignals(False)
 
 
-# ------ Curves management (data):
-
-
-class CurveManager(QObject):
-    """
-    Manages curve data, properties, and persistence for ChartView.
-
-    This class handles the storage and management of curve data including
-    plotting properties, persistent settings, and curve identification.
-    It provides signals for curve lifecycle events and maintains
-    persistent properties across plotting sessions.
-
-    Attributes:
-        _curves: Dictionary storing curve data with curve IDs as keys
-        _persistent_properties: Dictionary for storing curve properties across sessions
-
-    Signals:
-        curveAdded: Emitted when a curve is added (curveID)
-        curveRemoved: Emitted when a curve is removed (curveID, curveData, count)
-        curveUpdated: Emitted when a curve is updated (curveID, recompute_y, update_x)
-        allCurvesRemoved: Emitted when all curves are removed (doNotClearCheckboxes)
-
-    Key Features:
-        - Unique curve ID generation based on file path, row, and X2 index
-        - Persistent storage of curve properties (style, offset, factor)
-        - Curve data management with automatic property restoration
-        - Integration with MDA file data structures
-        - Support for 2D data with X2 index tracking
-
-    .. autosummary::
-
-        ~CurveManager.addCurve
-        ~CurveManager.curves
-        ~CurveManager.findCurveID
-        ~CurveManager.generateCurveID
-        ~CurveManager.getCurveData
-        ~CurveManager.removeAllCurves
-        ~CurveManager.removeCurve
-        ~CurveManager.updateCurve
-        ~CurveManager.updateCurveFactor
-        ~CurveManager.updateCurveOffset
-    """
-
-    curveAdded = pyqtSignal(str)  # Emit curveID when a curve is added
-    curveRemoved = pyqtSignal(str, dict, int)
-    # Emit curveID & its corresponding data when a curve is removed, plus the
-    # number of curves left on the graph for this file
-    curveUpdated = pyqtSignal(
-        str, bool, bool
-    )  # Emit curveID, recompute_y (bool) & update_x (bool) when a curve is updated
-    allCurvesRemoved = pyqtSignal(
-        bool
-    )  # Emit a doNotClearCheckboxes bool when all curve are removed
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self._curves = {}  # Store curves with a unique identifier as the key
-        # Persistent storage for curve properties across manager clears
-        self._persistent_properties = {}  # key: (file_path, row), value: {style, offset, factor}
-
-    def addCurve(self, row, *ds, **options):
-        """Add a new curve to the manager if not already present on the graph.
-
-        This method handles curve creation with automatic property restoration from
-        persistent storage. It generates unique curve IDs and manages curve lifecycle.
-
-        Parameters:
-            row: The row number in the file tableview associated with the curve
-            *ds: Dataset containing x_data and y_data arrays
-            **options: Additional options including:
-                plot_options: Plot metadata (filePath, fileName, title, x-axis label, y-axis label, x-axis unit, y-axis unit, i0_name, is_normalized, x2 index, x2-axis unit, x2-axis label, color palette)
-                ds_options: Plotting options (label, line style, marker, etc.)
-                x2_index: X2 slice index for 2D data (optional)
-
-        Returns:
-            None: Emits curveAdded signal when a new curve is successfully added
-        """
-        # Extract info:
-        plot_options = options.get("plot_options", {})
-        ds_options = options.get("ds_options", {})
-        label = ds_options.get("label", "unknown label")
-        file_path = plot_options.get("filePath", "unknown path")
-        x2_index = options.get("x2_index")  # Extract X2 index from options
-        logger.debug(f"addCurve - Received x2_index: {x2_index}")
-        # Generate unique curve ID & update options:
-        curveID = self.generateCurveID(label, file_path, row, x2_index)
-        ds_options["label"] = label  # Keep the original label for display purposes
-        logger.debug(
-            f"Adding curve with ID: {curveID}, label: {label}, file_path: {file_path}"
-        )
-        logger.debug(f"Current curves in manager: {list(self._curves.keys())}")
-        x_data = ds[0]
-        if curveID in self._curves:
-            logger.debug(f"Curve {curveID} already exists")
-            # Check if x_data is the same
-            existing_x_data = self._curves[curveID]["ds"][0]
-            existing_label = (
-                self._curves[curveID].get("ds_options", {}).get("label", "")
-            )
-
-            # Update the curve if x_data is different OR if the label has changed (I0 normalization)
-            if numpy.array_equal(x_data, existing_x_data) and label == existing_label:
-                logger.debug(
-                    " x_data and label are the same, do not add or update the curve"
-                )
-                # x_data and label are the same, do not add or update the curve
-                return
-            else:
-                logger.debug(
-                    " x_data is different OR label has changed, update the curve"
-                )
-                # x_data is different or label has changed, update the curve:
-                # Get existing curve data and preserve all properties
-                existing_curve_data = self._curves[curveID]
-                existing_curve_data["ds"] = ds
-                existing_curve_data["plot_options"] = plot_options
-                existing_curve_data["ds_options"] = ds_options  # Update the label
-                # Preserve existing style, offset, factor, and other properties
-                self.updateCurve(curveID, existing_curve_data, recompute_y=True)
-                return
-        else:
-            logger.debug(f"Curve {curveID} does NOT exist, creating new curve")
-            # Check if this might be a re-creation after removeAllCurves was called
-            # Look for any existing curve with the same file_path, row, and x2_index
-            for existing_curve_id, existing_data in self._curves.items():
-                if (
-                    existing_data["file_path"] == file_path
-                    and existing_data["row"] == row
-                    and existing_data.get("x2_index") == x2_index
-                ):
-                    # Transfer properties from existing curve
-                    self._curves[curveID] = {
-                        "ds": ds,  # ds = [x_data, y_data]
-                        "offset": existing_data.get("offset", 0),  # preserve offset
-                        "factor": existing_data.get("factor", 1),  # preserve factor
-                        "style": existing_data.get("style", "-"),  # preserve style
-                        "row": row,  # DET checkbox row in the file tableview
-                        "file_path": file_path,
-                        "file_name": plot_options.get("fileName", ""),  # without ext
-                        "plot_options": plot_options,
-                        "ds_options": ds_options,
-                        "x2_index": x2_index,  # Store X2 index for 2D data
-                    }
-                    # Remove the old curve entry
-                    del self._curves[existing_curve_id]
-                    logger.debug(f"Transferred properties to new curve ID: {curveID}")
-                    self.curveAdded.emit(curveID)
-                    return
-        # Add new curve if not already present on the graph:
-        # Check for persistent properties first
-        persistent_key = (file_path, row, x2_index)
-        persistent_props = self._persistent_properties.get(persistent_key, {})
-
-        self._curves[curveID] = {
-            "ds": ds,  # ds = [x_data, y_data]
-            "offset": persistent_props.get("offset", 0),  # restore offset
-            "factor": persistent_props.get("factor", 1),  # restore factor
-            "style": persistent_props.get("style", "-"),  # restore style
-            "row": row,  # DET checkbox row in the file tableview
-            "file_path": file_path,
-            "file_name": plot_options.get("fileName", ""),  # without ext
-            "plot_options": plot_options,
-            "ds_options": ds_options,
-            "x2_index": x2_index,  # Store X2 index for 2D data
-        }
-        logger.debug(
-            f"Created curve {curveID} with persistent properties: {persistent_props}"
-        )
-        self.curveAdded.emit(curveID)
-
-    def updateCurve(self, curveID, curveData, recompute_y=False, update_x=False):
-        """Update an existing curve.
-
-        Parameters:
-            curveID: The unique identifier of the curve to update
-            curveData: Complete curve data dictionary containing ds, plot_options, ds_options, etc.
-            recompute_y: If True, recalculate Y data with current offset/factor
-            update_x: If True, update X data (requires plot object recreation)
-
-        Returns:
-            None: Emits curveUpdated signal when curve is successfully updated
-        """
-        if curveID in self._curves:
-            logger.debug(f"Emits curveUpdated {curveID=}, {recompute_y=}, {update_x=}")
-            self._curves[curveID] = curveData
-            self.curveUpdated.emit(curveID, recompute_y, update_x)
-
-    def removeCurve(self, curveID):
-        """Remove a curve from the manager.
-
-        Removes the specified curve from the internal storage and emits a signal
-        with the curve data and count of remaining curves for the same file.
-
-        Parameters:
-            curveID: The unique identifier of the curve to remove
-
-        Returns:
-            None: Emits curveRemoved signal with curveID, curveData, and remaining count
-        """
-        if curveID in self._curves:
-            curveData = self._curves[curveID]
-            file_path = curveData["file_path"]
-            # Remove curve entry from self.curves & emit signal:
-            del self._curves[curveID]
-            # How many curves are left for this file:
-            count = 0
-            for curve_data in self._curves.values():
-                if curve_data["file_path"] == file_path:
-                    count += 1
-            # Emit signal:
-            self.curveRemoved.emit(curveID, curveData, count)
-
-    def removeAllCurves(self, doNotClearCheckboxes=True):
-        """Remove all curves from the manager.
-
-        Clears all curves from internal storage and emits a signal indicating
-        whether checkboxes should be cleared in the UI.
-
-        Parameters:
-            doNotClearCheckboxes: If True, preserves checkbox states in the UI
-
-        Returns:
-            None: Emits allCurvesRemoved signal with doNotClearCheckboxes parameter
-        """
-        self._curves.clear()
-        self.allCurvesRemoved.emit(doNotClearCheckboxes)
-
-    def getCurveData(self, curveID):
-        """Get curve data by ID.
-
-        Retrieves the complete data dictionary for a specific curve including
-        dataset, properties, and metadata.
-
-        Parameters:
-            curveID: The unique identifier of the curve
-
-        Returns:
-            dict or None: Complete curve data dictionary if found, None otherwise
-        """
-        return self._curves.get(curveID, None)
-
-    def curves(self):
-        """Returns a copy of the currently managed curves.
-
-        Provides access to all curves currently stored in the manager by
-        returning a copy of the internal dictionary to prevent direct
-        modification of the manager's state.
-
-        Returns:
-            dict: Copy of the curves dictionary with curveID as keys
-        """
-        return dict(self._curves)
-
-    def updateCurveOffset(self, curveID, new_offset):
-        """Update the offset value for a specific curve.
-
-        Updates the curve's offset value and saves it to persistent storage
-        for restoration across sessions.
-
-        Parameters:
-            curveID: The unique identifier of the curve
-            new_offset: The new offset value to apply to the curve
-
-        Returns:
-            None: Updates curve data and emits curveUpdated signal if changed
-        """
-        curve_data = self.getCurveData(curveID)
-        if curve_data:
-            offset = curve_data["offset"]
-            if offset != new_offset:
-                logger.debug(
-                    f"Updating offset for curve {curveID}: {offset} -> {new_offset}"
-                )
-                curve_data["offset"] = new_offset
-                # Save to persistent storage
-                persistent_key = (
-                    curve_data["file_path"],
-                    curve_data["row"],
-                    curve_data.get("x2_index"),
-                )
-                if persistent_key not in self._persistent_properties:
-                    self._persistent_properties[persistent_key] = {}
-                self._persistent_properties[persistent_key]["offset"] = new_offset
-                logger.debug(
-                    f"Saved offset to persistent storage: {persistent_key} -> {new_offset}"
-                )
-                self.updateCurve(curveID, curve_data, recompute_y=True)
-
-    def updateCurveFactor(self, curveID, new_factor):
-        """Update the factor value for a specific curve.
-
-        Updates the curve's factor value and saves it to persistent storage
-        for restoration across sessions.
-
-        Parameters:
-            curveID: The unique identifier of the curve
-            new_factor: The new factor value to apply to the curve
-
-        Returns:
-            None: Updates curve data and emits curveUpdated signal if changed
-        """
-        curve_data = self.getCurveData(curveID)
-        if curve_data:
-            factor = curve_data["factor"]
-            if factor != new_factor:
-                logger.debug(
-                    f"Updating factor for curve {curveID}: {factor} -> {new_factor}"
-                )
-                curve_data["factor"] = new_factor
-                # Save to persistent storage
-                persistent_key = (
-                    curve_data["file_path"],
-                    curve_data["row"],
-                    curve_data.get("x2_index"),
-                )
-                if persistent_key not in self._persistent_properties:
-                    self._persistent_properties[persistent_key] = {}
-                self._persistent_properties[persistent_key]["factor"] = new_factor
-                logger.debug(
-                    f"Saved factor to persistent storage: {persistent_key} -> {new_factor}"
-                )
-                self.updateCurve(curveID, curve_data, recompute_y=True)
-
-    def generateCurveID(self, label, file_path, row, x2_index=None):
-        """
-        Generates a unique curve ID based on file_path, row, and X2 index, ensuring the same detector
-        always gets the same curve ID regardless of I0 normalization.
-
-        Parameters:
-        - label (str): The original label for the curve (used for display purposes)
-        - file_path (str): The file path associated with the curve
-        - row (int): The row number in the file tableview associated with the curve
-        - x2_index (int, optional): The X2 slice index for 2D data
-
-        Returns:
-        - str: A unique curve ID based on file_path, row, and X2 index
-        """
-        # Generate curve ID based on file_path, row, and X2 index
-        if x2_index is not None:
-            curve_id = f"{file_path}_{row}_x2_{x2_index}"
-        else:
-            curve_id = f"{file_path}_{row}"
-
-        logger.debug(f"generateCurveID - curve_id={curve_id}")
-
-        # Check if this curve ID already exists
-        if curve_id in self._curves:
-            # If it exists, return the existing curve ID (this should not happen in normal usage)
-            return curve_id
-        else:
-            return curve_id
-
-    def findCurveID(self, file_path, row, x2_index=None):
-        """
-        Find the curveID based on the file path, row number, and X2 index.
-
-        Parameters:
-        - file_path (str): The path of the file associated with the curve.
-        - row (int): The row number in the file tableview associated with the curve.
-        - x2_index (int, optional): The X2 slice index for 2D data.
-
-        Returns:
-        - str: The curveID if a matching curve is found; otherwise, None.
-        """
-        for curveID, curveData in self._curves.items():
-            if (
-                curveData["file_path"] == file_path
-                and curveData["row"] == row
-                and curveData.get("x2_index") == x2_index
-            ):
-                return curveID
-        return None
+# ======================================================
+#  Chartview 2D
+# ======================================================
 
 
 class ChartView2D(ChartView):
@@ -1922,6 +1707,10 @@ class ChartView2D(ChartView):
         self._plot_type = "heatmap"  # "heatmap" or "contour"
         self._current_colorbar = None  # Store reference to current colorbar
 
+    def configPlot(self, grid=False):
+        """Apply axis labels and title; no grid for 2D plots."""
+        super().configPlot(grid=grid)
+
     def plot2D(self, y_data, x_data, x2_data, plot_options=None):
         """
         Plot 2D data as heatmap or contour.
@@ -1934,6 +1723,29 @@ class ChartView2D(ChartView):
         """
         if plot_options is None:
             plot_options = {}
+
+        # Validate 2D data and axes
+        y_data = numpy.asarray(y_data)
+        x_data = numpy.asarray(x_data)
+        x2_data = numpy.asarray(x2_data)
+
+        if y_data.ndim != 2 or y_data.size == 0:
+            logger.warning("plot2D: y_data must be non-empty 2D array")
+            self.showMessage("Invalid or empty 2D data")
+            return
+        if x_data.size == 0 or x2_data.size == 0:
+            logger.warning("plot2D: x_data and x2_data must be non-empty")
+            self.showMessage("Invalid or empty X/X2 data")
+            return
+        if y_data.shape[0] != x2_data.size or y_data.shape[1] != x_data.size:
+            logger.warning(
+                "plot2D: y_data shape %s does not match x_data len %s, x2_data len %s",
+                y_data.shape,
+                x_data.size,
+                x2_data.size,
+            )
+            self.showMessage("2D data shape mismatch")
+            return
 
         logger.debug("ChartView2D.plot2D - Plotting 2D data")
         logger.debug(f"  Y data shape: {y_data.shape}")
@@ -1969,7 +1781,6 @@ class ChartView2D(ChartView):
         self._set_2d_labels(plot_options)
 
         # Update the plot
-
         self.canvas.draw()
 
         # Force a repaint
@@ -1995,17 +1806,20 @@ class ChartView2D(ChartView):
         # If so, flip the Y data vertically to match the expected orientation
         if len(x2_data) > 1 and x2_data[0] > x2_data[-1]:
             y_data = y_data[::-1, :]  # Flip vertically
-
-        # Create meshgrid for proper axis scaling
-        X, Y = numpy.meshgrid(x_data, x2_data)
+        # Check if X data is in descending order; flip horizontally to match
+        if len(x_data) > 1 and x_data[0] > x_data[-1]:
+            y_data = y_data[:, ::-1]  # Flip horizontally
 
         # Apply log scale normalization if enabled
         norm = None
         if hasattr(self, "_log_y_2d") and self._log_y_2d:
-            from matplotlib.colors import LogNorm
+            # Only apply log if all values are positive
+            vmin, vmax = y_data.min(), y_data.max()
+            if vmin > 0:
+                from matplotlib.colors import LogNorm
 
-            # Use LogNorm for proper log color scaling
-            norm = LogNorm(vmin=y_data.min(), vmax=y_data.max())
+                # Use LogNorm for proper log color scaling
+                norm = LogNorm(vmin, vmax)
 
         # Plot heatmap
         im = self.main_axes.imshow(
@@ -2045,11 +1859,12 @@ class ChartView2D(ChartView):
         norm = None
         levels = 20
         if hasattr(self, "_log_y_2d") and self._log_y_2d:
-            # For contour plots with log scale, use LogNorm for color normalization
+            # Only apply log if all values are positive
             vmin, vmax = y_data.min(), y_data.max()
             if vmin > 0:  # Only apply log if all values are positive
                 from matplotlib.colors import LogNorm
 
+                # Use LogNorm for proper log color scaling
                 norm = LogNorm(vmin=vmin, vmax=vmax)
 
         # Plot contour
@@ -2133,23 +1948,8 @@ class ChartView2D(ChartView):
         Parameters:
         - log_y (bool): Whether to use logarithmic scale for Y-axis (color scale)
         """
-        try:
-            # Store the log scale state
-            self._log_y_2d = log_y
-
-            # For 2D plots, log_y affects the color scale normalization
-            # This would need to be handled in the plotting methods
-            # For now, we'll store the state for potential future use
-            self._log_y_2d = log_y
-
-            # Redraw the canvas to apply changes
-            self.canvas.draw()
-
-        except Exception as exc:
-            logger.error(f"Error setting 2D log scales: {exc}")
-            # If setting log scale fails (e.g., negative values), revert to linear
-            self._log_y_2d = False
-            self.canvas.draw()
+        # Store the log scale state
+        self._log_y_2d = log_y
 
     def showMessage(self, message: str):
         """

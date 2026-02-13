@@ -6,7 +6,7 @@ data fields with checkboxes for selection. It supports both 1D and 2D data visua
 with specialized controls for 2D plotting including X2 slice selection, X1/X2 positioner
 selection, Y detector selection, and I0 normalization.
 
-For 1D data, users can select X, Y, I0, and Unscaled fields for plotting.
+For 1D data, users can select X, Y, I0 fields for plotting.
 For 2D data, additional controls are available for:
 - X2 slice selection (spinbox)
 - X1/X2 positioner selection (comboboxes)
@@ -25,6 +25,7 @@ Uses :class:`mda_file_table_model.MDAFileTableModel` for data display.
     ~COLUMNS
 """
 
+from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import QWidget, QHeaderView
 import numpy as np
 
@@ -38,14 +39,13 @@ from mdaviz.logger import get_logger
 # Get logger for this module
 logger = get_logger("mda_file_table_view")
 
-HEADERS = "Field", "X", "Y", "I0", "Un", "PV", "DESC", "Unit"
+HEADERS = "Field", "X", "Y", "I0", "PV", "DESC", "Unit"
 
 COLUMNS = [
     TableColumn("Field", ColumnDataType.text),
     TableColumn("X", ColumnDataType.checkbox, rule=FieldRuleType.unique),  # type: ignore[arg-type]
     TableColumn("Y", ColumnDataType.checkbox, rule=FieldRuleType.multiple),  # type: ignore[arg-type]
     TableColumn("I0", ColumnDataType.checkbox, rule=FieldRuleType.unique),  # type: ignore[arg-type]
-    TableColumn("Un", ColumnDataType.checkbox, rule=FieldRuleType.multiple),  # type: ignore[arg-type]
     TableColumn("PV", ColumnDataType.text),
     TableColumn("DESC", ColumnDataType.text),
     TableColumn("Unit", ColumnDataType.text),
@@ -77,29 +77,27 @@ class MDAFileTableView(QWidget):
         header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
         # Setup 2D controls
-        self.setup2DControls()
+        self.setupX2Controls()
 
         # Setup Y DET controls after UI is fully loaded
-        self.setupYDetControls()
+        self.setup2DControls()
 
-    def setup2DControls(self):
-        """Setup 2D data controls (X2 selection)."""
+    def setupX2Controls(self):
+        """Setup 2D data controls (X2 selection for 1D plot/slice)."""
         # Connect X2 spinbox to update function
         self.x2SpinBox.valueChanged.connect(self.onX2ValueChanged)
 
         # Initially hide 2D controls
         self.dimensionControls.setVisible(False)
 
-    def setupYDetControls(self):
+    def setup2DControls(self):
         """Setup Y DET selection controls for 2D plotting."""
-        logger.debug("setupYDetControls - Starting setup")
-
         # Use QTimer to ensure UI is fully loaded
         from PyQt6.QtCore import QTimer
 
-        QTimer.singleShot(100, self._setupYDetControlsDelayed)
+        QTimer.singleShot(100, self._setup2DControlsDelayed)
 
-    def _setupYDetControlsDelayed(self):
+    def _setup2DControlsDelayed(self):
         """Setup Y DET controls after UI is fully loaded."""
         # Connect signals for 2D controls
         self.x1ComboBox.currentIndexChanged.connect(self.onX1SelectionChanged)
@@ -115,10 +113,26 @@ class MDAFileTableView(QWidget):
         # Connect log scale controls
         self.logYCheckBox.toggled.connect(self.onLogScaleChanged)
 
+        # Populate plot type and color palette comboboxes
+        if self.plotTypeComboBox.count() == 0 or self.colorPaletteComboBox.count() == 0:
+            self._populatePlotStyleComboBox()
+
+        # Initialize Y DET controls
+        current_tab = self.mda_file.mda_mvc.mda_file_viz.tabWidget.currentIndex()
+        if current_tab == 3:
+            self.yDetControls.setVisible(True)
+        else:
+            self.yDetControls.setVisible(False)
+
+    def _populatePlotStyleComboBox(self):
+        """Populate the plot type and color palette comboboxes"""
         # Populate plot type combobox
+        self.plotTypeComboBox.blockSignals(True)
         self.plotTypeComboBox.addItems(["Heatmap", "Contour"])
+        self.plotTypeComboBox.blockSignals(False)
 
         # Populate color palette combobox
+        self.colorPaletteComboBox.blockSignals(True)
         self.colorPaletteComboBox.addItems(
             [
                 "viridis",
@@ -136,9 +150,11 @@ class MDAFileTableView(QWidget):
                 "terrain",
             ]
         )
+        self.colorPaletteComboBox.blockSignals(False)
 
-        # Initially hide Y DET controls
-        self.yDetControls.setVisible(False)
+    # ==========================================
+    # Populate 2D-data comboBoxes
+    # ==========================================
 
     def populateX1ComboBox(self):
         """Populate X1 combobox with available positioners from scanDictInner."""
@@ -232,9 +248,6 @@ class MDAFileTableView(QWidget):
                 unit = value.get("unit", "")
                 display_text = f"{name} ({unit})" if unit else name
                 self.yDetComboBox.addItem(display_text, key)
-                logger.debug(
-                    f"populateYDetComboBox - Added detector: {name} (key={key})"
-                )
 
         logger.debug(
             f"populateYDetComboBox - Added {self.yDetComboBox.count()} Y detectors"
@@ -263,7 +276,6 @@ class MDAFileTableView(QWidget):
                 unit = value.get("unit", "")
                 display_text = f"{name} ({unit})" if unit else name
                 self.i0ComboBox.addItem(display_text, key)
-                logger.debug(f"populateI0ComboBox - Added detector: {name} (key={key})")
 
         logger.debug(
             f"populateI0ComboBox - Added {self.i0ComboBox.count()} I0 detectors"
@@ -277,7 +289,9 @@ class MDAFileTableView(QWidget):
         self.populateYDetComboBox()
         self.populateI0ComboBox()
 
-        logger.debug("populate2DControls - All 2D controls populated")
+    # ==========================================
+    # x2 controls & spinBox
+    # ==========================================
 
     def update2DControls(
         self,
@@ -295,11 +309,6 @@ class MDAFileTableView(QWidget):
             acquired_dimensions (list): List of actual acquired dimensions [X2_points, X1_points, ...]
             x2_positioner_info (dict): Information about the X2 positioner (name, unit, data)
         """
-        logger.debug(
-            f"update2DControls - is_multidimensional: {is_multidimensional}, dimensions: {dimensions}"
-        )
-        logger.debug(f"update2DControls - acquired_dimensions: {acquired_dimensions}")
-        logger.debug(f"update2DControls - x2_positioner_info: {x2_positioner_info}")
         if is_multidimensional and dimensions and len(dimensions) >= 2:
             # Show 2D controls
             self.dimensionControls.setVisible(True)
@@ -308,19 +317,10 @@ class MDAFileTableView(QWidget):
             # Use acquired_dimensions if available, otherwise fall back to intended dimensions
             if acquired_dimensions and len(acquired_dimensions) >= 2:
                 x2_max = acquired_dimensions[0] - 1  # Use actual acquired points
-                logger.debug(
-                    f"update2DControls - using acquired_dimensions, x2_max: {x2_max}"
-                )
             elif dimensions and len(dimensions) >= 2:
                 x2_max = dimensions[0] - 1  # Fallback to intended dimensions
-                logger.debug(
-                    f"update2DControls - using intended dimensions, x2_max: {x2_max}"
-                )
             else:
                 x2_max = 0  # Default fallback
-                logger.debug(
-                    f"update2DControls - using default fallback, x2_max: {x2_max}"
-                )
 
             self.x2SpinBox.setMaximum(max(0, x2_max))
             self.x2SpinBox.setValue(0)  # Start at first X2 position
@@ -340,7 +340,7 @@ class MDAFileTableView(QWidget):
             # Populate 2D control comboboxes
             self.populate2DControls()
         else:
-            # Hide 2D controls for 1D data
+            # Hide 2D controls (X2 spinBox) for 1D data
             self.dimensionControls.setVisible(False)
             # Clear X2 value label
             self.x2ValueLabel.setText("--")
@@ -350,6 +350,8 @@ class MDAFileTableView(QWidget):
 
     def onX2ValueChanged(self, value):
         """Handle X2 spinbox value changes."""
+        if getattr(self, "_applying_2d_selection", False):
+            return
         # Update the X2 value label if we have X2 positioner info
         if hasattr(self, "_x2_positioner_info") and self._x2_positioner_info:
             self._updateX2ValueLabel(value, self._x2_positioner_info)
@@ -357,6 +359,11 @@ class MDAFileTableView(QWidget):
         # Emit signal to update 1D plot with new X2 slice
         if hasattr(self.mda_file, "x2ValueChanged"):
             self.mda_file.x2ValueChanged.emit(value)
+
+        # Save selection
+        selection_by_pv = self.get2DSelectionsByPV()
+        if selection_by_pv:
+            self.mda_file.setLast2DSelection(selection_by_pv)
 
     def _updateX2ValueLabel(self, x2_index, x2_positioner_info):
         """
@@ -389,6 +396,235 @@ class MDAFileTableView(QWidget):
     def getX2Value(self):
         """Get the current X2 value from the spinbox."""
         return self.x2SpinBox.value()
+
+    # ==========================================
+    # 2D data plot & event handlers
+    # ==========================================
+
+    def get2DSelections(self):
+        """Get current 2D plotting selections."""
+        # Get color palette with validation
+        color_palette = self.colorPaletteComboBox.currentText()
+        if not color_palette or color_palette.strip() == "":
+            color_palette = "viridis"
+            logger.debug(
+                f"get2DSelections - Empty color palette, using default: {color_palette}"
+            )
+
+        plot_type = self.plotTypeComboBox.currentText().lower()
+        if not plot_type or plot_type.strip() == "":
+            plot_type = "heatmap"
+
+        selections = {
+            "X1": self.x1ComboBox.currentData(),
+            "X2": self.x2ComboBox.currentData(),
+            "Y": (
+                [self.yDetComboBox.currentData()]
+                if self.yDetComboBox.currentData() is not None
+                else []
+            ),
+            "I0": self.i0ComboBox.currentData(),
+            "plot_type": plot_type,
+            "color_palette": color_palette,
+            "log_y": self.logYCheckBox.isChecked(),
+        }
+        logger.debug(f"get2DSelections - {selections}")
+        return selections
+
+    def get2DSelectionsByPV(self):
+        """
+        Return current 2D selection using PV/field names instead of internal ids.
+
+        Structure:
+            {
+                "X1_pv": str | None,
+                "X2_pv": str | None,
+                "Y_pv": str | None,
+                "I0_pv": str | None,
+                "plot_type": str | None,
+                "color_palette": str | None,
+                "log_y": bool,
+                "x2_slice": int,
+            }
+        """
+        selection = self.get2DSelections()
+        data = self.data()
+        if not data:
+            return {}
+
+        fileInfo = data.get("fileInfo", {})
+        if not fileInfo.get("isMultidimensional", False):
+            return {}
+
+        scanDict = fileInfo.get("scanDict", {})  # outer (for X2)
+        scanDictInner = fileInfo.get("scanDictInner", {})  # inner (for X1)
+        scanDict2D = fileInfo.get("scanDict2D", {})  # detectors for 2D
+
+        def _pv_name_from_dict(d, key):
+            if key is None:
+                return None
+            entry = d.get(key)
+            if not entry:
+                return None
+            return entry.get("name")
+
+        x1_id = selection.get("X1")
+        x2_id = selection.get("X2")
+        y_list = selection.get("Y", [])
+        y_id = y_list[0] if y_list else None
+        i0_id = selection.get("I0")
+
+        # *_id is the key in scanDict*
+        x1_pv = _pv_name_from_dict(scanDictInner, x1_id)
+        x2_pv = _pv_name_from_dict(scanDict, x2_id)
+        y_pv = _pv_name_from_dict(scanDict2D, y_id)
+
+        # Special-case: I0 "None" option → store I0_pv as None
+        if i0_id is None:
+            i0_pv = None
+        else:
+            i0_pv = _pv_name_from_dict(scanDict2D, i0_id)
+
+        plot_type = selection.get("plot_type")
+        color_palette = selection.get("color_palette")
+        log_y = selection.get("log_y", False)
+        x2_slice = self.getX2Value()
+
+        return {
+            "X1_pv": x1_pv,
+            "X2_pv": x2_pv,
+            "Y_pv": y_pv,
+            "I0_pv": i0_pv,
+            "plot_type": plot_type,
+            "color_palette": color_palette,
+            "log_y": log_y,
+            "x2_slice": x2_slice,
+        }
+
+    def apply2DSelection(self, selection_by_pv):
+        """Apply PV-based 2D selection to this file's controls; use defaults when a PV is missing."""
+
+        if not selection_by_pv:
+            return
+
+        data = self.data()
+        if not data:
+            return
+
+        fileInfo = data.get("fileInfo", {})
+
+        if not fileInfo.get("isMultidimensional", False):
+            return
+
+        # Prevent 2D handlers from firing during programmatic apply (avoids cascade of
+        # _trigger2DPlot/update2DPlot that can trigger updateControlVisibility(0) and
+        # hide the control panel, causing flicker when switching files).
+        self._applying_2d_selection = True
+        try:
+            self._apply2DSelectionImpl(selection_by_pv, fileInfo)
+            if (
+                self.plotTypeComboBox.count() == 0
+                or self.colorPaletteComboBox.count() == 0
+            ):
+                self._populatePlotStyleComboBox()
+            self._apply2DPlotStyle(selection_by_pv)
+        finally:
+            self._applying_2d_selection = False
+            # Defer plot update to next event loop so we don't run update2DPlot() during
+            # handle2DMode/addFileTab; that can trigger layout/tab changes and
+            # updateControlVisibility(0), leaving the new file's panel in wrong state.
+            QTimer.singleShot(0, self._trigger2DPlot)
+
+    def _apply2DSelectionImpl(self, selection_by_pv, fileInfo):
+        """Apply PV-based selection to controls (called with _applying_2d_selection True)."""
+        scanDict = fileInfo.get("scanDict", {})  # outer (for X2)
+        scanDictInner = fileInfo.get("scanDictInner", {})  # inner (for X1)
+        scanDict2D = fileInfo.get("scanDict2D", {})  # detectors for 2D
+
+        def _pv_name_to_index(combo, d, pv):
+            if pv is None:
+                return None
+            for i in range(combo.count()):
+                field_id = combo.itemData(i)
+                entry = d.get(field_id)
+                if entry and entry.get("name") == pv:
+                    return i
+            return None
+
+        _2d_controls = (
+            self.x1ComboBox,
+            self.x2ComboBox,
+            self.yDetComboBox,
+            self.i0ComboBox,
+            self.logYCheckBox,
+            self.x2SpinBox,
+        )
+        for w in _2d_controls:
+            w.blockSignals(True)
+
+        x1_pv = selection_by_pv.get("X1_pv")
+        x1_idx = _pv_name_to_index(self.x1ComboBox, scanDictInner, x1_pv)
+        if x1_idx is not None:
+            self.x1ComboBox.setCurrentIndex(x1_idx)
+
+        x2_pv = selection_by_pv.get("X2_pv")
+        x2_idx = _pv_name_to_index(self.x2ComboBox, scanDict, x2_pv)
+        if x2_idx is not None:
+            self.x2ComboBox.setCurrentIndex(x2_idx)
+
+        y_pv = selection_by_pv.get("Y_pv")
+        y_idx = _pv_name_to_index(self.yDetComboBox, scanDict2D, y_pv)
+        if y_idx is not None:
+            self.yDetComboBox.setCurrentIndex(y_idx)
+
+        i0_pv = selection_by_pv.get("I0_pv")
+        if i0_pv is None:
+            self.i0ComboBox.setCurrentIndex(0)
+        else:
+            i0_idx = _pv_name_to_index(self.i0ComboBox, scanDict2D, i0_pv)
+            if i0_idx is not None:
+                self.i0ComboBox.setCurrentIndex(i0_idx)
+
+        self.logYCheckBox.setChecked(bool(selection_by_pv.get("log_y", False)))
+
+        x2_slice = selection_by_pv.get("x2_slice")
+        if isinstance(x2_slice, int):
+            min_val = self.x2SpinBox.minimum()
+            max_val = self.x2SpinBox.maximum()
+            x2_slice = max(min_val, min(max_val, x2_slice))  # clamp
+            self.x2SpinBox.setValue(x2_slice)
+            if hasattr(self, "_x2_positioner_info") and self._x2_positioner_info:
+                self._updateX2ValueLabel(x2_slice, self._x2_positioner_info)
+
+        for w in _2d_controls:
+            w.blockSignals(False)
+
+    def _apply2DPlotStyle(self, selection_by_pv):
+        """Apply plot style selection to controls."""
+
+        _2d_controls = (
+            self.plotTypeComboBox,
+            self.colorPaletteComboBox,
+        )
+        for w in _2d_controls:
+            w.blockSignals(True)
+
+        plotType = selection_by_pv.get("plot_type")
+        if plotType:
+            for i in range(self.plotTypeComboBox.count()):
+                if self.plotTypeComboBox.itemText(i).lower() == plotType.lower():
+                    self.plotTypeComboBox.setCurrentIndex(i)
+                    break
+
+        palette = selection_by_pv.get("color_palette")
+        if palette:
+            for i in range(self.colorPaletteComboBox.count()):
+                if self.colorPaletteComboBox.itemText(i) == palette:
+                    self.colorPaletteComboBox.setCurrentIndex(i)
+                    break
+
+        for w in _2d_controls:
+            w.blockSignals(False)
 
     # Y DET Controls Signal Handlers
     def _trigger2DPlot(self):
@@ -442,112 +678,93 @@ class MDAFileTableView(QWidget):
 
     def onX1SelectionChanged(self, index):
         """Handle X1 positioner selection change."""
+        if getattr(self, "_applying_2d_selection", False):
+            return
         logger.debug(f"onX1SelectionChanged - index: {index}")
         self._trigger2DPlot()
+        # Save selection
+        selection_by_pv = self.get2DSelectionsByPV()
+        if selection_by_pv:
+            self.mda_file.setLast2DSelection(selection_by_pv)
 
     def onX2SelectionChanged(self, index):
         """Handle X2 positioner selection change."""
+        if getattr(self, "_applying_2d_selection", False):
+            return
         logger.debug(f"onX2SelectionChanged - index: {index}")
         self._trigger2DPlot()
+        # Save selection
+        selection_by_pv = self.get2DSelectionsByPV()
+        if selection_by_pv:
+            self.mda_file.setLast2DSelection(selection_by_pv)
 
     def onYDetSelectionChanged(self, index):
         """Handle Y detector selection change."""
+        if getattr(self, "_applying_2d_selection", False):
+            return
         logger.debug(f"onYDetSelectionChanged - index: {index}")
         self._trigger2DPlot()
+        # Save selection
+        selection_by_pv = self.get2DSelectionsByPV()
+        if selection_by_pv:
+            self.mda_file.setLast2DSelection(selection_by_pv)
 
     def onI0SelectionChanged(self, index):
         """Handle I0 detector selection change."""
+        if getattr(self, "_applying_2d_selection", False):
+            return
         logger.debug(f"onI0SelectionChanged - index: {index}")
         self._trigger2DPlot()
+        # Save selection
+        selection_by_pv = self.get2DSelectionsByPV()
+        if selection_by_pv:
+            self.mda_file.setLast2DSelection(selection_by_pv)
 
     def onPlotTypeChanged(self, index):
         """Handle plot type selection change."""
+        if getattr(self, "_applying_2d_selection", False):
+            return
         plot_type = self.plotTypeComboBox.currentText().lower()
         logger.debug(f"onPlotTypeChanged - plot_type: {plot_type}")
         self._trigger2DPlot()
+        # Save selection
+        selection_by_pv = self.get2DSelectionsByPV()
+        if selection_by_pv:
+            self.mda_file.setLast2DSelection(selection_by_pv)
 
     def onColorPaletteChanged(self, index):
         """Handle color palette selection change."""
+        if getattr(self, "_applying_2d_selection", False):
+            return
         palette_name = self.colorPaletteComboBox.currentText()
         logger.debug(f"onColorPaletteChanged - palette_name: {palette_name}")
         self._trigger2DPlot()
+        # Save selection
+        selection_by_pv = self.get2DSelectionsByPV()
+        if selection_by_pv:
+            self.mda_file.setLast2DSelection(selection_by_pv)
 
     def onLogScaleChanged(self, checked):
         """Handle log scale checkbox changes."""
+        if getattr(self, "_applying_2d_selection", False):
+            return
         sender = self.sender()
         if sender == self.logYCheckBox:
             logger.debug(f"onLogScaleChanged - LogY: {checked}")
         self._trigger2DPlot()
+        # Save selection
+        selection_by_pv = self.get2DSelectionsByPV()
+        if selection_by_pv:
+            self.mda_file.setLast2DSelection(selection_by_pv)
 
     def onPlotButtonClicked(self):
         """Handle plot button click."""
         logger.debug("onPlotButtonClicked - Plot button clicked")
+        self._trigger2DPlot()
 
-        # Get current selections
-        selections = self.get2DSelections()
-        logger.debug(f"onPlotButtonClicked - selections: {selections}")
-
-        # Validate selections
-        if selections["Y"] is None or len(selections["Y"]) == 0:
-            logger.debug("onPlotButtonClicked - No Y detector selected")
-            return
-
-        if selections["X1"] is None:
-            logger.debug("onPlotButtonClicked - No X1 positioner selected")
-            return
-
-        if selections["X2"] is None:
-            logger.debug("onPlotButtonClicked - No X2 positioner selected")
-            return
-
-        # Trigger 2D plotting by emitting a signal or calling the parent
-        try:
-            # Find the parent MDA_MVC to trigger plotting
-            parent = self.parent()
-            while parent and not hasattr(parent, "doPlot"):
-                parent = parent.parent()
-
-            if parent and hasattr(parent, "doPlot"):
-                logger.debug(
-                    "onPlotButtonClicked - Calling parent.doPlot with 2D selections"
-                )
-                logger.debug(
-                    f"onPlotButtonClicked - About to call doPlot with: action='replace', selections={selections}"
-                )
-                parent.doPlot("replace", selections)
-                logger.debug("onPlotButtonClicked - doPlot call completed")
-            else:
-                logger.debug(
-                    "onPlotButtonClicked - Could not find parent with doPlot method"
-                )
-        except Exception as e:
-            logger.debug(f"onPlotButtonClicked - Error: {e}")
-
-    def get2DSelections(self):
-        """Get current 2D plotting selections."""
-        # Get color palette with validation
-        color_palette = self.colorPaletteComboBox.currentText()
-        if not color_palette or color_palette.strip() == "":
-            color_palette = "viridis"
-            logger.debug(
-                f"get2DSelections - Empty color palette, using default: {color_palette}"
-            )
-
-        selections = {
-            "X1": self.x1ComboBox.currentData(),
-            "X2": self.x2ComboBox.currentData(),
-            "Y": (
-                [self.yDetComboBox.currentData()]
-                if self.yDetComboBox.currentData() is not None
-                else []
-            ),
-            "I0": self.i0ComboBox.currentData(),
-            "plot_type": self.plotTypeComboBox.currentText().lower(),
-            "color_palette": color_palette,
-            "log_y": self.logYCheckBox.isChecked(),
-        }
-        logger.debug(f"get2DSelections - {selections}")
-        return selections
+    # ==========================================
+    # Data management & table display
+    # ==========================================
 
     def data(self):
         """Return the data from the table view:
@@ -567,6 +784,9 @@ class MDAFileTableView(QWidget):
                 - folderPath (str): The full path of the parent folder.
                 - metadata (dict): The extracted metadata from the file.
                 - scanDict (dict): A dictionary of positioner & detector dataset for plot.
+                - scanDict2D (dict): For 2D data
+                - scanDictInner (dict): For 2D data
+                - isMultidimensional (bool)
                 - firstPos (float): The first positioner (P1, or if no positioner, P0 = index).
                 - firstDet (float): The first detector (D01).
                 - pvList (list of str): List of detectors PV names as strings.
@@ -580,22 +800,16 @@ class MDAFileTableView(QWidget):
             fileInfo = self.mda_file.data()
 
             # For table display, use inner dimension data for 2D files, 1D data for 1D files
-            logger.debug(
-                f"isMultidimensional: {fileInfo.get('isMultidimensional', False)}"
-            )
-            logger.debug(f"scanDictInner exists: {'scanDictInner' in fileInfo}")
             if fileInfo.get("isMultidimensional", False) and fileInfo.get(
                 "scanDictInner"
             ):
                 scanDict = fileInfo["scanDictInner"]
-                logger.debug(
-                    f"Using scanDictInner for 2D data, keys: {list(scanDict.keys())}"
-                )
             else:
                 scanDict = fileInfo["scanDict"]
-                logger.debug(
-                    f"Using scanDict for 1D data, keys: {list(scanDict.keys())}"
-                )
+            logger.debug(
+                f"setData is_2d={fileInfo.get('isMultidimensional', False)}, "
+                f"fields={len(scanDict)}"
+            )
 
             fields = [
                 TableField(
@@ -635,13 +849,21 @@ class MDAFileTableView(QWidget):
         self.tableView.model().clearAllCheckboxes()
         self.tableView.setModel(None)
 
+    # ==========================================
+    # Data extraction for plotting
+    # ==========================================
+
     def data2Plot2D(self, selections):
         """
         Extracts 2D datasets for plotting from scanDict2D based on user selections.
 
         Parameters:
-            - selections: A dictionary with keys "X", "Y", where "X" is the index for the x-axis data,
-              "Y" is a list of indices for the y-axis data.
+            - selections: A dictionary with keys:
+                - "X": The index for the x1-axis data
+                - "X2": The index for the x2-axis data
+                - "Y": A list of indices for the y-axis data (only the 1st element is used)
+                - "I0" (optional): The index for normalization data
+                - e.g. selections = {"X": 1, "X2": 2 ,"Y": [3], "I0": 4}
 
         Returns:
             - A tuple of (datasets, plot_options), where datasets contains 2D data arrays,
@@ -655,6 +877,7 @@ class MDAFileTableView(QWidget):
             fileInfo = self.data()["fileInfo"]
             fileName = fileInfo["fileName"]
             filePath = fileInfo["filePath"]
+            acquired_dim = fileInfo.get("acquiredDimensions", [])
 
             # Check if this is 2D data
             if not fileInfo.get("isMultidimensional", False):
@@ -687,6 +910,12 @@ class MDAFileTableView(QWidget):
                 logger.debug(
                     f"data2Plot2D - X data shape: {np.array(x_data).shape if x_data is not None else 'None'}"
                 )
+                if acquired_dim and len(acquired_dim) >= 2 and x_data is not None:
+                    acquired_x1_points = acquired_dim[1]
+                    x_array = np.array(x_data)
+                    if len(x_array) > acquired_x1_points:
+                        x_data = x_array[:acquired_x1_points]
+
             else:
                 x_data = None
                 x_name = "X"
@@ -748,18 +977,28 @@ class MDAFileTableView(QWidget):
                         )
                         i0_data = None
                         i0_name = None
+
             else:
                 logger.debug(
                     f"data2Plot2D - No I0 normalization (I0 index: {i0_index})"
                 )
+
+            if acquired_dim and len(acquired_dim) >= 2 and y_data is not None:
+                acquired_x2_points = acquired_dim[0]
+                acquired_x1_points = acquired_dim[1]
+                y_array = np.array(y_data)
+                if (
+                    y_array.shape[0] > acquired_x2_points
+                    or y_array.shape[1] > acquired_x1_points
+                ):
+                    y_data = y_array[:acquired_x2_points, :acquired_x1_points]
 
             # ------ extract x2 data (from scanDict - this is the X2 positioner):
             x2_data = None
             x2_name = "X2"
             x2_unit = ""
 
-            # Get the selected X2 index from the combobox
-            x2_index = self.x2ComboBox.currentData()
+            x2_index = selections.get("X2")
             logger.debug(f"data2Plot2D - Selected X2 index: {x2_index}")
 
             # Get scanDict for X2 data extraction
@@ -778,14 +1017,9 @@ class MDAFileTableView(QWidget):
                 else:
                     x2_data = x2_data_2d
 
-                # If we have acquired_dimensions, slice X2 data to match actual acquired points
-                acquired_dimensions = fileInfo.get("acquiredDimensions", [])
-                if (
-                    acquired_dimensions
-                    and len(acquired_dimensions) >= 2
-                    and x2_data is not None
-                ):
-                    acquired_x2_points = acquired_dimensions[0]
+                # If we have acquired_dim, slice X2 data to match actual acquired points
+                if acquired_dim and len(acquired_dim) >= 2 and x2_data is not None:
+                    acquired_x2_points = acquired_dim[0]  # first element = X2 dimension
                     x2_data_array = np.array(x2_data)
                     if len(x2_data_array) > acquired_x2_points:
                         logger.debug(
@@ -939,11 +1173,14 @@ class MDAFileTableView(QWidget):
     def data2Plot(self, selections):
         """
         Extracts selected datasets for plotting from scanDict based on user selections.
+        Slice (if multidimensional) and/or normalize the data as needed.
 
         Parameters:
-            - selections: A dictionary with keys "X", "Y", and optionally "I0", where "X" is the index for the x-axis data,
-              "Y" is a list of indices for the y-axis data, and "I0" is the index for normalization data.
-
+            - selections: A dictionary with keys:
+                - "X": The index for the x-axis data
+                - "Y": A list of indices for the y-axis data
+                - "I0" (optional): The index for normalization data
+                - e.g. selections = {"X": 1, "Y": [2, 3, 5], "I0": 4}
         Returns:
             - A tuple of (datasets, plot_options), where datasets is a list of tuples containing the
               data and options (label) for each dataset, and plot_options contains overall plotting configurations.
@@ -965,21 +1202,8 @@ class MDAFileTableView(QWidget):
             ):
                 # Use inner dimension data for 1D plotting (matches table display)
                 scanDict = fileInfo["scanDictInner"]
-                x2_slice = 0  # Not needed since we're using 1D data
-
-                # Debug: Print field mappings
-                logger.debug(
-                    f"Using scanDictInner for 2D plotting, keys: {list(scanDict.keys())}"
-                )
-                logger.debug(f"selections: {selections}")
-
-                # Debug: Print data shapes for first few fields
-                for i in range(min(3, len(scanDict))):
-                    if i in scanDict:
-                        data = scanDict[i].get("data")
-                        logger.debug(
-                            f"Field {i} data shape: {np.array(data).shape if data else 'None'}"
-                        )
+                x2_slice = 0  # Initial value
+                logger.debug(f"data2Plot file={fileName} selections={selections}")
             else:
                 # Use 1D data structure
                 scanDict = fileInfo["scanDict"]
@@ -988,10 +1212,16 @@ class MDAFileTableView(QWidget):
             # ------ extract x data:
             x_index = selections.get("X")
             x_data = scanDict[x_index].get("data") if x_index in scanDict else None
+            if x_data is None and 0 in scanDict:
+                x_index = 0
+                x_data = scanDict[0].get("data")
 
             # For 2D data in scanDictInner, slice to get 1D data
             if x_data is not None and len(np.array(x_data).shape) > 1:
                 x2_slice = self.getX2Value()  # Get current X2 value from spinbox
+                x_data_array = np.array(x_data)
+                if x2_slice >= x_data_array.shape[0]:
+                    x2_slice = x_data_array.shape[0] - 1  # Use last available slice
                 x_data = x_data[x2_slice]  # Take the selected X2 slice
 
             # ------ extract I0 data for normalization:
@@ -1001,41 +1231,33 @@ class MDAFileTableView(QWidget):
             # For 2D data in scanDictInner, slice to get 1D data
             if i0_data is not None and len(np.array(i0_data).shape) > 1:
                 x2_slice = self.getX2Value()  # Get current X2 value from spinbox
+                i0_data_array = np.array(i0_data)
+                if x2_slice >= i0_data_array.shape[0]:
+                    x2_slice = i0_data_array.shape[0] - 1  # Use last available slice
                 i0_data = i0_data[x2_slice]  # Take the selected X2 slice
+
+            # Check acquired points - if none, return empty to prevent crashes
+            acquired_dim = fileInfo.get("acquiredDimensions", [])
+            acquired_points = None
+            if fileInfo.get("isMultidimensional", False):
+                # 2D scan: after slicing, truncate based on inner dimension (X1)
+                if len(acquired_dim) >= 2:
+                    acquired_points = acquired_dim[1]
+            else:
+                # 1D scan: truncate based on single dimension
+                if len(acquired_dim) >= 1:
+                    acquired_points = acquired_dim[0]
+
+            # If no acquired points, return early to prevent zero-size array errors
+            if acquired_points is not None and acquired_points <= 0:
+                logger.debug(
+                    "data2Plot - No acquired points for this scan; returning empty datasets"
+                )
+                return [], {}
 
             # ------ extract y(s) data:
             y_index = selections.get("Y", [])
-            un_index = selections.get("Un", [])
             y_first_unit = y_first_name = ""
-
-            # Identify rows that need unscaling (have both Y and Un selected)
-            unscaled_rows = set(y_index) & set(un_index)
-            regular_y_rows = set(y_index) - unscaled_rows
-
-            # Calculate global min/max for unscaling (from regular Y curves only)
-            global_min = float("inf")
-            global_max = float("-inf")
-            if unscaled_rows and regular_y_rows:
-                for y in regular_y_rows:
-                    if y in scanDict:
-                        y_data = scanDict[y].get("data")
-                        if y_data is not None:
-                            # Apply I0 normalization if I0 is selected
-                            if i0_data is not None:
-                                i0_data_safe = np.array(i0_data)
-                                i0_data_safe[i0_data_safe == 0] = 1
-                                y_data = np.array(y_data) / i0_data_safe
-                            else:
-                                y_data = np.array(y_data)
-                            global_min = min(global_min, np.min(y_data))
-                            global_max = max(global_max, np.max(y_data))
-
-            # If no regular Y curves to reference, use 0 to 1 scale for unscaling
-            if unscaled_rows and (
-                global_min == float("inf") or global_max == float("-inf")
-            ):
-                global_min = 0.0
-                global_max = 1.0
 
             # Process all Y curves
             for i, y in enumerate(y_index):
@@ -1053,12 +1275,11 @@ class MDAFileTableView(QWidget):
                     # Add bounds checking to prevent IndexError
                     y_data_array = np.array(y_data)
                     if x2_slice >= y_data_array.shape[0]:
-                        logger.debug(
-                            f"data2Plot - X2 slice {x2_slice} out of bounds for data shape {y_data_array.shape}, using last available slice"
-                        )
                         x2_slice = y_data_array.shape[0] - 1  # Use last available slice
-
                     y_data = y_data[x2_slice]  # Take the selected X2 slice
+
+                if y_data is None:
+                    continue
 
                 # Apply I0 normalization if I0 is selected
                 if i0_data is not None:
@@ -1081,36 +1302,38 @@ class MDAFileTableView(QWidget):
                     x2_index = self.getX2Value()
                     y_label = f"{y_label} [{x2_index}]"
 
-                # Apply unscaling if this row has both Y and Un selected
-                if (
-                    y in unscaled_rows
-                    and global_min != float("inf")
-                    and global_max != float("-inf")
-                ):
-                    # Calculate min/max of this curve
-                    m1, M1 = np.min(y_data), np.max(y_data)
-                    # Apply unscaling formula: g(x) = ((f1(x) - m1) / (M1 - m1)) * (M23 - m23) + m23
-                    if M1 != m1:  # Avoid division by zero
-                        y_data = ((y_data - m1) / (M1 - m1)) * (
-                            global_max - global_min
-                        ) + global_min
-                        y_label = f"{fileName}: {y_name} [unscaled]"
-                        if i0_data is not None:
-                            y_label = f"{fileName}: {y_name} [norm, unscaled]"
-
-                        # Add X2 index to unscaled label for 2D data
-                        if fileInfo.get("isMultidimensional", False):
-                            x2_index = self.getX2Value()
-                            y_label = f"{y_label} [{x2_index}]"
-
                 if i == 0:
                     y_first_unit = y_unit
                     # y_first_name is used for y-axis label and shows normalization status
-                    y_first_name = (
-                        f"{y_name} [norm]"
-                        if i0_data is not None
-                        else f"{y_name} {y_unit}"
-                    )
+                    if i0_data is not None:
+                        y_first_name = f"{y_name} [norm]"
+                    else:
+                        y_first_name = f"{y_name} {y_unit}"
+
+                # Truncate arrays to acquiredDimensions to remove unacquired points
+                if (
+                    x_data is not None
+                    and y_data is not None
+                    and acquired_points is not None
+                ):
+                    x_array = np.array(x_data)
+                    y_array = np.array(y_data)
+
+                    if len(y_array) > acquired_points:
+                        x_array = x_array[:acquired_points]
+                        y_array = y_array[:acquired_points]
+                        logger.debug(
+                            f"data2Plot - Truncated arrays from {len(np.array(y_data))} to "
+                            f"{acquired_points} acquired points"
+                        )
+
+                        # Convert back to original type
+                        x_data = (
+                            x_array.tolist() if isinstance(x_data, list) else x_array
+                        )
+                        y_data = (
+                            y_array.tolist() if isinstance(y_data, list) else y_array
+                        )
 
                 # append to dataset:
                 ds, ds_options = [], {}
@@ -1134,10 +1357,5 @@ class MDAFileTableView(QWidget):
             # Add X2 index to plot options for 2D data
             if fileInfo.get("isMultidimensional", False):
                 plot_options["x2_index"] = self.getX2Value()
-                logger.debug(
-                    f"data2Plot - Added x2_index to plot_options: {plot_options['x2_index']}"
-                )
-            else:
-                logger.debug("data2Plot - Not multidimensional, x2_index not added")
 
         return datasets, plot_options

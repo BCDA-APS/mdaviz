@@ -8,8 +8,7 @@ memory management, LRU eviction, and performance optimizations.
 
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, MagicMock
 
 
 from mdaviz.data_cache import (
@@ -18,9 +17,6 @@ from mdaviz.data_cache import (
     get_global_cache,
     set_global_cache,
 )
-
-if TYPE_CHECKING:
-    from pytest_mock.plugin import MockerFixture
 
 
 class TestCachedFileData:
@@ -377,7 +373,7 @@ class TestDataCache:
         assert cache.max_entries == 50
 
     @patch("psutil.Process")
-    def test_memory_usage_check(self, mock_process: "MockerFixture") -> None:
+    def test_memory_usage_check(self, mock_process: MagicMock) -> None:
         """Test memory usage checking."""
         # Mock psutil.Process
         mock_process_instance = Mock()
@@ -390,7 +386,7 @@ class TestDataCache:
         assert memory_usage == 500.0
 
     @patch("psutil.Process")
-    def test_memory_cleanup_triggered(self, mock_process: "MockerFixture") -> None:
+    def test_memory_cleanup_triggered(self, mock_process: MagicMock) -> None:
         """Test that memory cleanup is triggered when usage is high."""
         # Mock psutil.Process
         mock_process_instance = Mock()
@@ -448,7 +444,7 @@ class TestDataCache:
         assert cache.memory_warning is not None
 
     @patch("psutil.Process")
-    def test_memory_check_without_psutil(self, mock_process: "MockerFixture") -> None:
+    def test_memory_check_without_psutil(self, mock_process: MagicMock) -> None:
         """Test memory checking when psutil is not available."""
         mock_process.side_effect = ImportError("psutil not available")
 
@@ -527,10 +523,10 @@ class TestDataCacheIntegration:
     @patch("pathlib.Path.exists")
     def test_load_and_cache(
         self,
-        mock_exists: "MockerFixture",
-        mock_stat: "MockerFixture",
-        mock_get_scan: "MockerFixture",
-        mock_read_mda: "MockerFixture",
+        mock_exists: MagicMock,
+        mock_stat: MagicMock,
+        mock_get_scan: MagicMock,
+        mock_read_mda: MagicMock,
     ) -> None:
         """Test loading and caching MDA files."""
         # Mock file system
@@ -610,10 +606,10 @@ class TestDataCacheIntegration:
     @patch("pathlib.Path.exists")
     def test_get_or_load_not_cached(
         self,
-        mock_exists: "MockerFixture",
-        mock_stat: "MockerFixture",
-        mock_get_scan: "MockerFixture",
-        mock_read_mda: "MockerFixture",
+        mock_exists: MagicMock,
+        mock_stat: MagicMock,
+        mock_get_scan: MagicMock,
+        mock_read_mda: MagicMock,
     ) -> None:
         """Test get_or_load when file is not cached."""
         # Mock file system

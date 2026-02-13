@@ -1,8 +1,8 @@
 """
 Select data fields for 1-D plotting: QAbstractTableModel.
 
-General plot model is: Y/Mon vs X.  If X is not selected, use index number. If
-Mon is not selected, use 1.0 (trivial case, do not divide by Mon).
+General plot model is: Y/I0 vs X.  If X is not selected, use index number. If
+I0 is not selected, use 1.0 (trivial case, do not divide by I0).
 
 Data Field Selection Rules:
 
@@ -10,9 +10,9 @@ Data Field Selection Rules:
     * unselected (`None`)
     * `"X"`: abscissa (independent axis)
     * `"Y"` : ordinate (dependent axes)
-    * `"Mon"` : divide this array into each Y
+    * `"I0"` : divide this array into each Y
 2. Only zero or one data field can be selected as `"X"`.
-3. Only zero or one data field can be selected as `"Mon"`.
+3. Only zero or one data field can be selected as `"I0"`.
 4. One or more data fields can be selected as `"Y"`.
 
 When Model/View is created, the view should call 'model.setFields(fields)' with
@@ -30,7 +30,7 @@ such a 'list(object)' or 'dict(str=object)', then change both 'columns()' and
     ~TableField
 """
 
-from typing import Optional, List, Dict, Tuple
+from typing import Optional
 from mdaviz.utils import mda2ftm, ftm2mda
 from dataclasses import KW_ONLY
 from dataclasses import dataclass
@@ -83,7 +83,7 @@ class TableField:
     """
 
     name: str  # the "D#" column
-    selection: Optional[str] = None  # either of these, selection rule 1.
+    selection: Optional[str] = None  # None, "X", "Y", "I0", etc.
     _: KW_ONLY  # all parameters below are specified by keyword
     desc: str = ""  # the "desc" column
     pv: str = ""  # the "PV" column
@@ -150,7 +150,9 @@ class MDAFileTableModel(QAbstractTableModel):
         plot_fields = self.plotFields()
         return "I0" in plot_fields
 
-    # ------------ methods required by Qt's view
+    # =============================================
+    # Methods required by Qt's view
+    # =============================================
 
     def rowCount(self, parent=None):
         """Number of fields."""
@@ -188,10 +190,10 @@ class MDAFileTableModel(QAbstractTableModel):
         elif role == Qt.ItemDataRole.BackgroundRole:
             # Highlight row if it's the highlighted row
             if row == self.highlightedRow:
-                return QBrush(QColor(100, 150, 200))
+                return QBrush(QColor(0xE2E2EC))
             # Highlight I0 column if I0 is selected
             elif column == self.columnNumber("I0") and self.isI0Selected():
-                return QBrush(QColor(100, 150, 200))
+                return QBrush(QColor(0xE2E2EC))
 
         elif role == Qt.ItemDataRole.ToolTipRole:
             # Provide tooltips for checkbox columns
@@ -203,10 +205,31 @@ class MDAFileTableModel(QAbstractTableModel):
                     return "Select this field as a Y-axis (dependent variable). Multiple Y selections allowed."
                 elif column_name == "I0":
                     return "Select this field for normalization (divide Y data by this field). Only one I0 selection allowed."
-                elif column_name == "Un":
-                    return "Unscale this curve to match the range of other Y curves. Requires Y selection on same row. Multiple Un selections allowed."
 
         return None
+
+    def setData(self, index, value, role):
+        """Set the data for the given index and role."""
+        if not index.isValid():
+            return False
+
+        if role == Qt.ItemDataRole.CheckStateRole:
+            # Handle checkbox state changes
+            if index.column() in self.checkboxColumns:
+                # PyQt6 checkbox behavior fix: toggle the state
+                current_state = self.data(index, Qt.ItemDataRole.CheckStateRole)
+                if current_state == Qt.CheckState.Checked:
+                    new_state = Qt.CheckState.Unchecked
+                else:
+                    new_state = Qt.CheckState.Checked
+                self.setCheckbox(index, new_state)
+                return True
+
+        elif role == Qt.ItemDataRole.EditRole:
+            # Handle data editing if needed
+            return True
+
+        return False
 
     def headerData(self, section, orientation, role):
         """Return the header data for the given section and role."""
@@ -244,12 +267,16 @@ class MDAFileTableModel(QAbstractTableModel):
             self.highlightedRow = None
             self.layoutChanged.emit()
 
-    # ------------ checkbox methods
+    # =============================================
+    # Checkbox methods
+    # =============================================
 
     def checkbox(self, index):
         """Return the checkbox state for a given cell: (row, column) = (index.row(), index.column())."""
         nm = self.columnName(index.column())  # selection name of THIS column
-        selection = self.selections.get(index.row())  # user selection
+        selection = self.selections.get(
+            index.row()
+        )  # user selection, eg selection = ["Y", "Un"]
 
         # Handle both single selections (str) and multiple selections (list)
         if isinstance(selection, list):
@@ -288,10 +315,10 @@ class MDAFileTableModel(QAbstractTableModel):
             # Handle single selection (backward compatibility)
             if checked:
                 # If we're adding any column to a row that already has a selection, convert to multiple selection
-                if prior is not None:
+                if prior is not None and prior != column_name:
                     new_selection = [prior, column_name]
                     self.selections[row] = new_selection
-                    changes = True
+                    changes = new_selection != prior
                     logger.debug(
                         f"setCheckbox - converting to multiple selection: new_selection={new_selection}"
                     )
@@ -386,7 +413,7 @@ class MDAFileTableModel(QAbstractTableModel):
         )
         # Update the mda_mvc selection
         if self.mda_mvc is not None:
-            self.mda_mvc.setSelectionField()
+            self.mda_mvc.setSelectionField()  # No argument = None
         # Refresh background highlighting for I0 column if I0 selection changed
         if had_i0:
             self.layoutChanged.emit()
@@ -400,99 +427,47 @@ class MDAFileTableModel(QAbstractTableModel):
         logger.debug(f"applySelectionRules - row={row}, column_name={column_name}")
         logger.debug(f"applySelectionRules - current selections={self.selections}")
 
-        # Handle "Un" column special rules
-        if column_name == "Un":
-            logger.debug("applySelectionRules - handling Un column")
-            # Rule 1: Cannot be same as X
-            if isinstance(
-                self.selections.get(row), list
-            ) and "X" in self.selections.get(row, []):
-                if "Un" in self.selections.get(row, []):
-                    logger.debug(
-                        "applySelectionRules - removing Un because X is selected"
-                    )
-                    self.selections[row].remove("Un")
-                    changes = True
-            elif self.selections.get(row) == "X":
-                if "Un" in self.selections.get(row, []):
-                    logger.debug("applySelectionRules - keeping only X, removing Un")
-                    self.selections[row] = "X"  # Keep only X
-                    changes = True
-            # Rule 2: Cannot be same as I0
-            if isinstance(
-                self.selections.get(row), list
-            ) and "I0" in self.selections.get(row, []):
-                if "Un" in self.selections.get(row, []):
-                    logger.debug(
-                        "applySelectionRules - removing Un because I0 is selected"
-                    )
-                    self.selections[row].remove("Un")
-                    changes = True
-            elif self.selections.get(row) == "I0":
-                if "Un" in self.selections.get(row, []):
-                    logger.debug("applySelectionRules - keeping only I0, removing Un")
-                    self.selections[row] = "I0"  # Keep only I0
-                    changes = True
-            # Rule 3: Requires Y selection (handled in data2Plot)
-            # Rule 4: Multiple allowed (no special handling needed)
-        else:
-            # Handle unique selection columns (X, I0)
-            if current_column_number in self.uniqueSelectionColumns:
-                for r, v in sorted(self.selections.items()):
-                    if v is not None:
-                        # Handle both single selection (string) and multiple selection (list)
-                        if isinstance(v, list):
-                            # For multiple selections, check if any of them conflict
-                            for single_v in v:
-                                if single_v in ["X", "I0"]:
-                                    v_column_number = self.columnNumber(single_v)
-                                    if (
-                                        v_column_number in self.uniqueSelectionColumns
-                                        and current_column_number
-                                        in self.uniqueSelectionColumns
-                                        and single_v
-                                        == column_name  # Only conflict if same column type
-                                    ):
-                                        if r != row:
-                                            logger.debug(
-                                                f"applySelectionRules - removing {single_v} from row {r} because {column_name} selected"
-                                            )
-                                            # Remove the conflicting selection from the list
-                                            v.remove(single_v)
-                                            if not v:  # If list is empty, set to None
-                                                self.selections[r] = None
-                                            else:
-                                                self.selections[r] = v
-                                            changes = True
-                            # Also check for conflicts within the same row (e.g., X and Un, I0 and Un)
-                            if r == row and isinstance(v, list):
-                                # Remove "Un" if "X" is also selected
-                                if "X" in v and "Un" in v:
-                                    logger.debug(
-                                        "applySelectionRules - removing Un because X is selected on same row"
-                                    )
-                                    v.remove("Un")
-                                    changes = True
-                                # Remove "Un" if "I0" is also selected
-                                if "I0" in v and "Un" in v:
-                                    logger.debug(
-                                        "applySelectionRules - removing Un because I0 is selected on same row"
-                                    )
-                                    v.remove("Un")
-                                    changes = True
-                        else:
-                            # Handle single selection (backward compatibility)
-                            v_column_number = self.columnNumber(v)
-                            if (
-                                v_column_number in self.uniqueSelectionColumns
-                                and current_column_number in self.uniqueSelectionColumns
-                            ):
-                                if r != row and column_name == v:
-                                    logger.debug(
-                                        f"applySelectionRules - removing {v} from row {r} because {column_name} selected"
-                                    )
-                                    self.selections[r] = None
-                                    changes = True
+        # Handle unique selection columns (X, I0)
+        if current_column_number in self.uniqueSelectionColumns:
+            for r, v in sorted(self.selections.items()):
+                if v is not None:
+                    # Handle both single selection (string) and multiple selection (list)
+                    if isinstance(v, list):
+                        # For multiple selections, check if any of them conflict
+                        for single_v in v:
+                            if single_v in ["X", "I0"]:
+                                v_column_number = self.columnNumber(single_v)
+                                if (
+                                    v_column_number in self.uniqueSelectionColumns
+                                    and current_column_number
+                                    in self.uniqueSelectionColumns
+                                    and single_v
+                                    == column_name  # Only conflict if same column type
+                                ):
+                                    if r != row:
+                                        logger.debug(
+                                            f"applySelectionRules - removing {single_v} from row {r} because {column_name} selected"
+                                        )
+                                        # Remove the conflicting selection from the list
+                                        v.remove(single_v)
+                                        if not v:  # If list is empty, set to None
+                                            self.selections[r] = None
+                                        else:
+                                            self.selections[r] = v
+                                        changes = True
+                    else:
+                        # Handle single selection
+                        v_column_number = self.columnNumber(v)
+                        if (
+                            v_column_number in self.uniqueSelectionColumns
+                            and current_column_number in self.uniqueSelectionColumns
+                        ):
+                            if r != row and column_name == v:
+                                logger.debug(
+                                    f"applySelectionRules - removing {v} from row {r} because {column_name} selected"
+                                )
+                                self.selections[r] = None
+                                changes = True
 
         logger.debug(
             f"applySelectionRules - final selections={self.selections}, changes={changes}"
@@ -504,7 +479,7 @@ class MDAFileTableModel(QAbstractTableModel):
     ):
         """Update checkboxes to agree with self.selections."""
         if new_selection is None:
-            new_selection = self.selections
+            new_selection = self.selections or {}
         if len(new_selection) > 0:  # was self.selections
             top, bottom = min(new_selection), max(new_selection)
         else:
@@ -548,7 +523,9 @@ class MDAFileTableModel(QAbstractTableModel):
             text += f" {self.fieldName(r)}"
             logger.info(text)
 
-    # ------------ local methods
+    # =============================================
+    # Local methods
+    # =============================================
 
     def columnName(self, column: int):
         return self.columns()[column]
@@ -627,9 +604,9 @@ class MDAFileTableModel(QAbstractTableModel):
         """
         Returns a dictionary with the selected fields to be plotted.
 
-        key=column_name, value= row_number(s) or fieldName(s)
+        key=column_name, value= row_number(s)
         """
-        choices = dict(Y=[], Un=[])
+        choices = dict(Y=[])
         for row, selection in self.selections.items():
             if selection is None:
                 continue
@@ -654,199 +631,3 @@ class MDAFileTableModel(QAbstractTableModel):
     def setStatus(self, text):
         if self.mda_mvc is not None:
             self.mda_mvc.setStatus(text)
-
-    def columnLabels(self) -> List[str]:
-        """Return the column labels."""
-        return [
-            "Name",
-            "Prefix",
-            "Number",
-            "Points",
-            "Dimension",
-            "Positioner",
-            "Date",
-            "Size",
-        ]
-
-    def sort(self, column, order):
-        """Sort the data by the given column and order."""
-        # Implement sorting logic here
-        pass
-
-    def getFileList(self) -> List[str]:
-        """Return the list of file names."""
-        return self._file_list
-
-    def setFileList(self, file_list: List[str]) -> None:
-        """Set the list of file names."""
-        self._file_list = file_list
-        self.layoutChanged.emit()
-
-    def getPrefixList(self) -> List[str]:
-        """Return the list of prefixes."""
-        return self._prefix_list
-
-    def setPrefixList(self, prefix_list: List[str]) -> None:
-        """Set the list of prefixes."""
-        self._prefix_list = prefix_list
-        self.layoutChanged.emit()
-
-    def getNumberList(self) -> List[int]:
-        """Return the list of numbers."""
-        return self._number_list
-
-    def setNumberList(self, number_list: List[int]) -> None:
-        """Set the list of numbers."""
-        self._number_list = number_list
-        self.layoutChanged.emit()
-
-    def getPointsList(self) -> List[int]:
-        """Return the list of points."""
-        return self._points_list
-
-    def setPointsList(self, points_list: List[int]) -> None:
-        """Set the list of points."""
-        self._points_list = points_list
-        self.layoutChanged.emit()
-
-    def getDimensionList(self) -> List[int]:
-        """Return the list of dimensions."""
-        return self._dimension_list
-
-    def setDimensionList(self, dimension_list: List[int]) -> None:
-        """Set the list of dimensions."""
-        self._dimension_list = dimension_list
-        self.layoutChanged.emit()
-
-    def getPositionerList(self) -> List[str]:
-        """Return the list of positioners."""
-        return self._positioner_list
-
-    def setPositionerList(self, positioner_list: List[str]) -> None:
-        """Set the list of positioners."""
-        self._positioner_list = positioner_list
-        self.layoutChanged.emit()
-
-    def getDateList(self) -> List[str]:
-        """Return the list of dates."""
-        return self._date_list
-
-    def setDateList(self, date_list: List[str]) -> None:
-        """Set the list of dates."""
-        self._date_list = date_list
-        self.layoutChanged.emit()
-
-    def getSizeList(self) -> List[str]:
-        """Return the list of sizes."""
-        return self._size_list
-
-    def setSizeList(self, size_list: List[str]) -> None:
-        """Set the list of sizes."""
-        self._size_list = size_list
-        self.layoutChanged.emit()
-
-    def getAllData(self) -> Dict[str, List]:
-        """Return all data as a dictionary."""
-        return {
-            "Name": self._file_list,
-            "Prefix": self._prefix_list,
-            "Number": self._number_list,
-            "Points": self._points_list,
-            "Dimension": self._dimension_list,
-            "Positioner": self._positioner_list,
-            "Date": self._date_list,
-            "Size": self._size_list,
-        }
-
-    def setAllData(self, data: Dict[str, List]) -> None:
-        """Set all data from a dictionary."""
-        self._file_list = data.get("Name", [])
-        self._prefix_list = data.get("Prefix", [])
-        self._number_list = data.get("Number", [])
-        self._points_list = data.get("Points", [])
-        self._dimension_list = data.get("Dimension", [])
-        self._positioner_list = data.get("Positioner", [])
-        self._date_list = data.get("Date", [])
-        self._size_list = data.get("Size", [])
-        self.layoutChanged.emit()
-
-    def clearData(self) -> None:
-        """Clear all data."""
-        self._file_list = []
-        self._prefix_list = []
-        self._number_list = []
-        self._points_list = []
-        self._dimension_list = []
-        self._positioner_list = []
-        self._date_list = []
-        self._size_list = []
-        self.layoutChanged.emit()
-
-    def getRowData(self, row: int) -> Tuple[str, str, int, int, int, str, str, str]:
-        """Return the data for a specific row."""
-        if row >= len(self._file_list):
-            return ("", "", 0, 0, 1, "", "", "")
-
-        return (
-            self._file_list[row],
-            self._prefix_list[row] if row < len(self._prefix_list) else "",
-            self._number_list[row] if row < len(self._number_list) else 0,
-            self._points_list[row] if row < len(self._points_list) else 0,
-            self._dimension_list[row] if row < len(self._dimension_list) else 1,
-            self._positioner_list[row] if row < len(self._positioner_list) else "",
-            self._date_list[row] if row < len(self._date_list) else "",
-            self._size_list[row] if row < len(self._size_list) else "",
-        )
-
-    def setRowData(
-        self, row: int, data: Tuple[str, str, int, int, int, str, str, str]
-    ) -> None:
-        """Set the data for a specific row."""
-        if row >= len(self._file_list):
-            # Extend lists if needed
-            while len(self._file_list) <= row:
-                self._file_list.append("")
-                self._prefix_list.append("")
-                self._number_list.append(0)
-                self._points_list.append(0)
-                self._dimension_list.append(1)
-                self._positioner_list.append("")
-                self._date_list.append("")
-                self._size_list.append("")
-
-        self._file_list[row] = data[0]
-        self._prefix_list[row] = data[1]
-        self._number_list[row] = data[2]
-        self._points_list[row] = data[3]
-        self._dimension_list[row] = data[4]
-        self._positioner_list[row] = data[5]
-        self._date_list[row] = data[6]
-        self._size_list[row] = data[7]
-
-        # Emit data changed signal for the specific row
-        self.dataChanged.emit(
-            self.index(row, 0), self.index(row, len(self.columnLabels()) - 1)
-        )
-
-    def setData(self, index, value, role):
-        """Set the data for the given index and role."""
-        if not index.isValid():
-            return False
-
-        if role == Qt.ItemDataRole.CheckStateRole:
-            # Handle checkbox state changes
-            if index.column() in self.checkboxColumns:
-                # PyQt6 checkbox behavior fix: toggle the state
-                current_state = self.data(index, Qt.ItemDataRole.CheckStateRole)
-                if current_state == Qt.CheckState.Checked:
-                    new_state = Qt.CheckState.Unchecked
-                else:
-                    new_state = Qt.CheckState.Checked
-                self.setCheckbox(index, new_state)
-                return True
-
-        elif role == Qt.ItemDataRole.EditRole:
-            # Handle data editing if needed
-            return True
-
-        return False

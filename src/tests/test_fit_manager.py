@@ -10,6 +10,7 @@ import pytest
 import numpy as np
 
 from mdaviz.fit_manager import FitManager
+from mdaviz.fit_models import get_available_models
 
 if TYPE_CHECKING:
     from _pytest.logging import LogCaptureFixture
@@ -95,8 +96,12 @@ def test_fit_manager_parameter_update_and_extraction() -> None:
     curve_data = fit_manager.getFitCurveData(curve_id)
     assert curve_data is not None
     x_fit, y_fit = curve_data
-    assert len(x_fit) == len(x)
-    assert len(y_fit) == len(y)
+    # getFitCurveData returns 500 points for smooth plotting
+    assert len(x_fit) == 500
+    assert len(y_fit) == 500
+    # Verify the x range matches the input data
+    assert np.min(x_fit) <= np.min(x)
+    assert np.max(x_fit) >= np.max(x)
 
 
 def test_fit_manager_fit_with_nan_data() -> None:
@@ -128,26 +133,6 @@ def test_fit_manager_remove_fit() -> None:
     # Verify fit was removed
     assert not fit_manager.hasFits(curve_id)
     assert fit_manager.getFitData(curve_id) is None
-
-
-def test_fit_manager_fit_visibility() -> None:
-    """Test fit visibility controls."""
-    x = np.linspace(0, 10, 50)
-    y = 2 * x + 1
-    fit_manager = FitManager()
-
-    curve_id = "test_curve"
-    fit_manager.addFit(curve_id, "Linear", x, y)
-
-    # Test visibility
-    assert fit_manager.isFitVisible(curve_id)
-
-    # Change visibility
-    fit_manager.setFitVisibility(curve_id, False)
-    assert not fit_manager.isFitVisible(curve_id)
-
-    fit_manager.setFitVisibility(curve_id, True)
-    assert fit_manager.isFitVisible(curve_id)
 
 
 def test_fit_manager_fit_with_range() -> None:
@@ -204,8 +189,7 @@ def test_fit_manager_clear_all_fits() -> None:
 
 def test_fit_manager_get_available_models() -> None:
     """Test getting available fit models."""
-    fit_manager = FitManager()
-    models = fit_manager.get_available_models()
+    models = get_available_models()
 
     assert isinstance(models, dict)
     assert len(models) > 0

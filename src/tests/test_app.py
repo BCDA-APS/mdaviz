@@ -18,8 +18,7 @@ from mdaviz.app import command_line_interface, main, gui
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
     from _pytest.logging import LogCaptureFixture
-    from pytest_mock.plugin import MockerFixture
-    from pytest_qt.plugin import FixtureRequest
+    from pytest_qt.qtbot import QtBot
 
 
 class TestCommandLineInterface:
@@ -66,7 +65,7 @@ class TestMainFunction:
     @patch("mdaviz.app.gui")
     @patch("mdaviz.app.command_line_interface")
     def test_main_function_calls_gui(
-        self, mock_cli: "MockerFixture", mock_gui: "MockerFixture"
+        self, mock_cli: MagicMock, mock_gui: MagicMock
     ) -> None:
         """Test that main function calls gui function."""
         # Mock command line interface
@@ -83,7 +82,7 @@ class TestMainFunction:
     @patch("mdaviz.app.gui")
     @patch("mdaviz.app.command_line_interface")
     def test_main_function_sets_logging(
-        self, mock_cli: "MockerFixture", mock_gui: "MockerFixture"
+        self, mock_cli: MagicMock, mock_gui: MagicMock
     ) -> None:
         """Test that main function sets up logging correctly."""
         # Mock command line interface
@@ -107,7 +106,7 @@ class TestMainFunction:
     @patch("mdaviz.app.gui")
     @patch("mdaviz.app.command_line_interface")
     def test_main_function_sets_package_logging(
-        self, mock_cli: "MockerFixture", mock_gui: "MockerFixture"
+        self, mock_cli: MagicMock, mock_gui: MagicMock
     ) -> None:
         """Test that main function sets package logging levels."""
         # Mock command line interface
@@ -127,8 +126,8 @@ class TestMainFunction:
     @patch("mdaviz.app.command_line_interface")
     def test_main_function_logs_info(
         self,
-        mock_cli: "MockerFixture",
-        mock_gui: "MockerFixture",
+        mock_cli: MagicMock,
+        mock_gui: MagicMock,
         caplog: "LogCaptureFixture",
     ) -> None:
         """Test that main function logs the logging level."""
@@ -153,7 +152,7 @@ class TestGuiFunction:
     @pytest.mark.skip(reason="GUI tests cause segmentation faults in test environment")
     @patch("sys.exit")
     def test_gui_function_creates_application(
-        self, mock_exit: "MockerFixture", qtbot: "FixtureRequest"
+        self, mock_exit: MagicMock, qtbot: "QtBot"
     ) -> None:
         """Test that gui function creates QApplication."""
         # Use qtbot to manage QApplication - don't create our own
@@ -178,7 +177,7 @@ class TestGuiFunction:
     @pytest.mark.skip(reason="GUI tests cause segmentation faults in test environment")
     @patch("sys.exit")
     def test_gui_function_creates_main_window(
-        self, mock_exit: "MockerFixture", qtbot: "FixtureRequest"
+        self, mock_exit: MagicMock, qtbot: "QtBot"
     ) -> None:
         """Test that gui function creates MainWindow."""
         # Use qtbot to manage QApplication - don't create our own
@@ -205,9 +204,7 @@ class TestAppIntegration:
 
     @pytest.mark.skip(reason="GUI tests cause segmentation faults in test environment")
     @patch("sys.exit")
-    def test_app_startup_flow(
-        self, mock_exit: "MockerFixture", qtbot: "FixtureRequest"
-    ) -> None:
+    def test_app_startup_flow(self, mock_exit: MagicMock, qtbot: "QtBot") -> None:
         """Test complete application startup flow."""
         # Test the main function with command line arguments
         # This is an integration test that verifies the complete flow
@@ -234,7 +231,7 @@ class TestAppErrorHandling:
     """Test error handling in the application."""
 
     @patch("mdaviz.app.command_line_interface")
-    def test_main_function_handles_cli_errors(self, mock_cli: "MockerFixture") -> None:
+    def test_main_function_handles_cli_errors(self, mock_cli: MagicMock) -> None:
         """Test that main function handles CLI errors gracefully."""
         # Mock CLI to raise an exception
         mock_cli.side_effect = SystemExit(1)
@@ -246,7 +243,7 @@ class TestAppErrorHandling:
     @patch("mdaviz.app.gui")
     @patch("mdaviz.app.command_line_interface")
     def test_main_function_handles_gui_errors(
-        self, mock_cli: "MockerFixture", mock_gui: "MockerFixture"
+        self, mock_cli: MagicMock, mock_gui: MagicMock
     ) -> None:
         """Test that main function handles GUI errors gracefully."""
         # Mock command line interface
@@ -267,31 +264,31 @@ class TestAppErrorHandling:
 class TestGuiIntegration:
     """Integration tests for GUI functionality (skipped in CI)."""
 
-    def test_main_window_components(self, qtbot: "MockerFixture") -> None:
+    def test_main_window_components(self, qtbot: "QtBot") -> None:
         """Test that main window components are created correctly."""
         # This test would require a full GUI environment
         # For now, we'll skip it in CI
         pass
 
-    def test_about_dialog(self, qtbot: "MockerFixture") -> None:
+    def test_about_dialog(self, qtbot: "QtBot") -> None:
         """Test about dialog functionality."""
         # This test would require a full GUI environment
         # For now, we'll skip it in CI
         pass
 
-    def test_data_cache_initialization(self, qtbot: "MockerFixture") -> None:
+    def test_data_cache_initialization(self, qtbot: "QtBot") -> None:
         """Test data cache initialization in main window."""
         # This test would require a full GUI environment
         # For now, we'll skip it in CI
         pass
 
-    def test_lazy_folder_scanner_initialization(self, qtbot: "MockerFixture") -> None:
+    def test_lazy_folder_scanner_initialization(self, qtbot: "QtBot") -> None:
         """Test lazy folder scanner initialization in main window."""
         # This test would require a full GUI environment
         # For now, we'll skip it in CI
         pass
 
-    def test_fit_manager_initialization(self, qtbot: "MockerFixture") -> None:
+    def test_fit_manager_initialization(self, qtbot: "QtBot") -> None:
         """Test fit manager initialization in main window."""
         # This test would require a full GUI environment
         # For now, we'll skip it in CI
