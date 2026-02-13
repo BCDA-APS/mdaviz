@@ -3,8 +3,16 @@
 Changes
 =======
 
-Version 1.3.0 (latest)
+Version 1.3.1 (latest)
 ----------------------
+
+**Logging**
+
+- **Log rotation**: Use ``RotatingFileHandler`` to cap log file size (5 MB per file, 3 backups); prevents unbounded growth during long or debug sessions.
+- **Default file level**: File handler uses the same level as console (default WARNING). The log file records warnings, errors, and unhandled crash tracebacks. Use ``--log debug`` when actively debugging for full detail.
+
+Version 1.3.0
+-------------
 
 **Major Features**
 
