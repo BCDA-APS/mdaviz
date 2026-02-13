@@ -3,7 +3,62 @@
 Changes
 =======
 
-Version 1.2.5 (latest)
+Version 1.3.0 (latest)
+----------------------
+
+**Major Features**
+
+- **2D selection persistence**: Remember 2D selection (X1, X2, Y, I0, plot type, color palette, log scale, x2 slice) across file switches; restore when switching back to 2D files.
+- **Unscale feature**: Un column removed from table, moved to curve panel; apply to currently selected curve in curve pull-down menu.
+- **Derivative support**: Add derivative option for curves in curve panel; apply to currently selected curve in curve pull-down menu.
+- **Progress dialog**: Progress dialog during folder scan (throttled updates, non-modal).
+- **Folder refresh cache**: Reuse cached file info for unchanged files (mtime) on refresh to speed up repeated scans.
+- **Exception logging**: Custom excepthook logs unhandled exceptions to ``~/.mdaviz/logs/`` for debugging.
+- **Active scans**: Plot only acquired points; omit the final (0,0) placeholder point.
+- **Multi-fit support**: Each curve can have its own fit; the fit panel shows the result for the curve currently selected in the pull down menu.
+
+**Minor Features**
+
+- Preserve visualization tab (1D/2D) when switching files.
+- Show cursor info panel in 2D tab.
+- Add horizontal splitter between graph and curve/cursor panel (collapsible).
+- Fit improvements: display uncertainty and FWHM when available; smooth x array for fit plotting.
+- Fit models: add topHat model; negative Gaussian/Lorentzian.
+- Curve panel: select last plotted curve on add; restore curve selection after replace and when I0 toggled.
+- Reset log scale when graph is cleared.
+- Snap-to-curve uses normalized nearest-point.
+
+**Bug Fixes**
+
+- **Crash guards**: Guard ``addCurve`` when ``len(ds) < 2``; guard ``removeAllLayoutWidgets`` when layout item has no widget (spacer); defensive null checks for ``getCurveData()``, plot widgets, and 2D data validation; default X when missing in ``data2Plot``; skip None y_data; validate 2D plot data shape/empty in ``ChartView2D.plot2D``.
+- **Excepthook**: Wrap handler flush in try/except so bad logger cannot crash excepthook; ensure ``_folderList`` is never a string in main window (avoids ``insert`` on string).
+- **Lazy scan**: Throttle scan progress to every 100 files (avoid RecursionError); clear ``_scanning`` only when scan thread has finished; wait for previous scan thread before starting new one; timeout and error on duplicate refresh.
+- **Plot data**: Truncate 1D/2D plot data to ``acquiredDimensions`` for incomplete scans; early return when no acquired points; fix zero-size array crashes; bounds checking for X/I0 slicing.
+- **2D UI**: Fix Ydet control panel visibility when switching 2D files; fix 2D control panel sometimes missing (defer retry with QTimer); avoid Ydet flicker; guard 2D selection restore from duplicate plots; fix invalid plot type when combo not yet populated.
+- **Curves**: Reset persistent curve props on detector uncheck; refresh unscale when adding/removing det(s) or normalizing; fix I0 checkbox uncheck to use current file model; fix curve combobox selection after replace and I0 toggle.
+- **2D plot**: Fix heatmap/contour orientation and log scale handling; fix ``first_det`` for 2D data;
+- **Other**: Fix window geometry save/restore for multi-monitor; progress dialog non-modal (fix modalSession warning); ``displayData()`` tabledata optional; fix data truncation and unscaling (constant reference, bounds); duplicate selection prevention (X/Y checkboxes); fix ``has_curve`` boolean in showAnalysisControls; fix progress dialog rendering at 100% (hide bar on completion).
+
+**Refactoring / Code Quality**
+
+- Main window: extract preferences dialog; extract ``doOpen`` into helpers; reorganize sections; center window.
+- ``mda_file_viz``: refactor mode control and tab widget; rename 2D control setup methods; simplify ``onPlotButtonClicked``.
+- Curve manager: move to ``curve_manager.py``; use curveID for persistent properties; store ``original_y`` and add transformations helper; ``getTransformedCurveXYData``.
+- ChartView: use CurveManager transformations; docstrings and section headers.
+- ``mda_file_table_model``: duplicate selection fix; docstrings; setData/data order; defensive None checks.
+- ``mda_folder``: clean up; ``doPlot2D`` public; remove dead code; null checks for selection.
+- Utils: ``get_scan`` reuses ``get_det``; remove code duplication.
+- Logging consolidated into ``logger.py``; remove ``logging_config.py`` and unused methods (fit visibility, toggle_auto_load, fit data tab, etc.).
+
+**Testing**
+
+- Tests for crash guards: ``addCurve`` len(ds)<2, ``removeAllLayoutWidgets`` spacer, ``ChartView2D.plot2D`` invalid data.
+- Tests for DataTableModel, EmptyTableModel, PreferencesDialog (coverage).
+- Fix mypy in tests (conftest qapp, qtbot type, patch mocks).
+- Tests for duplicate selection prevention, transformation functionality, log scale reset.
+
+
+Version 1.2.5
 ----------------------
 
 **Bug Fixes**
