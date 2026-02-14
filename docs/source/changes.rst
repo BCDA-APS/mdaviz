@@ -17,13 +17,13 @@ Version 1.3.0
 **Major Features**
 
 - **2D selection persistence**: Remember 2D selection (X1, X2, Y, I0, plot type, color palette, log scale, x2 slice) across file switches; restore when switching back to 2D files.
-- **Unscale feature**: Un column removed from table, moved to curve panel; apply to currently selected curve in curve pull-down menu.
-- **Derivative support**: Add derivative option for curves in curve panel; apply to currently selected curve in curve pull-down menu.
+- **Unscale feature**: ``Un`` column removed from table, moved to curve panel; apply to currently selected curve in curve dropdown menu.
+- **Derivative support**: Add derivative option for curves in curve panel; apply to currently selected curve in curve dropdown menu.
+- **Active scans**: Plot only acquired points; omit the final (0,0) placeholder point.
+- **Multi-fit support**: Each curve can have its own fit; the fit panel shows the result for the curve currently selected in the pull down menu.
 - **Progress dialog**: Progress dialog during folder scan (throttled updates, non-modal).
 - **Folder refresh cache**: Reuse cached file info for unchanged files (mtime) on refresh to speed up repeated scans.
 - **Exception logging**: Custom excepthook logs unhandled exceptions to ``~/.mdaviz/logs/`` for debugging.
-- **Active scans**: Plot only acquired points; omit the final (0,0) placeholder point.
-- **Multi-fit support**: Each curve can have its own fit; the fit panel shows the result for the curve currently selected in the pull down menu.
 
 **Minor Features**
 
@@ -32,7 +32,7 @@ Version 1.3.0
 - Add horizontal splitter between graph and curve/cursor panel (collapsible).
 - Fit improvements: display uncertainty and FWHM when available; smooth x array for fit plotting.
 - Fit models: add topHat model; negative Gaussian/Lorentzian.
-- Curve panel: select last plotted curve on add; restore curve selection after replace and when I0 toggled.
+- Curve panel: select last plotted curve when added; restore curve selection after replace and when I0 toggled.
 - Reset log scale when graph is cleared.
 - Snap-to-curve uses normalized nearest-point.
 
