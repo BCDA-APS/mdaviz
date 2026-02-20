@@ -1337,11 +1337,15 @@ class ChartView(QWidget):
         # Check for the first cursor and update text accordingly
         if self.cursors[1]:
             x1, y1 = self.cursors["pos1"]
-            self.cursors["text1"] = f"({utils.num2fstr(x1)}, {utils.num2fstr(y1)})"
+            self.cursors["text1"] = (
+                f"({utils.num2fstr(x1, 4)}, {utils.num2fstr(y1, 4)})"
+            )
         # Check for the second cursor and update text accordingly
         if self.cursors[2]:
             x2, y2 = self.cursors["pos2"]
-            self.cursors["text2"] = f"({utils.num2fstr(x2)}, {utils.num2fstr(y2)})"
+            self.cursors["text2"] = (
+                f"({utils.num2fstr(x2, 4)}, {utils.num2fstr(y2, 4)})"
+            )
         # Calculate differences and midpoints only if both cursors are present
         if self.cursors[1] and self.cursors[2]:
             delta_x = x2 - x1
@@ -1349,10 +1353,10 @@ class ChartView(QWidget):
             midpoint_x = (x1 + x2) / 2
             midpoint_y = (y1 + y2) / 2
             self.cursors["diff"] = (
-                f"({utils.num2fstr(delta_x)}, {utils.num2fstr(delta_y)})"
+                f"({utils.num2fstr(delta_x, 4)}, {utils.num2fstr(delta_y, 4)})"
             )
             self.cursors["midpoint"] = (
-                f"({utils.num2fstr(midpoint_x)}, {utils.num2fstr(midpoint_y)})"
+                f"({utils.num2fstr(midpoint_x, 4)}, {utils.num2fstr(midpoint_y, 4)})"
             )
         self.updateCursorInfo()
 
