@@ -17,7 +17,7 @@ MVC implementation of mda files.
         - mdaFileList: Fetches names of MDA files in the selected folder.
 
         User interaction handling methods:
-        - doRefresh: Refreshes the view to display updated MDA files from the selected folder.
+        - refresh2 button: Connected to MainWindow.onRefresh to refresh the folder and file list.
         - onFileSelected: Handles user selection of MDA files, updating UI and initiating data plotting.
         - doPlot: Initiates data plotting based on user selections and current plot mode. It checks for the
         selected positioner and detectors, retrieves the corresponding data, and plots it in the visualization panel.
@@ -46,9 +46,9 @@ MVC implementation of mda files.
 
     Flow Chart:
 
-        Refresh Button Press
-        |___> doRefresh
-            |___> mda_folder_tableview.displayTable()   (to reload folder content)
+        Refresh Button Press (refresh2)
+        |___> MainWindow.onRefresh
+            |___> re-scan folder, invalidate cache, mda_folder_tableview.displayTable()
 
         File Selection (Double Click or Navigation Button)
         |___> onFileSelected
@@ -154,6 +154,9 @@ class MDA_MVC(QWidget):
         self.mda_folder_tableview.lastButton.clicked.connect(self.goToLast)
         self.mda_folder_tableview.backButton.clicked.connect(self.goToPrevious)
         self.mda_folder_tableview.nextButton.clicked.connect(self.goToNext)
+        utils.reconnect(
+            self.mda_folder_tableview.refresh2.released, self.mainWindow.onRefresh
+        )
         if self.selectionModel():
             utils.reconnect(self.selectionModel().currentChanged, self.onFileSelected)
 
