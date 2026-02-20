@@ -3,6 +3,16 @@
 Changes
 =======
 
+Version 1.3.2 (latest)
+----------------------
+
+**Minor Features**
+
+- Move x axis label closer to plot
+- Add refresh button between previous and next buttons
+- Format fit results, basic stats and cursor coordinates with significant figures (sigfigs)
+
+
 Version 1.3.1 (latest)
 ----------------------
 
