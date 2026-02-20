@@ -334,11 +334,11 @@ class ChartView(QWidget):
 
     def setBottomAxisText(self, text):
         """Set the x-axis label on the axes."""
-        self.main_axes.set_xlabel(text, fontsize=FONTSIZE, labelpad=10)
+        self.main_axes.set_xlabel(text, fontsize=FONTSIZE, labelpad=3)
 
     def setLeftAxisText(self, text):
         """Set the y-axis label on the axes."""
-        self.main_axes.set_ylabel(text, fontsize=FONTSIZE, labelpad=10)
+        self.main_axes.set_ylabel(text, fontsize=FONTSIZE, labelpad=5)
 
     def title(self):
         """Return the stored plot title."""
