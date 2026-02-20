@@ -23,6 +23,7 @@ data conversion, and general utility operations.
     ~ts2iso
 """
 
+import math
 import pathlib
 import re
 import threading
@@ -104,15 +105,32 @@ def ts2iso(timestamp: float) -> str:
     return ts2dt(timestamp).isoformat(sep=" ")
 
 
-def num2fstr(x: float, decimal=2) -> str:
+def num2fstr(x: float, decimal=2, sigfigs: int | None = None) -> str:
     """Return a string with the adequate precision and format.
 
     Parameters:
         x (float): Number to format
+        decimal (int): Number of decimal places (used when sigfigs is None).
+        sigfigs (int | None): If set, format with this many significant figures:
+            use scientific notation when |x| < 0.01 or |x| >= 1e4, otherwise
+            fixed-point. If None, use decimal places and existing rules.
 
     Returns:
         str: Formatted string
     """
+    if sigfigs is not None:
+        n = max(1, sigfigs)
+        if x == 0 or (isinstance(x, float) and math.isnan(x)):
+            return "0" if n <= 1 else ("0." + "0" * (n - 1))
+        if isinstance(x, float) and math.isinf(x):
+            return str(x)
+        ax = abs(x)
+        if ax < 0.1 or ax >= 1e4:
+            return f"{x:.{n - 1}e}"
+        exp = int(math.floor(math.log10(ax))) if ax > 0 else 0
+        dec_places = max(0, n - 1 - exp)
+        return f"{x:.{dec_places}f}"
+
     precision = decimal if decimal >= 0 else 2
     return f"{x:.{precision}e}" if abs(x) < 1e-3 else f"{x:.{precision}f}"
 

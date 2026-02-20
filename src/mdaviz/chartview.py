@@ -1129,9 +1129,9 @@ class ChartView(QWidget):
                     stats, ["min_text", "max_text", "com_text", "mean_text"]
                 ):
                     if isinstance(i, tuple):
-                        result = f"({utils.num2fstr(i[0])}, {utils.num2fstr(i[1])})"
+                        result = f"({utils.num2fstr(i[0], sigfigs=4)}, {utils.num2fstr(i[1], sigfigs=4)})"
                     else:
-                        result = f"{utils.num2fstr(i)}" if i else "n/a"
+                        result = f"{utils.num2fstr(i, sigfigs=4)}" if i else "n/a"
                     self.mda_mvc.findChild(QtWidgets.QLabel, txt).setText(result)
 
             except Exception as exc:
@@ -1338,13 +1338,13 @@ class ChartView(QWidget):
         if self.cursors[1]:
             x1, y1 = self.cursors["pos1"]
             self.cursors["text1"] = (
-                f"({utils.num2fstr(x1, 4)}, {utils.num2fstr(y1, 4)})"
+                f"({utils.num2fstr(x1, sigfigs=5)}, {utils.num2fstr(y1, sigfigs=5)})"
             )
         # Check for the second cursor and update text accordingly
         if self.cursors[2]:
             x2, y2 = self.cursors["pos2"]
             self.cursors["text2"] = (
-                f"({utils.num2fstr(x2, 4)}, {utils.num2fstr(y2, 4)})"
+                f"({utils.num2fstr(x2, sigfigs=5)}, {utils.num2fstr(y2, sigfigs=5)})"
             )
         # Calculate differences and midpoints only if both cursors are present
         if self.cursors[1] and self.cursors[2]:
@@ -1353,10 +1353,10 @@ class ChartView(QWidget):
             midpoint_x = (x1 + x2) / 2
             midpoint_y = (y1 + y2) / 2
             self.cursors["diff"] = (
-                f"({utils.num2fstr(delta_x, 4)}, {utils.num2fstr(delta_y, 4)})"
+                f"({utils.num2fstr(delta_x, sigfigs=5)}, {utils.num2fstr(delta_y, sigfigs=5)})"
             )
             self.cursors["midpoint"] = (
-                f"({utils.num2fstr(midpoint_x, 4)}, {utils.num2fstr(midpoint_y, 4)})"
+                f"({utils.num2fstr(midpoint_x, sigfigs=5)}, {utils.num2fstr(midpoint_y, sigfigs=5)})"
             )
         self.updateCursorInfo()
 
@@ -1530,23 +1530,27 @@ class ChartView(QWidget):
         details_text += "Fitting results:\n"
         for param_name, param_value in result.parameters.items():
             uncertainty = result.uncertainties.get(param_name, 0.0)
-            details_text += f"  {param_name}: {utils.num2fstr(param_value, 3)}"
+            details_text += f"  {param_name}: {utils.num2fstr(param_value, sigfigs=5)}"
             if uncertainty > 0:
-                details_text += f" ± {utils.num2fstr(uncertainty, 3)}"
+                details_text += f" ± {utils.num2fstr(uncertainty, sigfigs=5)}"
             details_text += "\n"
             if fit_data.model_name == "Gaussian" and param_name == "sigma":
-                details_text += f"  FWHM: {utils.num2fstr(2.35482 * param_value, 3)}"
-                details_text += f" ± {utils.num2fstr(2.35482 * uncertainty, 3)}\n"
+                details_text += (
+                    f"  FWHM: {utils.num2fstr(2.35482 * param_value, sigfigs=5)}"
+                )
+                details_text += (
+                    f" ± {utils.num2fstr(2.35482 * uncertainty, sigfigs=5)}\n"
+                )
             if fit_data.model_name == "Lorentzian" and param_name == "gamma":
-                details_text += f"  FWHM: {utils.num2fstr(2 * param_value, 3)}"
-                details_text += f" ± {utils.num2fstr(2 * uncertainty, 3)}\n"
+                details_text += f"  FWHM: {utils.num2fstr(2 * param_value, sigfigs=5)}"
+                details_text += f" ± {utils.num2fstr(2 * uncertainty, sigfigs=5)}\n"
 
         # Quality metrics
         details_text += "\nQuality Metrics:\n"
-        details_text += f"  R²: {utils.num2fstr(result.r_squared, 3)}\n"
-        details_text += f"  χ²: {utils.num2fstr(result.chi_squared, 3)}\n"
+        details_text += f"  R²: {utils.num2fstr(result.r_squared, sigfigs=5)}\n"
+        details_text += f"  χ²: {utils.num2fstr(result.chi_squared, sigfigs=5)}\n"
         details_text += (
-            f"  Reduced χ²: {utils.num2fstr(result.reduced_chi_squared, 3)}\n"
+            f"  Reduced χ²: {utils.num2fstr(result.reduced_chi_squared, sigfigs=5)}\n"
         )
 
         fit_details.setText(details_text)
