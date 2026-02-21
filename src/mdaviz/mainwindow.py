@@ -431,8 +431,10 @@ class MainWindow(QMainWindow):
         logger.info("🔄 REFRESH DEBUG: Refreshing folder...")
         current_folder = self.dataPath()
         if current_folder:
-            # Preserve the currently selected file
+            # Preserve the currently selected file (and detector/positioner selection)
             selected_file_name = None
+            if hasattr(self, "_saved_selection_field"):
+                self._saved_selection_field = None
             if (
                 self.mvc_folder
                 and hasattr(self.mvc_folder, "mda_folder_tableview")
@@ -444,6 +446,12 @@ class MainWindow(QMainWindow):
                     if current_index.row() < len(current_file_list):
                         selected_file_name = current_file_list[current_index.row()]
                         self._selected_file_name = selected_file_name
+                        # Preserve detector/positioner selection for restore after refresh
+                        self._saved_selection_field = (
+                            self.mvc_folder.selectionField()
+                            if self.mvc_folder and self.mvc_folder.selectionField()
+                            else None
+                        )
                         self.setStatus(f"Preserving selection: {selected_file_name}")
                     else:
                         self.setStatus("Invalid row index for current selection")
@@ -464,6 +472,12 @@ class MainWindow(QMainWindow):
                         if current_index.row() < len(current_file_list):
                             selected_file_name = current_file_list[current_index.row()]
                             self._selected_file_name = selected_file_name
+                            # Preserve detector/positioner selection for restore after refresh
+                            self._saved_selection_field = (
+                                self.mvc_folder.selectionField()
+                                if self.mvc_folder and self.mvc_folder.selectionField()
+                                else None
+                            )
                             self.setStatus(
                                 f"Preserving selection (alt method): {selected_file_name}"
                             )
@@ -617,6 +631,14 @@ class MainWindow(QMainWindow):
 
                     def restore_selection():
                         try:
+                            # Restore detector/positioner selection before selecting file
+                            if (
+                                getattr(self, "_saved_selection_field", None)
+                                and self.mvc_folder
+                            ):
+                                self.mvc_folder.setSelectionField(
+                                    self._saved_selection_field
+                                )
                             # Find the index of the selected file
                             selected_index = sorted_files.index(
                                 self._selected_file_name
@@ -638,8 +660,10 @@ class MainWindow(QMainWindow):
                                 f"Selected file {self._selected_file_name} not found after refresh"
                             )
                         finally:
-                            # Clear the selected file name
+                            # Clear the selected file name and saved selection
                             self._selected_file_name = None
+                            if hasattr(self, "_saved_selection_field"):
+                                self._saved_selection_field = None
 
                     # Use a short delay to ensure the model is fully updated
                     QTimer.singleShot(100, restore_selection)

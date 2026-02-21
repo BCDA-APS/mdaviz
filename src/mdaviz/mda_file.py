@@ -572,8 +572,8 @@ class MDAFile(QWidget):
         """
         tableview = MDAFileTableView(self)
         tab_index = self.tabWidget.addTab(tableview, file_name)  # addTab(widget, label)
-        self.tabWidget.setCurrentIndex(tab_index)
         tableview.displayTable(selection_field)
+        self.tabWidget.setCurrentIndex(tab_index)
         tableview.filePath.setText(file_path)
         self.tabWidget.setTabToolTip(tab_index, file_path)
         # NOTE: Consider setting tab tool tip for Data & Metadata tabs and updating dynamically when switching file.
