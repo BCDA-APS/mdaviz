@@ -67,14 +67,20 @@ Data Visualization
 4. **Data Processing Options**:
 
    - **I0 Normalization**: Divide Y data by the selected I0 field to normalize intensity.
-   - **Curve Unscaling ("Un" column)**: Rescale selected curves to match the range of other Y curves.
+   - **Curve Unscaling**: Rescale selected curves to match the range of other Y curves.
 
-     - Select both "Y" and "Un" on the same row to unscale that curve
+     - Select the curve to unscale from the curve dropdown
+     - Check the unscale checkbox in the Basic tab
      - The unscaling formula: ``g(x) = ((f(x) - m) / (M - m)) * (Mg - mg) + mg``
 
        - `m, M`: min/max of the curve being unscaled `f(x)`
        - `mg, Mg`: global min/max of other Y curves (excluding unscaled ones)
+   - **Derivative**:
+
+     - Select a curve from the curve dropdown
+     - Check the derivative checkbox in the Basic tab
    - **Factor/Offset**: Open the Basic tab and apply a factor and/or offset to the selected curve (from the curve dropdown)
+
      - ``g(x) = f(x) * factor + offset``
 
 Curve Management
@@ -90,13 +96,13 @@ The following options apply to the *selected curve* in the curve dropdown (top l
 Remove Curve
 ^^^^^^^^^^^^
 
-1. **Select Curve**: Choose the curve to fit from the curve dropdown.
+1. **Select Curve**: Choose the curve to remove from the curve dropdown.
 2. **Remove Curve**: Click the |remove_icon| button.
 
 Curve Style
 ^^^^^^^^^^^
 
-1. **Select Curve**: Choose the curve to fit from the curve dropdown.
+1. **Select Curve**: Choose a curve from the curve dropdown.
 2. **Curve Style**: Choose between lines, markers, or both in the "Style" dropdown.
 
 Cursor Utilities
@@ -104,7 +110,7 @@ Cursor Utilities
 
 Cursors *snap* to the nearest data point of the *selected curve*
 
-1. **Select Curve**: Choose the curve to fit from the curve dropdown.
+1. **Select Curve**: Choose a curve from the curve dropdown.
 2. **Cursor 1**: Middle-click or alt+right-click to set the first cursor position
 3. **Cursor 2**: Right-click to set the second cursor position
 4. **Range Selection**: Use cursors to define fitting ranges
@@ -114,13 +120,13 @@ Cursors *snap* to the nearest data point of the *selected curve*
 Basic Statistics
 ^^^^^^^^^^^^^^^^
 
-1. **Select Curve**: Choose the curve to fit from the curve dropdown.
+1. **Select Curve**: Choose a curve from the curve dropdown.
 2. **Basic Statistics**: View basic statistics of the curve in the "Basic" tab: `min`, `max`, `mean`, `COM`.
 
 Factor / Offset
 ^^^^^^^^^^^^^^^
 
-1. **Select Curve**: Choose the curve to fit from the curve dropdown.
+1. **Select Curve**: Choose a curve to transform from the curve dropdown.
 2. **Data scaling**: Open the Basic tab and apply a factor and/or offset to the selected curve: ``f(x) = f(x) * factor + offset``.
 
 Curve Fitting
@@ -143,12 +149,15 @@ Curve Fitting
 
 1. **Load 2D Data**: Open an MDA file containing multi-dimensional data.
 2. **Choose Visualization Mode**:
+
    - **1D Slices**: Select the 1D tab for line plots
    - **2D Maps**: Select the 2D tab for 2D maps
 3. **For 1D Slices**:
+
    - Select the (inner) positioner and detector(s) to plot
    - Use the spinbox to select the outer positioner value
 4. **For 2D Maps**:
+
    - Use the dropdowns to select the positioner and detector to plot
    - Choose between heatmap or contour plot display
    - Adjust color scale or select log scale as needed
