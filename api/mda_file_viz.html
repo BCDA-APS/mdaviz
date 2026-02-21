@@ -1,0 +1,911 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>MDA File Viz &#8212; mdaviz 1.3</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=8749d347"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/mda_file_viz';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="MDA Folder" href="mda_folder.html" />
+    <link rel="prev" title="MDA File Table View" href="mda_file_table_view.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mdaviz 1.3</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changes.html">
+    Changes
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../license.html">
+    License
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changes.html">
+    Changes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../license.html">
+    License
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="aboutdialog.html">About Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="app.html">Application starting point</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chartview.html">Chartview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_cache.html">Data Cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_table_model.html">Data Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_table_view.html">Data Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="empty_table_model.html">Empty Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_manager.html">Fit Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_models.html">Fit Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lazy_folder_scanner.html">Lazy Folder Scanner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lazy_loading_config.html">Lazy Loading Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licensedialog.html">License Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mainwindow.html">Main Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file.html">MDA File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_table_model.html">MDA File Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_table_view.html">MDA File Table View</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">MDA File Viz</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder.html">MDA Folder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder_table_model.html">MDA Folder Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder_table_view.html">MDA Folder Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opendialog.html">Open Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="popup.html">Popup Dialogs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="progress_dialog.html">Progress Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_settings.html">User Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtual_table_model.html">Virtual Table Model</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">Source Code Documentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">MDA File Viz</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-mdaviz.mda_file_viz">
+<span id="mda-file-viz"></span><h1>MDA File Viz<a class="headerlink" href="#module-mdaviz.mda_file_viz" title="Link to this heading">#</a></h1>
+<p>MDA File Visualization Module</p>
+<dl class="simple">
+<dt>Classes:</dt><dd><p>MDAFileVisualization: Main widget for displaying MDA file contents with tabbed interface
+MetadataSearchDialog: Dialog for searching within metadata text</p>
+</dd>
+<dt>Key Features:</dt><dd><ul class="simple">
+<li><p>Tabbed interface for Data, Plot, Metadata, and 2D visualization</p></li>
+<li><p>Integrated 1D and 2D plotting with ChartView and ChartView2D</p></li>
+<li><p>Interactive controls for curve fitting, styling, and log scales</p></li>
+<li><p>Metadata search functionality</p></li>
+<li><p>Dynamic tab visibility based on data dimensionality</p></li>
+<li><p>Persistent UI state management</p></li>
+</ul>
+</dd>
+<dt>Dependencies:</dt><dd><ul class="simple">
+<li><p>PyQt6: GUI framework</p></li>
+<li><p>mdaviz.chartview: 1D and 2D plotting widgets</p></li>
+<li><p>mdaviz.data_table_view: Data table display</p></li>
+<li><p>mdaviz.fit_models: Curve fitting functionality</p></li>
+<li><p>mdaviz.utils: Utility functions for UI loading</p></li>
+</ul>
+</dd>
+<dt>Usage:</dt><dd><p>The MDAFileVisualization widget is typically instantiated as part of the main
+application window and receives MDA file data through:
+- setTableData(): Sets the data table content from MDA file
+- setMetadata(): Sets the metadata text content
+- setPlot(): Sets the 1D plotting widget (ChartView) with data from user selections
+- set2DData(): Sets 2D data for multi-dimensional arrays
+- update2DPlot(): Updates 2D plots based on user selections in 2D controls</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mdaviz.mda_file_viz.</span></span><span class="sig-name descname"><span class="pre">MDAFileVisualization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization" title="Link to this definition">#</a></dt>
+<dd><p>The panel to show the contents of a file.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization._updateTabWidgetMaxHeight">
+<span class="sig-name descname"><span class="pre">_updateTabWidgetMaxHeight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization._updateTabWidgetMaxHeight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization._updateTabWidgetMaxHeight" title="Link to this definition">#</a></dt>
+<dd><p>Update the tab widget’s maximum height to match the plot height setting.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.clearContents">
+<span class="sig-name descname"><span class="pre">clearContents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.clearContents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.clearContents" title="Link to this definition">#</a></dt>
+<dd><p>Clears content from the specified components of the visualization.</p>
+<p>Parameters:
+- plot (bool, optional): If True, clears the plot content. Defaults to True.
+- data (bool, optional): If True, clears the data table content. Defaults to True.
+- metadata (bool, optional): If True, clears the metadata content. Defaults to True.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.connectToFileTabChanges">
+<span class="sig-name descname"><span class="pre">connectToFileTabChanges</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.connectToFileTabChanges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.connectToFileTabChanges" title="Link to this definition">#</a></dt>
+<dd><p>Connect to file tab changes to update 2D plot when needed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.getCurrentFileTableview">
+<span class="sig-name descname"><span class="pre">getCurrentFileTableview</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.getCurrentFileTableview"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.getCurrentFileTableview" title="Link to this definition">#</a></dt>
+<dd><p>Get the current file table view from the parent.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.getLogScaleState">
+<span class="sig-name descname"><span class="pre">getLogScaleState</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.getLogScaleState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.getLogScaleState" title="Link to this definition">#</a></dt>
+<dd><p>Get the current log scale state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.onClearFitsButtonClicked">
+<span class="sig-name descname"><span class="pre">onClearFitsButtonClicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.onClearFitsButtonClicked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.onClearFitsButtonClicked" title="Link to this definition">#</a></dt>
+<dd><p>Handle clear fits button click.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.onCurveStyleChanged">
+<span class="sig-name descname"><span class="pre">onCurveStyleChanged</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">style_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.onCurveStyleChanged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.onCurveStyleChanged" title="Link to this definition">#</a></dt>
+<dd><p>Handle curve style change.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.onFileTabChanged">
+<span class="sig-name descname"><span class="pre">onFileTabChanged</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tab_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection_field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.onFileTabChanged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.onFileTabChanged" title="Link to this definition">#</a></dt>
+<dd><p>Handle file tab changes and update 2D plot if on 2D tab.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>tab_index (int): Index of the newly selected file tab
+file_path (str): Path of the file associated with the new tab
+file_data (dict): Contains metadata and table data for the file
+selection_field (dict): Specifies the fields (POS/DET) selected for plotting</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.onFitButtonClicked">
+<span class="sig-name descname"><span class="pre">onFitButtonClicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.onFitButtonClicked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.onFitButtonClicked" title="Link to this definition">#</a></dt>
+<dd><p>Handle fit button click.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.onLogScaleChanged">
+<span class="sig-name descname"><span class="pre">onLogScaleChanged</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.onLogScaleChanged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.onLogScaleChanged" title="Link to this definition">#</a></dt>
+<dd><p>Handle log scale checkbox changes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.onTabChanged">
+<span class="sig-name descname"><span class="pre">onTabChanged</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.onTabChanged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.onTabChanged" title="Link to this definition">#</a></dt>
+<dd><p>Handle tab changes.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>index (int): Index of the newly selected tab</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.set2DData">
+<span class="sig-name descname"><span class="pre">set2DData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.set2DData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.set2DData" title="Link to this definition">#</a></dt>
+<dd><p>Set 2D data for visualization and manage 2D tab visibility.</p>
+<p>If data is multidimensional, shows the 2D tab and stores the data; otherwise hides the
+2D tab and clears stored data.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>data (dict or None): 2D data dictionary with scanDict2D and metadata, or None to clear</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.setLogScaleState">
+<span class="sig-name descname"><span class="pre">setLogScaleState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.setLogScaleState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.setLogScaleState" title="Link to this definition">#</a></dt>
+<dd><p>Set the log scale state and update checkboxes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.setMetadata">
+<span class="sig-name descname"><span class="pre">setMetadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.setMetadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.setMetadata" title="Link to this definition">#</a></dt>
+<dd><p>Set text content for the metadata display.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>text (str): Text content to display</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.setPlot">
+<span class="sig-name descname"><span class="pre">setPlot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot_widget</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.setPlot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.setPlot" title="Link to this definition">#</a></dt>
+<dd><p>Set the plot widget for the visualization tab.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>plot_widget: The plot widget to add to the layout</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.setStatus">
+<span class="sig-name descname"><span class="pre">setStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.setStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.setStatus" title="Link to this definition">#</a></dt>
+<dd><p>Set the status bar text.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>text (str): Status message to display</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.setTableData">
+<span class="sig-name descname"><span class="pre">setTableData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.setTableData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.setTableData" title="Link to this definition">#</a></dt>
+<dd><p>Set data for the data table view.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>data: Data to display in the table</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.setup" title="Link to this definition">#</a></dt>
+<dd><p>Setup the UI components and connections.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.setup2DFunctionality">
+<span class="sig-name descname"><span class="pre">setup2DFunctionality</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.setup2DFunctionality"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.setup2DFunctionality" title="Link to this definition">#</a></dt>
+<dd><p>Setup 2D plotting functionality.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.setupCurveStyleUI">
+<span class="sig-name descname"><span class="pre">setupCurveStyleUI</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.setupCurveStyleUI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.setupCurveStyleUI" title="Link to this definition">#</a></dt>
+<dd><p>Setup the curve style UI components and connections.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.setupFitUI">
+<span class="sig-name descname"><span class="pre">setupFitUI</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.setupFitUI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.setupFitUI" title="Link to this definition">#</a></dt>
+<dd><p>Setup the fit UI components and connections.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.setupLogScaleUI">
+<span class="sig-name descname"><span class="pre">setupLogScaleUI</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.setupLogScaleUI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.setupLogScaleUI" title="Link to this definition">#</a></dt>
+<dd><p>Setup the log scale UI components and connections.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.setupSearchFunctionality">
+<span class="sig-name descname"><span class="pre">setupSearchFunctionality</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.setupSearchFunctionality"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.setupSearchFunctionality" title="Link to this definition">#</a></dt>
+<dd><p>Setup search functionality for the metadata widget.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.showAnalysisControls">
+<span class="sig-name descname"><span class="pre">showAnalysisControls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.showAnalysisControls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.showAnalysisControls" title="Link to this definition">#</a></dt>
+<dd><p>Show or hide 1D-specific controls by hiding/showing the entire curves widget.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.showModeControls">
+<span class="sig-name descname"><span class="pre">showModeControls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.showModeControls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.showModeControls" title="Link to this definition">#</a></dt>
+<dd><p>Show or hide mode controls (autoBox, clearButton, etc.).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.showSearchDialog">
+<span class="sig-name descname"><span class="pre">showSearchDialog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.showSearchDialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.showSearchDialog" title="Link to this definition">#</a></dt>
+<dd><p>Show the search dialog for the metadata widget.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.syncLogScaleCheckboxes">
+<span class="sig-name descname"><span class="pre">syncLogScaleCheckboxes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.syncLogScaleCheckboxes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.syncLogScaleCheckboxes" title="Link to this definition">#</a></dt>
+<dd><p>Sync checkbox states with the stored log scale state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.update2DPlot">
+<span class="sig-name descname"><span class="pre">update2DPlot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.update2DPlot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.update2DPlot" title="Link to this definition">#</a></dt>
+<dd><p>Update the 2D plot with current data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.update2DTabVisibility">
+<span class="sig-name descname"><span class="pre">update2DTabVisibility</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show_2d_tab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.update2DTabVisibility"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.update2DTabVisibility" title="Link to this definition">#</a></dt>
+<dd><p>Update 2D tab visibility based on data dimensions.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>show_2d_tab (bool): Whether to show the 2D tab</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.updateControlVisibility">
+<span class="sig-name descname"><span class="pre">updateControlVisibility</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tab_index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.updateControlVisibility"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.updateControlVisibility" title="Link to this definition">#</a></dt>
+<dd><p>Update control visibility based on the selected tab (1D vs 2D).</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>tab_index (int): Index of the selected tab</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MDAFileVisualization.updatePlotControls">
+<span class="sig-name descname"><span class="pre">updatePlotControls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">curve_selected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MDAFileVisualization.updatePlotControls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MDAFileVisualization.updatePlotControls" title="Link to this definition">#</a></dt>
+<dd><p>Update plot control states based on curve selection.</p>
+<p>Parameters:
+- curve_selected: Whether a curve is currently selected</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MetadataSearchDialog">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mdaviz.mda_file_viz.</span></span><span class="sig-name descname"><span class="pre">MetadataSearchDialog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MetadataSearchDialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MetadataSearchDialog" title="Link to this definition">#</a></dt>
+<dd><p>A simple search dialog for the metadata widget.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MetadataSearchDialog.findNext">
+<span class="sig-name descname"><span class="pre">findNext</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MetadataSearchDialog.findNext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MetadataSearchDialog.findNext" title="Link to this definition">#</a></dt>
+<dd><p>Find next occurrence of the search text.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MetadataSearchDialog.findPrevious">
+<span class="sig-name descname"><span class="pre">findPrevious</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MetadataSearchDialog.findPrevious"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MetadataSearchDialog.findPrevious" title="Link to this definition">#</a></dt>
+<dd><p>Find previous occurrence of the search text.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MetadataSearchDialog.findText">
+<span class="sig-name descname"><span class="pre">findText</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MetadataSearchDialog.findText"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MetadataSearchDialog.findText" title="Link to this definition">#</a></dt>
+<dd><p>Find text as user types.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MetadataSearchDialog.keyPressEvent">
+<span class="sig-name descname"><span class="pre">keyPressEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MetadataSearchDialog.keyPressEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MetadataSearchDialog.keyPressEvent" title="Link to this definition">#</a></dt>
+<dd><p>Handle key press events.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_viz.MetadataSearchDialog.setupUI">
+<span class="sig-name descname"><span class="pre">setupUI</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_viz.html#MetadataSearchDialog.setupUI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_viz.MetadataSearchDialog.setupUI" title="Link to this definition">#</a></dt>
+<dd><p>Setup the search dialog UI.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="mda_file_table_view.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">MDA File Table View</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="mda_folder.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">MDA Folder</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization._updateTabWidgetMaxHeight"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization._updateTabWidgetMaxHeight()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.clearContents"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.clearContents()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.connectToFileTabChanges"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.connectToFileTabChanges()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.getCurrentFileTableview"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.getCurrentFileTableview()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.getLogScaleState"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.getLogScaleState()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.onClearFitsButtonClicked"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.onClearFitsButtonClicked()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.onCurveStyleChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.onCurveStyleChanged()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.onFileTabChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.onFileTabChanged()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.onFitButtonClicked"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.onFitButtonClicked()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.onLogScaleChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.onLogScaleChanged()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.onTabChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.onTabChanged()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.set2DData"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.set2DData()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.setLogScaleState"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setLogScaleState()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.setMetadata"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setMetadata()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.setPlot"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setPlot()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.setStatus"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setStatus()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.setTableData"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setTableData()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.setup"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setup()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.setup2DFunctionality"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setup2DFunctionality()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.setupCurveStyleUI"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setupCurveStyleUI()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.setupFitUI"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setupFitUI()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.setupLogScaleUI"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setupLogScaleUI()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.setupSearchFunctionality"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setupSearchFunctionality()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.showAnalysisControls"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.showAnalysisControls()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.showModeControls"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.showModeControls()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.showSearchDialog"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.showSearchDialog()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.syncLogScaleCheckboxes"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.syncLogScaleCheckboxes()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.update2DPlot"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.update2DPlot()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.update2DTabVisibility"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.update2DTabVisibility()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.updateControlVisibility"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.updateControlVisibility()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MDAFileVisualization.updatePlotControls"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.updatePlotControls()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MetadataSearchDialog"><code class="docutils literal notranslate"><span class="pre">MetadataSearchDialog</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MetadataSearchDialog.findNext"><code class="docutils literal notranslate"><span class="pre">MetadataSearchDialog.findNext()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MetadataSearchDialog.findPrevious"><code class="docutils literal notranslate"><span class="pre">MetadataSearchDialog.findPrevious()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MetadataSearchDialog.findText"><code class="docutils literal notranslate"><span class="pre">MetadataSearchDialog.findText()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MetadataSearchDialog.keyPressEvent"><code class="docutils literal notranslate"><span class="pre">MetadataSearchDialog.keyPressEvent()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_viz.MetadataSearchDialog.setupUI"><code class="docutils literal notranslate"><span class="pre">MetadataSearchDialog.setupUI()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/mda_file_viz.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

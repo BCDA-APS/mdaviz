@@ -1,0 +1,1555 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mdaviz.mda_folder &#8212; mdaviz 1.3</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=8749d347"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/mdaviz/mda_folder';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mdaviz 1.3</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Changes
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Changes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">mdaviz.mda_folder</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for mdaviz.mda_folder</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">MVC implementation of mda files.</span>
+
+<span class="sd">* MVC: Model View Controller</span>
+
+<span class="sd">.. Summary::</span>
+
+<span class="sd">    ~MDA_MVC</span>
+
+<span class="sd">        General initialization and setup methods:</span>
+<span class="sd">        - __init__: Initializes the MDA_MVC instance, linking it with the main application window.</span>
+<span class="sd">        - setup: Sets up folder and file table views, data visualization components, and establishes</span>
+<span class="sd">        signal-slot connections.</span>
+
+<span class="sd">        Data Access and Management:</span>
+<span class="sd">        - dataPath: Provides the path to the folder containing MDA files.</span>
+<span class="sd">        - mdaFileList: Fetches names of MDA files in the selected folder.</span>
+
+<span class="sd">        User interaction handling methods:</span>
+<span class="sd">        - refresh2 button: Connected to MainWindow.onRefresh to refresh the folder and file list.</span>
+<span class="sd">        - onFileSelected: Handles user selection of MDA files, updating UI and initiating data plotting.</span>
+<span class="sd">        - doPlot: Initiates data plotting based on user selections and current plot mode. It checks for the</span>
+<span class="sd">        selected positioner and detectors, retrieves the corresponding data, and plots it in the visualization panel.</span>
+<span class="sd">        - onCheckboxStateChanged: Responds to user changes in checkbox states within the MDA file table,</span>
+<span class="sd">        triggering a re-plot of selected data.</span>
+<span class="sd">        - handlePlotBasedOnMode: Determines plot updates based on the user-selected mode, e.g. Auto-add or Auto-replace.</span>
+
+
+<span class="sd">        Navigation and UI state management:</span>
+<span class="sd">        - goToFirst, goToLast, goToNext, goToPrevious: Methods for navigating through the list of MDA files.</span>
+<span class="sd">        - selectAndShowIndex: Selects and highlights a file in the folder view based on index.</span>
+<span class="sd">        - selectionModel, setSelectionModel: Get and set methods for the current selection model, managing</span>
+<span class="sd">        item selections within the view.</span>
+<span class="sd">        - setCurrentFileTableview, currentFileTableview: Manages the table view for the currently active file.</span>
+
+<span class="sd">        Selection Configuration:</span>
+<span class="sd">        - updateDetectorSelection: Maps user-selected detectors across file changes to ensure consistency</span>
+<span class="sd">        despite changes in detector ordering or availability</span>
+<span class="sd">        - updateSelectionForNewPVs: Updates to both detector and positioner selections for a new file.</span>
+<span class="sd">        - applySelectionChanges: Updates the UI with new selections after a file change.</span>
+<span class="sd">        - setSelectionField, selectionField: Sets and retrieves field selections for plotting.</span>
+
+<span class="sd">        Splitter position management:</span>
+<span class="sd">        - setSplitterSettingsName, setSplitterMoved, setSplitterWaitChanges: Methods for managing user-adjusted</span>
+<span class="sd">        splitter positions and saving these settings for future sessions.</span>
+
+<span class="sd">    Flow Chart:</span>
+
+<span class="sd">        Refresh Button Press (refresh2)</span>
+<span class="sd">        |___&gt; MainWindow.onRefresh</span>
+<span class="sd">            |___&gt; re-scan folder, invalidate cache, mda_folder_tableview.displayTable()</span>
+
+<span class="sd">        File Selection (Double Click or Navigation Button)</span>
+<span class="sd">        |___&gt; onFileSelected</span>
+<span class="sd">            |___&gt; Update UI (Tabs, Metadata, Data Display)</span>
+<span class="sd">            |___&gt; doPlot (Based on current mode and selections)</span>
+<span class="sd">                |___&gt; Retrieve and plot data based on selected positioner and detectors</span>
+
+<span class="sd">        Checkbox State Change in File View</span>
+<span class="sd">        |___&gt; onCheckboxStateChanged</span>
+<span class="sd">            |___&gt; doPlot (Replot based on new selections)</span>
+<span class="sd">                |___&gt; Retrieve and plot data based on selected positioner and detectors</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtCore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">QItemSelectionModel</span><span class="p">,</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">pyqtSignal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6.QtWidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">QAbstractItemView</span><span class="p">,</span> <span class="n">QWidget</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+
+<span class="c1"># Get logger for this module</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;mda_folder&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="MDA_MVC">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MDA_MVC</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Model View Controller class for mda files.&quot;&quot;&quot;</span>
+
+    <span class="c1"># DESIGN NOTE: Should this signal be emitted here or in MDA_FILE_TM? Review if refactoring signal emission logic.</span>
+    <span class="n">detRemoved</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span>
+    <span class="p">)</span>  <span class="c1"># Emit the file path and row when a DET checkbox is unchecked</span>
+
+    <span class="n">ui_file</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">getUiFileName</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+    <span class="n">motion_wait_time</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the model and connect with its parent.</span>
+
+<span class="sd">        PARAMETERS</span>
+
+<span class="sd">        parent object:</span>
+<span class="sd">            Instance of mdaviz.mainwindow.MainWindow</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">myLoadUi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ui_file</span><span class="p">,</span> <span class="n">baseinstance</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.user_settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.mda_folder_table_view</span><span class="w"> </span><span class="kn">import</span> <span class="n">MDAFolderTableView</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.mda_file_viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">MDAFileVisualization</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.mda_file</span><span class="w"> </span><span class="kn">import</span> <span class="n">MDAFile</span>
+
+        <span class="c1"># Folders table view:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span> <span class="o">=</span> <span class="n">MDAFolderTableView</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder_groupbox</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">displayTable</span><span class="p">()</span>
+
+        <span class="c1"># File table view:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span> <span class="o">=</span> <span class="n">MDAFile</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_groupbox</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="p">)</span>
+
+        <span class="c1"># Data vizualisation:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_file_viz</span> <span class="o">=</span> <span class="n">MDAFileVisualization</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz_groupbox</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mda_file_viz</span><span class="p">)</span>
+
+        <span class="c1"># Initialize attributes:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSelectionField</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSelectionModel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setCurrentFileTableview</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_plotted_file_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_selection</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Set Selection Model &amp; Focus for keyboard arrow keys to Folder Table View:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mdaFileList</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">setFocus</span><span class="p">()</span>
+            <span class="n">selection_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setSelectionModel</span><span class="p">(</span><span class="n">selection_model</span><span class="p">)</span>
+        <span class="c1"># Ensure focus policy and selection mode for keyboard navigation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">setFocusPolicy</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">FocusPolicy</span><span class="o">.</span><span class="n">StrongFocus</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">setSelectionMode</span><span class="p">(</span>
+            <span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">SelectionMode</span><span class="o">.</span><span class="n">SingleSelection</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">setSelectionBehavior</span><span class="p">(</span>
+            <span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">SelectionBehavior</span><span class="o">.</span><span class="n">SelectRows</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Folder table view signal/slot connections:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">doubleClicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onFileSelected</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onFileSelected</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">firstButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">goToFirst</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">lastButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">goToLast</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">backButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">goToPrevious</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">nextButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">goToNext</span><span class="p">)</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">reconnect</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">refresh2</span><span class="o">.</span><span class="n">released</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">onRefresh</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">():</span>
+            <span class="n">utils</span><span class="o">.</span><span class="n">reconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">()</span><span class="o">.</span><span class="n">currentChanged</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onFileSelected</span><span class="p">)</span>
+
+        <span class="c1"># MDAFile Tab connection:</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">reconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">tabChanged</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onTabChanged</span><span class="p">)</span>
+
+        <span class="c1"># MDAFile Push buttons connection:</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">reconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">buttonPushed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">doPlot</span><span class="p">)</span>
+
+        <span class="c1"># MDAFile X2 value changes connection:</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">reconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">x2ValueChanged</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">doPlot</span><span class="p">)</span>
+
+        <span class="c1"># Debug signals:</span>
+        <span class="c1"># self.mda_folder_tableview.tableView.doubleClicked.connect(utils.debug_signal)</span>
+        <span class="c1"># self.mda_folder_tableview.firstButton.clicked.connect(utils.debug_signal)</span>
+        <span class="c1"># self.mda_folder_tableview.lastButton.clicked.connect(utils.debug_signal)</span>
+        <span class="c1"># self.mda_folder_tableview.backButton.clicked.connect(utils.debug_signal)</span>
+        <span class="c1"># self.mda_folder_tableview.nextButton.clicked.connect(utils.debug_signal)</span>
+
+        <span class="c1"># save/restore splitter sizes in application settings</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="s2">&quot;hsplitter vsplitter&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+            <span class="n">splitter</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="n">sname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter_settings_name</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">restoreSplitter</span><span class="p">(</span><span class="n">splitter</span><span class="p">,</span> <span class="n">sname</span><span class="p">)</span>
+            <span class="n">splitter</span><span class="o">.</span><span class="n">splitterMoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter_moved</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+
+    <span class="c1"># # ------------ set &amp; get methods:</span>
+
+<div class="viewcode-block" id="MDA_MVC.dataPath">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.dataPath">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dataPath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the path of the currently selected data folder.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The path to the data folder as determined by the folder +</span>
+<span class="sd">            subfolder comboBoxes in the mainWindow.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">dataPath</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.mdaFileList">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.mdaFileList">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mdaFileList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fetches a list of MDA file names from the currently selected folder.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: A list of strings representing the names of MDA files in the selected folder.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">mdaFileList</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.mdaInfoList">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.mdaInfoList">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mdaInfoList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fetches a list of MDA file info from the currently selected folder.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: A list of dictionary containing the high level info for the MDA files in the selected folder.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">mdaInfoList</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.currentFileTableview">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.currentFileTableview">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">currentFileTableview</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the current file TableView being displayed in the active tab.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            QTableView: The TableView widget associated with the currently selected MDA file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_currentFileTableview</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.setCurrentFileTableview">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.setCurrentFileTableview">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setCurrentFileTableview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tableview</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the current file TableView to be displayed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tableview (QTableView, optional): The TableView widget to be set as</span>
+<span class="sd">            the current file TableView. Defaults to None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_currentFileTableview</span> <span class="o">=</span> <span class="n">tableview</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.selectionModel">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.selectionModel">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">selectionModel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accesses the selection model of the view (e.g. MDAFolderTableView)</span>
+<span class="sd">        managing the selection state.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            QItemSelectionModel: The selection model associated with a view,</span>
+<span class="sd">            managing which rows/items are selected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection_model</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.setSelectionModel">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.setSelectionModel">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setSelectionModel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the selection model for managing view selections.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            selection (QItemSelectionModel, optional): The selection model to be</span>
+<span class="sd">            associated with the view. Defaults to None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_selection_model</span> <span class="o">=</span> <span class="n">selection</span></div>
+
+
+    <span class="c1"># # ------------ Folder table view methods:</span>
+
+<div class="viewcode-block" id="MDA_MVC.updateFolderView">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.updateFolderView">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updateFolderView</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear existing data and set new data for the folder tableview&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">clearContents</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">displayTable</span><span class="p">()</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mdaFileList</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">setFocus</span><span class="p">()</span>
+            <span class="n">selection_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setSelectionModel</span><span class="p">(</span><span class="n">selection_model</span><span class="p">)</span>
+            <span class="n">utils</span><span class="o">.</span><span class="n">reconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">()</span><span class="o">.</span><span class="n">currentChanged</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onFileSelected</span><span class="p">)</span></div>
+
+
+    <span class="c1"># # ------------ Fields selection methods:</span>
+
+<div class="viewcode-block" id="MDA_MVC.selectionField">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.selectionField">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">selectionField</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the current field selection for plotting.</span>
+<span class="sd">        - Returns a dictionary with selected positioner, detectors, and I0 indices.</span>
+<span class="sd">        - Format: {&#39;X&#39;: positioner_index, &#39;Y&#39;: [detector_indices], &#39;I0&#39;: i0_index}.</span>
+<span class="sd">        - Returns None if no selection is made.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection_field</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.setSelectionField">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.setSelectionField">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setSelectionField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_selection</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the current field selection for plotting.</span>
+<span class="sd">        - Accepts a dictionary specifying new selection of positioner, detectors, and I0.</span>
+<span class="sd">        - Resets to None if given an empty dictionary.</span>
+<span class="sd">        - Format for new_selection: {&#39;X&#39;: positioner_index, &#39;Y&#39;: [detector_indices], &#39;I0&#39;: i0_index}.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_selection_field</span> <span class="o">=</span> <span class="n">new_selection</span> <span class="k">if</span> <span class="n">new_selection</span> <span class="o">!=</span> <span class="p">{}</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.applySelectionChanges">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.applySelectionChanges">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">applySelectionChanges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_selection</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies changes to the field selection and updates checkboxes accordingly:</span>
+<span class="sd">        - Updates the selection field with the new selection.</span>
+<span class="sd">        - Updates checkboxes in the current file&#39;s table view based on the new selection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tableview</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentFileTableview</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSelectionField</span><span class="p">(</span><span class="n">new_selection</span><span class="p">)</span>
+        <span class="n">tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span><span class="o">.</span><span class="n">updateCheckboxes</span><span class="p">(</span>
+            <span class="n">utils</span><span class="o">.</span><span class="n">mda2ftm</span><span class="p">(</span><span class="n">new_selection</span><span class="p">),</span> <span class="n">update_mda_mvc</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.updateSelectionForNewPVs">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.updateSelectionForNewPVs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updateSelectionForNewPVs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">old_selection</span><span class="p">,</span> <span class="n">oldPvList</span><span class="p">,</span> <span class="n">newPvList</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates field selection based on new PV list when a new file is selected.</span>
+<span class="sd">        - Adjusts selection indices for POS, DET, and I0 to match new PVs indexes.</span>
+<span class="sd">        - Directly updates the selection field if changes are made.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            old_selection (dict): selection fields for the previously selected file.</span>
+<span class="sd">            oldPvList (list): PVs in the previously selected file.</span>
+<span class="sd">            newPvList (list): Matching PVs in the newly selected file.</span>
+<span class="sd">            verbose (bool): If True, print detailed changes.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None: Updates the selection field directly if changes are made.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">old_selection</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;No previous selection.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">----- Selection before clean up: </span><span class="si">{</span><span class="n">old_selection</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">changes_made</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">tableview</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentFileTableview</span><span class="p">()</span>
+        <span class="n">new_selection</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+        <span class="c1"># Update Y selections:</span>
+        <span class="n">changes_made</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">updateDetectorSelection</span><span class="p">(</span>
+            <span class="n">oldPvList</span><span class="p">,</span> <span class="n">old_selection</span><span class="p">,</span> <span class="n">newPvList</span><span class="p">,</span> <span class="n">new_selection</span><span class="p">,</span> <span class="n">verbose</span>
+        <span class="p">)</span>  <span class="c1"># if either left operand or right operand is True, result will be True</span>
+        <span class="c1"># Update I0 selection</span>
+        <span class="n">changes_made</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">updateI0Selection</span><span class="p">(</span>
+            <span class="n">oldPvList</span><span class="p">,</span> <span class="n">old_selection</span><span class="p">,</span> <span class="n">newPvList</span><span class="p">,</span> <span class="n">new_selection</span><span class="p">,</span> <span class="n">verbose</span>
+        <span class="p">)</span>
+        <span class="c1"># Update X selection and check for changes: if X was 0 or None, set to 0; if not, set to 1st POS</span>
+        <span class="n">old_idx</span> <span class="o">=</span> <span class="n">old_selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">old_idx</span><span class="p">:</span>
+            <span class="n">new_idx</span> <span class="o">=</span> <span class="n">tableview</span><span class="o">.</span><span class="n">data</span><span class="p">()[</span><span class="s2">&quot;fileInfo&quot;</span><span class="p">][</span><span class="s2">&quot;firstPos&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">old_idx</span> <span class="o">!=</span> <span class="n">new_idx</span><span class="p">:</span>
+            <span class="n">changes_made</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">new_selection</span><span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_idx</span>
+
+        <span class="k">if</span> <span class="n">changes_made</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">applySelectionChanges</span><span class="p">(</span><span class="n">new_selection</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;----- Selection After clean up: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">selectionField</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.updateDetectorSelection">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.updateDetectorSelection">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updateDetectorSelection</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">oldPvList</span><span class="p">,</span> <span class="n">old_selection</span><span class="p">,</span> <span class="n">newPvList</span><span class="p">,</span> <span class="n">new_selection</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function to update detector selections in the new selection field.</span>
+<span class="sd">        - Iterates through old detector selections and updates based on new PVs.</span>
+<span class="sd">        - Adds updated detector indices to new_selection[&#39;Y&#39;].</span>
+<span class="sd">        - Returns True if changes were made, otherwise False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">changes_made</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">old_index</span> <span class="ow">in</span> <span class="n">old_selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">if</span> <span class="n">oldPvList</span> <span class="ow">and</span> <span class="n">old_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">oldPvList</span><span class="p">):</span>
+                <span class="n">old_pv</span> <span class="o">=</span> <span class="n">oldPvList</span><span class="p">[</span><span class="n">old_index</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">old_pv</span> <span class="ow">in</span> <span class="n">newPvList</span><span class="p">:</span>
+                    <span class="n">new_index</span> <span class="o">=</span> <span class="n">newPvList</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">old_pv</span><span class="p">)</span>
+                    <span class="n">new_selection</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_index</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">new_index</span> <span class="o">!=</span> <span class="n">old_index</span><span class="p">:</span>
+                        <span class="n">changes_made</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;DET &lt;</span><span class="si">{</span><span class="n">old_pv</span><span class="si">}</span><span class="s2">&gt; changed from </span><span class="si">{</span><span class="n">old_index</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">new_index</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">changes_made</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DET &lt;</span><span class="si">{</span><span class="n">old_pv</span><span class="si">}</span><span class="s2">&gt; was removed&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Handle out-of-bounds index</span>
+                <span class="n">changes_made</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;DET index </span><span class="si">{</span><span class="n">old_index</span><span class="si">}</span><span class="s2"> out of range (oldPvList length: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">oldPvList</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+                    <span class="p">)</span>
+        <span class="k">return</span> <span class="n">changes_made</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.updateI0Selection">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.updateI0Selection">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updateI0Selection</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">oldPvList</span><span class="p">,</span> <span class="n">old_selection</span><span class="p">,</span> <span class="n">newPvList</span><span class="p">,</span> <span class="n">new_selection</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function to update the I0 selection in the new selection field.</span>
+<span class="sd">        Returns True if changes were made, otherwise False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">changes_made</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># Update I0 selection and check for changes</span>
+        <span class="n">old_i0_idx</span> <span class="o">=</span> <span class="n">old_selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;I0&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">old_i0_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">oldPvList</span> <span class="ow">and</span> <span class="n">old_i0_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">oldPvList</span><span class="p">):</span>
+                <span class="n">old_i0_pv</span> <span class="o">=</span> <span class="n">oldPvList</span><span class="p">[</span><span class="n">old_i0_idx</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">old_i0_pv</span> <span class="ow">in</span> <span class="n">newPvList</span><span class="p">:</span>
+                    <span class="n">new_i0_idx</span> <span class="o">=</span> <span class="n">newPvList</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">old_i0_pv</span><span class="p">)</span>
+                    <span class="n">new_selection</span><span class="p">[</span><span class="s2">&quot;I0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_i0_idx</span>
+                    <span class="k">if</span> <span class="n">new_i0_idx</span> <span class="o">!=</span> <span class="n">old_i0_idx</span><span class="p">:</span>
+                        <span class="n">changes_made</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;I0 &lt;</span><span class="si">{</span><span class="n">old_i0_pv</span><span class="si">}</span><span class="s2">&gt; changed from </span><span class="si">{</span><span class="n">old_i0_idx</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">new_i0_idx</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">changes_made</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="c1"># I0 PV doesn&#39;t exist in new file, so uncheck the I0 checkbox</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">uncheckI0</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;I0 &lt;</span><span class="si">{</span><span class="n">old_i0_pv</span><span class="si">}</span><span class="s2">&gt; was removed - auto-unchecking I0&quot;</span>
+                        <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">changes_made</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="c1"># I0 index was invalid, so uncheck the I0 checkbox</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">uncheckI0</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;I0 index </span><span class="si">{</span><span class="n">old_i0_idx</span><span class="si">}</span><span class="s2"> out of range - auto-unchecking I0&quot;</span>
+                    <span class="p">)</span>
+        <span class="k">return</span> <span class="n">changes_made</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.uncheckI0">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.uncheckI0">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">uncheckI0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finds and unchecks the I0 checkbox in the current file&#39;s table view.</span>
+<span class="sd">        Only unchecks if I0 is currently selected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tableview</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentFileTableview</span><span class="p">()</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+        <span class="n">plot_fields</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">plotFields</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;I0&quot;</span> <span class="ow">in</span> <span class="n">plot_fields</span><span class="p">:</span>
+            <span class="n">i0_row</span> <span class="o">=</span> <span class="n">plot_fields</span><span class="p">[</span><span class="s2">&quot;I0&quot;</span><span class="p">]</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">uncheckCheckBox</span><span class="p">(</span><span class="n">i0_row</span><span class="p">)</span></div>
+
+
+    <span class="c1"># # ------------ File selection methods:</span>
+
+<div class="viewcode-block" id="MDA_MVC.onFileSelected">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.onFileSelected">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onFileSelected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - Handles the selection of a new file in the folder table view.</span>
+<span class="sd">        - Updates the UI to:</span>
+<span class="sd">            - Add a tab with the selected file content in a table view.</span>
+<span class="sd">            - Display the data for the selected file.</span>
+<span class="sd">            - Display the metadata for the selected file.</span>
+<span class="sd">        - Manages connections for:</span>
+<span class="sd">            - Selection changes in the folder table view.</span>
+<span class="sd">            - Checkbox state changes in the file&#39;s data view.</span>
+<span class="sd">        - Initiates plotting based on the current mode, which can be:</span>
+<span class="sd">            - Auto-add: Automatically adds new data to the existing plot.</span>
+<span class="sd">            - Auto-replace: Automatically replaces the existing plot with new data.</span>
+<span class="sd">            - Auto-off: Does not automatically plot new data; requires manual action to plot.</span>
+
+<span class="sd">        This method ensures the selection of positioners and detectors reflects the PVs available</span>
+<span class="sd">        in the newly selected file, accounting for  index changes from the previously selected file.</span>
+<span class="sd">            - addFileTab -&gt; tabWidget.setCurrentIndex updates -&gt; onTabChanged triggered</span>
+<span class="sd">                         -&gt; setCurrentFileTableview()</span>
+<span class="sd">                         -&gt; updateSelectionField() (if selectionField was None only)</span>
+<span class="sd">                         -&gt; mda_file.setData()</span>
+<span class="sd">                         -&gt; mda_file.displayMetadata(metadata)</span>
+<span class="sd">                         -&gt; mda_file.displayData(tabledata)</span>
+<span class="sd">        Args:</span>
+<span class="sd">            index (QModelIndex): The model index of the selected file in the file list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">selected_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdaFileList</span><span class="p">()[</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()]</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataPath</span><span class="p">())</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">selected_file</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Loading </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Ensures the table view scrolls to the selected item.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">QModelIndex</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">scrollTo</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+        <span class="c1"># If there is no Folder Table View, do nothing</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># If no tabs are open, oldPvList should be None:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">old_pv_list</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># otherwise, store the previous selection and PV list:</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">old_tab_tableview</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentFileTableview</span><span class="p">()</span>
+            <span class="n">old_pv_list</span> <span class="o">=</span> <span class="n">old_tab_tableview</span><span class="o">.</span><span class="n">data</span><span class="p">()[</span><span class="s2">&quot;fileInfo&quot;</span><span class="p">][</span><span class="s2">&quot;pvList&quot;</span><span class="p">]</span>
+            <span class="n">old_selection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectionField</span><span class="p">()</span>
+
+        <span class="c1"># Add (or replace) a tab &amp; update selectionField() to default if it was None:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">addFileTab</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectionField</span><span class="p">())</span>
+        <span class="n">new_pv_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">data</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pvList&quot;</span><span class="p">)</span>
+        <span class="n">new_tab_tableview</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentFileTableview</span><span class="p">()</span>
+        <span class="c1"># Manage signal connections for the new file selection.</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">reconnect</span><span class="p">(</span>
+            <span class="n">new_tab_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span><span class="o">.</span><span class="n">checkboxStateChanged</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">onCheckboxStateChanged</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># selectionField() may have changed when calling addFileTab</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectionField</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">old_pv_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">updateSelectionForNewPVs</span><span class="p">(</span>
+                        <span class="n">old_selection</span><span class="p">,</span> <span class="n">old_pv_list</span><span class="p">,</span> <span class="n">new_pv_list</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
+                    <span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">handlePlotBasedOnMode</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s2">&quot;Could not find a (positioner,detector) pair to plot.&quot;</span><span class="p">)</span></div>
+
+
+    <span class="c1"># # ------------ Plot methods:</span>
+
+<div class="viewcode-block" id="MDA_MVC.handlePlotBasedOnMode">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.handlePlotBasedOnMode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handlePlotBasedOnMode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle plotting based on the current mode (add, replace, or auto-off).&quot;&quot;&quot;</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">mode</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;Auto-add&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">doPlot</span><span class="p">(</span><span class="s2">&quot;add&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;Auto-replace&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">doPlot</span><span class="p">(</span><span class="s2">&quot;replace&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s2">&quot;Mode is set to Auto-off&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.doPlot">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.doPlot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">doPlot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initiates plotting based on the currently selected file &amp; selection field, and the specified action</span>
+<span class="sd">        (&#39;add&#39;, &#39;replace&#39;, or &#39;clear&#39;).</span>
+<span class="sd">        - Retrieves and plots datasets based on the selection for actions &#39;add&#39; or &#39;replace&#39;.</span>
+<span class="sd">        - Uses a ChartView widget for plotting within a specified layout.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        - args[0] (str or int): The plotting action to be taken (&#39;add&#39;, &#39;replace&#39;, or &#39;clear&#39;),</span>
+<span class="sd">          or an integer representing the X2 value change.</span>
+<span class="sd">        - kwargs (dict): Additional options for plotting, if any.</span>
+
+<span class="sd">        Behavior:</span>
+<span class="sd">        - &#39;clear&#39;: Removes all tabs and clears the visualization.</span>
+<span class="sd">        - &#39;add&#39;/&#39;replace&#39;: Plots new data according to the current selection, adding to existing plots or replacing them.</span>
+<span class="sd">        - X2 value change: Replots the current selection with the new X2 slice.</span>
+<span class="sd">        - Exits with a status message if no file is selected or no detectors (Y) are selected for plotting.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.chartview</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChartView</span>
+
+        <span class="c1"># Handle X2 value changes</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="c1"># This is an X2 value change, respect the current mode</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">mode</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;Auto-add&quot;</span><span class="p">:</span>
+                <span class="n">action</span> <span class="o">=</span> <span class="s2">&quot;add&quot;</span>
+            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;Auto-off&quot;</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">action</span> <span class="o">=</span> <span class="s2">&quot;replace&quot;</span>  <span class="c1"># Default for Auto-replace</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;doPlot action=</span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">tableview</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentFileTableview</span><span class="p">()</span>
+
+        <span class="c1"># Check if this is a 2D selection (has X1, X2 keys)</span>
+        <span class="n">is_2d_selection</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="s2">&quot;X1&quot;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="ow">and</span> <span class="s2">&quot;X2&quot;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">is_2d_selection</span><span class="p">:</span>
+            <span class="c1"># Handle 2D plotting - use the passed selection</span>
+            <span class="n">selection</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">doPlot2D</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">selection</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># For 1D plotting, use the selection from the table view</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectionField</span><span class="p">()</span>
+
+        <span class="c1"># Clear all content from the file table view &amp; viz panel:</span>
+        <span class="k">if</span> <span class="n">action</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;clear&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">removeAllFileTabs</span><span class="p">()</span>
+            <span class="k">return</span>
+
+        <span class="c1"># If there is no file selected (ie no tableview) or no selection or no DET:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tableview</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">selection</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s2">&quot;Nothing to plot.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Handle 1D plotting (existing logic)</span>
+        <span class="c1"># Get the matplotlib chartview widget, if exists:</span>
+        <span class="n">layoutMpl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_file_viz</span><span class="o">.</span><span class="n">plotPageMpl</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">layoutMpl</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># in case something changes ...</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Expected exactly one widget in this layout!&quot;</span><span class="p">)</span>
+        <span class="n">widgetMpl</span> <span class="o">=</span> <span class="n">layoutMpl</span><span class="o">.</span><span class="n">itemAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">widget</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">widgetMpl</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Plot layout has no widget at index 0&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">action</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;replace&quot;</span><span class="p">,</span> <span class="s2">&quot;add&quot;</span><span class="p">):</span>
+            <span class="c1"># Get dataset for the positioner/detector selection:</span>
+            <span class="n">datasets</span><span class="p">,</span> <span class="n">plot_options</span> <span class="o">=</span> <span class="n">tableview</span><span class="o">.</span><span class="n">data2Plot</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
+            <span class="n">y_index</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">widgetMpl</span><span class="p">,</span> <span class="n">ChartView</span><span class="p">):</span>  <span class="c1"># Make a blank chart.</span>
+                <span class="n">widgetMpl</span> <span class="o">=</span> <span class="n">ChartView</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_options</span><span class="p">)</span>
+                <span class="c1"># Apply stored log scale state to the new chart</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mda_file_viz</span><span class="p">,</span> <span class="s2">&quot;getLogScaleState&quot;</span><span class="p">):</span>
+                    <span class="n">stored_log_x</span><span class="p">,</span> <span class="n">stored_log_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_file_viz</span><span class="o">.</span><span class="n">getLogScaleState</span><span class="p">()</span>
+                    <span class="n">widgetMpl</span><span class="o">.</span><span class="n">setLogScales</span><span class="p">(</span><span class="n">stored_log_x</span><span class="p">,</span> <span class="n">stored_log_y</span><span class="p">)</span>
+            <span class="n">current_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">tabIndex2Path</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">action</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;replace&quot;</span><span class="p">):</span>
+                <span class="n">widgetMpl</span><span class="o">.</span><span class="n">curveManager</span><span class="o">.</span><span class="n">removeAllCurves</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">current_file_path</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_plotted_file_path</span><span class="p">:</span>
+                    <span class="n">widgetMpl</span><span class="o">.</span><span class="n">curveManager</span><span class="o">.</span><span class="n">clearPersistentProperties</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_last_plotted_file_path</span> <span class="o">=</span> <span class="n">current_file_path</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">ds_options</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">y_index</span><span class="p">,</span> <span class="n">datasets</span><span class="p">):</span>
+                <span class="c1"># ds: [x_data, y_data]</span>
+                <span class="c1"># ds_options: {&quot;label&quot;:y_label} (for legend)</span>
+                <span class="c1"># plot_options: {&quot;x&quot; (label), &quot;x_unit&quot;, &quot;y&quot; (label), &quot;y_unit&quot;, &quot;title&quot;, &quot;folderPath&quot;}</span>
+                <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ds_options&quot;</span><span class="p">:</span> <span class="n">ds_options</span><span class="p">,</span> <span class="s2">&quot;plot_options&quot;</span><span class="p">:</span> <span class="n">plot_options</span><span class="p">}</span>
+                <span class="c1"># Add X2 index to options if available</span>
+                <span class="k">if</span> <span class="s2">&quot;x2_index&quot;</span> <span class="ow">in</span> <span class="n">plot_options</span><span class="p">:</span>
+                    <span class="n">options</span><span class="p">[</span><span class="s2">&quot;x2_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">plot_options</span><span class="p">[</span><span class="s2">&quot;x2_index&quot;</span><span class="p">]</span>
+                <span class="n">widgetMpl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="o">*</span><span class="n">ds</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+            <span class="n">widgetMpl</span><span class="o">.</span><span class="n">refreshAllUnscaledCurves</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mda_file_viz</span><span class="o">.</span><span class="n">setPlot</span><span class="p">(</span><span class="n">widgetMpl</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.doPlot2D">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.doPlot2D">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">doPlot2D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle 2D plotting with the given selection.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            action (str): &#39;add&#39; or &#39;replace&#39;</span>
+<span class="sd">            selection (dict): 2D selection with X1, X2, Y, I0, plot_type keys</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;doPlot2D - action: </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2">, selection: </span><span class="si">{</span><span class="n">selection</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">tableview</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentFileTableview</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tableview</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;doPlot2D - No tableview available&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Update the 2D plot in the 2D tab</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mda_file_viz</span><span class="o">.</span><span class="n">update2DPlot</span><span class="p">()</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;doPlot2D - Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error plotting 2D data: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.onTabChanged">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.onTabChanged">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onTabChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">file_data</span><span class="p">,</span> <span class="n">selection_field</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates UI to reflect the content of the newly selected tab or resets UI if no tab is selected.</span>
+<span class="sd">        - Activates the corresponding table view for the new tab, displaying the selected file&#39;s metadata and data.</span>
+<span class="sd">        - Resets UI to a default state if no tab is selected (index == -1), indicating no active file.</span>
+<span class="sd">        - Connected to the `tabChanged` signal to handle UI updates when a tab is switched.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        - index (int): Index of the newly selected tab; -1 indicates no tab is selected.</span>
+<span class="sd">        - file_path (str): Path of the file associated with the newly selected tab.</span>
+<span class="sd">        - file_data (dict): Contains metadata and table data for the file. Expected keys: &#39;metadata&#39;, &#39;tabledata&#39;.</span>
+<span class="sd">        - selection_field (dict or None): Specifies the fields (POS/DET) selected for plotting.</span>
+
+<span class="sd">        Notes: This method is connected to the `tabChanged` signal of the MDAFile&#39;s QTabWidget:</span>
+<span class="sd">        In MDAFile:</span>
+<span class="sd">            self.mda_file.tabWidget.currentChanged.connect [signal: emits new_tab_index]</span>
+<span class="sd">                --&gt; self.mda_file.updateCurrentTabInfo(new_tab_index) [slot]</span>
+<span class="sd">                    --&gt; self.mda_file.tabChanged.emit  [QtCore.pyqtSignal]</span>
+<span class="sd">                        emits: new_tab_index, _file_path, _tab_data, _selection_field</span>
+<span class="sd">        In MDA_MVC:</span>
+<span class="sd">            self.mda_file.tabChanged.connect</span>
+<span class="sd">                --&gt; self.onTabChanged(new_tab_index, _file_path, _tab_data, _selection_field)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setCurrentFileTableview</span><span class="p">()</span>  <span class="c1"># Reset to indicate no active file table view</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setSelectionField</span><span class="p">()</span>  <span class="c1"># Reset selection field to default</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Retrieve the table view for the currently selected tab:</span>
+        <span class="n">new_tab_tableview</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">tabIndex2Tableview</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setCurrentFileTableview</span><span class="p">(</span><span class="n">new_tab_tableview</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSelectionField</span><span class="p">(</span><span class="n">selection_field</span><span class="p">)</span>
+
+        <span class="c1"># Fetch and display the metadata and data associated with the file path</span>
+        <span class="k">if</span> <span class="n">file_data</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Displaying data and metadata for </span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">displayMetadata</span><span class="p">(</span><span class="n">file_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;metadata&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+            <span class="c1"># Reconstruct full data structure for 2D support by setting data again</span>
+            <span class="c1"># This ensures we have scanDict, scanDict2D, isMultidimensional, etc.</span>
+            <span class="k">if</span> <span class="n">file_path</span><span class="p">:</span>
+                <span class="c1"># Find the file index in the current folder</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">file_name</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+                    <span class="n">file_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdaFileList</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+                    <span class="c1"># Set the data again to get the full structure</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">file_index</span><span class="p">)</span>
+                    <span class="c1"># Now display the full data structure</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">displayData</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="c1"># File not found in current folder, use fallback</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">displayData</span><span class="p">()</span>
+
+        <span class="c1"># Highlight the corresponding file in the folder table view if it belongs to the current folder</span>
+        <span class="k">if</span> <span class="n">file_path</span><span class="p">:</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">current_folder_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataPath</span><span class="p">())</span>
+
+            <span class="c1"># Check if the file belongs to the currently loaded folder</span>
+            <span class="k">if</span> <span class="n">file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">current_folder_path</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># Find the index of the file in the current folder&#39;s file list</span>
+                    <span class="n">file_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdaFileList</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+
+                    <span class="c1"># Get the model and create the index</span>
+                    <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">model</span> <span class="ow">and</span> <span class="n">file_index</span> <span class="o">&lt;</span> <span class="n">model</span><span class="o">.</span><span class="n">rowCount</span><span class="p">():</span>
+                        <span class="n">index</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">file_index</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+                        <span class="c1"># Temporarily disconnect the currentChanged signal to avoid triggering onFileSelected</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">():</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">()</span><span class="o">.</span><span class="n">currentChanged</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">onFileSelected</span>
+                            <span class="p">)</span>
+
+                        <span class="c1"># Highlight the file in the folder table view</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">setFocus</span><span class="p">()</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">()</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span>
+                            <span class="n">index</span><span class="p">,</span>
+                            <span class="n">QItemSelectionModel</span><span class="o">.</span><span class="n">SelectionFlag</span><span class="o">.</span><span class="n">ClearAndSelect</span>
+                            <span class="o">|</span> <span class="n">QItemSelectionModel</span><span class="o">.</span><span class="n">SelectionFlag</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">scrollTo</span><span class="p">(</span>
+                            <span class="n">index</span><span class="p">,</span> <span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">ScrollHint</span><span class="o">.</span><span class="n">EnsureVisible</span>
+                        <span class="p">)</span>
+
+                        <span class="c1"># Reconnect the currentChanged signal</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">():</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">()</span><span class="o">.</span><span class="n">currentChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">onFileSelected</span>
+                            <span class="p">)</span>
+
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="c1"># File not found in the current folder&#39;s file list, ignore</span>
+                    <span class="k">pass</span></div>
+
+
+        <span class="c1"># NOTE: Consider disabling UI elements or actions that require an active file/folder to be meaningful.</span>
+
+    <span class="c1"># # ------------ Folder Table View navigation &amp; selection highlight:</span>
+
+<div class="viewcode-block" id="MDA_MVC.goToFirst">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.goToFirst">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">goToFirst</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Navigates to and selects the first file in the folder table view.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">model</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">firstIndex</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selectAndShowIndex</span><span class="p">(</span><span class="n">firstIndex</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.goToLast">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.goToLast">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">goToLast</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Navigates to and selects the last file in the folder table view.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">model</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">lastIndex</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selectAndShowIndex</span><span class="p">(</span><span class="n">lastIndex</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.goToNext">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.goToNext">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">goToNext</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Navigates to and selects the next file relative to the current selection in the folder table view.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdaFileList</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">():</span>
+                <span class="n">currentIndex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">()</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
+                <span class="n">nextIndex</span> <span class="o">=</span> <span class="n">currentIndex</span><span class="o">.</span><span class="n">sibling</span><span class="p">(</span>
+                    <span class="n">currentIndex</span><span class="o">.</span><span class="n">row</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">currentIndex</span><span class="o">.</span><span class="n">column</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">nextIndex</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">selectAndShowIndex</span><span class="p">(</span><span class="n">nextIndex</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;The selection model is no longer valid:&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.goToPrevious">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.goToPrevious">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">goToPrevious</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Navigates to and selects the previous file relative to the current selection in the folder table view.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdaFileList</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">():</span>
+                <span class="n">currentIndex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">()</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
+                <span class="n">prevIndex</span> <span class="o">=</span> <span class="n">currentIndex</span><span class="o">.</span><span class="n">sibling</span><span class="p">(</span>
+                    <span class="n">currentIndex</span><span class="o">.</span><span class="n">row</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">currentIndex</span><span class="o">.</span><span class="n">column</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">prevIndex</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">selectAndShowIndex</span><span class="p">(</span><span class="n">prevIndex</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;The selection model is no longer valid:&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.selectAndShowIndex">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.selectAndShowIndex">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">selectAndShowIndex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Selects a file by its index in the folder table view and ensures it is visible to the user.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        - index (QModelIndex): Index of the file to select.</span>
+
+<span class="sd">        Details:</span>
+<span class="sd">        - Focuses on the table view for visual feedback (blue highlight in Mac OS).</span>
+<span class="sd">        - Adjusts scroll position based on the file&#39;s position in the list.</span>
+<span class="sd">        - Trigger actions associated with file selection (onFileSelected).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Ensure the table view has focus:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">setFocus</span><span class="p">()</span>
+        <span class="c1"># Determine the appropriate scrollHint based on the row position:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+        <span class="n">rowCount</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()</span>
+        <span class="n">scrollHint</span> <span class="o">=</span> <span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">ScrollHint</span><span class="o">.</span><span class="n">EnsureVisible</span>
+        <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">scrollHint</span> <span class="o">=</span> <span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">ScrollHint</span><span class="o">.</span><span class="n">PositionAtTop</span>
+        <span class="k">elif</span> <span class="n">index</span><span class="o">.</span><span class="n">row</span><span class="p">()</span> <span class="o">==</span> <span class="n">rowCount</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">scrollHint</span> <span class="o">=</span> <span class="n">QAbstractItemView</span><span class="o">.</span><span class="n">ScrollHint</span><span class="o">.</span><span class="n">PositionAtBottom</span>
+        <span class="c1"># Select the row and ensure it&#39;s visible:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">()</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span>
+            <span class="n">index</span><span class="p">,</span>
+            <span class="n">QItemSelectionModel</span><span class="o">.</span><span class="n">SelectionFlag</span><span class="o">.</span><span class="n">ClearAndSelect</span>
+            <span class="o">|</span> <span class="n">QItemSelectionModel</span><span class="o">.</span><span class="n">SelectionFlag</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">scrollTo</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">scrollHint</span><span class="p">)</span>
+        <span class="c1"># Trigger actions associated with file selection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">onFileSelected</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div>
+
+
+    <span class="c1"># # ------------ Checkbox methods:</span>
+
+<div class="viewcode-block" id="MDA_MVC.onCheckboxStateChanged">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.onCheckboxStateChanged">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onCheckboxStateChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">,</span> <span class="n">det_removed</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Responds to changes in checkbox states within the file&#39;s data view.</span>
+<span class="sd">         - adjusts the plot based on the selection of detectors and I0.</span>
+<span class="sd">         - updates the selection field with the new selection and initiates plotting based</span>
+<span class="sd">         on the current mode (Auto-add, Auto-replace, or Auto-off).</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        - selection (dict): The current selection of detectors (Y), positioner (X), and I0 for plotting.</span>
+<span class="sd">        - det_removed (bool): Indicates if a detector has been removed (unchecked).</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">        - The selection dict format: {&#39;X&#39;: int, &#39;Y&#39;: list[int], &#39;I0&#39;: int}.</span>
+<span class="sd">        - If &#39;Auto-off&#39; mode is active, the method returns without updating the plot.</span>
+<span class="sd">        - If no positioner is selected, default to Index.</span>
+<span class="sd">        - If no detectors are selected or if all curves are removed, the plot is cleared.</span>
+<span class="sd">        - If a detector is unchecked, the corresponding curve is removed from the plot.</span>
+<span class="sd">        - If I0 is selected, Y data will be normalized as Y/I0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.chartview</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChartView</span>
+
+        <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">mode</span><span class="p">()</span>
+        <span class="n">tableview</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">currentFileTableview</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_selection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">i0_toggled</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;I0&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;I0&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">i0_toggled</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Get the matplotlib chartview widget, if exists:</span>
+        <span class="n">layoutMpl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_file_viz</span><span class="o">.</span><span class="n">plotPageMpl</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">layoutMpl</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># in case something changes ...</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Expected exactly one widget in this layout!&quot;</span><span class="p">)</span>
+        <span class="n">widgetMpl</span> <span class="o">=</span> <span class="n">layoutMpl</span><span class="o">.</span><span class="n">itemAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">widget</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">widgetMpl</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Plot layout has no widget at index 0&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># ----------- Exceptions:</span>
+
+        <span class="c1"># In auto-off mode: no synchronisation - user needs to push a button.</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;Auto-off&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_selection</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># If no POS, default to index:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">selection</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">):</span>
+            <span class="n">selection</span> <span class="o">=</span> <span class="n">selection</span> <span class="ow">or</span> <span class="p">{}</span>
+            <span class="n">selection</span><span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span><span class="o">.</span><span class="n">checkCheckBox</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">)</span>
+
+        <span class="c1"># If no DET and there is only 1 tab open, clear the graph</span>
+        <span class="n">new_y_selection</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">new_y_selection</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mda_file_viz</span><span class="o">.</span><span class="n">setLogScaleState</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">widgetMpl</span><span class="o">.</span><span class="n">curveManager</span><span class="o">.</span><span class="n">removeAllCurves</span><span class="p">(</span><span class="n">savePersistentProperties</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_selection</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Handle detector removal - emit signals but don&#39;t return early</span>
+        <span class="k">if</span> <span class="n">det_removed</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">det_removed</span><span class="p">:</span>
+                <span class="n">tab_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
+                <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">tabIndex2Path</span><span class="p">(</span><span class="n">tab_index</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">detRemoved</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+        <span class="c1"># Get dataset for the positioner/detector selection:</span>
+        <span class="n">datasets</span><span class="p">,</span> <span class="n">plot_options</span> <span class="o">=</span> <span class="n">tableview</span><span class="o">.</span><span class="n">data2Plot</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">widgetMpl</span><span class="p">,</span> <span class="n">ChartView</span><span class="p">):</span>
+            <span class="n">widgetMpl</span> <span class="o">=</span> <span class="n">ChartView</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_options</span><span class="p">)</span>  <span class="c1"># Make a blank chart.</span>
+            <span class="c1"># Apply stored log scale state to the new chart</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mda_file_viz</span><span class="p">,</span> <span class="s2">&quot;getLogScaleState&quot;</span><span class="p">):</span>
+                <span class="n">stored_log_x</span><span class="p">,</span> <span class="n">stored_log_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mda_file_viz</span><span class="o">.</span><span class="n">getLogScaleState</span><span class="p">()</span>
+                <span class="n">widgetMpl</span><span class="o">.</span><span class="n">setLogScales</span><span class="p">(</span><span class="n">stored_log_x</span><span class="p">,</span> <span class="n">stored_log_y</span><span class="p">)</span>
+
+        <span class="n">last_selected_curve_index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;Auto-replace&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">widgetMpl</span><span class="o">.</span><span class="n">curveBox</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">last_selected_curve_index</span> <span class="o">=</span> <span class="n">widgetMpl</span><span class="o">.</span><span class="n">curveBox</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
+            <span class="n">widgetMpl</span><span class="o">.</span><span class="n">curveManager</span><span class="o">.</span><span class="n">removeAllCurves</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">ds_options</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">new_y_selection</span><span class="p">,</span> <span class="n">datasets</span><span class="p">):</span>
+            <span class="c1"># ds_options: label (for legend)</span>
+            <span class="c1"># plot_options: xlabel, ylabel, title</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ds_options&quot;</span><span class="p">:</span> <span class="n">ds_options</span><span class="p">,</span> <span class="s2">&quot;plot_options&quot;</span><span class="p">:</span> <span class="n">plot_options</span><span class="p">}</span>
+            <span class="c1"># Add X2 index to options if available</span>
+            <span class="k">if</span> <span class="s2">&quot;x2_index&quot;</span> <span class="ow">in</span> <span class="n">plot_options</span><span class="p">:</span>
+                <span class="n">options</span><span class="p">[</span><span class="s2">&quot;x2_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">plot_options</span><span class="p">[</span><span class="s2">&quot;x2_index&quot;</span><span class="p">]</span>
+            <span class="n">widgetMpl</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="o">*</span><span class="n">ds</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_file_viz</span><span class="o">.</span><span class="n">setPlot</span><span class="p">(</span><span class="n">widgetMpl</span><span class="p">)</span>
+        <span class="c1"># Restore last selected curve in comboBox</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">last_selected_curve_index</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+            <span class="ow">and</span> <span class="n">last_selected_curve_index</span> <span class="o">&lt;</span> <span class="n">widgetMpl</span><span class="o">.</span><span class="n">curveBox</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+            <span class="ow">and</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;Auto-replace&quot;</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">i0_toggled</span>
+        <span class="p">):</span>
+            <span class="n">restore_index</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+                <span class="n">last_selected_curve_index</span><span class="p">,</span> <span class="n">widgetMpl</span><span class="o">.</span><span class="n">curveBox</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="p">)</span>
+            <span class="n">widgetMpl</span><span class="o">.</span><span class="n">curveBox</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">restore_index</span><span class="p">)</span>
+            <span class="n">widgetMpl</span><span class="o">.</span><span class="n">onCurveSelected</span><span class="p">(</span><span class="n">restore_index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_selection</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span></div>
+
+
+    <span class="c1"># # ------------ splitter methods</span>
+
+<div class="viewcode-block" id="MDA_MVC.splitter_moved">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.splitter_moved">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">splitter_moved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="o">*</span><span class="n">arg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handles a splitter&#39;s movement by initiating a delay before updating the settings.</span>
+<span class="sd">        - Sets a deadline for changes and starts a new thread if one isn&#39;t already monitoring changes.</span>
+<span class="sd">        - Ensures settings are updated only after movement has ceased for a defined interval.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        - key (str): Identifier for the splitter (&#39;hsplitter&#39; or &#39;vsplitter&#39;).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">thread</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_wait_thread&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_deadline&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">motion_wait_time</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">thread</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start new thread now.  </span><span class="si">{</span><span class="n">key</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_wait_thread&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter_wait_changes</span><span class="p">(</span><span class="n">key</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="MDA_MVC.splitter_settings_name">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.splitter_settings_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">splitter_settings_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a unique settings name for the given splitter.</span>
+<span class="sd">        - Formats the name based on the class name and splitter identifier.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        - key (str): Identifier for the splitter.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        - str: A unique name for storing splitter settings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+    <span class="nd">@utils</span><span class="o">.</span><span class="n">run_in_thread</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">splitter_wait_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Monitors splitter movement and updates settings after movement ceases.</span>
+<span class="sd">        - Waits until there have been no changes to the splitter position for a set interval.</span>
+<span class="sd">        - Updates application settings with the new splitter sizes.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        - key (str): Identifier for the splitter being monitored &#39;(hsplitter&#39; or &#39;vsplitter&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.user_settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+
+        <span class="n">splitter</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">_deadline&quot;</span><span class="p">):</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">motion_wait_time</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">)</span>
+
+        <span class="n">sname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter_settings_name</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Update settings: </span><span class="si">{</span><span class="n">sname</span><span class="si">=}</span><span class="s2"> </span><span class="si">{</span><span class="n">splitter</span><span class="o">.</span><span class="n">sizes</span><span class="p">()</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">settings</span><span class="o">.</span><span class="n">saveSplitter</span><span class="p">(</span><span class="n">splitter</span><span class="p">,</span> <span class="n">sname</span><span class="p">)</span>
+
+    <span class="c1"># # ------------ Status method</span>
+
+<div class="viewcode-block" id="MDA_MVC.setStatus">
+<a class="viewcode-back" href="../../api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.setStatus">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set status text.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mainWindow</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1289 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mdaviz.utils &#8212; mdaviz 1.3</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=8749d347"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/mdaviz/utils';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mdaviz 1.3</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Changes
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Changes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">mdaviz.utils</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for mdaviz.utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utility functions for MDA file processing and data manipulation.</span>
+
+<span class="sd">This module provides various utility functions for handling MDA files,</span>
+<span class="sd">data conversion, and general utility operations.</span>
+
+<span class="sd">.. autosummary::</span>
+
+<span class="sd">    ~get_file_info</span>
+<span class="sd">    ~get_scan</span>
+<span class="sd">    ~mda2ftm</span>
+<span class="sd">    ~ftm2mda</span>
+<span class="sd">    ~byte2str</span>
+<span class="sd">    ~num2fstr</span>
+<span class="sd">    ~getUiFileName</span>
+<span class="sd">    ~human_readable_size</span>
+<span class="sd">    ~iso2dt</span>
+<span class="sd">    ~iso2ts</span>
+<span class="sd">    ~myLoadUi</span>
+<span class="sd">    ~removeAllLayoutWidgets</span>
+<span class="sd">    ~run_in_thread</span>
+<span class="sd">    ~ts2dt</span>
+<span class="sd">    ~ts2iso</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6</span><span class="w"> </span><span class="kn">import</span> <span class="n">uic</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.synApps_mdalib.mda</span><span class="w"> </span><span class="kn">import</span> <span class="n">scanPositioner</span><span class="p">,</span> <span class="n">scanDetector</span><span class="p">,</span> <span class="n">readMDA</span><span class="p">,</span> <span class="n">skimMDA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+
+<span class="c1"># Get logger for this module</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;utils&quot;</span><span class="p">)</span>
+
+
+<span class="n">HEADERS</span> <span class="o">=</span> <span class="s2">&quot;Prefix&quot;</span><span class="p">,</span> <span class="s2">&quot;Scan #&quot;</span><span class="p">,</span> <span class="s2">&quot;Points&quot;</span><span class="p">,</span> <span class="s2">&quot;Dim&quot;</span><span class="p">,</span> <span class="s2">&quot;Date&quot;</span><span class="p">,</span> <span class="s2">&quot;Size&quot;</span>
+
+
+<div class="viewcode-block" id="human_readable_size">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.human_readable_size">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">human_readable_size</span><span class="p">(</span><span class="n">size</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">decimal_places</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert size in bytes to human readable format.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        size (float): Size in bytes</span>
+<span class="sd">        decimal_places (int): Number of decimal places to show</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Human readable size string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;kB&quot;</span><span class="p">,</span> <span class="s2">&quot;MB&quot;</span><span class="p">,</span> <span class="s2">&quot;GB&quot;</span><span class="p">,</span> <span class="s2">&quot;TB&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="o">&lt;</span> <span class="mf">1024.0</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">size</span> <span class="o">/=</span> <span class="mf">1024.0</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">size</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">decimal_places</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="iso2dt">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.iso2dt">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">iso2dt</span><span class="p">(</span><span class="n">iso_date_time</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert ISO8601 time string to datetime object.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        iso_date_time (str): ISO8601 formatted time string</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        datetime: Datetime object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">iso_date_time</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="iso2ts">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.iso2ts">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">iso2ts</span><span class="p">(</span><span class="n">iso_date_time</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert ISO8601 time string to timestamp.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        iso_date_time (str): ISO8601 formatted time string</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Unix timestamp</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">iso2dt</span><span class="p">(</span><span class="n">iso_date_time</span><span class="p">)</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="ts2dt">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.ts2dt">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ts2dt</span><span class="p">(</span><span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert timestamp to datetime object.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        timestamp (float): Unix timestamp</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        datetime: Datetime object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ts2iso">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.ts2iso">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ts2iso</span><span class="p">(</span><span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert timestamp to ISO8601 time string.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        timestamp (float): Unix timestamp</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: ISO8601 formatted time string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">ts2dt</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="num2fstr">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.num2fstr">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">num2fstr</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">decimal</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sigfigs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a string with the adequate precision and format.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        x (float): Number to format</span>
+<span class="sd">        decimal (int): Number of decimal places (used when sigfigs is None).</span>
+<span class="sd">        sigfigs (int | None): If set, format with this many significant figures:</span>
+<span class="sd">            use scientific notation when |x| &lt; 0.01 or |x| &gt;= 1e4, otherwise</span>
+<span class="sd">            fixed-point. If None, use decimal places and existing rules.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Formatted string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">sigfigs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">sigfigs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="s2">&quot;0&quot;</span> <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="k">else</span> <span class="p">(</span><span class="s2">&quot;0.&quot;</span> <span class="o">+</span> <span class="s2">&quot;0&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ax</span> <span class="o">&lt;</span> <span class="mf">0.1</span> <span class="ow">or</span> <span class="n">ax</span> <span class="o">&gt;=</span> <span class="mf">1e4</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">e</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">exp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">ax</span><span class="p">)))</span> <span class="k">if</span> <span class="n">ax</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="n">dec_places</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">exp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">dec_places</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">precision</span> <span class="o">=</span> <span class="n">decimal</span> <span class="k">if</span> <span class="n">decimal</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">e</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-3</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="byte2str">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.byte2str">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">byte2str</span><span class="p">(</span><span class="n">byte_literal</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a byte literal to a UTF-8 encoded string. If the input is not a byte literal, it is returned as is without any conversion.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        - byte_literal (bytes | Any): The byte literal to be decoded or any input to be returned as is if not bytes.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        - str | Any: The decoded string if the input is a byte literal, otherwise the original input.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">byte_literal</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">byte_literal</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
+        <span class="k">else</span> <span class="n">byte_literal</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_file_info_lightweight">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.get_file_info_lightweight">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_file_info_lightweight</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get lightweight file information without loading full MDA data.</span>
+
+<span class="sd">    This function extracts only the essential metadata needed for the folder view</span>
+<span class="sd">    without loading the complete file data, making it much faster for large folders.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        file_path (Path): Path to the MDA file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary containing lightweight file information with keys:</span>
+
+<span class="sd">        - Name: File name</span>
+<span class="sd">        - Prefix: File prefix (if extractable)</span>
+<span class="sd">        - Number: Scan number (if available)</span>
+<span class="sd">        - Points: Number of data points (if available)</span>
+<span class="sd">        - Dimension: Scan dimension (if available)</span>
+<span class="sd">        - Date: File date (if available)</span>
+<span class="sd">        - Size: Human readable file size</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">file_size</span> <span class="o">=</span> <span class="n">human_readable_size</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="p">)</span>
+
+    <span class="c1"># Try to get basic info from skimMDA first (fastest)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">skim_result</span> <span class="o">=</span> <span class="n">skimMDA</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">skim_result</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">skim_result</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># skimMDA returns a list where the first element is a dict with metadata</span>
+            <span class="n">skim_data</span> <span class="o">=</span> <span class="n">skim_result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">skim_result</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="p">{}</span>
+
+            <span class="n">file_num</span> <span class="o">=</span> <span class="n">skim_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scan_number&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">file_prefix</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">extract_file_prefix</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">file_num</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">file_num</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Get basic scan info from skim data</span>
+            <span class="k">if</span> <span class="n">skim_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rank&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">file_pts</span> <span class="o">=</span> <span class="n">skim_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;acquired_dimensions&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">file_dim</span> <span class="o">=</span> <span class="n">skim_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rank&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">file_pts</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">file_dim</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="c1"># Try to get date from file modification time as fallback</span>
+            <span class="n">file_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span>
+                <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Fallback to basic file info only</span>
+            <span class="n">file_num</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">file_prefix</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">file_pts</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">file_dim</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">file_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span>
+                <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># If skimMDA fails, provide minimal info</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error reading </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">file_num</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">file_prefix</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">file_pts</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">file_dim</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">file_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span>
+            <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">fileInfo</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="n">file_name</span><span class="p">,</span>
+        <span class="s2">&quot;folderPath&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">parent</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">file_prefix</span><span class="p">)</span> <span class="k">if</span> <span class="n">file_prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">file_num</span><span class="p">)</span> <span class="k">if</span> <span class="n">file_num</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">file_pts</span><span class="p">)</span> <span class="k">if</span> <span class="n">file_pts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">file_dim</span><span class="p">)</span> <span class="k">if</span> <span class="n">file_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">file_date</span><span class="p">)</span> <span class="k">if</span> <span class="n">file_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">file_size</span><span class="p">)</span> <span class="k">if</span> <span class="n">file_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">HEADERS</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="n">fileInfo</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="k">return</span> <span class="n">fileInfo</span></div>
+
+
+
+<div class="viewcode-block" id="get_file_info_full">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.get_file_info_full">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_file_info_full</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get complete file information by loading the full MDA data.</span>
+
+<span class="sd">    This is the original get_file_info function, renamed for clarity.</span>
+<span class="sd">    Use this only when detailed file information is needed.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        file_path (Path): Path to the MDA file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Complete file information including all metadata and data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="c1"># Check if readMDA returns None</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">readMDA</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Return minimal info if file cannot be read</span>
+        <span class="n">minimal_file_info</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="n">file_name</span><span class="p">}</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+            <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span>
+                <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span>
+            <span class="p">),</span>
+            <span class="n">human_readable_size</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">HEADERS</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+            <span class="n">minimal_file_info</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">minimal_file_info</span>
+
+    <span class="n">file_metadata</span><span class="p">,</span> <span class="n">file_data_dim1</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">result</span>
+    <span class="n">file_num</span> <span class="o">=</span> <span class="n">file_metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scan_number&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">file_prefix</span> <span class="o">=</span> <span class="n">extract_file_prefix</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">file_num</span><span class="p">)</span>
+    <span class="n">file_size</span> <span class="o">=</span> <span class="n">human_readable_size</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="p">)</span>
+    <span class="n">file_date</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">byte2str</span><span class="p">(</span><span class="n">file_data_dim1</span><span class="o">.</span><span class="n">time</span><span class="p">))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">file_pts</span> <span class="o">=</span> <span class="n">file_data_dim1</span><span class="o">.</span><span class="n">curr_pt</span>
+    <span class="n">file_dim</span> <span class="o">=</span> <span class="n">file_data_dim1</span><span class="o">.</span><span class="n">dim</span>
+
+    <span class="n">fileInfo</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="n">file_name</span><span class="p">}</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">file_prefix</span><span class="p">)</span> <span class="k">if</span> <span class="n">file_prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">file_num</span><span class="p">)</span> <span class="k">if</span> <span class="n">file_num</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">file_pts</span><span class="p">)</span> <span class="k">if</span> <span class="n">file_pts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">file_dim</span><span class="p">)</span> <span class="k">if</span> <span class="n">file_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">file_date</span><span class="p">)</span> <span class="k">if</span> <span class="n">file_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">file_size</span><span class="p">)</span> <span class="k">if</span> <span class="n">file_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">HEADERS</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="n">fileInfo</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="k">return</span> <span class="n">fileInfo</span></div>
+
+
+
+<span class="c1"># Keep the original function name for backward compatibility</span>
+<div class="viewcode-block" id="get_file_info">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.get_file_info">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_file_info</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get file information. This is an alias for get_file_info_full for backward compatibility.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        file_path (Path): Path to the MDA file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Complete file information</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_file_info_full</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="extract_file_prefix">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.extract_file_prefix">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_file_prefix</span><span class="p">(</span><span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scan_number</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a pattern that matches the prefix followed by an optional separator and the scan number with possible leading zeros.</span>
+
+<span class="sd">    The separators considered here are underscore (_), hyphen (-), dot (.), and space ( )</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        file_name (str): Name of the file</span>
+<span class="sd">        scan_number (int | None): Scan number to extract prefix for</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str | None: Extracted prefix or None if no match</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">scan_number_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">scan_number</span><span class="p">)</span> <span class="k">if</span> <span class="n">scan_number</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;0&quot;</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="sa">rf</span><span class="s2">&quot;^(.*?)[_\-\. ]?0*</span><span class="si">{</span><span class="n">scan_number_str</span><span class="si">}</span><span class="s2">\.mda$&quot;</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="get_det">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.get_det">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_det</span><span class="p">(</span><span class="n">mda_file_data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts scan positioners and detectors from an MDA file data object.</span>
+
+<span class="sd">    This function processes an mda.scanDim object to extract its scanPositioner and scanDetector instances.</span>
+<span class="sd">    It organizes these instances into a dictionary, with their indexes as keys in the order of ``p0, P1,... Px, D01, D02,... DX``.</span>
+<span class="sd">    ``p0`` is a default scanPositioner object representing the point index. If additional positioners exist, they follow ``p0`` in sequence.</span>
+<span class="sd">    The first detector is labeled ``D01`` and subsequent detectors follow in numerical order.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        - mda_file_data: An instance of an mda.scanDim object, which contains the MDA file data to be processed.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple containing:</span>
+
+<span class="sd">        - A dictionary (d) where keys are indexes, mapping to either scanPositioner or scanDetector objects.</span>
+<span class="sd">          The dictionary is structured as ``{0: p0, 1: P1, ..., np: D01, np+1: D02, ..., np+nd: DX}``.</span>
+<span class="sd">        - The index (first_pos) of the first positioner in the returned dictionary. This is 1 if a positioner</span>
+<span class="sd">          other than the default index positioner exists, otherwise 0.</span>
+<span class="sd">        - The index (first_det) of the first detector in the returned dictionary, which directly follows the last positioner.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        - p0 is created by default and corresponds to the point index, described as an &#39;Index&#39; scanPositioner object with predefined properties.</span>
+<span class="sd">        - np is the total number of positioners, nd the number of detectors, and npts the number of data points actually acquired.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">p_list</span> <span class="o">=</span> <span class="n">mda_file_data</span><span class="o">.</span><span class="n">p</span>  <span class="c1"># list of scanDetector instances</span>
+    <span class="n">d_list</span> <span class="o">=</span> <span class="n">mda_file_data</span><span class="o">.</span><span class="n">d</span>  <span class="c1"># list of scanPositioner instances</span>
+    <span class="n">np</span> <span class="o">=</span> <span class="n">mda_file_data</span><span class="o">.</span><span class="n">np</span>  <span class="c1"># number of pos</span>
+    <span class="n">npts</span> <span class="o">=</span> <span class="n">mda_file_data</span><span class="o">.</span><span class="n">curr_pt</span>  <span class="c1"># number of data points actually acquired</span>
+
+    <span class="n">first_pos</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">np</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="n">first_det</span> <span class="o">=</span> <span class="n">np</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># Defining a default scanPositioner Object for &quot;Index&quot; at for key=0:</span>
+    <span class="n">p0</span> <span class="o">=</span> <span class="n">scanPositioner</span><span class="p">()</span>
+    <span class="n">p0</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># positioner number in sscan record</span>
+    <span class="n">p0</span><span class="o">.</span><span class="n">fieldName</span> <span class="o">=</span> <span class="s2">&quot;P0&quot;</span>  <span class="c1"># name of sscanRecord PV</span>
+    <span class="n">p0</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Index&quot;</span>  <span class="c1"># name of EPICS PV this positioner wrote to</span>
+    <span class="n">p0</span><span class="o">.</span><span class="n">desc</span> <span class="o">=</span> <span class="s2">&quot;Index&quot;</span>  <span class="c1"># description of &#39;name&#39; PV</span>
+    <span class="n">p0</span><span class="o">.</span><span class="n">step_mode</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># &#39;LINEAR&#39;, &#39;TABLE&#39;, or &#39;FLY&#39;</span>
+    <span class="n">p0</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># units of &#39;name&#39; PV</span>
+    <span class="n">p0</span><span class="o">.</span><span class="n">readback_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># name of EPICS PV this positioner read from, if any</span>
+    <span class="n">p0</span><span class="o">.</span><span class="n">readback_desc</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># description of &#39;readback_name&#39; PV</span>
+    <span class="n">p0</span><span class="o">.</span><span class="n">readback_unit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># units of &#39;readback_name&#39; PV</span>
+    <span class="n">p0</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">npts</span><span class="p">))</span>  <span class="c1"># list of values written to &#39;Index&#39; PV.</span>
+
+    <span class="c1"># Make the Index scanPositioner the positioner 0 and build d:</span>
+    <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">p0</span>
+    <span class="k">for</span> <span class="n">e</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">p_list</span><span class="p">):</span>
+        <span class="n">d</span><span class="p">[</span><span class="n">e</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span>
+    <span class="k">for</span> <span class="n">e</span><span class="p">,</span> <span class="n">det</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">d_list</span><span class="p">):</span>
+        <span class="n">d</span><span class="p">[</span><span class="n">e</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="p">]</span> <span class="o">=</span> <span class="n">det</span>
+    <span class="k">return</span> <span class="n">d</span><span class="p">,</span> <span class="n">first_pos</span><span class="p">,</span> <span class="n">first_det</span></div>
+
+
+
+<div class="viewcode-block" id="get_scan">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.get_scan">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_scan</span><span class="p">(</span><span class="n">mda_file_data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts scan positioners and detectors from an MDA file data object and prepares datasets.</span>
+
+<span class="sd">    Processes an mda.scanDim object to extract scanPositioner and scanDetector</span>
+<span class="sd">    instances, organizing them into a dictionary with additional metadata like</span>
+<span class="sd">    data, units, and names. A default scanPositioner object representing the</span>
+<span class="sd">    point index (``p0``) is included. If additional positioners exist, they follow</span>
+<span class="sd">    ``p0`` in sequence. The first detector is labeled ``D01`` and subsequent detectors</span>
+<span class="sd">    follow in numerical order: ``p0``, ``p1``,... ``px``, ``d01``, ``d02``,... ``dX``.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        - mda_file_data: An instance of an mda.scanDim object to be processed.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple containing:</span>
+
+<span class="sd">        - A dictionary keyed by index, each mapping to a sub-dictionary containing</span>
+<span class="sd">          the scan object along with its ``data``, ``unit``, ``name`` and ``type``.</span>
+<span class="sd">          Structure: ``{index: {&#39;object&#39;: scanObject, &#39;data&#39;: [...], &#39;unit&#39;: &#39;...&#39;, &#39;name&#39;: &#39;...&#39;,&#39;type&#39;:...}}``.</span>
+<span class="sd">        - The index (first_pos) of the first positioner in the returned dictionary. This</span>
+<span class="sd">          is 1 if a positioner other than the default index positioner exists, otherwise 0.</span>
+<span class="sd">        - The index (first_det) of the first detector in the returned dictionary, which</span>
+<span class="sd">          directly follows the last positioner.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">d</span><span class="p">,</span> <span class="n">first_pos_index</span><span class="p">,</span> <span class="n">first_det_index</span> <span class="o">=</span> <span class="n">get_det</span><span class="p">(</span><span class="n">mda_file_data</span><span class="p">)</span>
+
+    <span class="n">np</span> <span class="o">=</span> <span class="n">mda_file_data</span><span class="o">.</span><span class="n">np</span>  <span class="c1"># number of positioners (excluding p0)</span>
+    <span class="n">npts</span> <span class="o">=</span> <span class="n">mda_file_data</span><span class="o">.</span><span class="n">curr_pt</span>  <span class="c1"># number of data points actually acquired</span>
+
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># For time scans (no positioners), truncate detector data to match acquired points</span>
+        <span class="k">if</span> <span class="n">np</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">scanDetector</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">npts</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">data</span><span class="p">[:</span><span class="n">npts</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">data</span> <span class="ow">or</span> <span class="p">[]</span>
+
+        <span class="n">datasets</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;object&quot;</span><span class="p">:</span> <span class="n">v</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;POS&quot;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">scanPositioner</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;DET&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span>
+            <span class="s2">&quot;unit&quot;</span><span class="p">:</span> <span class="n">byte2str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">unit</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">byte2str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">name</span> <span class="k">else</span> <span class="s2">&quot;n/a&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;desc&quot;</span><span class="p">:</span> <span class="n">byte2str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">desc</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">desc</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fieldName&quot;</span><span class="p">:</span> <span class="n">byte2str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">fieldName</span><span class="p">),</span>
+        <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">first_pos_index</span><span class="p">,</span> <span class="n">first_det_index</span></div>
+
+
+
+<div class="viewcode-block" id="get_scan_2d">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.get_scan_2d">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_scan_2d</span><span class="p">(</span><span class="n">mda_file_data_dim1</span><span class="p">,</span> <span class="n">mda_file_data_dim2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts scan positioners and detectors from 2D MDA file data objects and prepares datasets.</span>
+
+<span class="sd">    Processes two mda.scanDim objects (outer and inner dimensions) to extract scanPositioner</span>
+<span class="sd">    and scanDetector instances, organizing them into a dictionary with additional metadata.</span>
+<span class="sd">    For 2D data, the structure is typically:</span>
+<span class="sd">        - ``dim1`` (outer): X2 positioner + detectors</span>
+<span class="sd">        - ``dim2`` (inner): X1 positioner + detectors</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        - mda_file_data_dim1: An instance of an ``mda.scanDim`` object for the outer dimension</span>
+<span class="sd">        - mda_file_data_dim2: An instance of an ``mda.scanDim`` object for the inner dimension</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple containing:</span>
+
+<span class="sd">        - A dictionary keyed by index, each mapping to a sub-dictionary containing</span>
+<span class="sd">          the scan object along with its ``data``, ``unit``, ``name`` and ``type``.</span>
+<span class="sd">          For 2D data, detectors have 2D arrays: ``data[X2_index][X1_index]``</span>
+<span class="sd">          For positioners, includes ``all_positioners`` list and ``np`` count for full positioner information.</span>
+<span class="sd">        - The index (first_pos) of the first positioner in the returned dictionary</span>
+<span class="sd">        - The index (first_det) of the first detector in the returned dictionary</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Process outer dimension (dim1) - typically X2 positioner + detectors</span>
+    <span class="n">p_list_dim1</span> <span class="o">=</span> <span class="n">mda_file_data_dim1</span><span class="o">.</span><span class="n">p</span>
+    <span class="n">np_dim1</span> <span class="o">=</span> <span class="n">mda_file_data_dim1</span><span class="o">.</span><span class="n">np</span>
+    <span class="n">npts_dim1</span> <span class="o">=</span> <span class="n">mda_file_data_dim1</span><span class="o">.</span><span class="n">curr_pt</span>
+
+    <span class="c1"># Process inner dimension (dim2) - typically X1 positioner + detectors</span>
+    <span class="n">p_list_dim2</span> <span class="o">=</span> <span class="n">mda_file_data_dim2</span><span class="o">.</span><span class="n">p</span>
+    <span class="n">d_list_dim2</span> <span class="o">=</span> <span class="n">mda_file_data_dim2</span><span class="o">.</span><span class="n">d</span>
+    <span class="n">np_dim2</span> <span class="o">=</span> <span class="n">mda_file_data_dim2</span><span class="o">.</span><span class="n">np</span>
+    <span class="n">npts_dim2</span> <span class="o">=</span> <span class="n">mda_file_data_dim2</span><span class="o">.</span><span class="n">curr_pt</span>
+
+    <span class="c1"># Create X2 positioner (outer dimension)</span>
+    <span class="k">if</span> <span class="n">np_dim1</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">x2_pos</span> <span class="o">=</span> <span class="n">p_list_dim1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># First positioner from outer dimension</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Create default X2 positioner if none exists</span>
+        <span class="n">x2_pos</span> <span class="o">=</span> <span class="n">scanPositioner</span><span class="p">()</span>
+        <span class="n">x2_pos</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">x2_pos</span><span class="o">.</span><span class="n">fieldName</span><span class="p">,</span> <span class="n">x2_pos</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">x2_pos</span><span class="o">.</span><span class="n">desc</span> <span class="o">=</span> <span class="s2">&quot;X2&quot;</span><span class="p">,</span> <span class="s2">&quot;X2&quot;</span><span class="p">,</span> <span class="s2">&quot;X2 Position&quot;</span>
+        <span class="n">x2_pos</span><span class="o">.</span><span class="n">step_mode</span><span class="p">,</span> <span class="n">x2_pos</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">x2_pos</span><span class="o">.</span><span class="n">readback_name</span><span class="p">,</span> <span class="n">x2_pos</span><span class="o">.</span><span class="n">readback_desc</span><span class="p">,</span> <span class="n">x2_pos</span><span class="o">.</span><span class="n">readback_unit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">x2_pos</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">npts_dim1</span><span class="p">))</span>
+    <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x2_pos</span>
+    <span class="n">first_pos_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Create X1 positioner (inner dimension)</span>
+    <span class="k">if</span> <span class="n">np_dim2</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">x1_pos</span> <span class="o">=</span> <span class="n">p_list_dim2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># First positioner from inner dimension</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Create default X1 positioner if none exists</span>
+        <span class="n">x1_pos</span> <span class="o">=</span> <span class="n">scanPositioner</span><span class="p">()</span>
+        <span class="n">x1_pos</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">x1_pos</span><span class="o">.</span><span class="n">fieldName</span><span class="p">,</span> <span class="n">x1_pos</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">x1_pos</span><span class="o">.</span><span class="n">desc</span> <span class="o">=</span> <span class="s2">&quot;X1&quot;</span><span class="p">,</span> <span class="s2">&quot;X1&quot;</span><span class="p">,</span> <span class="s2">&quot;X1 Position&quot;</span>
+        <span class="n">x1_pos</span><span class="o">.</span><span class="n">step_mode</span><span class="p">,</span> <span class="n">x1_pos</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">x1_pos</span><span class="o">.</span><span class="n">readback_name</span><span class="p">,</span> <span class="n">x1_pos</span><span class="o">.</span><span class="n">readback_desc</span><span class="p">,</span> <span class="n">x1_pos</span><span class="o">.</span><span class="n">readback_unit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">x1_pos</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">npts_dim2</span><span class="p">))</span>
+    <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x1_pos</span>
+
+    <span class="c1"># Add detectors from inner dimension (these are the Y values)</span>
+    <span class="n">detector_index</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">for</span> <span class="n">e</span><span class="p">,</span> <span class="n">det</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">d_list_dim2</span><span class="p">):</span>
+        <span class="n">d</span><span class="p">[</span><span class="n">detector_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">det</span>
+        <span class="n">detector_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">first_det_index</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="c1"># Add P0 index field at the end (so it doesn&#39;t break existing indices)</span>
+    <span class="n">p0</span> <span class="o">=</span> <span class="n">scanPositioner</span><span class="p">()</span>
+    <span class="n">p0</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="n">detector_index</span>
+    <span class="n">p0</span><span class="o">.</span><span class="n">fieldName</span><span class="p">,</span> <span class="n">p0</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">p0</span><span class="o">.</span><span class="n">desc</span> <span class="o">=</span> <span class="s2">&quot;P0&quot;</span><span class="p">,</span> <span class="s2">&quot;Index&quot;</span><span class="p">,</span> <span class="s2">&quot;Index&quot;</span>
+    <span class="n">p0</span><span class="o">.</span><span class="n">step_mode</span><span class="p">,</span> <span class="n">p0</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">p0</span><span class="o">.</span><span class="n">readback_name</span><span class="p">,</span> <span class="n">p0</span><span class="o">.</span><span class="n">readback_desc</span><span class="p">,</span> <span class="n">p0</span><span class="o">.</span><span class="n">readback_unit</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
+    <span class="c1"># For 2D data, use the total number of points (X2 * X1)</span>
+    <span class="n">total_points</span> <span class="o">=</span> <span class="n">npts_dim1</span> <span class="o">*</span> <span class="n">npts_dim2</span>
+    <span class="n">p0</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">total_points</span><span class="p">))</span>
+    <span class="n">d</span><span class="p">[</span><span class="n">detector_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">p0</span>
+
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">data</span> <span class="ow">or</span> <span class="p">[]</span>
+
+        <span class="n">datasets</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;object&quot;</span><span class="p">:</span> <span class="n">v</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;POS&quot;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">scanPositioner</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;DET&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span>
+            <span class="s2">&quot;unit&quot;</span><span class="p">:</span> <span class="n">byte2str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">unit</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">byte2str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">name</span> <span class="k">else</span> <span class="s2">&quot;n/a&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;desc&quot;</span><span class="p">:</span> <span class="n">byte2str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">desc</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">desc</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fieldName&quot;</span><span class="p">:</span> <span class="n">byte2str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">fieldName</span><span class="p">),</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Add full positioner information for positioners</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">scanPositioner</span><span class="p">)</span> <span class="ow">and</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># Outer dimension (X2)</span>
+                <span class="n">datasets</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;all_positioners&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_list_dim1</span>
+                <span class="n">datasets</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;np&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np_dim1</span>
+            <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># Inner dimension (X1)</span>
+                <span class="n">datasets</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;all_positioners&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_list_dim2</span>
+                <span class="n">datasets</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s2">&quot;np&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np_dim2</span>
+
+    <span class="k">return</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">first_pos_index</span><span class="p">,</span> <span class="n">first_det_index</span></div>
+
+
+
+<div class="viewcode-block" id="get_md">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.get_md">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_md</span><span class="p">(</span><span class="n">mda_file_metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Process MDA file metadata to convert bytes to strings and clean up structure.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        mda_file_metadata (dict): Raw metadata from MDA file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Processed metadata with string keys and cleaned values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">new_metadata</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">mda_file_metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="c1"># Exclude unwanted keys like EPICS_type</span>
+            <span class="n">new_metadata</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">k</span><span class="p">:</span> <span class="n">byte2str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                    <span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;unit&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="s2">&quot;EPICS_type&quot;</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">],</span>
+                    <span class="n">value</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;EPICS_type&quot;</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_metadata</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">new_metadata</span></div>
+
+
+
+<div class="viewcode-block" id="mda2ftm">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.mda2ftm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mda2ftm</span><span class="p">(</span><span class="n">selection</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a field selection from MDA_MVC (MVC) format to SelectFieldsTableModel (TM) format.</span>
+
+<span class="sd">    The MVC format {&#39;Y&#39;: [2, 3], &#39;X&#39;: 1, &#39;I0&#39;: 4} is transformed into TM format {1: &#39;X&#39;, 2: &#39;Y&#39;, 4: &#39;Y&#39;, 4: &#39;I0&#39;}.</span>
+<span class="sd">    This is used to sync selection states between SelectFieldsTableModel and MDA_MVC.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        selection (dict | None): The selection in MVC format to be converted.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: The selection converted to TM format.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">selection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ftm_selection</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">selection</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;I0&quot;</span><span class="p">]:</span>
+                <span class="c1"># Handle unique selections (X and I0)</span>
+                <span class="n">ftm_selection</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Handle multiple selections (Y)</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ftm_selection</span><span class="p">:</span>
+                        <span class="c1"># If this row already has a selection, convert to multiple selection</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ftm_selection</span><span class="p">[</span><span class="n">v</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                            <span class="n">ftm_selection</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ftm_selection</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">ftm_selection</span><span class="p">[</span><span class="n">v</span><span class="p">],</span> <span class="n">k</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">ftm_selection</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ftm_selection</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">return</span> <span class="n">ftm_selection</span></div>
+
+
+
+<div class="viewcode-block" id="ftm2mda">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.ftm2mda">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ftm2mda</span><span class="p">(</span><span class="n">selection</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a field selection from SelectFieldsTableModel (TM) format to MDA_MVC (MVC) format.</span>
+
+<span class="sd">    The TM format {1: &#39;X&#39;, 2: &#39;Y&#39;, 4: &#39;Y&#39;, 4: &#39;I0&#39;} is transformed into MVC format {&#39;Y&#39;: [2, 3], &#39;X&#39;: 1, &#39;I0&#39;: 4}.</span>
+<span class="sd">    Used to update MDA_MVC selection state (self.selectionField()) based on changes in SelectFieldsTableModel.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        selection (dict | None): The selection in TM format to be converted.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: The selection converted to MVC format.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mda_selection</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">selection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">selection</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="c1"># Handle multiple selections per row</span>
+                <span class="k">for</span> <span class="n">column_name</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">column_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;I0&quot;</span><span class="p">]:</span>
+                        <span class="c1"># These should be unique, so we take the last one</span>
+                        <span class="n">mda_selection</span><span class="p">[</span><span class="n">column_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># For Y, append to list</span>
+                        <span class="k">if</span> <span class="n">column_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mda_selection</span><span class="p">:</span>
+                            <span class="n">mda_selection</span><span class="p">[</span><span class="n">column_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="n">mda_selection</span><span class="p">[</span><span class="n">column_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Handle single selection</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;I0&quot;</span><span class="p">]:</span>
+                    <span class="c1"># Directly assign the value for &#39;X&#39; and &#39;I0&#39; since they are always unique</span>
+                    <span class="n">mda_selection</span><span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Append to the list for &#39;Y&#39;</span>
+                    <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mda_selection</span><span class="p">:</span>
+                        <span class="n">mda_selection</span><span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">mda_selection</span><span class="p">[</span><span class="n">value</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mda_selection</span></div>
+
+
+
+<div class="viewcode-block" id="run_in_thread">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.run_in_thread">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_in_thread</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    (decorator) run ``func`` in thread</span>
+
+<span class="sd">    USAGE::</span>
+
+<span class="sd">       @run_in_thread</span>
+<span class="sd">       def progress_reporting():</span>
+<span class="sd">           logger.debug(&quot;progress_reporting is starting&quot;)</span>
+<span class="sd">           # ...</span>
+
+<span class="sd">       #...</span>
+<span class="sd">       progress_reporting()   # runs in separate thread</span>
+<span class="sd">       #...</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">thread</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+
+<div class="viewcode-block" id="removeAllLayoutWidgets">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.removeAllLayoutWidgets">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">removeAllLayoutWidgets</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove all existing widgets from QLayout.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        layout: QLayout object to clear</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">layout</span><span class="o">.</span><span class="n">count</span><span class="p">())):</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">itemAt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">widget</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">w</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">w</span><span class="o">.</span><span class="n">setParent</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="myLoadUi">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.myLoadUi">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">myLoadUi</span><span class="p">(</span><span class="n">ui_file</span><span class="p">,</span> <span class="n">baseinstance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load a .ui file for use in building a GUI.</span>
+
+<span class="sd">    Wraps `uic.loadUi()` with code that finds our program&#39;s</span>
+<span class="sd">    *resources* directory.</span>
+
+<span class="sd">    :see: http://nullege.com/codes/search/PyQt4.uic.loadUi</span>
+<span class="sd">    :see: http://bitesofcode.blogspot.ca/2011/10/comparison-of-loading-techniques.html</span>
+
+<span class="sd">    inspired by:</span>
+<span class="sd">    http://stackoverflow.com/questions/14892713/how-do-you-load-ui-files-onto-python-classes-with-pyside?lq=1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz</span><span class="w"> </span><span class="kn">import</span> <span class="n">UI_DIR</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ui_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">ui_file</span> <span class="o">=</span> <span class="n">UI_DIR</span> <span class="o">/</span> <span class="n">ui_file</span>
+
+    <span class="k">return</span> <span class="n">uic</span><span class="o">.</span><span class="n">loadUi</span><span class="p">(</span><span class="n">ui_file</span><span class="p">,</span> <span class="n">baseinstance</span><span class="o">=</span><span class="n">baseinstance</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="getUiFileName">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.getUiFileName">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">getUiFileName</span><span class="p">(</span><span class="n">py_file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;UI file name matches the Python file, different extension.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        py_file_name (str): Python file name</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Corresponding UI file name</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">py_file_name</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">.ui&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="reconnect">
+<a class="viewcode-back" href="../../api/utils.html#mdaviz.utils.reconnect">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">reconnect</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">new_slot</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Disconnects any slots connected to the given signal and then connects the signal to the new_slot.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        - signal: The signal to disconnect and then reconnect.</span>
+<span class="sd">        - new_slot: The new slot to connect to the signal.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        - this function catches TypeError which occurs if the signal was not connected to any slots.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">signal</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="n">signal</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">new_slot</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">debug_signal</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Signal emitted with args:&quot;</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="s2">&quot;and kwargs:&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1582 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mdaviz.mda_file_viz &#8212; mdaviz 1.3</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=8749d347"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/mdaviz/mda_file_viz';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mdaviz 1.3</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Changes
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Changes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">mdaviz.mda_file_viz</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for mdaviz.mda_file_viz</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">MDA File Visualization Module</span>
+
+<span class="sd">.. Summary::</span>
+<span class="sd">    This module provides the main visualization interface for MDA (Multi-dimensional Array)</span>
+<span class="sd">    data files. It manages the display of data tables, metadata, 1D plots, and 2D plots in a</span>
+<span class="sd">    tabbed interface with integrated controls for data analysis and manipulation.</span>
+
+<span class="sd">Classes:</span>
+<span class="sd">    MDAFileVisualization: Main widget for displaying MDA file contents with tabbed interface</span>
+<span class="sd">    MetadataSearchDialog: Dialog for searching within metadata text</span>
+
+<span class="sd">Key Features:</span>
+<span class="sd">    - Tabbed interface for Data, Plot, Metadata, and 2D visualization</span>
+<span class="sd">    - Integrated 1D and 2D plotting with ChartView and ChartView2D</span>
+<span class="sd">    - Interactive controls for curve fitting, styling, and log scales</span>
+<span class="sd">    - Metadata search functionality</span>
+<span class="sd">    - Dynamic tab visibility based on data dimensionality</span>
+<span class="sd">    - Persistent UI state management</span>
+
+<span class="sd">Dependencies:</span>
+<span class="sd">    - PyQt6: GUI framework</span>
+<span class="sd">    - mdaviz.chartview: 1D and 2D plotting widgets</span>
+<span class="sd">    - mdaviz.data_table_view: Data table display</span>
+<span class="sd">    - mdaviz.fit_models: Curve fitting functionality</span>
+<span class="sd">    - mdaviz.utils: Utility functions for UI loading</span>
+
+<span class="sd">Usage:</span>
+<span class="sd">    The MDAFileVisualization widget is typically instantiated as part of the main</span>
+<span class="sd">    application window and receives MDA file data through:</span>
+<span class="sd">    - setTableData(): Sets the data table content from MDA file</span>
+<span class="sd">    - setMetadata(): Sets the metadata text content</span>
+<span class="sd">    - setPlot(): Sets the 1D plotting widget (ChartView) with data from user selections</span>
+<span class="sd">    - set2DData(): Sets 2D data for multi-dimensional arrays</span>
+<span class="sd">    - update2DPlot(): Updates 2D plots based on user selections in 2D controls</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtWidgets</span><span class="p">,</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtGui</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">QTimer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6.QtGui</span><span class="w"> </span><span class="kn">import</span> <span class="n">QFont</span><span class="p">,</span> <span class="n">QKeySequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6.QtWidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QDialog</span><span class="p">,</span> <span class="n">QSizePolicy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6.QtGui</span><span class="w"> </span><span class="kn">import</span> <span class="n">QShortcut</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.chartview</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChartView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.data_table_view</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataTableView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.fit_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_available_models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.chartview</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChartView2D</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+
+<span class="c1"># Get logger for this module</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;mda_file_viz&quot;</span><span class="p">)</span>
+
+<span class="n">MD_FONT</span> <span class="o">=</span> <span class="s2">&quot;Arial&quot;</span>
+<span class="n">MD_FONT_SIZE</span> <span class="o">=</span> <span class="mi">12</span>
+
+
+<div class="viewcode-block" id="MDAFileVisualization">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MDAFileVisualization</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The panel to show the contents of a file.&quot;&quot;&quot;</span>
+
+    <span class="c1"># UI file name matches this module, different extension</span>
+    <span class="n">ui_file</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">getUiFileName</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the MDA file visualization widget.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        - parent: Parent widget</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">myLoadUi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ui_file</span><span class="p">,</span> <span class="n">baseinstance</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+
+        <span class="c1"># Initialize log scale state storage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_x_state</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_y_state</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Initialize control update state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_control_update</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_control_update_value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_control_update_delay</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># milliseconds</span>
+
+        <span class="c1"># Initialize last tab index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_viz_tab_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="MDAFileVisualization.setup">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup the UI components and connections.&quot;&quot;&quot;</span>
+        <span class="n">font</span> <span class="o">=</span> <span class="n">QFont</span><span class="p">(</span><span class="n">MD_FONT</span><span class="p">)</span>
+        <span class="n">font</span><span class="o">.</span><span class="n">setPointSize</span><span class="p">(</span><span class="n">MD_FONT_SIZE</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">font</span><span class="p">)</span>
+
+        <span class="c1"># Set size policies to prevent unwanted expansion</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span>
+            <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Expanding</span>
+        <span class="p">)</span>  <span class="c1"># main visualization widget</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotPageMpl</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span>
+            <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Expanding</span>
+        <span class="p">)</span>  <span class="c1"># plot page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span>
+            <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Preferred</span>
+        <span class="p">)</span>  <span class="c1"># tab widget</span>
+
+        <span class="c1"># Set-up vertical splitter ratio</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">setStretchFactor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># top = 4/5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">setStretchFactor</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># bottom = 1/5</span>
+
+        <span class="c1"># Set maximum height for the tab widget to prevent vertical growth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_updateTabWidgetMaxHeight</span><span class="p">()</span>
+
+        <span class="c1"># Setup fit functionality</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setupFitUI</span><span class="p">()</span>
+
+        <span class="c1"># Setup log scale controls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setupLogScaleUI</span><span class="p">()</span>
+
+        <span class="c1"># Setup curve style functionality</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setupCurveStyleUI</span><span class="p">()</span>
+
+        <span class="c1"># Setup search functionality for metadata</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setupSearchFunctionality</span><span class="p">()</span>
+
+        <span class="c1"># Setup 2D functionality</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup2DFunctionality</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.setup2DFunctionality">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setup2DFunctionality">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup2DFunctionality</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup 2D plotting functionality.&quot;&quot;&quot;</span>
+        <span class="c1"># Initially hide 2D tab</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update2DTabVisibility</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># Connect mda_file_viz tab change signal (1D, data, 2D...)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">currentChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onTabChanged</span><span class="p">)</span>
+
+        <span class="c1"># Connect to file tab changes to update 2D plot when switching files</span>
+        <span class="c1"># Use a timer to delay connection until widget is fully initialized</span>
+        <span class="n">QTimer</span><span class="o">.</span><span class="n">singleShot</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectToFileTabChanges</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.connectToFileTabChanges">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.connectToFileTabChanges">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">connectToFileTabChanges</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Connect to file tab changes to update 2D plot when needed.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span>  <span class="c1"># MDA_MVC</span>
+            <span class="k">while</span> <span class="n">parent</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;mda_file&quot;</span><span class="p">):</span>
+                <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">parent</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;mda_file&quot;</span><span class="p">):</span>
+                <span class="c1"># Connect to the tabChanged signal from MDAFile</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">tabChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onFileTabChanged</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Connected to file tab changes&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Could not find MDA_MVC with mda_file&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error connecting to file tab changes: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.onFileTabChanged">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.onFileTabChanged">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onFileTabChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_index</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">file_data</span><span class="p">,</span> <span class="n">selection_field</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle file tab changes and update 2D plot if on 2D tab.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            tab_index (int): Index of the newly selected file tab</span>
+<span class="sd">            file_path (str): Path of the file associated with the new tab</span>
+<span class="sd">            file_data (dict): Contains metadata and table data for the file</span>
+<span class="sd">            selection_field (dict): Specifies the fields (POS/DET) selected for plotting</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">file_path</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File tab changed to </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">tab_index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Capture before update2DTabVisibility; hiding 2D tab triggers onTabChanged</span>
+        <span class="c1"># and overwrites _last_viz_tab_index</span>
+        <span class="n">viz_tab_to_restore</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_viz_tab_index</span>
+
+        <span class="c1"># Update 2D tab visibility based on the active file&#39;s data</span>
+        <span class="n">current_tableview</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCurrentFileTableview</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">current_tableview</span>
+            <span class="ow">and</span> <span class="n">current_tableview</span><span class="o">.</span><span class="n">mda_file</span>
+            <span class="ow">and</span> <span class="n">current_tableview</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">data</span><span class="p">()</span>
+        <span class="p">):</span>
+            <span class="n">active_file_data</span> <span class="o">=</span> <span class="n">current_tableview</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">data</span><span class="p">()</span>
+            <span class="n">is_2d_data</span> <span class="o">=</span> <span class="n">active_file_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;isMultidimensional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update2DTabVisibility</span><span class="p">(</span><span class="n">is_2d_data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update2DTabVisibility</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">is_2d_data</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Restore viz tab: use stored index if valid, else switch to 1D (0)</span>
+        <span class="k">if</span> <span class="n">is_2d_data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">viz_tab_to_restore</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">desired</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">viz_tab_to_restore</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">viz_tab_to_restore</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="n">desired</span><span class="p">)</span>
+
+        <span class="c1"># Always update control visibility to ensure correct controls are shown</span>
+        <span class="n">current_tab_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
+        <span class="c1"># When switching to a 2D file on 2D tab, set visibility immediately so the</span>
+        <span class="c1"># control panel (comboBoxes) appears without a brief empty frame</span>
+        <span class="k">if</span> <span class="n">is_2d_data</span> <span class="ow">and</span> <span class="n">current_tab_index</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">updateControlVisibility</span><span class="p">(</span><span class="n">current_tab_index</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">QTimer</span><span class="o">.</span><span class="n">singleShot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">deferredUpdateControlVisibility</span><span class="p">())</span>
+
+        <span class="c1"># Update 2D plot if we&#39;re currently on the 2D tab</span>
+        <span class="k">if</span> <span class="n">current_tab_index</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># 2D tab</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update2DPlot</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">deferredUpdateControlVisibility</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tab_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateControlVisibility</span><span class="p">(</span><span class="n">tab_index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tab_index</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update2DPlot</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MDAFileVisualization.update2DTabVisibility">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.update2DTabVisibility">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update2DTabVisibility</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show_2d_tab</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update 2D tab visibility based on data dimensions.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            show_2d_tab (bool): Whether to show the 2D tab</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Find the 2D tab index (should be index 3 after Metadata tab)</span>
+        <span class="n">tab_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">tab_count</span> <span class="o">&lt;</span> <span class="mi">4</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">show_2d_tab</span><span class="p">:</span>
+            <span class="c1"># Do nothing - tab doesn&#39;t exist and we don&#39;t want to show it</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">tab_count</span> <span class="o">&lt;</span> <span class="mi">4</span> <span class="ow">and</span> <span class="n">show_2d_tab</span><span class="p">:</span>
+            <span class="c1"># The 2D tab should exist but might be hidden</span>
+            <span class="c1"># Try to show it anyway - the tab should be at index 3</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">setTabVisible</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">show_2d_tab</span><span class="p">)</span>
+            <span class="c1"># Update the 2D plot to populate the tab</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update2DPlot</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># tab_count &gt;= 4, just show/hide as needed</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">setTabVisible</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">show_2d_tab</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.set2DData">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.set2DData">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set2DData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set 2D data for visualization and manage 2D tab visibility.</span>
+
+<span class="sd">        If data is multidimensional, shows the 2D tab and stores the data; otherwise hides the</span>
+<span class="sd">        2D tab and clears stored data.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            data (dict or None): 2D data dictionary with scanDict2D and metadata, or None to clear</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;isMultidimensional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update2DTabVisibility</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="c1"># Clear 2D data</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_2d_data&quot;</span><span class="p">):</span>
+                <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_2d_data&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">updateControlVisibility</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">())</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Show 2D tab for multidimensional data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update2DTabVisibility</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Store 2D data for plotting</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_2d_data</span> <span class="o">=</span> <span class="n">data</span>
+
+        <span class="c1"># Update 2D plot if tab is visible</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># 2D tab</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update2DPlot</span><span class="p">()</span>
+
+        <span class="c1"># Update control (tableview vs 2D/Ydet control)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateControlVisibility</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.update2DPlot">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.update2DPlot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update2DPlot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the 2D plot with current data.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_2d_data&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_2d_data</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Get the current table view by traversing up the parent chain to find MDA_MVC</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span>
+        <span class="k">while</span> <span class="n">parent</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;currentFileTableview&quot;</span><span class="p">):</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">parent</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">tableview</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">currentFileTableview</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tableview</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Get 2D selections from comboboxes instead of 1D selections from table view</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">tableview</span><span class="p">,</span> <span class="s2">&quot;get2DSelections&quot;</span><span class="p">):</span>
+            <span class="n">selection</span> <span class="o">=</span> <span class="n">tableview</span><span class="o">.</span><span class="n">get2DSelections</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No get2DSelections method available&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Convert 2D selection to 1D format for data2Plot2D</span>
+        <span class="c1"># data2Plot2D expects: {&#39;X&#39;: x_index, &#39;Y&#39;: [y_indices], &#39;I0&#39;: i0_index}</span>
+        <span class="c1"># i.e X1 -&gt; X; could refactor but it is too risky for a small gain</span>
+        <span class="n">converted_selection</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;X1&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;X2&quot;</span><span class="p">:</span> <span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;X2&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="p">[]),</span>
+            <span class="s2">&quot;I0&quot;</span><span class="p">:</span> <span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;I0&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;log_y&quot;</span><span class="p">:</span> <span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;log_y&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Converted to 1D format: </span><span class="si">{</span><span class="n">converted_selection</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Call our data2Plot2D function to extract 2D data</span>
+        <span class="n">datasets</span><span class="p">,</span> <span class="n">plot_options</span> <span class="o">=</span> <span class="n">tableview</span><span class="o">.</span><span class="n">data2Plot2D</span><span class="p">(</span><span class="n">converted_selection</span><span class="p">)</span>
+
+        <span class="c1"># Create and display 2D plot if we have data</span>
+        <span class="k">if</span> <span class="n">datasets</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating 2D plot&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Get the 2D plot widget from the 2D tab layout</span>
+            <span class="n">layoutMpl2D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotPage2D</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">layoutMpl2D</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span>
+
+            <span class="n">widgetMpl2D</span> <span class="o">=</span> <span class="n">layoutMpl2D</span><span class="o">.</span><span class="n">itemAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">widget</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">widgetMpl2D</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;2D layout has no widget at index 0&quot;</span><span class="p">)</span>
+                <span class="n">widgetMpl2D</span> <span class="o">=</span> <span class="n">ChartView2D</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_options</span><span class="p">)</span>
+                <span class="n">widgetMpl2D</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">layoutMpl2D</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">widgetMpl2D</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">widgetMpl2D</span><span class="p">,</span> <span class="n">ChartView2D</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating new ChartView2D widget for 2D tab&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Remove the existing widget from the layout</span>
+                <span class="n">layoutMpl2D</span><span class="o">.</span><span class="n">removeWidget</span><span class="p">(</span><span class="n">widgetMpl2D</span><span class="p">)</span>
+                <span class="n">widgetMpl2D</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span>
+
+                <span class="c1"># Create new ChartView2D widget with correct parent (MDA_MVC)</span>
+                <span class="n">widgetMpl2D</span> <span class="o">=</span> <span class="n">ChartView2D</span><span class="p">(</span>
+                    <span class="n">parent</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_options</span>
+                <span class="p">)</span>  <span class="c1"># Use parent (MDA_MVC) as parent</span>
+
+                <span class="c1"># Make the widget visible</span>
+                <span class="n">widgetMpl2D</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Set 2D widget visible: </span><span class="si">{</span><span class="n">widgetMpl2D</span><span class="o">.</span><span class="n">isVisible</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Add the widget to the 2D layout</span>
+                <span class="n">layoutMpl2D</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">widgetMpl2D</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Added ChartView2D to 2D layout&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Apply 2D log scale state from current selections (for both new and existing widgets)</span>
+            <span class="n">log_y</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;log_y&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">widgetMpl2D</span><span class="o">.</span><span class="n">setLogScales2D</span><span class="p">(</span><span class="n">log_y</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Applied log scale: </span><span class="si">{</span><span class="n">log_y</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Plot the 2D data; datasets is a list with 1 element (only 1 det selected)</span>
+            <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
+                <span class="n">y_data</span><span class="p">,</span> <span class="n">dataset_options</span> <span class="o">=</span> <span class="n">dataset</span>
+                <span class="n">x_data</span> <span class="o">=</span> <span class="n">dataset_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;x_data&quot;</span><span class="p">)</span>
+                <span class="n">x2_data</span> <span class="o">=</span> <span class="n">dataset_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;x2_data&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">x_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">x2_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Plotting 2D data in 2D tab&quot;</span><span class="p">)</span>
+
+                    <span class="c1"># Set the plot type from current selections</span>
+                    <span class="n">plot_type</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;plot_type&quot;</span><span class="p">,</span> <span class="s2">&quot;heatmap&quot;</span><span class="p">)</span>
+                    <span class="n">widgetMpl2D</span><span class="o">.</span><span class="n">set_plot_type</span><span class="p">(</span><span class="n">plot_type</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Set plot type to: </span><span class="si">{</span><span class="n">plot_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                    <span class="c1"># Add color palette to plot options</span>
+                    <span class="n">color_palette</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color_palette&quot;</span><span class="p">,</span> <span class="s2">&quot;viridis&quot;</span><span class="p">)</span>
+
+                    <span class="c1"># Validate color palette - ensure it&#39;s not empty</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">color_palette</span> <span class="ow">or</span> <span class="n">color_palette</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                        <span class="n">color_palette</span> <span class="o">=</span> <span class="s2">&quot;viridis&quot;</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Empty color palette, using default: </span><span class="si">{</span><span class="n">color_palette</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+
+                    <span class="n">plot_options</span><span class="p">[</span><span class="s2">&quot;color_palette&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">color_palette</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Set color palette to: </span><span class="si">{</span><span class="n">color_palette</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                    <span class="n">widgetMpl2D</span><span class="o">.</span><span class="n">plot2D</span><span class="p">(</span><span class="n">y_data</span><span class="p">,</span> <span class="n">x_data</span><span class="p">,</span> <span class="n">x2_data</span><span class="p">,</span> <span class="n">plot_options</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Missing Y, X or X2 data for 2D plotting&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Store reference to 2D chart view</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chart_view_2d</span> <span class="o">=</span> <span class="n">widgetMpl2D</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;No 2D datasets extracted, showing message&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Show &quot;Nothing to plot&quot; message when no datasets are available</span>
+            <span class="c1"># This happens when validation fails (e.g., only 1 point for X2)</span>
+            <span class="n">layoutMpl2D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotPage2D</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">layoutMpl2D</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Expected exactly one widget in 2D layout&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="n">widgetMpl2D</span> <span class="o">=</span> <span class="n">layoutMpl2D</span><span class="o">.</span><span class="n">itemAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">widget</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">widgetMpl2D</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;2D layout has no widget at index 0&quot;</span><span class="p">)</span>
+                <span class="n">widgetMpl2D</span> <span class="o">=</span> <span class="n">ChartView2D</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="o">**</span><span class="p">{})</span>
+                <span class="n">layoutMpl2D</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">widgetMpl2D</span><span class="p">)</span>
+            <span class="c1"># Use the showMessage method if the widget supports it</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">widgetMpl2D</span><span class="p">,</span> <span class="s2">&quot;showMessage&quot;</span><span class="p">):</span>
+                <span class="n">widgetMpl2D</span><span class="o">.</span><span class="n">showMessage</span><span class="p">(</span><span class="s2">&quot;Nothing to plot&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chart_view_2d</span> <span class="o">=</span> <span class="n">widgetMpl2D</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Create a simple message widget if needed</span>
+                <span class="c1"># Remove the existing widget from the layout</span>
+                <span class="n">layoutMpl2D</span><span class="o">.</span><span class="n">removeWidget</span><span class="p">(</span><span class="n">widgetMpl2D</span><span class="p">)</span>
+                <span class="n">widgetMpl2D</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span>
+
+                <span class="c1"># Create a simple QLabel widget to show the message</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6.QtWidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">QLabel</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">Qt</span>
+
+                <span class="n">message_widget</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Nothing to plot&quot;</span><span class="p">)</span>
+                <span class="n">message_widget</span><span class="o">.</span><span class="n">setAlignment</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignmentFlag</span><span class="o">.</span><span class="n">AlignCenter</span><span class="p">)</span>
+                <span class="n">message_widget</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span>
+<span class="w">                    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                    QLabel {</span>
+<span class="sd">                        font-size: 16px;</span>
+<span class="sd">                        color: #666666;</span>
+<span class="sd">                        background-color: #f5f5f5;</span>
+<span class="sd">                        border: 1px solid #cccccc;</span>
+<span class="sd">                        border-radius: 5px;</span>
+<span class="sd">                        padding: 20px;</span>
+<span class="sd">                    }</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Add the message widget to the 2D layout</span>
+                <span class="n">layoutMpl2D</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">message_widget</span><span class="p">)</span>
+
+                <span class="c1"># Store reference to message widget</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chart_view_2d</span> <span class="o">=</span> <span class="n">message_widget</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.onTabChanged">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.onTabChanged">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onTabChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle tab changes.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            index (int): Index of the newly selected tab</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tab changed to index: </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Store new tab index</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_viz_tab_index</span> <span class="o">=</span> <span class="n">index</span>
+
+        <span class="c1"># Get current tab structure</span>
+        <span class="n">tab_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="n">is_2d_visible</span> <span class="o">=</span> <span class="n">tab_count</span> <span class="o">&gt;=</span> <span class="mi">4</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">isTabVisible</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="c1"># Handle control visibility based on tab</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateControlVisibility</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+        <span class="c1"># Handle 2D plotting</span>
+        <span class="k">if</span> <span class="n">is_2d_visible</span> <span class="ow">and</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># 2D tab</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Switching to 2D tab, calling update2DPlot&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update2DPlot</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># 1D tab</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Switching to 1D tab&quot;</span><span class="p">)</span>
+            <span class="c1"># Update 1D plot if needed</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># Handle search functionality</span>
+        <span class="c1"># Enable search only when metadata tab is active</span>
+        <span class="c1"># Tab indices: 0=1D, 1=Data, 2=Metadata, 3=2D(if visible)</span>
+        <span class="c1"># Metadata is always at index 2</span>
+        <span class="n">is_metadata_tab</span> <span class="o">=</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">2</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;search_shortcut&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">search_shortcut</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">is_metadata_tab</span><span class="p">)</span>
+
+        <span class="c1"># Close search dialog if switching away from metadata tab</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;search_dialog&quot;</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_metadata_tab</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_dialog</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_dialog</span><span class="o">.</span><span class="n">isVisible</span><span class="p">()</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">search_dialog</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.updateControlVisibility">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.updateControlVisibility">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updateControlVisibility</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update control visibility based on the selected tab (1D vs 2D).</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            tab_index (int): Index of the selected tab</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get the current file table view</span>
+
+        <span class="n">current_tableview</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCurrentFileTableview</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">current_tableview</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">&quot;updateControlVisibility No current tableview found, deferring retry&quot;</span>
+            <span class="p">)</span>
+            <span class="n">QTimer</span><span class="o">.</span><span class="n">singleShot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">updateControlVisibility</span><span class="p">(</span><span class="n">tab_index</span><span class="p">))</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Tab indices: 0=1D, 1=Data, 2=Metadata, 3=2D(if visible)</span>
+        <span class="k">if</span> <span class="n">tab_index</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>  <span class="c1"># 1D, data &amp; metadata tabs</span>
+            <span class="c1"># Show table view, hide Y DET controls</span>
+            <span class="n">current_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">current_tableview</span><span class="o">.</span><span class="n">yDetControls</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="c1"># Only show X2 controls if the active tab contains 2D data</span>
+            <span class="k">if</span> <span class="n">current_tableview</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">data</span><span class="p">():</span>
+                <span class="n">active_file_data</span> <span class="o">=</span> <span class="n">current_tableview</span><span class="o">.</span><span class="n">mda_file</span><span class="o">.</span><span class="n">data</span><span class="p">()</span>
+                <span class="n">is_2d_data</span> <span class="o">=</span> <span class="n">active_file_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;isMultidimensional&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="n">current_tableview</span><span class="o">.</span><span class="n">dimensionControls</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="n">is_2d_data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">current_tableview</span><span class="o">.</span><span class="n">dimensionControls</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="c1"># Show mode controls and clear button</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">showModeControls</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Show analysis controls (curves, graphInfo, cursorInfo)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">showAnalysisControls</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">tab_index</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># 2D tab</span>
+            <span class="c1"># Hide table view and X2 controls, show Y DET controls</span>
+            <span class="n">current_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">current_tableview</span><span class="o">.</span><span class="n">dimensionControls</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">current_tableview</span><span class="o">.</span><span class="n">yDetControls</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Hide mode controls and clear button</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">showModeControls</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="c1"># Hide analysis controls: curve box, graphInfo, cursorInfo</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">showAnalysisControls</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.showModeControls">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.showModeControls">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">showModeControls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Show or hide mode controls (autoBox, clearButton, etc.).&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Try to find MDA_MVC first</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span>
+            <span class="k">while</span> <span class="n">parent</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;mda_file&quot;</span><span class="p">):</span>
+                <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">parent</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;mda_file&quot;</span><span class="p">):</span>
+                <span class="c1"># Found MDA_MVC, access controls through mda_file</span>
+                <span class="n">mda_file</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">mda_file</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mda_file</span><span class="p">,</span> <span class="s2">&quot;autoBox&quot;</span><span class="p">):</span>
+                    <span class="n">mda_file</span><span class="o">.</span><span class="n">autoBox</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mda_file</span><span class="p">,</span> <span class="s2">&quot;clearButton&quot;</span><span class="p">):</span>
+                    <span class="n">mda_file</span><span class="o">.</span><span class="n">clearButton</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mda_file</span><span class="p">,</span> <span class="s2">&quot;clearGraphButton&quot;</span><span class="p">):</span>
+                    <span class="n">mda_file</span><span class="o">.</span><span class="n">clearGraphButton</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+
+                <span class="c1"># addButton and replaceButton should only be visible in Auto-off mode</span>
+                <span class="k">if</span> <span class="n">show</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mda_file</span><span class="p">,</span> <span class="s2">&quot;mode&quot;</span><span class="p">):</span>
+                    <span class="n">is_auto_off</span> <span class="o">=</span> <span class="n">mda_file</span><span class="o">.</span><span class="n">mode</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Auto-off&quot;</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mda_file</span><span class="p">,</span> <span class="s2">&quot;addButton&quot;</span><span class="p">):</span>
+                        <span class="n">mda_file</span><span class="o">.</span><span class="n">addButton</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="n">is_auto_off</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mda_file</span><span class="p">,</span> <span class="s2">&quot;replaceButton&quot;</span><span class="p">):</span>
+                        <span class="n">mda_file</span><span class="o">.</span><span class="n">replaceButton</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="n">is_auto_off</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Hide when show=False (switching to 2D tab)</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mda_file</span><span class="p">,</span> <span class="s2">&quot;addButton&quot;</span><span class="p">):</span>
+                        <span class="n">mda_file</span><span class="o">.</span><span class="n">addButton</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mda_file</span><span class="p">,</span> <span class="s2">&quot;replaceButton&quot;</span><span class="p">):</span>
+                        <span class="n">mda_file</span><span class="o">.</span><span class="n">replaceButton</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in showModeControls: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.showAnalysisControls">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.showAnalysisControls">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">showAnalysisControls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Show or hide 1D-specific controls by hiding/showing the entire curves widget.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Hide/show the entire curves widget (contains curveBox, curveRemove, curveStyle, clearAll, etc.)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;curves&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">curves</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+
+            <span class="c1"># Hide/show graphInfo panel</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;graphInfo&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">graphInfo</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+
+            <span class="c1"># Hide/show cursorInfo panel for 2D tab</span>
+            <span class="c1"># if hasattr(self, &quot;cursorInfo&quot;):</span>
+            <span class="c1">#     self.cursorInfo.setVisible(show)</span>
+
+            <span class="c1"># If showing 1D controls, restore their state based on current curve selection</span>
+            <span class="k">if</span> <span class="n">show</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;chart_view&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">chart_view</span><span class="p">:</span>
+                <span class="c1"># Reconnect the curveRemove button signal</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;curveRemove&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">chart_view</span><span class="p">,</span> <span class="s2">&quot;onRemoveButtonClicked&quot;</span>
+                <span class="p">):</span>
+                    <span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+
+                    <span class="n">utils</span><span class="o">.</span><span class="n">reconnect</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">curveRemove</span><span class="o">.</span><span class="n">clicked</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chart_view</span><span class="o">.</span><span class="n">onRemoveButtonClicked</span>
+                    <span class="p">)</span>
+
+                <span class="n">selected_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chart_view</span><span class="o">.</span><span class="n">getSelectedCurveID</span><span class="p">()</span>
+                <span class="n">has_curve</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span>
+                    <span class="n">selected_id</span> <span class="ow">and</span> <span class="n">selected_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chart_view</span><span class="o">.</span><span class="n">curveManager</span><span class="o">.</span><span class="n">curves</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">updatePlotControls</span><span class="p">(</span><span class="n">has_curve</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in showAnalysisControls: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.getCurrentFileTableview">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.getCurrentFileTableview">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getCurrentFileTableview</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current file table view from the parent.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span>
+            <span class="k">while</span> <span class="n">parent</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;currentFileTableview&quot;</span><span class="p">):</span>
+                <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">parent</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;currentFileTableview&quot;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">parent</span><span class="o">.</span><span class="n">currentFileTableview</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No MDA_MVC found&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in getCurrentFileTableview: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.setupFitUI">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setupFitUI">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setupFitUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup the fit UI components and connections.&quot;&quot;&quot;</span>
+        <span class="c1"># Populate fit model combo box in the desired order</span>
+        <span class="n">models</span> <span class="o">=</span> <span class="n">get_available_models</span><span class="p">()</span>
+        <span class="n">ordered_model_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">model_name</span> <span class="ow">in</span> <span class="n">ordered_model_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">model_name</span> <span class="ow">in</span> <span class="n">models</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fitModelCombo</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+
+        <span class="c1"># Connect fit buttons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onFitButtonClicked</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clearFitsButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onClearFitsButtonClicked</span><span class="p">)</span>
+
+        <span class="c1"># Initially disable fit controls until a curve is selected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clearFitsButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.onFitButtonClicked">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.onFitButtonClicked">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onFitButtonClicked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle fit button click.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;chart_view&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">chart_view</span><span class="p">:</span>
+            <span class="n">model_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitModelCombo</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span>
+            <span class="n">use_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">useFitRangeCheck</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chart_view</span><span class="o">.</span><span class="n">performFit</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">use_range</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.onClearFitsButtonClicked">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.onClearFitsButtonClicked">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onClearFitsButtonClicked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle clear fits button click.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;chart_view&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">chart_view</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chart_view</span><span class="o">.</span><span class="n">clearSelectedFit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.updatePlotControls">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.updatePlotControls">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updatePlotControls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">curve_selected</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update plot control states based on curve selection.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        - curve_selected: Whether a curve is currently selected</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">QTimer</span>
+
+        <span class="c1"># Prevent rapid successive calls that would disable controls</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_last_control_update&quot;</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_control_update</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_last_control_update_value&quot;</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_control_update_value</span> <span class="ow">is</span> <span class="kc">True</span>
+            <span class="ow">and</span> <span class="n">curve_selected</span> <span class="ow">is</span> <span class="kc">False</span>
+        <span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Set a timer to allow the next call after a delay</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_control_update</span> <span class="o">=</span> <span class="n">QTimer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_control_update</span><span class="o">.</span><span class="n">singleShot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_control_update_delay</span><span class="p">,</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_last_control_update&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_control_update_value</span> <span class="o">=</span> <span class="n">curve_selected</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">curve_selected</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clearFitsButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">curve_selected</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">curveStyle</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">curve_selected</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logXCheckBox</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">curve_selected</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logYCheckBox</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">curve_selected</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.setupCurveStyleUI">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setupCurveStyleUI">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setupCurveStyleUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup the curve style UI components and connections.&quot;&quot;&quot;</span>
+        <span class="c1"># Define available curve styles with their matplotlib format strings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">curve_styles</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Line&quot;</span><span class="p">:</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Points&quot;</span><span class="p">:</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Circle Markers&quot;</span><span class="p">:</span> <span class="s2">&quot;o-&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Square Markers&quot;</span><span class="p">:</span> <span class="s2">&quot;s-&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Triangle Markers&quot;</span><span class="p">:</span> <span class="s2">&quot;^-&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Diamond Markers&quot;</span><span class="p">:</span> <span class="s2">&quot;D-&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Dashed&quot;</span><span class="p">:</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Dots&quot;</span><span class="p">:</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Dash-Dot&quot;</span><span class="p">:</span> <span class="s2">&quot;-.&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Populate the combo box</span>
+        <span class="k">for</span> <span class="n">style_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">curve_styles</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">curveStyle</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">style_name</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+
+        <span class="c1"># Set default style</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">curveStyle</span><span class="o">.</span><span class="n">setCurrentText</span><span class="p">(</span><span class="s2">&quot;Line&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+
+        <span class="c1"># Connect the combo box signal</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">curveStyle</span><span class="o">.</span><span class="n">currentTextChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onCurveStyleChanged</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+
+        <span class="c1"># Initially disable until a curve is selected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">curveStyle</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.onCurveStyleChanged">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.onCurveStyleChanged">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onCurveStyleChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle curve style change.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;chart_view&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">chart_view</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chart_view</span><span class="o">.</span><span class="n">updateCurveStyle</span><span class="p">(</span><span class="n">style_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.setupLogScaleUI">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setupLogScaleUI">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setupLogScaleUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup the log scale UI components and connections.&quot;&quot;&quot;</span>
+        <span class="c1"># Connect log scale checkboxes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logXCheckBox</span><span class="o">.</span><span class="n">toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onLogScaleChanged</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logYCheckBox</span><span class="o">.</span><span class="n">toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onLogScaleChanged</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+
+        <span class="c1"># Initially disable until a curve is selected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logXCheckBox</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logYCheckBox</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.onLogScaleChanged">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.onLogScaleChanged">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onLogScaleChanged</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle log scale checkbox changes.&quot;&quot;&quot;</span>
+        <span class="c1"># Store the log scale state centrally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_x_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logXCheckBox</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span>  <span class="c1"># type: ignore[attr-defined]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_y_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logYCheckBox</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span>  <span class="c1"># type: ignore[attr-defined]</span>
+
+        <span class="c1"># Apply to chart if available</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;chart_view&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">chart_view</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chart_view</span><span class="o">.</span><span class="n">setLogScales</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_x_state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_y_state</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.getLogScaleState">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.getLogScaleState">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">getLogScaleState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current log scale state.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_x_state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_y_state</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.setLogScaleState">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setLogScaleState">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setLogScaleState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_x</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">log_y</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the log scale state and update checkboxes.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_x_state</span> <span class="o">=</span> <span class="n">log_x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_y_state</span> <span class="o">=</span> <span class="n">log_y</span>
+
+        <span class="c1"># Update checkbox states to match stored state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logXCheckBox</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">log_x</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logYCheckBox</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="n">log_y</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+
+        <span class="c1"># Apply to chart if available</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;chart_view&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">chart_view</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chart_view</span><span class="o">.</span><span class="n">setLogScales</span><span class="p">(</span><span class="n">log_x</span><span class="p">,</span> <span class="n">log_y</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.syncLogScaleCheckboxes">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.syncLogScaleCheckboxes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">syncLogScaleCheckboxes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sync checkbox states with the stored log scale state.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logXCheckBox</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_x_state</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logYCheckBox</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_y_state</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.setTableData">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setTableData">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setTableData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set data for the data table view.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            data: Data to display in the table</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Reuse existing data table view if it exists</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;data_table_view&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_table_view</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_table_view</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_table_view</span><span class="o">.</span><span class="n">displayTable</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Create new one only if it doesn&#39;t exist</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_table_view</span> <span class="o">=</span> <span class="n">DataTableView</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+            <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataPage</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+            <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_table_view</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_table_view</span><span class="o">.</span><span class="n">displayTable</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.setMetadata">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setMetadata">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setMetadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set text content for the metadata display.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            text (str): Text content to display</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># tab=self.metadataPage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.setPlot">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setPlot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setPlot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_widget</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the plot widget for the visualization tab.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            plot_widget: The plot widget to add to the layout</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotPageMpl</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">removeAllLayoutWidgets</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+
+        <span class="c1"># Set size policy to prevent vertical expansion</span>
+        <span class="n">plot_widget</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span>
+            <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Preferred</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Don&#39;t override the ChartView&#39;s own height constraints</span>
+        <span class="c1"># The ChartView already has proper max height constraints set</span>
+
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">plot_widget</span><span class="p">)</span>
+
+        <span class="c1"># Store reference to chart view for fit functionality</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chart_view</span> <span class="o">=</span> <span class="n">plot_widget</span>
+
+        <span class="c1"># Sync log scale checkbox states with the stored state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">syncLogScaleCheckboxes</span><span class="p">()</span>
+
+        <span class="c1"># Update tab widget max height to match the chart view</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_updateTabWidgetMaxHeight</span><span class="p">()</span>
+
+        <span class="n">kind</span> <span class="o">=</span> <span class="s2">&quot;ChartView2D&quot;</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">plot_widget</span><span class="p">,</span> <span class="s2">&quot;_plot_type&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;ChartView&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;setPlot - added </span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2"> to layout&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization._updateTabWidgetMaxHeight">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization._updateTabWidgetMaxHeight">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_updateTabWidgetMaxHeight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the tab widget&#39;s maximum height to match the plot height setting.&quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.user_settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+
+        <span class="n">max_height</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">getKey</span><span class="p">(</span><span class="s2">&quot;plot_max_height&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">max_height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_height</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="n">max_height</span> <span class="o">=</span> <span class="mi">800</span>  <span class="c1"># Default value</span>
+
+        <span class="c1"># Set maximum height for the tab widget to prevent vertical growth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabWidget</span><span class="o">.</span><span class="n">setMaximumHeight</span><span class="p">(</span>
+            <span class="n">max_height</span> <span class="o">+</span> <span class="mi">100</span>
+        <span class="p">)</span>  <span class="c1"># Add some padding for tab headers</span>
+
+        <span class="c1"># Also update the plot page max height</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotPageMpl</span><span class="o">.</span><span class="n">setMaximumHeight</span><span class="p">(</span>
+            <span class="n">max_height</span> <span class="o">+</span> <span class="mi">50</span>
+        <span class="p">)</span>  <span class="c1"># Add padding for tab content</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.clearContents">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.clearContents">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clearContents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clears content from the specified components of the visualization.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        - plot (bool, optional): If True, clears the plot content. Defaults to True.</span>
+<span class="sd">        - data (bool, optional): If True, clears the data table content. Defaults to True.</span>
+<span class="sd">        - metadata (bool, optional): If True, clears the metadata content. Defaults to True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Clear Plot</span>
+        <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+            <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotPageMpl</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">layout</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">plot_widget</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">itemAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">widget</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">plot_widget</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Plot layout has no widget at index 0&quot;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plot_widget</span><span class="p">,</span> <span class="n">ChartView</span><span class="p">):</span>
+                    <span class="n">plot_widget</span><span class="o">.</span><span class="n">clearPlot</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">setLogScaleState</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                    <span class="n">plot_widget</span><span class="o">.</span><span class="n">curveManager</span><span class="o">.</span><span class="n">removeAllCurves</span><span class="p">()</span>
+        <span class="c1"># Clear Metadata</span>
+        <span class="k">if</span> <span class="n">metadata</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="c1"># Clear Data Table</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_table_view</span><span class="o">.</span><span class="n">clearContents</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">pass</span>  <span class="c1"># data_table_view does not exist, so do nothing</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.setStatus">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setStatus">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the status bar text.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            text (str): Status message to display</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mda_mvc</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.setupSearchFunctionality">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setupSearchFunctionality">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setupSearchFunctionality</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup search functionality for the metadata widget.&quot;&quot;&quot;</span>
+        <span class="c1"># Create a shortcut for Ctrl+F</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">search_shortcut</span> <span class="o">=</span> <span class="n">QShortcut</span><span class="p">(</span><span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+F&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">search_shortcut</span><span class="o">.</span><span class="n">activated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">showSearchDialog</span><span class="p">)</span>
+
+        <span class="c1"># Initially disable the shortcut (only enable when metadata tab is active)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">search_shortcut</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Create search dialog (but don&#39;t show it yet)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">search_dialog</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="MDAFileVisualization.showSearchDialog">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.showSearchDialog">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">showSearchDialog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Show the search dialog for the metadata widget.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_dialog</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">search_dialog</span> <span class="o">=</span> <span class="n">MetadataSearchDialog</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># Show the dialog</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">search_dialog</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">search_dialog</span><span class="o">.</span><span class="n">raise_</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">search_dialog</span><span class="o">.</span><span class="n">activateWindow</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MetadataSearchDialog">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MetadataSearchDialog">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MetadataSearchDialog</span><span class="p">(</span><span class="n">QDialog</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A simple search dialog for the metadata widget.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_widget</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_widget</span> <span class="o">=</span> <span class="n">text_widget</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_find_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setupUI</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MetadataSearchDialog.setupUI">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MetadataSearchDialog.setupUI">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setupUI</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup the search dialog UI.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s2">&quot;Search Metadata&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setModal</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># Search input</span>
+        <span class="n">search_layout</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+        <span class="n">search_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Find:&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">search_input</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">search_input</span><span class="o">.</span><span class="n">textChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">findText</span><span class="p">)</span>
+        <span class="n">search_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">search_input</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">search_layout</span><span class="p">)</span>
+
+        <span class="c1"># Buttons</span>
+        <span class="n">button_layout</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QHBoxLayout</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">find_next_btn</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Find Next&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">find_next_btn</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">findNext</span><span class="p">)</span>
+        <span class="n">button_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">find_next_btn</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">find_prev_btn</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Find Previous&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">find_prev_btn</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">findPrevious</span><span class="p">)</span>
+        <span class="n">button_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">find_prev_btn</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_btn</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Close&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_btn</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
+        <span class="n">button_layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">close_btn</span><span class="p">)</span>
+
+        <span class="n">layout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">button_layout</span><span class="p">)</span>
+
+        <span class="c1"># Set focus to search input</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">search_input</span><span class="o">.</span><span class="n">setFocus</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MetadataSearchDialog.findText">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MetadataSearchDialog.findText">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">findText</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find text as user types.&quot;&quot;&quot;</span>
+        <span class="n">search_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_input</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">search_text</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_find_index</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">findNext</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MetadataSearchDialog.findNext">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MetadataSearchDialog.findNext">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">findNext</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find next occurrence of the search text.&quot;&quot;&quot;</span>
+        <span class="n">search_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_input</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">search_text</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Use QTextBrowser&#39;s find method</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_widget</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">search_text</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+            <span class="c1"># If not found, start from beginning</span>
+            <span class="n">cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_widget</span><span class="o">.</span><span class="n">textCursor</span><span class="p">()</span>
+            <span class="n">cursor</span><span class="o">.</span><span class="n">movePosition</span><span class="p">(</span><span class="n">cursor</span><span class="o">.</span><span class="n">MoveOperation</span><span class="o">.</span><span class="n">Start</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">text_widget</span><span class="o">.</span><span class="n">setTextCursor</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_widget</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">search_text</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">found</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">text_widget</span><span class="o">.</span><span class="n">setFocus</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MetadataSearchDialog.findPrevious">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MetadataSearchDialog.findPrevious">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">findPrevious</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find previous occurrence of the search text.&quot;&quot;&quot;</span>
+        <span class="n">search_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_input</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">search_text</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Use QTextBrowser&#39;s find method with backward search</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_widget</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+            <span class="n">search_text</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QTextDocument</span><span class="o">.</span><span class="n">FindFlag</span><span class="o">.</span><span class="n">FindBackward</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+            <span class="c1"># If not found, start from end</span>
+            <span class="n">cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_widget</span><span class="o">.</span><span class="n">textCursor</span><span class="p">()</span>
+            <span class="n">cursor</span><span class="o">.</span><span class="n">movePosition</span><span class="p">(</span><span class="n">cursor</span><span class="o">.</span><span class="n">MoveOperation</span><span class="o">.</span><span class="n">End</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">text_widget</span><span class="o">.</span><span class="n">setTextCursor</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_widget</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+                <span class="n">search_text</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QTextDocument</span><span class="o">.</span><span class="n">FindFlag</span><span class="o">.</span><span class="n">FindBackward</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">found</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">text_widget</span><span class="o">.</span><span class="n">setFocus</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MetadataSearchDialog.keyPressEvent">
+<a class="viewcode-back" href="../../api/mda_file_viz.html#mdaviz.mda_file_viz.MetadataSearchDialog.keyPressEvent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">keyPressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle key press events.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key</span><span class="o">.</span><span class="n">Key_Return</span>
+            <span class="ow">or</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key</span><span class="o">.</span><span class="n">Key_Enter</span>
+        <span class="p">):</span>
+            <span class="c1"># Enter key finds next</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">findNext</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">Key</span><span class="o">.</span><span class="n">Key_Escape</span><span class="p">:</span>
+            <span class="c1"># Escape key closes dialog</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">keyPressEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

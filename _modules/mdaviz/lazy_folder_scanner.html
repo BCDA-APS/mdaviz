@@ -1,0 +1,1261 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mdaviz.lazy_folder_scanner &#8212; mdaviz 1.3</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=8749d347"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/mdaviz/lazy_folder_scanner';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mdaviz 1.3</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Changes
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Changes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">mdaviz.lazy_folder_scanner</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for mdaviz.lazy_folder_scanner</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Lazy folder scanning functionality.</span>
+
+<span class="sd">This module provides efficient folder scanning capabilities for MDA files</span>
+<span class="sd">with support for batch processing and progress tracking.</span>
+
+<span class="sd">.. autosummary::</span>
+
+<span class="sd">    ~LazyFolderScanner</span>
+<span class="sd">    ~FolderScanResult</span>
+<span class="sd">    ~FolderScanWorker</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">QObject</span><span class="p">,</span> <span class="n">QThread</span><span class="p">,</span> <span class="n">pyqtSignal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_file_info_lightweight</span><span class="p">,</span> <span class="n">get_file_info_full</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.progress_dialog</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncProgressDialog</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.lazy_loading_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config</span>
+
+<span class="c1"># Get logger for this module</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;lazy_folder_scanner&quot;</span><span class="p">)</span>
+
+<span class="c1"># Emit progress at most every N files to avoid flooding the event queue (RecursionError</span>
+<span class="c1"># when setStatus/statusbar triggers event processing and re-enters progress handler).</span>
+<span class="n">PROGRESS_EMIT_INTERVAL</span> <span class="o">=</span> <span class="mi">100</span>
+
+
+<span class="c1"># Cache key: resolved path str; value: (mtime, file_info dict)</span>
+<span class="n">FileInfoCache</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span>
+
+
+<div class="viewcode-block" id="FolderScanResult">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.FolderScanResult">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FolderScanResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Result of a folder scan operation.&quot;&quot;&quot;</span>
+
+    <span class="n">file_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">file_info_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+    <span class="n">total_files</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">scanned_files</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">is_complete</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">error_message</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">is_progressive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Whether this is a progressive scan</span>
+    <span class="n">file_info_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FileInfoCache</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># For incremental refresh</span></div>
+
+
+
+<div class="viewcode-block" id="LazyFolderScanner">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LazyFolderScanner</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Lazy folder scanner for handling large MDA folders efficiently.</span>
+
+<span class="sd">    This class provides methods to scan folders in batches, allowing the UI</span>
+<span class="sd">    to remain responsive while processing large numbers of files.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        batch_size (int): Number of files to process in each batch</span>
+<span class="sd">        max_files (int): Maximum number of files to scan before warning</span>
+<span class="sd">        use_lightweight_scan (bool): Whether to use lightweight scanning</span>
+<span class="sd">        progressive_loading (bool): Whether to use progressive loading for large directories</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Signals</span>
+    <span class="n">scan_progress</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>  <span class="c1"># current, total</span>
+    <span class="n">scan_complete</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>  <span class="c1"># FolderScanResult</span>
+    <span class="n">scan_error</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>  <span class="c1"># error message</span>
+    <span class="n">progressive_scan_update</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>  <span class="c1"># FolderScanResult (partial)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="n">max_files</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span>
+        <span class="n">use_lightweight_scan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">progressive_loading</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the lazy folder scanner.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            batch_size (int): Number of files to process in each batch</span>
+<span class="sd">            max_files (int): Maximum number of files to scan before warning</span>
+<span class="sd">            use_lightweight_scan (bool): Whether to use lightweight scanning</span>
+<span class="sd">            progressive_loading (bool): Whether to use progressive loading for large directories</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_files</span> <span class="o">=</span> <span class="n">max_files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_lightweight_scan</span> <span class="o">=</span> <span class="n">use_lightweight_scan</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressive_loading</span> <span class="o">=</span> <span class="n">progressive_loading</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scanning</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_scan_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_info_cache</span><span class="p">:</span> <span class="n">FileInfoCache</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># path -&gt; (mtime, file_info); reused on refresh</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanner_thread</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">QThread</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanner_worker</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FolderScanWorker</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_progress_dialog</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AsyncProgressDialog</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="LazyFolderScanner.scan_folder">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner.scan_folder">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scan_folder</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">folder_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">progress_callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FolderScanResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Scan a folder for MDA files using lazy loading.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            folder_path (Path): Path to the folder to scan</span>
+<span class="sd">            progress_callback (callable, optional): Callback for progress updates</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            FolderScanResult: Result of the scan operation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">folder_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">folder_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">FolderScanResult</span><span class="p">([],</span> <span class="p">[],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Folder does not exist&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get all MDA files in the folder</span>
+        <span class="n">mda_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">folder_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.mda&quot;</span><span class="p">))</span>
+        <span class="n">total_files</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mda_files</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">total_files</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">FolderScanResult</span><span class="p">([],</span> <span class="p">[],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;No MDA files found&quot;</span><span class="p">)</span>
+
+        <span class="c1"># For very large directories, use progressive loading</span>
+        <span class="k">if</span> <span class="n">total_files</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_files</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">progressive_loading</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progressive_scan</span><span class="p">(</span><span class="n">folder_path</span><span class="p">,</span> <span class="n">mda_files</span><span class="p">,</span> <span class="n">progress_callback</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">total_files</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_files</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">FolderScanResult</span><span class="p">(</span>
+                <span class="p">[],</span>
+                <span class="p">[],</span>
+                <span class="n">total_files</span><span class="p">,</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="kc">False</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;Too many files (</span><span class="si">{</span><span class="n">total_files</span><span class="si">}</span><span class="s2"> &gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_files</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Scan files in batches</span>
+        <span class="n">file_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">file_info_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">scanned_files</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">total_files</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">):</span>
+            <span class="n">batch_files</span> <span class="o">=</span> <span class="n">mda_files</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">batch_files</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_lightweight_scan</span><span class="p">:</span>
+                        <span class="n">file_info</span> <span class="o">=</span> <span class="n">get_file_info_lightweight</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">file_info</span> <span class="o">=</span> <span class="n">get_file_info_full</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+                    <span class="n">file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="n">file_info_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_info</span><span class="p">)</span>
+                    <span class="n">scanned_files</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                    <span class="c1"># Emit progress signal</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">scan_progress</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">scanned_files</span><span class="p">,</span> <span class="n">total_files</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">progress_callback</span><span class="p">:</span>
+                        <span class="n">progress_callback</span><span class="p">(</span><span class="n">scanned_files</span><span class="p">,</span> <span class="n">total_files</span><span class="p">)</span>
+
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="c1"># Continue scanning other files even if one fails</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error scanning </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">FolderScanResult</span><span class="p">(</span>
+            <span class="n">file_list</span><span class="o">=</span><span class="n">file_list</span><span class="p">,</span>
+            <span class="n">file_info_list</span><span class="o">=</span><span class="n">file_info_list</span><span class="p">,</span>
+            <span class="n">total_files</span><span class="o">=</span><span class="n">total_files</span><span class="p">,</span>
+            <span class="n">scanned_files</span><span class="o">=</span><span class="n">scanned_files</span><span class="p">,</span>
+            <span class="n">is_complete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">scan_complete</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="LazyFolderScanner._progressive_scan">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner._progressive_scan">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_progressive_scan</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">folder_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">mda_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span>
+        <span class="n">progress_callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FolderScanResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform progressive scanning for very large directories.</span>
+
+<span class="sd">        This method scans files in chunks and provides partial results</span>
+<span class="sd">        to keep the UI responsive.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            folder_path (Path): Path to the folder to scan</span>
+<span class="sd">            mda_files (list[Path]): List of MDA files to scan</span>
+<span class="sd">            progress_callback (callable, optional): Callback for progress updates</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            FolderScanResult: Initial result with first batch of files</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">total_files</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mda_files</span><span class="p">)</span>
+
+        <span class="c1"># For progressive loading, we&#39;ll scan the first batch immediately</span>
+        <span class="c1"># and return a partial result</span>
+        <span class="n">initial_batch_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">total_files</span><span class="p">)</span>
+
+        <span class="n">file_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">file_info_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">scanned_files</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Scan initial batch</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">initial_batch_size</span><span class="p">):</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">mda_files</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_lightweight_scan</span><span class="p">:</span>
+                    <span class="n">file_info</span> <span class="o">=</span> <span class="n">get_file_info_lightweight</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">file_info</span> <span class="o">=</span> <span class="n">get_file_info_full</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+                <span class="n">file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">file_info_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_info</span><span class="p">)</span>
+                <span class="n">scanned_files</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="c1"># Emit progress signal</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scan_progress</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">scanned_files</span><span class="p">,</span> <span class="n">total_files</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">progress_callback</span><span class="p">:</span>
+                    <span class="n">progress_callback</span><span class="p">(</span><span class="n">scanned_files</span><span class="p">,</span> <span class="n">total_files</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error scanning </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+        <span class="c1"># Return partial result</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">FolderScanResult</span><span class="p">(</span>
+            <span class="n">file_list</span><span class="o">=</span><span class="n">file_list</span><span class="p">,</span>
+            <span class="n">file_info_list</span><span class="o">=</span><span class="n">file_info_list</span><span class="p">,</span>
+            <span class="n">total_files</span><span class="o">=</span><span class="n">total_files</span><span class="p">,</span>
+            <span class="n">scanned_files</span><span class="o">=</span><span class="n">scanned_files</span><span class="p">,</span>
+            <span class="n">is_complete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># Not complete yet</span>
+            <span class="n">is_progressive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Emit progressive update</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressive_scan_update</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="c1"># Continue scanning in background</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_continue_progressive_scan</span><span class="p">(</span>
+            <span class="n">folder_path</span><span class="p">,</span> <span class="n">mda_files</span><span class="p">,</span> <span class="n">scanned_files</span><span class="p">,</span> <span class="n">progress_callback</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="LazyFolderScanner._continue_progressive_scan">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner._continue_progressive_scan">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_continue_progressive_scan</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">folder_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">mda_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span>
+        <span class="n">start_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">progress_callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Continue progressive scanning from a given index.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            folder_path (Path): Path to the folder to scan</span>
+<span class="sd">            mda_files (list[Path]): List of MDA files to scan</span>
+<span class="sd">            start_index (int): Index to start scanning from</span>
+<span class="sd">            progress_callback (callable, optional): Callback for progress updates</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">total_files</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mda_files</span><span class="p">)</span>
+        <span class="n">file_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">file_info_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">scanned_files</span> <span class="o">=</span> <span class="n">start_index</span>
+
+        <span class="c1"># Continue scanning from where we left off</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start_index</span><span class="p">,</span> <span class="n">total_files</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">):</span>
+            <span class="n">batch_files</span> <span class="o">=</span> <span class="n">mda_files</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">batch_files</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_lightweight_scan</span><span class="p">:</span>
+                        <span class="n">file_info</span> <span class="o">=</span> <span class="n">get_file_info_lightweight</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">file_info</span> <span class="o">=</span> <span class="n">get_file_info_full</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+                    <span class="n">file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="n">file_info_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_info</span><span class="p">)</span>
+                    <span class="n">scanned_files</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                    <span class="c1"># Emit progress signal</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">scan_progress</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">scanned_files</span><span class="p">,</span> <span class="n">total_files</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">progress_callback</span><span class="p">:</span>
+                        <span class="n">progress_callback</span><span class="p">(</span><span class="n">scanned_files</span><span class="p">,</span> <span class="n">total_files</span><span class="p">)</span>
+
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error scanning </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+            <span class="c1"># Emit progressive update every batch</span>
+            <span class="k">if</span> <span class="n">file_list</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">FolderScanResult</span><span class="p">(</span>
+                    <span class="n">file_list</span><span class="o">=</span><span class="n">file_list</span><span class="p">,</span>
+                    <span class="n">file_info_list</span><span class="o">=</span><span class="n">file_info_list</span><span class="p">,</span>
+                    <span class="n">total_files</span><span class="o">=</span><span class="n">total_files</span><span class="p">,</span>
+                    <span class="n">scanned_files</span><span class="o">=</span><span class="n">scanned_files</span><span class="p">,</span>
+                    <span class="n">is_complete</span><span class="o">=</span><span class="p">(</span><span class="n">scanned_files</span> <span class="o">&gt;=</span> <span class="n">total_files</span><span class="p">),</span>
+                    <span class="n">is_progressive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">progressive_scan_update</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="c1"># Final completion</span>
+        <span class="k">if</span> <span class="n">scanned_files</span> <span class="o">&gt;=</span> <span class="n">total_files</span><span class="p">:</span>
+            <span class="n">final_result</span> <span class="o">=</span> <span class="n">FolderScanResult</span><span class="p">(</span>
+                <span class="n">file_list</span><span class="o">=</span><span class="n">file_list</span><span class="p">,</span>
+                <span class="n">file_info_list</span><span class="o">=</span><span class="n">file_info_list</span><span class="p">,</span>
+                <span class="n">total_files</span><span class="o">=</span><span class="n">total_files</span><span class="p">,</span>
+                <span class="n">scanned_files</span><span class="o">=</span><span class="n">scanned_files</span><span class="p">,</span>
+                <span class="n">is_complete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">is_progressive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scan_complete</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">final_result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LazyFolderScanner.scan_folder_async">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner.scan_folder_async">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scan_folder_async</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Scan a folder asynchronously in a separate thread.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            folder_path (Path): Path to the folder to scan</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Ignore duplicate refresh: same folder already scanning</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scanning</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_scan_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_scan_path</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span> <span class="o">==</span> <span class="n">Path</span><span class="p">(</span><span class="n">folder_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">():</span>
+                <span class="k">return</span>
+
+        <span class="c1"># Cancel any existing scan and wait for the thread to actually finish</span>
+        <span class="c1"># so we never destroy a QThread while it is still running (avoids crash).</span>
+        <span class="n">old_thread</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scanning</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cancel_scan</span><span class="p">()</span>
+            <span class="n">old_thread</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanner_thread</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scanner_thread</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scanner_worker</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">old_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">old_thread</span><span class="o">.</span><span class="n">isRunning</span><span class="p">():</span>
+            <span class="n">max_wait_ms</span> <span class="o">=</span> <span class="mi">10000</span>  <span class="c1"># 10 seconds max</span>
+            <span class="n">waited_ms</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">old_thread</span><span class="o">.</span><span class="n">isRunning</span><span class="p">()</span> <span class="ow">and</span> <span class="n">waited_ms</span> <span class="o">&lt;</span> <span class="n">max_wait_ms</span><span class="p">:</span>
+                <span class="n">old_thread</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+                <span class="n">waited_ms</span> <span class="o">+=</span> <span class="mi">100</span>
+            <span class="k">if</span> <span class="n">old_thread</span><span class="o">.</span><span class="n">isRunning</span><span class="p">():</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Previous scan thread did not finish within </span><span class="si">%d</span><span class="s2"> ms; skipping new scan&quot;</span><span class="p">,</span>
+                    <span class="n">max_wait_ms</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scan_error</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span>
+                    <span class="s2">&quot;Previous scan did not finish in time. Please try again in a moment.&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scanning</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">resolved_folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">folder_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+        <span class="c1"># Clear cache when switching to a different folder so we don&#39;t mix or grow unbounded</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_current_scan_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="n">resolved_folder</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_scan_path</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_info_cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_scan_path</span> <span class="o">=</span> <span class="n">folder_path</span>
+
+        <span class="c1"># Copy of cache for worker (same folder: reuse unchanged file info on refresh)</span>
+        <span class="n">previous_cache</span><span class="p">:</span> <span class="n">FileInfoCache</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_info_cache</span><span class="p">)</span>
+
+        <span class="c1"># Create progress dialog if enabled</span>
+        <span class="k">if</span> <span class="n">get_config</span><span class="p">()</span><span class="o">.</span><span class="n">enable_progress_dialogs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_progress_dialog</span> <span class="o">=</span> <span class="n">AsyncProgressDialog</span><span class="p">(</span>
+                <span class="s2">&quot;Scanning folder...&quot;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_progress_dialog</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_progress_dialog</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Create a worker thread for scanning</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanner_thread</span> <span class="o">=</span> <span class="n">QThread</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanner_worker</span> <span class="o">=</span> <span class="n">FolderScanWorker</span><span class="p">(</span>
+            <span class="n">folder_path</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_files</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">use_lightweight_scan</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progressive_loading</span><span class="p">,</span>
+            <span class="n">previous_cache</span><span class="o">=</span><span class="n">previous_cache</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Move worker to thread</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanner_worker</span><span class="o">.</span><span class="n">moveToThread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scanner_thread</span><span class="p">)</span>
+
+        <span class="c1"># Connect signals</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanner_thread</span><span class="o">.</span><span class="n">started</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scanner_worker</span><span class="o">.</span><span class="n">scan</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanner_worker</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scan_progress</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanner_worker</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_update_progress</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanner_worker</span><span class="o">.</span><span class="n">complete</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_scan_complete</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanner_worker</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_scan_error</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanner_worker</span><span class="o">.</span><span class="n">progressive_update</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_progressive_update</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanner_worker</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scanner_thread</span><span class="o">.</span><span class="n">quit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanner_thread</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_scan_thread_finished</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanner_thread</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scanner_worker</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanner_thread</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scanner_thread</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">)</span>
+
+        <span class="c1"># Start scanning</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanner_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="LazyFolderScanner._update_progress">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner._update_progress">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">total</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update progress dialog.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_progress_dialog&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress_dialog</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_progress_dialog</span><span class="o">.</span><span class="n">update_progress_async</span><span class="p">(</span>
+                <span class="n">current</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Scanning files: </span><span class="si">{</span><span class="n">current</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LazyFolderScanner._on_scan_thread_finished">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner._on_scan_thread_finished">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_scan_thread_finished</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Called when the scan thread has actually finished (avoids race on refresh).&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scanning</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_scan_path</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="LazyFolderScanner._on_scan_complete">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner._on_scan_complete">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_scan_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">FolderScanResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle scan completion.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">file_info_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_info_cache</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">file_info_cache</span>
+        <span class="c1"># Close progress dialog</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_progress_dialog&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress_dialog</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_progress_dialog</span><span class="o">.</span><span class="n">complete_async</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scan_complete</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LazyFolderScanner._on_progressive_update">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner._on_progressive_update">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_progressive_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">FolderScanResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle progressive scan update; keep cache in sync before re-emitting.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">file_info_cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_info_cache</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">file_info_cache</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressive_scan_update</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LazyFolderScanner._on_scan_error">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner._on_scan_error">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_scan_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle scan error.&quot;&quot;&quot;</span>
+        <span class="c1"># Close progress dialog on error</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_progress_dialog&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress_dialog</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_progress_dialog</span><span class="o">.</span><span class="n">fail_async</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scan_error</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LazyFolderScanner.is_scanning">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner.is_scanning">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_scanning</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a scan is currently in progress.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scanning</span></div>
+
+
+<div class="viewcode-block" id="LazyFolderScanner.cancel_scan">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner.cancel_scan">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cancel_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cancel the current scan operation.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanner_worker</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scanner_worker</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scanning</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_scan_path</span> <span class="o">=</span> <span class="kc">None</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="FolderScanWorker">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.FolderScanWorker">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FolderScanWorker</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Worker class for performing folder scans in background threads.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Signals</span>
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>  <span class="c1"># current, total</span>
+    <span class="n">complete</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>  <span class="c1"># FolderScanResult</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>  <span class="c1"># error message</span>
+    <span class="n">progressive_update</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>  <span class="c1"># FolderScanResult (partial)</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">folder_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">max_files</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">use_lightweight_scan</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">progressive_loading</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">previous_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FileInfoCache</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the folder scan worker.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            folder_path (Path): Path to the folder to scan</span>
+<span class="sd">            batch_size (int): Number of files to process in each batch</span>
+<span class="sd">            max_files (int): Maximum number of files to scan before warning</span>
+<span class="sd">            use_lightweight_scan (bool): Whether to use lightweight scanning</span>
+<span class="sd">            progressive_loading (bool): Whether to use progressive loading</span>
+<span class="sd">            previous_cache (dict, optional): Cache from last scan (path -&gt; (mtime, file_info))</span>
+<span class="sd">                to avoid re-reading unchanged files on refresh.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folder_path</span> <span class="o">=</span> <span class="n">folder_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_files</span> <span class="o">=</span> <span class="n">max_files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_lightweight_scan</span> <span class="o">=</span> <span class="n">use_lightweight_scan</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progressive_loading</span> <span class="o">=</span> <span class="n">progressive_loading</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_previous_cache</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">previous_cache</span><span class="p">)</span> <span class="k">if</span> <span class="n">previous_cache</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cancelled</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="FolderScanWorker.scan">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.FolderScanWorker.scan">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform the folder scan operation.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s2">&quot;Folder does not exist&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="c1"># Get all MDA files in the folder</span>
+            <span class="n">mda_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.mda&quot;</span><span class="p">))</span>
+            <span class="n">total_files</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mda_files</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">total_files</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">FolderScanResult</span><span class="p">([],</span> <span class="p">[],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;No MDA files found&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">complete</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="c1"># For very large directories, use progressive loading</span>
+            <span class="k">if</span> <span class="n">total_files</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_files</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">progressive_loading</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_progressive_scan</span><span class="p">(</span><span class="n">mda_files</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="k">if</span> <span class="n">total_files</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_files</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">FolderScanResult</span><span class="p">(</span>
+                    <span class="p">[],</span>
+                    <span class="p">[],</span>
+                    <span class="n">total_files</span><span class="p">,</span>
+                    <span class="mi">0</span><span class="p">,</span>
+                    <span class="kc">False</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;Too many files (</span><span class="si">{</span><span class="n">total_files</span><span class="si">}</span><span class="s2"> &gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_files</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">complete</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="c1"># Regular batch scanning; reuse cached file_info when mtime unchanged</span>
+            <span class="n">file_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">file_info_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">cache</span><span class="p">:</span> <span class="n">FileInfoCache</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_previous_cache</span><span class="p">)</span>
+            <span class="n">scanned_files</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">total_files</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cancelled</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="n">batch_files</span> <span class="o">=</span> <span class="n">mda_files</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">]</span>
+
+                <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">batch_files</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cancelled</span><span class="p">:</span>
+                        <span class="k">break</span>
+
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span>
+                        <span class="n">st</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cache</span> <span class="ow">and</span> <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">st</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">:</span>
+                            <span class="n">file_info</span> <span class="o">=</span> <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_lightweight_scan</span><span class="p">:</span>
+                                <span class="n">file_info</span> <span class="o">=</span> <span class="n">get_file_info_lightweight</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">file_info</span> <span class="o">=</span> <span class="n">get_file_info_full</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+                            <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">,</span> <span class="n">file_info</span><span class="p">)</span>
+
+                        <span class="n">file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                        <span class="n">file_info_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_info</span><span class="p">)</span>
+                        <span class="n">scanned_files</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                        <span class="c1"># Emit progress throttled to avoid event-queue flood and RecursionError</span>
+                        <span class="k">if</span> <span class="p">(</span>
+                            <span class="n">scanned_files</span> <span class="o">%</span> <span class="n">PROGRESS_EMIT_INTERVAL</span> <span class="o">==</span> <span class="mi">0</span>
+                            <span class="ow">or</span> <span class="n">scanned_files</span> <span class="o">==</span> <span class="n">total_files</span>
+                        <span class="p">):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">scanned_files</span><span class="p">,</span> <span class="n">total_files</span><span class="p">)</span>
+
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error scanning </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cancelled</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">FolderScanResult</span><span class="p">(</span>
+                    <span class="n">file_list</span><span class="o">=</span><span class="n">file_list</span><span class="p">,</span>
+                    <span class="n">file_info_list</span><span class="o">=</span><span class="n">file_info_list</span><span class="p">,</span>
+                    <span class="n">total_files</span><span class="o">=</span><span class="n">total_files</span><span class="p">,</span>
+                    <span class="n">scanned_files</span><span class="o">=</span><span class="n">scanned_files</span><span class="p">,</span>
+                    <span class="n">is_complete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">file_info_cache</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">complete</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scan error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="FolderScanWorker._progressive_scan">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.FolderScanWorker._progressive_scan">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_progressive_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mda_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform progressive scanning for very large directories.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            mda_files (list[Path]): List of MDA files to scan</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">total_files</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mda_files</span><span class="p">)</span>
+        <span class="n">cache</span><span class="p">:</span> <span class="n">FileInfoCache</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_previous_cache</span><span class="p">)</span>
+
+        <span class="c1"># Initial batch</span>
+        <span class="n">initial_batch_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">total_files</span><span class="p">)</span>
+        <span class="n">file_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">file_info_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">scanned_files</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Scan initial batch (reuse cache when mtime unchanged)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">initial_batch_size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cancelled</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">mda_files</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span>
+                <span class="n">st</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cache</span> <span class="ow">and</span> <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">st</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">:</span>
+                    <span class="n">file_info</span> <span class="o">=</span> <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_lightweight_scan</span><span class="p">:</span>
+                        <span class="n">file_info</span> <span class="o">=</span> <span class="n">get_file_info_lightweight</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">file_info</span> <span class="o">=</span> <span class="n">get_file_info_full</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+                    <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">,</span> <span class="n">file_info</span><span class="p">)</span>
+
+                <span class="n">file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">file_info_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_info</span><span class="p">)</span>
+                <span class="n">scanned_files</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">scanned_files</span> <span class="o">%</span> <span class="n">PROGRESS_EMIT_INTERVAL</span> <span class="o">==</span> <span class="mi">0</span>
+                    <span class="ow">or</span> <span class="n">scanned_files</span> <span class="o">==</span> <span class="n">total_files</span>
+                <span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">scanned_files</span><span class="p">,</span> <span class="n">total_files</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error scanning </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+        <span class="c1"># Emit initial result</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cancelled</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">FolderScanResult</span><span class="p">(</span>
+                <span class="n">file_list</span><span class="o">=</span><span class="n">file_list</span><span class="p">,</span>
+                <span class="n">file_info_list</span><span class="o">=</span><span class="n">file_info_list</span><span class="p">,</span>
+                <span class="n">total_files</span><span class="o">=</span><span class="n">total_files</span><span class="p">,</span>
+                <span class="n">scanned_files</span><span class="o">=</span><span class="n">scanned_files</span><span class="p">,</span>
+                <span class="n">is_complete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">is_progressive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">file_info_cache</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progressive_update</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="c1"># Continue scanning in background</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cancelled</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_continue_progressive_scan</span><span class="p">(</span><span class="n">mda_files</span><span class="p">,</span> <span class="n">scanned_files</span><span class="p">,</span> <span class="n">cache</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FolderScanWorker._continue_progressive_scan">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.FolderScanWorker._continue_progressive_scan">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_continue_progressive_scan</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">mda_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">start_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cache</span><span class="p">:</span> <span class="n">FileInfoCache</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Continue progressive scanning from a given index.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            mda_files (list[Path]): List of MDA files to scan</span>
+<span class="sd">            start_index (int): Index to start scanning from</span>
+<span class="sd">            cache (dict): File info cache (path -&gt; (mtime, file_info)); updated in place.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">total_files</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mda_files</span><span class="p">)</span>
+        <span class="n">file_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">file_info_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">scanned_files</span> <span class="o">=</span> <span class="n">start_index</span>
+
+        <span class="c1"># Continue scanning from where we left off; reuse cache when mtime unchanged</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start_index</span><span class="p">,</span> <span class="n">total_files</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cancelled</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="n">batch_files</span> <span class="o">=</span> <span class="n">mda_files</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">]</span>
+            <span class="n">file_list</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="n">file_info_list</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">batch_files</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cancelled</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span>
+                    <span class="n">st</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cache</span> <span class="ow">and</span> <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">st</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">:</span>
+                        <span class="n">file_info</span> <span class="o">=</span> <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_lightweight_scan</span><span class="p">:</span>
+                            <span class="n">file_info</span> <span class="o">=</span> <span class="n">get_file_info_lightweight</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">file_info</span> <span class="o">=</span> <span class="n">get_file_info_full</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+                        <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">,</span> <span class="n">file_info</span><span class="p">)</span>
+
+                    <span class="n">file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="n">file_info_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_info</span><span class="p">)</span>
+                    <span class="n">scanned_files</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="n">scanned_files</span> <span class="o">%</span> <span class="n">PROGRESS_EMIT_INTERVAL</span> <span class="o">==</span> <span class="mi">0</span>
+                        <span class="ow">or</span> <span class="n">scanned_files</span> <span class="o">==</span> <span class="n">total_files</span>
+                    <span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">scanned_files</span><span class="p">,</span> <span class="n">total_files</span><span class="p">)</span>
+
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error scanning </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+            <span class="c1"># Emit progressive update every batch</span>
+            <span class="k">if</span> <span class="n">file_list</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cancelled</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">FolderScanResult</span><span class="p">(</span>
+                    <span class="n">file_list</span><span class="o">=</span><span class="n">file_list</span><span class="p">,</span>
+                    <span class="n">file_info_list</span><span class="o">=</span><span class="n">file_info_list</span><span class="p">,</span>
+                    <span class="n">total_files</span><span class="o">=</span><span class="n">total_files</span><span class="p">,</span>
+                    <span class="n">scanned_files</span><span class="o">=</span><span class="n">scanned_files</span><span class="p">,</span>
+                    <span class="n">is_complete</span><span class="o">=</span><span class="p">(</span><span class="n">scanned_files</span> <span class="o">&gt;=</span> <span class="n">total_files</span><span class="p">),</span>
+                    <span class="n">is_progressive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">file_info_cache</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">progressive_update</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="c1"># Final completion</span>
+        <span class="k">if</span> <span class="n">scanned_files</span> <span class="o">&gt;=</span> <span class="n">total_files</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cancelled</span><span class="p">:</span>
+            <span class="n">final_result</span> <span class="o">=</span> <span class="n">FolderScanResult</span><span class="p">(</span>
+                <span class="n">file_list</span><span class="o">=</span><span class="n">file_list</span><span class="p">,</span>
+                <span class="n">file_info_list</span><span class="o">=</span><span class="n">file_info_list</span><span class="p">,</span>
+                <span class="n">total_files</span><span class="o">=</span><span class="n">total_files</span><span class="p">,</span>
+                <span class="n">scanned_files</span><span class="o">=</span><span class="n">scanned_files</span><span class="p">,</span>
+                <span class="n">is_complete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">is_progressive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">file_info_cache</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">complete</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">final_result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FolderScanWorker.cancel">
+<a class="viewcode-back" href="../../api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.FolderScanWorker.cancel">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cancel the scan operation.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cancelled</span> <span class="o">=</span> <span class="kc">True</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

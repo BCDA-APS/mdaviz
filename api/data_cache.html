@@ -1,0 +1,843 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Data Cache &#8212; mdaviz 1.3</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=8749d347"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/data_cache';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Data Table Model" href="data_table_model.html" />
+    <link rel="prev" title="Chartview" href="chartview.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mdaviz 1.3</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changes.html">
+    Changes
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../license.html">
+    License
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changes.html">
+    Changes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../license.html">
+    License
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="aboutdialog.html">About Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="app.html">Application starting point</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chartview.html">Chartview</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Data Cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_table_model.html">Data Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_table_view.html">Data Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="empty_table_model.html">Empty Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_manager.html">Fit Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_models.html">Fit Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lazy_folder_scanner.html">Lazy Folder Scanner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lazy_loading_config.html">Lazy Loading Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licensedialog.html">License Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mainwindow.html">Main Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file.html">MDA File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_table_model.html">MDA File Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_table_view.html">MDA File Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_viz.html">MDA File Viz</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder.html">MDA Folder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder_table_model.html">MDA Folder Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder_table_view.html">MDA Folder Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opendialog.html">Open Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="popup.html">Popup Dialogs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="progress_dialog.html">Progress Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_settings.html">User Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtual_table_model.html">Virtual Table Model</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">Source Code Documentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Data Cache</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-mdaviz.data_cache">
+<span id="data-cache"></span><h1>Data Cache<a class="headerlink" href="#module-mdaviz.data_cache" title="Link to this heading">#</a></h1>
+<p>Data caching functionality for MDA files.</p>
+<p>This module provides caching capabilities to improve performance when
+loading and processing MDA files.</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.data_cache.DataCache" title="mdaviz.data_cache.DataCache"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataCache</span></code></a>(*args, **kwargs)</p></td>
+<td><p>LRU cache for MDA file data to improve performance and manage memory usage.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.data_cache.CachedFileData" title="mdaviz.data_cache.CachedFileData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CachedFileData</span></code></a>(file_path, metadata, ...)</p></td>
+<td><p>Cached file data with metadata.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.data_cache.get_global_cache" title="mdaviz.data_cache.get_global_cache"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_global_cache</span></code></a>()</p></td>
+<td><p>Get the global data cache instance.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="mdaviz.data_cache.CachedFileData">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mdaviz.data_cache.</span></span><span class="sig-name descname"><span class="pre">CachedFileData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">file_path:</span> <span class="pre">str,</span> <span class="pre">metadata:</span> <span class="pre">dict[str,</span> <span class="pre">~typing.Any],</span> <span class="pre">scan_dict:</span> <span class="pre">dict[str,</span> <span class="pre">~typing.Any],</span> <span class="pre">first_pos:</span> <span class="pre">int,</span> <span class="pre">first_det:</span> <span class="pre">int,</span> <span class="pre">pv_list:</span> <span class="pre">list,</span> <span class="pre">file_name:</span> <span class="pre">str,</span> <span class="pre">folder_path:</span> <span class="pre">str,</span> <span class="pre">access_time:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">size_bytes:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">scan_dict_2d:</span> <span class="pre">dict[str,</span> <span class="pre">~typing.Any]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">scan_dict_inner:</span> <span class="pre">dict[str,</span> <span class="pre">~typing.Any]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">is_multidimensional:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">rank:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">1,</span> <span class="pre">dimensions:</span> <span class="pre">list[int]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">acquired_dimensions:</span> <span class="pre">list[int]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">file_mtime:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#CachedFileData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.CachedFileData" title="Link to this definition">#</a></dt>
+<dd><p>Cached file data with metadata.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.data_cache.CachedFileData.get_size_mb">
+<span class="sig-name descname"><span class="pre">get_size_mb</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#CachedFileData.get_size_mb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.CachedFileData.get_size_mb" title="Link to this definition">#</a></dt>
+<dd><p>Get the size in megabytes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.data_cache.CachedFileData.update_access_time">
+<span class="sig-name descname"><span class="pre">update_access_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#CachedFileData.update_access_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.CachedFileData.update_access_time" title="Link to this definition">#</a></dt>
+<dd><p>Update the last access time.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mdaviz.data_cache.</span></span><span class="sig-name descname"><span class="pre">DataCache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#DataCache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.DataCache" title="Link to this definition">#</a></dt>
+<dd><p>LRU cache for MDA file data to improve performance and manage memory usage.</p>
+<p>This cache stores loaded MDA file data in memory and automatically evicts
+least recently used entries when memory limits are exceeded.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>max_size_mb (float): Maximum cache size in megabytes
+max_entries (int): Maximum number of cached entries
+enable_compression (bool): Whether to compress cached data
+max_memory_mb (float): Maximum system memory usage in megabytes</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache._check_memory_usage">
+<span class="sig-name descname"><span class="pre">_check_memory_usage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#DataCache._check_memory_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.DataCache._check_memory_usage" title="Link to this definition">#</a></dt>
+<dd><p>Check current memory usage and trigger cleanup if needed.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: Current memory usage in MB</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache._evict_lru">
+<span class="sig-name descname"><span class="pre">_evict_lru</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#DataCache._evict_lru"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.DataCache._evict_lru" title="Link to this definition">#</a></dt>
+<dd><p>Evict the least recently used entry from the cache.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>bool: True if an entry was evicted, False if cache is empty</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache._load_without_caching">
+<span class="sig-name descname"><span class="pre">_load_without_caching</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mdaviz.data_cache.CachedFileData" title="mdaviz.data_cache.CachedFileData"><span class="pre">CachedFileData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#DataCache._load_without_caching"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.DataCache._load_without_caching" title="Link to this definition">#</a></dt>
+<dd><p>Load file data without caching it (for large files or high memory usage).</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>path_obj (Path): Path object to the file</p>
+</dd>
+<dt>Returns:</dt><dd><p>CachedFileData or None: Loaded data (not cached)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache._perform_memory_cleanup">
+<span class="sig-name descname"><span class="pre">_perform_memory_cleanup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#DataCache._perform_memory_cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.DataCache._perform_memory_cleanup" title="Link to this definition">#</a></dt>
+<dd><p>Perform aggressive memory cleanup when usage is high.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache.cache_eviction">
+<span class="sig-name descname"><span class="pre">cache_eviction</span></span><a class="headerlink" href="#mdaviz.data_cache.DataCache.cache_eviction" title="Link to this definition">#</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache.cache_hit">
+<span class="sig-name descname"><span class="pre">cache_hit</span></span><a class="headerlink" href="#mdaviz.data_cache.DataCache.cache_hit" title="Link to this definition">#</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache.cache_miss">
+<span class="sig-name descname"><span class="pre">cache_miss</span></span><a class="headerlink" href="#mdaviz.data_cache.DataCache.cache_miss" title="Link to this definition">#</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#DataCache.clear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.DataCache.clear" title="Link to this definition">#</a></dt>
+<dd><p>Clear all cached data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mdaviz.data_cache.CachedFileData" title="mdaviz.data_cache.CachedFileData"><span class="pre">CachedFileData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#DataCache.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.DataCache.get" title="Link to this definition">#</a></dt>
+<dd><p>Get cached data for a file.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>file_path (str): Path to the file</p>
+</dd>
+<dt>Returns:</dt><dd><p>CachedFileData or None: Cached data if available and not stale, None otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache.get_or_load">
+<span class="sig-name descname"><span class="pre">get_or_load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mdaviz.data_cache.CachedFileData" title="mdaviz.data_cache.CachedFileData"><span class="pre">CachedFileData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#DataCache.get_or_load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.DataCache.get_or_load" title="Link to this definition">#</a></dt>
+<dd><p>Get cached data or load and cache it if not available.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>file_path (str): Path to the file</p>
+</dd>
+<dt>Returns:</dt><dd><p>CachedFileData or None: Data from cache or newly loaded</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache.get_stats">
+<span class="sig-name descname"><span class="pre">get_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#DataCache.get_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.DataCache.get_stats" title="Link to this definition">#</a></dt>
+<dd><p>Get cache statistics.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>dict: Cache statistics including size, entry count, hit rate, etc.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache.invalidate_file">
+<span class="sig-name descname"><span class="pre">invalidate_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#DataCache.invalidate_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.DataCache.invalidate_file" title="Link to this definition">#</a></dt>
+<dd><p>Invalidate cached data for a specific file, forcing it to be reloaded.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>file_path (str): Path to the file to invalidate</p>
+</dd>
+<dt>Returns:</dt><dd><p>bool: True if the file was in the cache and invalidated, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache.invalidate_folder">
+<span class="sig-name descname"><span class="pre">invalidate_folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#DataCache.invalidate_folder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.DataCache.invalidate_folder" title="Link to this definition">#</a></dt>
+<dd><p>Invalidate cached data for all files in a specific folder.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>folder_path (str): Path to the folder</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: Number of files invalidated</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache.load_and_cache">
+<span class="sig-name descname"><span class="pre">load_and_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mdaviz.data_cache.CachedFileData" title="mdaviz.data_cache.CachedFileData"><span class="pre">CachedFileData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#DataCache.load_and_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.DataCache.load_and_cache" title="Link to this definition">#</a></dt>
+<dd><p>Load file data and cache it.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>file_path (str): Path to the file to load</p>
+</dd>
+<dt>Returns:</dt><dd><p>CachedFileData or None: Loaded and cached data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache.memory_warning">
+<span class="sig-name descname"><span class="pre">memory_warning</span></span><a class="headerlink" href="#mdaviz.data_cache.DataCache.memory_warning" title="Link to this definition">#</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache.put">
+<span class="sig-name descname"><span class="pre">put</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cached_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#mdaviz.data_cache.CachedFileData" title="mdaviz.data_cache.CachedFileData"><span class="pre">CachedFileData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#DataCache.put"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.DataCache.put" title="Link to this definition">#</a></dt>
+<dd><p>Store data in the cache.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>file_path (str): Path to the file
+cached_data (CachedFileData): Data to cache</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#DataCache.remove"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.DataCache.remove" title="Link to this definition">#</a></dt>
+<dd><p>Remove a file from the cache.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>file_path (str): Path to the file to remove</p>
+</dd>
+<dt>Returns:</dt><dd><p>bool: True if the file was in the cache, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache.set_max_entries">
+<span class="sig-name descname"><span class="pre">set_max_entries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_entries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#DataCache.set_max_entries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.DataCache.set_max_entries" title="Link to this definition">#</a></dt>
+<dd><p>Set the maximum number of cache entries.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>max_entries (int): New maximum number of entries</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.data_cache.DataCache.set_max_size_mb">
+<span class="sig-name descname"><span class="pre">set_max_size_mb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_size_mb</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#DataCache.set_max_size_mb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.DataCache.set_max_size_mb" title="Link to this definition">#</a></dt>
+<dd><p>Set the maximum cache size.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>max_size_mb (float): New maximum size in megabytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.data_cache.get_global_cache">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.data_cache.</span></span><span class="sig-name descname"><span class="pre">get_global_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mdaviz.data_cache.DataCache" title="mdaviz.data_cache.DataCache"><span class="pre">DataCache</span></a></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#get_global_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.get_global_cache" title="Link to this definition">#</a></dt>
+<dd><p>Get the global data cache instance.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>DataCache: Global cache instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.data_cache.set_global_cache">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.data_cache.</span></span><span class="sig-name descname"><span class="pre">set_global_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#mdaviz.data_cache.DataCache" title="mdaviz.data_cache.DataCache"><span class="pre">DataCache</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/data_cache.html#set_global_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.data_cache.set_global_cache" title="Link to this definition">#</a></dt>
+<dd><p>Set the global data cache instance.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>cache (DataCache): Cache instance to use globally</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="chartview.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Chartview</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="data_table_model.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Data Table Model</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.CachedFileData"><code class="docutils literal notranslate"><span class="pre">CachedFileData</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.CachedFileData.get_size_mb"><code class="docutils literal notranslate"><span class="pre">CachedFileData.get_size_mb()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.CachedFileData.update_access_time"><code class="docutils literal notranslate"><span class="pre">CachedFileData.update_access_time()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache"><code class="docutils literal notranslate"><span class="pre">DataCache</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache._check_memory_usage"><code class="docutils literal notranslate"><span class="pre">DataCache._check_memory_usage()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache._evict_lru"><code class="docutils literal notranslate"><span class="pre">DataCache._evict_lru()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache._load_without_caching"><code class="docutils literal notranslate"><span class="pre">DataCache._load_without_caching()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache._perform_memory_cleanup"><code class="docutils literal notranslate"><span class="pre">DataCache._perform_memory_cleanup()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache.cache_eviction"><code class="docutils literal notranslate"><span class="pre">DataCache.cache_eviction</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache.cache_hit"><code class="docutils literal notranslate"><span class="pre">DataCache.cache_hit</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache.cache_miss"><code class="docutils literal notranslate"><span class="pre">DataCache.cache_miss</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache.clear"><code class="docutils literal notranslate"><span class="pre">DataCache.clear()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache.get"><code class="docutils literal notranslate"><span class="pre">DataCache.get()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache.get_or_load"><code class="docutils literal notranslate"><span class="pre">DataCache.get_or_load()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache.get_stats"><code class="docutils literal notranslate"><span class="pre">DataCache.get_stats()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache.invalidate_file"><code class="docutils literal notranslate"><span class="pre">DataCache.invalidate_file()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache.invalidate_folder"><code class="docutils literal notranslate"><span class="pre">DataCache.invalidate_folder()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache.load_and_cache"><code class="docutils literal notranslate"><span class="pre">DataCache.load_and_cache()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache.memory_warning"><code class="docutils literal notranslate"><span class="pre">DataCache.memory_warning</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache.put"><code class="docutils literal notranslate"><span class="pre">DataCache.put()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache.remove"><code class="docutils literal notranslate"><span class="pre">DataCache.remove()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache.set_max_entries"><code class="docutils literal notranslate"><span class="pre">DataCache.set_max_entries()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.DataCache.set_max_size_mb"><code class="docutils literal notranslate"><span class="pre">DataCache.set_max_size_mb()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.get_global_cache"><code class="docutils literal notranslate"><span class="pre">get_global_cache()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.data_cache.set_global_cache"><code class="docutils literal notranslate"><span class="pre">set_global_cache()</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/data_cache.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

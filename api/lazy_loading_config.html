@@ -1,0 +1,760 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Lazy Loading Configuration &#8212; mdaviz 1.3</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=8749d347"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/lazy_loading_config';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="License Dialog" href="licensedialog.html" />
+    <link rel="prev" title="Lazy Folder Scanner" href="lazy_folder_scanner.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mdaviz 1.3</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changes.html">
+    Changes
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../license.html">
+    License
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changes.html">
+    Changes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../license.html">
+    License
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="aboutdialog.html">About Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="app.html">Application starting point</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chartview.html">Chartview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_cache.html">Data Cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_table_model.html">Data Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_table_view.html">Data Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="empty_table_model.html">Empty Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_manager.html">Fit Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_models.html">Fit Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lazy_folder_scanner.html">Lazy Folder Scanner</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Lazy Loading Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licensedialog.html">License Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mainwindow.html">Main Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file.html">MDA File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_table_model.html">MDA File Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_table_view.html">MDA File Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_viz.html">MDA File Viz</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder.html">MDA Folder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder_table_model.html">MDA Folder Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder_table_view.html">MDA Folder Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opendialog.html">Open Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="popup.html">Popup Dialogs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="progress_dialog.html">Progress Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_settings.html">User Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtual_table_model.html">Virtual Table Model</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">Source Code Documentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Lazy Loading Configuration</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-mdaviz.lazy_loading_config">
+<span id="lazy-loading-configuration"></span><h1>Lazy Loading Configuration<a class="headerlink" href="#module-mdaviz.lazy_loading_config" title="Link to this heading">#</a></h1>
+<p>Configuration management for lazy loading functionality.</p>
+<p>This module provides configuration management for the lazy loading system,
+allowing users to customize behavior and persist settings.</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.lazy_loading_config.LazyLoadingConfig" title="mdaviz.lazy_loading_config.LazyLoadingConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LazyLoadingConfig</span></code></a>([folder_scan_batch_size, ...])</p></td>
+<td><p>Configuration for lazy loading behavior.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.lazy_loading_config.ConfigManager" title="mdaviz.lazy_loading_config.ConfigManager"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConfigManager</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Manager for lazy loading configuration.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.lazy_loading_config.get_config" title="mdaviz.lazy_loading_config.get_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_config</span></code></a>()</p></td>
+<td><p>Get the current lazy loading configuration.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.lazy_loading_config.update_config" title="mdaviz.lazy_loading_config.update_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_config</span></code></a>(**kwargs)</p></td>
+<td><p>Update the lazy loading configuration.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="mdaviz.lazy_loading_config.ConfigManager">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mdaviz.lazy_loading_config.</span></span><span class="sig-name descname"><span class="pre">ConfigManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/lazy_loading_config.html#ConfigManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.lazy_loading_config.ConfigManager" title="Link to this definition">#</a></dt>
+<dd><p>Manager for lazy loading configuration.</p>
+<p>This class manages the loading, saving, and updating of lazy loading
+configuration settings.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.lazy_loading_config.ConfigManager._load_config">
+<span class="sig-name descname"><span class="pre">_load_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mdaviz.lazy_loading_config.LazyLoadingConfig" title="mdaviz.lazy_loading_config.LazyLoadingConfig"><span class="pre">LazyLoadingConfig</span></a></span></span><a class="reference internal" href="../_modules/mdaviz/lazy_loading_config.html#ConfigManager._load_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.lazy_loading_config.ConfigManager._load_config" title="Link to this definition">#</a></dt>
+<dd><p>Load configuration from file or create default.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mdaviz.lazy_loading_config.ConfigManager.config_changed">
+<span class="sig-name descname"><span class="pre">config_changed</span></span><a class="headerlink" href="#mdaviz.lazy_loading_config.ConfigManager.config_changed" title="Link to this definition">#</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.lazy_loading_config.ConfigManager.get_config">
+<span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mdaviz.lazy_loading_config.LazyLoadingConfig" title="mdaviz.lazy_loading_config.LazyLoadingConfig"><span class="pre">LazyLoadingConfig</span></a></span></span><a class="reference internal" href="../_modules/mdaviz/lazy_loading_config.html#ConfigManager.get_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.lazy_loading_config.ConfigManager.get_config" title="Link to this definition">#</a></dt>
+<dd><p>Get the current configuration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.lazy_loading_config.ConfigManager.get_memory_usage_mb">
+<span class="sig-name descname"><span class="pre">get_memory_usage_mb</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/mdaviz/lazy_loading_config.html#ConfigManager.get_memory_usage_mb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.lazy_loading_config.ConfigManager.get_memory_usage_mb" title="Link to this definition">#</a></dt>
+<dd><p>Get current memory usage in megabytes.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: Memory usage in MB</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.lazy_loading_config.ConfigManager.is_memory_usage_high">
+<span class="sig-name descname"><span class="pre">is_memory_usage_high</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/mdaviz/lazy_loading_config.html#ConfigManager.is_memory_usage_high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.lazy_loading_config.ConfigManager.is_memory_usage_high" title="Link to this definition">#</a></dt>
+<dd><p>Check if memory usage is above the warning threshold.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>bool: True if memory usage is high</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.lazy_loading_config.ConfigManager.reset_to_defaults">
+<span class="sig-name descname"><span class="pre">reset_to_defaults</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/mdaviz/lazy_loading_config.html#ConfigManager.reset_to_defaults"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.lazy_loading_config.ConfigManager.reset_to_defaults" title="Link to this definition">#</a></dt>
+<dd><p>Reset configuration to default values.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>bool: True if successful, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.lazy_loading_config.ConfigManager.save_config">
+<span class="sig-name descname"><span class="pre">save_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#mdaviz.lazy_loading_config.LazyLoadingConfig" title="mdaviz.lazy_loading_config.LazyLoadingConfig"><span class="pre">LazyLoadingConfig</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/mdaviz/lazy_loading_config.html#ConfigManager.save_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.lazy_loading_config.ConfigManager.save_config" title="Link to this definition">#</a></dt>
+<dd><p>Save configuration to file.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>config (LazyLoadingConfig): Configuration to save</p>
+</dd>
+<dt>Returns:</dt><dd><p>bool: True if successful, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.lazy_loading_config.ConfigManager.update_config">
+<span class="sig-name descname"><span class="pre">update_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/mdaviz/lazy_loading_config.html#ConfigManager.update_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.lazy_loading_config.ConfigManager.update_config" title="Link to this definition">#</a></dt>
+<dd><p>Update configuration with new values.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p><a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs: Configuration values to update</p>
+</dd>
+<dt>Returns:</dt><dd><p>bool: True if successful, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mdaviz.lazy_loading_config.LazyLoadingConfig">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mdaviz.lazy_loading_config.</span></span><span class="sig-name descname"><span class="pre">LazyLoadingConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_scan_batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_scan_max_files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_scan_use_lightweight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_cache_max_size_mb</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">500.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_cache_max_entries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_cache_enable_compression</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">virtual_table_page_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">virtual_table_preload_pages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_progress_dialogs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_memory_monitoring</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_warning_threshold_mb</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cache_stats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_clear_cache_on_low_memory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/lazy_loading_config.html#LazyLoadingConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.lazy_loading_config.LazyLoadingConfig" title="Link to this definition">#</a></dt>
+<dd><p>Configuration for lazy loading behavior.</p>
+<p>This class contains all the configuration options for the lazy loading
+system, including cache sizes, batch sizes, and performance settings.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.lazy_loading_config.LazyLoadingConfig.from_dict">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mdaviz.lazy_loading_config.LazyLoadingConfig" title="mdaviz.lazy_loading_config.LazyLoadingConfig"><span class="pre">LazyLoadingConfig</span></a></span></span><a class="reference internal" href="../_modules/mdaviz/lazy_loading_config.html#LazyLoadingConfig.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.lazy_loading_config.LazyLoadingConfig.from_dict" title="Link to this definition">#</a></dt>
+<dd><p>Create configuration from dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.lazy_loading_config.LazyLoadingConfig.load_from_file">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">load_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mdaviz.lazy_loading_config.LazyLoadingConfig" title="mdaviz.lazy_loading_config.LazyLoadingConfig"><span class="pre">LazyLoadingConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/lazy_loading_config.html#LazyLoadingConfig.load_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.lazy_loading_config.LazyLoadingConfig.load_from_file" title="Link to this definition">#</a></dt>
+<dd><p>Load configuration from file.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>file_path (Path): Path to load configuration from</p>
+</dd>
+<dt>Returns:</dt><dd><p>LazyLoadingConfig or None: Configuration if successful, None otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.lazy_loading_config.LazyLoadingConfig.save_to_file">
+<span class="sig-name descname"><span class="pre">save_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/mdaviz/lazy_loading_config.html#LazyLoadingConfig.save_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.lazy_loading_config.LazyLoadingConfig.save_to_file" title="Link to this definition">#</a></dt>
+<dd><p>Save configuration to file.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>file_path (Path): Path to save configuration</p>
+</dd>
+<dt>Returns:</dt><dd><p>bool: True if successful, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.lazy_loading_config.LazyLoadingConfig.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/mdaviz/lazy_loading_config.html#LazyLoadingConfig.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.lazy_loading_config.LazyLoadingConfig.to_dict" title="Link to this definition">#</a></dt>
+<dd><p>Convert configuration to dictionary.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.lazy_loading_config.get_config">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.lazy_loading_config.</span></span><span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mdaviz.lazy_loading_config.LazyLoadingConfig" title="mdaviz.lazy_loading_config.LazyLoadingConfig"><span class="pre">LazyLoadingConfig</span></a></span></span><a class="reference internal" href="../_modules/mdaviz/lazy_loading_config.html#get_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.lazy_loading_config.get_config" title="Link to this definition">#</a></dt>
+<dd><p>Get the current lazy loading configuration.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>LazyLoadingConfig: Current configuration</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.lazy_loading_config.get_global_config_manager">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.lazy_loading_config.</span></span><span class="sig-name descname"><span class="pre">get_global_config_manager</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mdaviz.lazy_loading_config.ConfigManager" title="mdaviz.lazy_loading_config.ConfigManager"><span class="pre">ConfigManager</span></a></span></span><a class="reference internal" href="../_modules/mdaviz/lazy_loading_config.html#get_global_config_manager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.lazy_loading_config.get_global_config_manager" title="Link to this definition">#</a></dt>
+<dd><p>Get the global configuration manager instance.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>ConfigManager: Global configuration manager</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.lazy_loading_config.update_config">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.lazy_loading_config.</span></span><span class="sig-name descname"><span class="pre">update_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/mdaviz/lazy_loading_config.html#update_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.lazy_loading_config.update_config" title="Link to this definition">#</a></dt>
+<dd><p>Update the lazy loading configuration.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p><a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs: Configuration values to update</p>
+</dd>
+<dt>Returns:</dt><dd><p>bool: True if successful, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="lazy_folder_scanner.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Lazy Folder Scanner</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="licensedialog.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">License Dialog</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.lazy_loading_config.ConfigManager"><code class="docutils literal notranslate"><span class="pre">ConfigManager</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.lazy_loading_config.ConfigManager._load_config"><code class="docutils literal notranslate"><span class="pre">ConfigManager._load_config()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.lazy_loading_config.ConfigManager.config_changed"><code class="docutils literal notranslate"><span class="pre">ConfigManager.config_changed</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.lazy_loading_config.ConfigManager.get_config"><code class="docutils literal notranslate"><span class="pre">ConfigManager.get_config()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.lazy_loading_config.ConfigManager.get_memory_usage_mb"><code class="docutils literal notranslate"><span class="pre">ConfigManager.get_memory_usage_mb()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.lazy_loading_config.ConfigManager.is_memory_usage_high"><code class="docutils literal notranslate"><span class="pre">ConfigManager.is_memory_usage_high()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.lazy_loading_config.ConfigManager.reset_to_defaults"><code class="docutils literal notranslate"><span class="pre">ConfigManager.reset_to_defaults()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.lazy_loading_config.ConfigManager.save_config"><code class="docutils literal notranslate"><span class="pre">ConfigManager.save_config()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.lazy_loading_config.ConfigManager.update_config"><code class="docutils literal notranslate"><span class="pre">ConfigManager.update_config()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.lazy_loading_config.LazyLoadingConfig"><code class="docutils literal notranslate"><span class="pre">LazyLoadingConfig</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.lazy_loading_config.LazyLoadingConfig.from_dict"><code class="docutils literal notranslate"><span class="pre">LazyLoadingConfig.from_dict()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.lazy_loading_config.LazyLoadingConfig.load_from_file"><code class="docutils literal notranslate"><span class="pre">LazyLoadingConfig.load_from_file()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.lazy_loading_config.LazyLoadingConfig.save_to_file"><code class="docutils literal notranslate"><span class="pre">LazyLoadingConfig.save_to_file()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.lazy_loading_config.LazyLoadingConfig.to_dict"><code class="docutils literal notranslate"><span class="pre">LazyLoadingConfig.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.lazy_loading_config.get_config"><code class="docutils literal notranslate"><span class="pre">get_config()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.lazy_loading_config.get_global_config_manager"><code class="docutils literal notranslate"><span class="pre">get_global_config_manager()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.lazy_loading_config.update_config"><code class="docutils literal notranslate"><span class="pre">update_config()</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/lazy_loading_config.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,909 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Main Window &#8212; mdaviz 1.3</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=8749d347"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/mainwindow';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="MDA File" href="mda_file.html" />
+    <link rel="prev" title="License Dialog" href="licensedialog.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mdaviz 1.3</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changes.html">
+    Changes
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../license.html">
+    License
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changes.html">
+    Changes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../license.html">
+    License
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="aboutdialog.html">About Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="app.html">Application starting point</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chartview.html">Chartview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_cache.html">Data Cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_table_model.html">Data Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_table_view.html">Data Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="empty_table_model.html">Empty Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_manager.html">Fit Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_models.html">Fit Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lazy_folder_scanner.html">Lazy Folder Scanner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lazy_loading_config.html">Lazy Loading Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licensedialog.html">License Dialog</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Main Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file.html">MDA File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_table_model.html">MDA File Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_table_view.html">MDA File Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_viz.html">MDA File Viz</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder.html">MDA Folder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder_table_model.html">MDA Folder Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder_table_view.html">MDA Folder Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opendialog.html">Open Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="popup.html">Popup Dialogs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="progress_dialog.html">Progress Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_settings.html">User Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtual_table_model.html">Virtual Table Model</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">Source Code Documentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Main Window</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-mdaviz.mainwindow">
+<span id="main-window"></span><h1>Main Window<a class="headerlink" href="#module-mdaviz.mainwindow" title="Link to this heading">#</a></h1>
+<p>Defines MainWindow class.</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.mainwindow.MainWindow" title="mdaviz.mainwindow.MainWindow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MainWindow</span></code></a>(*args, **kwargs)</p></td>
+<td><p>The main window of the app, built in Qt designer.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mdaviz.mainwindow.</span></span><span class="sig-name descname"><span class="pre">MainWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow" title="Link to this definition">#</a></dt>
+<dd><p>The main window of the app, built in Qt designer.</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.mainwindow.MainWindow.setStatus" title="mdaviz.mainwindow.MainWindow.setStatus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setStatus</span></code></a>(text[, timeout])</p></td>
+<td><p>Write new status to the main window and terminal output.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.mainwindow.MainWindow.doAboutDialog" title="mdaviz.mainwindow.MainWindow.doAboutDialog"><code class="xref py py-obj docutils literal notranslate"><span class="pre">doAboutDialog</span></code></a>(*args, **kw)</p></td>
+<td><p>Show the &quot;About ...&quot; dialog</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.mainwindow.MainWindow.closeEvent" title="mdaviz.mainwindow.MainWindow.closeEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">closeEvent</span></code></a>(event)</p></td>
+<td><p>User clicked the big [X] to quit.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.mainwindow.MainWindow.doClose" title="mdaviz.mainwindow.MainWindow.doClose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">doClose</span></code></a>(*args, **kw)</p></td>
+<td><p>User chose exit (or quit), or closeEvent() was called.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.mainwindow.MainWindow.doOpen" title="mdaviz.mainwindow.MainWindow.doOpen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">doOpen</span></code></a>(*args, **kw)</p></td>
+<td><p>User chose to open a file or folder dialog.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_mainwindow</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.mainwindow.MainWindow.dataPath" title="mdaviz.mainwindow.MainWindow.dataPath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataPath</span></code></a>()</p></td>
+<td><p>Full path object for the selected folder</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setDataPath</span></code>([path])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.mainwindow.MainWindow.mdaFileList" title="mdaviz.mainwindow.MainWindow.mdaFileList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mdaFileList</span></code></a>()</p></td>
+<td><p>List of mda file (name only) in the selected folder.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMdaFileList</span></code>([mda_file_list])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mdaInfoList</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMdaInfoList</span></code>([infoList])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">folderList</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.mainwindow.MainWindow.setFolderList" title="mdaviz.mainwindow.MainWindow.setFolderList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFolderList</span></code></a>([folder_list])</p></td>
+<td><p>Set the folder path list &amp; populating the folder QComboBox.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.mainwindow.MainWindow.onFolderSelected" title="mdaviz.mainwindow.MainWindow.onFolderSelected"><code class="xref py py-obj docutils literal notranslate"><span class="pre">onFolderSelected</span></code></a>(folder_name)</p></td>
+<td><p>A folder was selected (from the open dialog or pull down menu).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.mainwindow.MainWindow.onRefresh" title="mdaviz.mainwindow.MainWindow.onRefresh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">onRefresh</span></code></a>()</p></td>
+<td><p>Refreshes the file list in the currently selected folder - Re-fetch the list of MDA files in the current folder.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.mainwindow.MainWindow.doPreferences" title="mdaviz.mainwindow.MainWindow.doPreferences"><code class="xref py py-obj docutils literal notranslate"><span class="pre">doPreferences</span></code></a>(*args, **kw)</p></td>
+<td><p>Show the Preferences dialog.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.mainwindow.MainWindow.doPopUp" title="mdaviz.mainwindow.MainWindow.doPopUp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">doPopUp</span></code></a>(message)</p></td>
+<td><p>User chose to show a popup dialog with a message.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.mainwindow.MainWindow.proceed" title="mdaviz.mainwindow.MainWindow.proceed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">proceed</span></code></a>()</p></td>
+<td><p>Handle the logic when the user clicks 'OK'.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.mainwindow.MainWindow.cancel" title="mdaviz.mainwindow.MainWindow.cancel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cancel</span></code></a>()</p></td>
+<td><p>Handle the logic when the user clicks 'Cancel'.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.mainwindow.MainWindow.get_auto_load_setting" title="mdaviz.mainwindow.MainWindow.get_auto_load_setting"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_auto_load_setting</span></code></a>()</p></td>
+<td><p>Get the current auto-load folder setting.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow._addToRecentFolders">
+<span class="sig-name descname"><span class="pre">_addToRecentFolders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow._addToRecentFolders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow._addToRecentFolders" title="Link to this definition">#</a></dt>
+<dd><p>Add a new folder path to the list of recent folders in the app settings.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>folder_path (str): The path of the folder to be added.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow._apply_preferences">
+<span class="sig-name descname"><span class="pre">_apply_preferences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow._apply_preferences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow._apply_preferences" title="Link to this definition">#</a></dt>
+<dd><p>Apply preference changes to the application.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow._auto_load_first_folder">
+<span class="sig-name descname"><span class="pre">_auto_load_first_folder</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow._auto_load_first_folder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow._auto_load_first_folder" title="Link to this definition">#</a></dt>
+<dd><p>Auto-load the first valid folder from recent folders.</p>
+<p>This method attempts to automatically load the first folder from the recent
+folders list if it exists and is valid. This provides a better user experience
+by not requiring manual folder selection on startup.</p>
+<p>The auto-loading can be disabled by setting the ‘auto_load_folder’ setting to False.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow._buildFolderList">
+<span class="sig-name descname"><span class="pre">_buildFolderList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow._buildFolderList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow._buildFolderList" title="Link to this definition">#</a></dt>
+<dd><p>Build the list of recent folders and remove duplicates from the folder list.</p>
+<ul class="simple">
+<li><p>If folder_list arg is not None (after a doOpen call), it just removes duplicates.</p></li>
+<li><p>If folder_list arg is None, it grabs the list of recent folder from the app settings.
+The directory loaded at start-up will be added at index 0.</p></li>
+</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>folder_list (list, optional): a list folders. Defaults to None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>list: list of folders to be populated in the QComboBox</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow._center_window">
+<span class="sig-name descname"><span class="pre">_center_window</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow._center_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow._center_window" title="Link to this definition">#</a></dt>
+<dd><p>Center the window on the screen.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow._fillFolderBox">
+<span class="sig-name descname"><span class="pre">_fillFolderBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow._fillFolderBox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow._fillFolderBox" title="Link to this definition">#</a></dt>
+<dd><p>Fill the Folder ComboBox; Clear Recently Open… is added at the end by default.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>folder_list (list, optional): The list of folders to be displayed in the ComboBox. Defaults to [].</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow._handle_folder_selection">
+<span class="sig-name descname"><span class="pre">_handle_folder_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow._handle_folder_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow._handle_folder_selection" title="Link to this definition">#</a></dt>
+<dd><p>Handle the selected folder and file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow._initialize_data">
+<span class="sig-name descname"><span class="pre">_initialize_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow._initialize_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow._initialize_data" title="Link to this definition">#</a></dt>
+<dd><p>Initialize data structures and state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow._on_scan_complete">
+<span class="sig-name descname"><span class="pre">_on_scan_complete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.FolderScanResult" title="mdaviz.lazy_folder_scanner.FolderScanResult"><span class="pre">FolderScanResult</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow._on_scan_complete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow._on_scan_complete" title="Link to this definition">#</a></dt>
+<dd><p>Handle scan completion.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow._on_scan_error">
+<span class="sig-name descname"><span class="pre">_on_scan_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow._on_scan_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow._on_scan_error" title="Link to this definition">#</a></dt>
+<dd><p>Handle scan errors.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow._on_scan_progress">
+<span class="sig-name descname"><span class="pre">_on_scan_progress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow._on_scan_progress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow._on_scan_progress" title="Link to this definition">#</a></dt>
+<dd><p>Handle scan progress updates.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow._process_selected_path">
+<span class="sig-name descname"><span class="pre">_process_selected_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow._process_selected_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow._process_selected_path" title="Link to this definition">#</a></dt>
+<dd><p>Process the selected path and return folder/file info.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow._setup_scanner">
+<span class="sig-name descname"><span class="pre">_setup_scanner</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow._setup_scanner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow._setup_scanner" title="Link to this definition">#</a></dt>
+<dd><p>Initialize and configure the lazy folder scanner.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow._setup_window_properties">
+<span class="sig-name descname"><span class="pre">_setup_window_properties</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow._setup_window_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow._setup_window_properties" title="Link to this definition">#</a></dt>
+<dd><p>Set up window flags, attributes, and basic properties.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow._show_open_dialog">
+<span class="sig-name descname"><span class="pre">_show_open_dialog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow._show_open_dialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow._show_open_dialog" title="Link to this definition">#</a></dt>
+<dd><p>Show the open dialog and return selected path info.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow._update_plot_height">
+<span class="sig-name descname"><span class="pre">_update_plot_height</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_height</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow._update_plot_height"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow._update_plot_height" title="Link to this definition">#</a></dt>
+<dd><p>Update plot height in existing components.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow.cancel">
+<span class="sig-name descname"><span class="pre">cancel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow.cancel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow.cancel" title="Link to this definition">#</a></dt>
+<dd><p>Handle the logic when the user clicks ‘Cancel’.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow.closeEvent">
+<span class="sig-name descname"><span class="pre">closeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow.closeEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow.closeEvent" title="Link to this definition">#</a></dt>
+<dd><p>User clicked the big [X] to quit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow.dataPath">
+<span class="sig-name descname"><span class="pre">dataPath</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow.dataPath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow.dataPath" title="Link to this definition">#</a></dt>
+<dd><p>Full path object for the selected folder</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow.doAboutDialog">
+<span class="sig-name descname"><span class="pre">doAboutDialog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow.doAboutDialog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow.doAboutDialog" title="Link to this definition">#</a></dt>
+<dd><p>Show the “About …” dialog</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow.doClose">
+<span class="sig-name descname"><span class="pre">doClose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow.doClose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow.doClose" title="Link to this definition">#</a></dt>
+<dd><p>User chose exit (or quit), or closeEvent() was called.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow.doOpen">
+<span class="sig-name descname"><span class="pre">doOpen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow.doOpen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow.doOpen" title="Link to this definition">#</a></dt>
+<dd><p>User chose to open a file or folder dialog.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow.doPopUp">
+<span class="sig-name descname"><span class="pre">doPopUp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow.doPopUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow.doPopUp" title="Link to this definition">#</a></dt>
+<dd><p>User chose to show a popup dialog with a message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow.doPreferences">
+<span class="sig-name descname"><span class="pre">doPreferences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow.doPreferences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow.doPreferences" title="Link to this definition">#</a></dt>
+<dd><p>Show the Preferences dialog.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow.get_auto_load_setting">
+<span class="sig-name descname"><span class="pre">get_auto_load_setting</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow.get_auto_load_setting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow.get_auto_load_setting" title="Link to this definition">#</a></dt>
+<dd><p>Get the current auto-load folder setting.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>bool: True if auto-loading is enabled, False if disabled</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow.mdaFileList">
+<span class="sig-name descname"><span class="pre">mdaFileList</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow.mdaFileList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow.mdaFileList" title="Link to this definition">#</a></dt>
+<dd><p>List of mda file (name only) in the selected folder.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow.onFolderSelected">
+<span class="sig-name descname"><span class="pre">onFolderSelected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow.onFolderSelected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow.onFolderSelected" title="Link to this definition">#</a></dt>
+<dd><p>A folder was selected (from the open dialog or pull down menu).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow.onRefresh">
+<span class="sig-name descname"><span class="pre">onRefresh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow.onRefresh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow.onRefresh" title="Link to this definition">#</a></dt>
+<dd><p>Refreshes the file list in the currently selected folder
+- Re-fetch the list of MDA files in the current folder.
+- Display the updated file list in the MDA folder table view.
+- Invalidate cache for files in the current folder to ensure fresh data.
+- Preserve the currently selected file after refresh.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow.proceed">
+<span class="sig-name descname"><span class="pre">proceed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow.proceed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow.proceed" title="Link to this definition">#</a></dt>
+<dd><p>Handle the logic when the user clicks ‘OK’.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow.setFolderList">
+<span class="sig-name descname"><span class="pre">setFolderList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow.setFolderList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow.setFolderList" title="Link to this definition">#</a></dt>
+<dd><p>Set the folder path list &amp; populating the folder QComboBox.</p>
+<ul class="simple">
+<li><p>If folder_list is not None, it will remove its duplicates.</p></li>
+<li><p>If folder_list is None, the call to buildFolderList will take care of building the list
+based on the recent list of folder saved in the app settings.</p></li>
+</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>folder_list (list, optional): the current list of recent folders. Defaults to None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mainwindow.MainWindow.setStatus">
+<span class="sig-name descname"><span class="pre">setStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mainwindow.html#MainWindow.setStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mainwindow.MainWindow.setStatus" title="Link to this definition">#</a></dt>
+<dd><p>Write new status to the main window and terminal output.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="licensedialog.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">License Dialog</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="mda_file.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">MDA File</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow"><code class="docutils literal notranslate"><span class="pre">MainWindow</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow._addToRecentFolders"><code class="docutils literal notranslate"><span class="pre">MainWindow._addToRecentFolders()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow._apply_preferences"><code class="docutils literal notranslate"><span class="pre">MainWindow._apply_preferences()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow._auto_load_first_folder"><code class="docutils literal notranslate"><span class="pre">MainWindow._auto_load_first_folder()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow._buildFolderList"><code class="docutils literal notranslate"><span class="pre">MainWindow._buildFolderList()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow._center_window"><code class="docutils literal notranslate"><span class="pre">MainWindow._center_window()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow._fillFolderBox"><code class="docutils literal notranslate"><span class="pre">MainWindow._fillFolderBox()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow._handle_folder_selection"><code class="docutils literal notranslate"><span class="pre">MainWindow._handle_folder_selection()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow._initialize_data"><code class="docutils literal notranslate"><span class="pre">MainWindow._initialize_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow._on_scan_complete"><code class="docutils literal notranslate"><span class="pre">MainWindow._on_scan_complete()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow._on_scan_error"><code class="docutils literal notranslate"><span class="pre">MainWindow._on_scan_error()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow._on_scan_progress"><code class="docutils literal notranslate"><span class="pre">MainWindow._on_scan_progress()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow._process_selected_path"><code class="docutils literal notranslate"><span class="pre">MainWindow._process_selected_path()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow._setup_scanner"><code class="docutils literal notranslate"><span class="pre">MainWindow._setup_scanner()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow._setup_window_properties"><code class="docutils literal notranslate"><span class="pre">MainWindow._setup_window_properties()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow._show_open_dialog"><code class="docutils literal notranslate"><span class="pre">MainWindow._show_open_dialog()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow._update_plot_height"><code class="docutils literal notranslate"><span class="pre">MainWindow._update_plot_height()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow.cancel"><code class="docutils literal notranslate"><span class="pre">MainWindow.cancel()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow.closeEvent"><code class="docutils literal notranslate"><span class="pre">MainWindow.closeEvent()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow.dataPath"><code class="docutils literal notranslate"><span class="pre">MainWindow.dataPath()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow.doAboutDialog"><code class="docutils literal notranslate"><span class="pre">MainWindow.doAboutDialog()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow.doClose"><code class="docutils literal notranslate"><span class="pre">MainWindow.doClose()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow.doOpen"><code class="docutils literal notranslate"><span class="pre">MainWindow.doOpen()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow.doPopUp"><code class="docutils literal notranslate"><span class="pre">MainWindow.doPopUp()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow.doPreferences"><code class="docutils literal notranslate"><span class="pre">MainWindow.doPreferences()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow.get_auto_load_setting"><code class="docutils literal notranslate"><span class="pre">MainWindow.get_auto_load_setting()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow.mdaFileList"><code class="docutils literal notranslate"><span class="pre">MainWindow.mdaFileList()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow.onFolderSelected"><code class="docutils literal notranslate"><span class="pre">MainWindow.onFolderSelected()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow.onRefresh"><code class="docutils literal notranslate"><span class="pre">MainWindow.onRefresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow.proceed"><code class="docutils literal notranslate"><span class="pre">MainWindow.proceed()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow.setFolderList"><code class="docutils literal notranslate"><span class="pre">MainWindow.setFolderList()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mainwindow.MainWindow.setStatus"><code class="docutils literal notranslate"><span class="pre">MainWindow.setStatus()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/mainwindow.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

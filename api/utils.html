@@ -1,0 +1,1001 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Utilities &#8212; mdaviz 1.3</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=8749d347"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/utils';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Virtual Table Model" href="virtual_table_model.html" />
+    <link rel="prev" title="User Settings" href="user_settings.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mdaviz 1.3</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changes.html">
+    Changes
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../license.html">
+    License
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changes.html">
+    Changes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../license.html">
+    License
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="aboutdialog.html">About Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="app.html">Application starting point</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chartview.html">Chartview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_cache.html">Data Cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_table_model.html">Data Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_table_view.html">Data Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="empty_table_model.html">Empty Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_manager.html">Fit Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_models.html">Fit Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lazy_folder_scanner.html">Lazy Folder Scanner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lazy_loading_config.html">Lazy Loading Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licensedialog.html">License Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mainwindow.html">Main Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file.html">MDA File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_table_model.html">MDA File Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_table_view.html">MDA File Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_viz.html">MDA File Viz</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder.html">MDA Folder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder_table_model.html">MDA Folder Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder_table_view.html">MDA Folder Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opendialog.html">Open Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="popup.html">Popup Dialogs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="progress_dialog.html">Progress Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_settings.html">User Settings</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtual_table_model.html">Virtual Table Model</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">Source Code Documentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Utilities</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-mdaviz.utils">
+<span id="utilities"></span><h1>Utilities<a class="headerlink" href="#module-mdaviz.utils" title="Link to this heading">#</a></h1>
+<p>Utility functions for MDA file processing and data manipulation.</p>
+<p>This module provides various utility functions for handling MDA files,
+data conversion, and general utility operations.</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.utils.get_file_info" title="mdaviz.utils.get_file_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_file_info</span></code></a>(file_path)</p></td>
+<td><p>Get file information.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.utils.get_scan" title="mdaviz.utils.get_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_scan</span></code></a>(mda_file_data)</p></td>
+<td><p>Extracts scan positioners and detectors from an MDA file data object and prepares datasets.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.utils.mda2ftm" title="mdaviz.utils.mda2ftm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mda2ftm</span></code></a>(selection)</p></td>
+<td><p>Converts a field selection from MDA_MVC (MVC) format to SelectFieldsTableModel (TM) format.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.utils.ftm2mda" title="mdaviz.utils.ftm2mda"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ftm2mda</span></code></a>(selection)</p></td>
+<td><p>Converts a field selection from SelectFieldsTableModel (TM) format to MDA_MVC (MVC) format.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.utils.byte2str" title="mdaviz.utils.byte2str"><code class="xref py py-obj docutils literal notranslate"><span class="pre">byte2str</span></code></a>(byte_literal)</p></td>
+<td><p>Converts a byte literal to a UTF-8 encoded string.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.utils.num2fstr" title="mdaviz.utils.num2fstr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num2fstr</span></code></a>(x[, decimal, sigfigs])</p></td>
+<td><p>Return a string with the adequate precision and format.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.utils.getUiFileName" title="mdaviz.utils.getUiFileName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getUiFileName</span></code></a>(py_file_name)</p></td>
+<td><p>UI file name matches the Python file, different extension.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.utils.human_readable_size" title="mdaviz.utils.human_readable_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">human_readable_size</span></code></a>(size[, decimal_places])</p></td>
+<td><p>Convert size in bytes to human readable format.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.utils.iso2dt" title="mdaviz.utils.iso2dt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iso2dt</span></code></a>(iso_date_time)</p></td>
+<td><p>Convert ISO8601 time string to datetime object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.utils.iso2ts" title="mdaviz.utils.iso2ts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iso2ts</span></code></a>(iso_date_time)</p></td>
+<td><p>Convert ISO8601 time string to timestamp.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.utils.myLoadUi" title="mdaviz.utils.myLoadUi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">myLoadUi</span></code></a>(ui_file[, baseinstance])</p></td>
+<td><p>Load a .ui file for use in building a GUI.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.utils.removeAllLayoutWidgets" title="mdaviz.utils.removeAllLayoutWidgets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removeAllLayoutWidgets</span></code></a>(layout)</p></td>
+<td><p>Remove all existing widgets from QLayout.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.utils.run_in_thread" title="mdaviz.utils.run_in_thread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_in_thread</span></code></a>(func)</p></td>
+<td><p>(decorator) run <code class="docutils literal notranslate"><span class="pre">func</span></code> in thread</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdaviz.utils.ts2dt" title="mdaviz.utils.ts2dt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ts2dt</span></code></a>(timestamp)</p></td>
+<td><p>Convert timestamp to datetime object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.utils.ts2iso" title="mdaviz.utils.ts2iso"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ts2iso</span></code></a>(timestamp)</p></td>
+<td><p>Convert timestamp to ISO8601 time string.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.byte2str">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">byte2str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte_literal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/utils.html#byte2str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.byte2str" title="Link to this definition">#</a></dt>
+<dd><p>Converts a byte literal to a UTF-8 encoded string. If the input is not a byte literal, it is returned as is without any conversion.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><ul class="simple">
+<li><p>byte_literal (bytes | Any): The byte literal to be decoded or any input to be returned as is if not bytes.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><ul class="simple">
+<li><p>str | Any: The decoded string if the input is a byte literal, otherwise the original input.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.extract_file_prefix">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">extract_file_prefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/utils.html#extract_file_prefix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.extract_file_prefix" title="Link to this definition">#</a></dt>
+<dd><p>Create a pattern that matches the prefix followed by an optional separator and the scan number with possible leading zeros.</p>
+<p>The separators considered here are underscore (_), hyphen (-), dot (.), and space ( )</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>file_name (str): Name of the file
+scan_number (int | None): Scan number to extract prefix for</p>
+</dd>
+<dt>Returns:</dt><dd><p>str | None: Extracted prefix or None if no match</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.ftm2mda">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">ftm2mda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/mdaviz/utils.html#ftm2mda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.ftm2mda" title="Link to this definition">#</a></dt>
+<dd><p>Converts a field selection from SelectFieldsTableModel (TM) format to MDA_MVC (MVC) format.</p>
+<p>The TM format {1: ‘X’, 2: ‘Y’, 4: ‘Y’, 4: ‘I0’} is transformed into MVC format {‘Y’: [2, 3], ‘X’: 1, ‘I0’: 4}.
+Used to update MDA_MVC selection state (self.selectionField()) based on changes in SelectFieldsTableModel.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>selection (dict | None): The selection in TM format to be converted.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: The selection converted to MVC format.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.getUiFileName">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">getUiFileName</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">py_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/mdaviz/utils.html#getUiFileName"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.getUiFileName" title="Link to this definition">#</a></dt>
+<dd><p>UI file name matches the Python file, different extension.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>py_file_name (str): Python file name</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: Corresponding UI file name</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.get_det">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">get_det</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mda_file_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/utils.html#get_det"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.get_det" title="Link to this definition">#</a></dt>
+<dd><p>Extracts scan positioners and detectors from an MDA file data object.</p>
+<p>This function processes an mda.scanDim object to extract its scanPositioner and scanDetector instances.
+It organizes these instances into a dictionary, with their indexes as keys in the order of <code class="docutils literal notranslate"><span class="pre">p0,</span> <span class="pre">P1,...</span> <span class="pre">Px,</span> <span class="pre">D01,</span> <span class="pre">D02,...</span> <span class="pre">DX</span></code>.
+<code class="docutils literal notranslate"><span class="pre">p0</span></code> is a default scanPositioner object representing the point index. If additional positioners exist, they follow <code class="docutils literal notranslate"><span class="pre">p0</span></code> in sequence.
+The first detector is labeled <code class="docutils literal notranslate"><span class="pre">D01</span></code> and subsequent detectors follow in numerical order.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><ul class="simple">
+<li><p>mda_file_data: An instance of an mda.scanDim object, which contains the MDA file data to be processed.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>A tuple containing:</p>
+<ul class="simple">
+<li><p>A dictionary (d) where keys are indexes, mapping to either scanPositioner or scanDetector objects.
+The dictionary is structured as <code class="docutils literal notranslate"><span class="pre">{0:</span> <span class="pre">p0,</span> <span class="pre">1:</span> <span class="pre">P1,</span> <span class="pre">...,</span> <span class="pre">np:</span> <span class="pre">D01,</span> <span class="pre">np+1:</span> <span class="pre">D02,</span> <span class="pre">...,</span> <span class="pre">np+nd:</span> <span class="pre">DX}</span></code>.</p></li>
+<li><p>The index (first_pos) of the first positioner in the returned dictionary. This is 1 if a positioner
+other than the default index positioner exists, otherwise 0.</p></li>
+<li><p>The index (first_det) of the first detector in the returned dictionary, which directly follows the last positioner.</p></li>
+</ul>
+</dd>
+<dt>Notes:</dt><dd><ul class="simple">
+<li><p>p0 is created by default and corresponds to the point index, described as an ‘Index’ scanPositioner object with predefined properties.</p></li>
+<li><p>np is the total number of positioners, nd the number of detectors, and npts the number of data points actually acquired.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.get_file_info">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">get_file_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/mdaviz/utils.html#get_file_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.get_file_info" title="Link to this definition">#</a></dt>
+<dd><p>Get file information. This is an alias for get_file_info_full for backward compatibility.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>file_path (Path): Path to the MDA file</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Complete file information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.get_file_info_full">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">get_file_info_full</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/mdaviz/utils.html#get_file_info_full"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.get_file_info_full" title="Link to this definition">#</a></dt>
+<dd><p>Get complete file information by loading the full MDA data.</p>
+<p>This is the original get_file_info function, renamed for clarity.
+Use this only when detailed file information is needed.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>file_path (Path): Path to the MDA file</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Complete file information including all metadata and data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.get_file_info_lightweight">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">get_file_info_lightweight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/mdaviz/utils.html#get_file_info_lightweight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.get_file_info_lightweight" title="Link to this definition">#</a></dt>
+<dd><p>Get lightweight file information without loading full MDA data.</p>
+<p>This function extracts only the essential metadata needed for the folder view
+without loading the complete file data, making it much faster for large folders.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>file_path (Path): Path to the MDA file</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Dictionary containing lightweight file information with keys:</p>
+<ul class="simple">
+<li><p>Name: File name</p></li>
+<li><p>Prefix: File prefix (if extractable)</p></li>
+<li><p>Number: Scan number (if available)</p></li>
+<li><p>Points: Number of data points (if available)</p></li>
+<li><p>Dimension: Scan dimension (if available)</p></li>
+<li><p>Date: File date (if available)</p></li>
+<li><p>Size: Human readable file size</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.get_md">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">get_md</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mda_file_metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/mdaviz/utils.html#get_md"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.get_md" title="Link to this definition">#</a></dt>
+<dd><p>Process MDA file metadata to convert bytes to strings and clean up structure.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>mda_file_metadata (dict): Raw metadata from MDA file</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: Processed metadata with string keys and cleaned values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.get_scan">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">get_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mda_file_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/utils.html#get_scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.get_scan" title="Link to this definition">#</a></dt>
+<dd><p>Extracts scan positioners and detectors from an MDA file data object and prepares datasets.</p>
+<p>Processes an mda.scanDim object to extract scanPositioner and scanDetector
+instances, organizing them into a dictionary with additional metadata like
+data, units, and names. A default scanPositioner object representing the
+point index (<code class="docutils literal notranslate"><span class="pre">p0</span></code>) is included. If additional positioners exist, they follow
+<code class="docutils literal notranslate"><span class="pre">p0</span></code> in sequence. The first detector is labeled <code class="docutils literal notranslate"><span class="pre">D01</span></code> and subsequent detectors
+follow in numerical order: <code class="docutils literal notranslate"><span class="pre">p0</span></code>, <code class="docutils literal notranslate"><span class="pre">p1</span></code>,… <code class="docutils literal notranslate"><span class="pre">px</span></code>, <code class="docutils literal notranslate"><span class="pre">d01</span></code>, <code class="docutils literal notranslate"><span class="pre">d02</span></code>,… <code class="docutils literal notranslate"><span class="pre">dX</span></code>.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><ul class="simple">
+<li><p>mda_file_data: An instance of an mda.scanDim object to be processed.</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>A tuple containing:</p>
+<ul class="simple">
+<li><p>A dictionary keyed by index, each mapping to a sub-dictionary containing
+the scan object along with its <code class="docutils literal notranslate"><span class="pre">data</span></code>, <code class="docutils literal notranslate"><span class="pre">unit</span></code>, <code class="docutils literal notranslate"><span class="pre">name</span></code> and <code class="docutils literal notranslate"><span class="pre">type</span></code>.
+Structure: <code class="docutils literal notranslate"><span class="pre">{index:</span> <span class="pre">{'object':</span> <span class="pre">scanObject,</span> <span class="pre">'data':</span> <span class="pre">[...],</span> <span class="pre">'unit':</span> <span class="pre">'...',</span> <span class="pre">'name':</span> <span class="pre">'...','type':...}}</span></code>.</p></li>
+<li><p>The index (first_pos) of the first positioner in the returned dictionary. This
+is 1 if a positioner other than the default index positioner exists, otherwise 0.</p></li>
+<li><p>The index (first_det) of the first detector in the returned dictionary, which
+directly follows the last positioner.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.get_scan_2d">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">get_scan_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mda_file_data_dim1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mda_file_data_dim2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/utils.html#get_scan_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.get_scan_2d" title="Link to this definition">#</a></dt>
+<dd><p>Extracts scan positioners and detectors from 2D MDA file data objects and prepares datasets.</p>
+<p>Processes two mda.scanDim objects (outer and inner dimensions) to extract scanPositioner
+and scanDetector instances, organizing them into a dictionary with additional metadata.
+For 2D data, the structure is typically:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dim1</span></code> (outer): X2 positioner + detectors</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dim2</span></code> (inner): X1 positioner + detectors</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Parameters:</dt><dd><ul class="simple">
+<li><p>mda_file_data_dim1: An instance of an <code class="docutils literal notranslate"><span class="pre">mda.scanDim</span></code> object for the outer dimension</p></li>
+<li><p>mda_file_data_dim2: An instance of an <code class="docutils literal notranslate"><span class="pre">mda.scanDim</span></code> object for the inner dimension</p></li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><p>A tuple containing:</p>
+<ul class="simple">
+<li><p>A dictionary keyed by index, each mapping to a sub-dictionary containing
+the scan object along with its <code class="docutils literal notranslate"><span class="pre">data</span></code>, <code class="docutils literal notranslate"><span class="pre">unit</span></code>, <code class="docutils literal notranslate"><span class="pre">name</span></code> and <code class="docutils literal notranslate"><span class="pre">type</span></code>.
+For 2D data, detectors have 2D arrays: <code class="docutils literal notranslate"><span class="pre">data[X2_index][X1_index]</span></code>
+For positioners, includes <code class="docutils literal notranslate"><span class="pre">all_positioners</span></code> list and <code class="docutils literal notranslate"><span class="pre">np</span></code> count for full positioner information.</p></li>
+<li><p>The index (first_pos) of the first positioner in the returned dictionary</p></li>
+<li><p>The index (first_det) of the first detector in the returned dictionary</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.human_readable_size">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">human_readable_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimal_places</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/mdaviz/utils.html#human_readable_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.human_readable_size" title="Link to this definition">#</a></dt>
+<dd><p>Convert size in bytes to human readable format.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>size (float): Size in bytes
+decimal_places (int): Number of decimal places to show</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: Human readable size string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.iso2dt">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">iso2dt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iso_date_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">datetime</span></span></span><a class="reference internal" href="../_modules/mdaviz/utils.html#iso2dt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.iso2dt" title="Link to this definition">#</a></dt>
+<dd><p>Convert ISO8601 time string to datetime object.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>iso_date_time (str): ISO8601 formatted time string</p>
+</dd>
+<dt>Returns:</dt><dd><p>datetime: Datetime object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.iso2ts">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">iso2ts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iso_date_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/mdaviz/utils.html#iso2ts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.iso2ts" title="Link to this definition">#</a></dt>
+<dd><p>Convert ISO8601 time string to timestamp.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>iso_date_time (str): ISO8601 formatted time string</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: Unix timestamp</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.mda2ftm">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">mda2ftm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/mdaviz/utils.html#mda2ftm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.mda2ftm" title="Link to this definition">#</a></dt>
+<dd><p>Converts a field selection from MDA_MVC (MVC) format to SelectFieldsTableModel (TM) format.</p>
+<p>The MVC format {‘Y’: [2, 3], ‘X’: 1, ‘I0’: 4} is transformed into TM format {1: ‘X’, 2: ‘Y’, 4: ‘Y’, 4: ‘I0’}.
+This is used to sync selection states between SelectFieldsTableModel and MDA_MVC.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>selection (dict | None): The selection in MVC format to be converted.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: The selection converted to TM format.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.myLoadUi">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">myLoadUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ui_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseinstance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/utils.html#myLoadUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.myLoadUi" title="Link to this definition">#</a></dt>
+<dd><p>Load a .ui file for use in building a GUI.</p>
+<p>Wraps <cite>uic.loadUi()</cite> with code that finds our program’s
+<em>resources</em> directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">See<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="http://nullege.com/codes/search/PyQt4.uic.loadUi">http://nullege.com/codes/search/PyQt4.uic.loadUi</a></p>
+</dd>
+<dt class="field-even">See<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="http://bitesofcode.blogspot.ca/2011/10/comparison-of-loading-techniques.html">http://bitesofcode.blogspot.ca/2011/10/comparison-of-loading-techniques.html</a></p>
+</dd>
+</dl>
+<p>inspired by:
+<a class="reference external" href="http://stackoverflow.com/questions/14892713/how-do-you-load-ui-files-onto-python-classes-with-pyside?lq=1">http://stackoverflow.com/questions/14892713/how-do-you-load-ui-files-onto-python-classes-with-pyside?lq=1</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.num2fstr">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">num2fstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigfigs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/mdaviz/utils.html#num2fstr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.num2fstr" title="Link to this definition">#</a></dt>
+<dd><p>Return a string with the adequate precision and format.</p>
+<dl>
+<dt>Parameters:</dt><dd><p>x (float): Number to format
+decimal (int): Number of decimal places (used when sigfigs is None).
+sigfigs (int | None): If set, format with this many significant figures:</p>
+<blockquote>
+<div><p>use scientific notation when <a href="#id1"><span class="problematic" id="id2">|x|</span></a> &lt; 0.01 or <a href="#id3"><span class="problematic" id="id4">|x|</span></a> &gt;= 1e4, otherwise
+fixed-point. If None, use decimal places and existing rules.</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>str: Formatted string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.reconnect">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">reconnect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_slot</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/utils.html#reconnect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.reconnect" title="Link to this definition">#</a></dt>
+<dd><p>Disconnects any slots connected to the given signal and then connects the signal to the new_slot.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><ul class="simple">
+<li><p>signal: The signal to disconnect and then reconnect.</p></li>
+<li><p>new_slot: The new slot to connect to the signal.</p></li>
+</ul>
+</dd>
+<dt>Note:</dt><dd><ul class="simple">
+<li><p>this function catches TypeError which occurs if the signal was not connected to any slots.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.removeAllLayoutWidgets">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">removeAllLayoutWidgets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layout</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/mdaviz/utils.html#removeAllLayoutWidgets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.removeAllLayoutWidgets" title="Link to this definition">#</a></dt>
+<dd><p>Remove all existing widgets from QLayout.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>layout: QLayout object to clear</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.run_in_thread">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">run_in_thread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/utils.html#run_in_thread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.run_in_thread" title="Link to this definition">#</a></dt>
+<dd><p>(decorator) run <code class="docutils literal notranslate"><span class="pre">func</span></code> in thread</p>
+<p>USAGE:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@run_in_thread</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">progress_reporting</span><span class="p">():</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;progress_reporting is starting&quot;</span><span class="p">)</span>
+    <span class="c1"># ...</span>
+
+<span class="c1">#...</span>
+<span class="n">progress_reporting</span><span class="p">()</span>   <span class="c1"># runs in separate thread</span>
+<span class="c1">#...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.ts2dt">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">ts2dt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">datetime</span></span></span><a class="reference internal" href="../_modules/mdaviz/utils.html#ts2dt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.ts2dt" title="Link to this definition">#</a></dt>
+<dd><p>Convert timestamp to datetime object.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>timestamp (float): Unix timestamp</p>
+</dd>
+<dt>Returns:</dt><dd><p>datetime: Datetime object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mdaviz.utils.ts2iso">
+<span class="sig-prename descclassname"><span class="pre">mdaviz.utils.</span></span><span class="sig-name descname"><span class="pre">ts2iso</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/mdaviz/utils.html#ts2iso"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.utils.ts2iso" title="Link to this definition">#</a></dt>
+<dd><p>Convert timestamp to ISO8601 time string.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>timestamp (float): Unix timestamp</p>
+</dd>
+<dt>Returns:</dt><dd><p>str: ISO8601 formatted time string</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="user_settings.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">User Settings</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="virtual_table_model.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Virtual Table Model</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.byte2str"><code class="docutils literal notranslate"><span class="pre">byte2str()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.extract_file_prefix"><code class="docutils literal notranslate"><span class="pre">extract_file_prefix()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.ftm2mda"><code class="docutils literal notranslate"><span class="pre">ftm2mda()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.getUiFileName"><code class="docutils literal notranslate"><span class="pre">getUiFileName()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.get_det"><code class="docutils literal notranslate"><span class="pre">get_det()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.get_file_info"><code class="docutils literal notranslate"><span class="pre">get_file_info()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.get_file_info_full"><code class="docutils literal notranslate"><span class="pre">get_file_info_full()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.get_file_info_lightweight"><code class="docutils literal notranslate"><span class="pre">get_file_info_lightweight()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.get_md"><code class="docutils literal notranslate"><span class="pre">get_md()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.get_scan"><code class="docutils literal notranslate"><span class="pre">get_scan()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.get_scan_2d"><code class="docutils literal notranslate"><span class="pre">get_scan_2d()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.human_readable_size"><code class="docutils literal notranslate"><span class="pre">human_readable_size()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.iso2dt"><code class="docutils literal notranslate"><span class="pre">iso2dt()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.iso2ts"><code class="docutils literal notranslate"><span class="pre">iso2ts()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.mda2ftm"><code class="docutils literal notranslate"><span class="pre">mda2ftm()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.myLoadUi"><code class="docutils literal notranslate"><span class="pre">myLoadUi()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.num2fstr"><code class="docutils literal notranslate"><span class="pre">num2fstr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.reconnect"><code class="docutils literal notranslate"><span class="pre">reconnect()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.removeAllLayoutWidgets"><code class="docutils literal notranslate"><span class="pre">removeAllLayoutWidgets()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.run_in_thread"><code class="docutils literal notranslate"><span class="pre">run_in_thread()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.ts2dt"><code class="docutils literal notranslate"><span class="pre">ts2dt()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.utils.ts2iso"><code class="docutils literal notranslate"><span class="pre">ts2iso()</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/utils.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

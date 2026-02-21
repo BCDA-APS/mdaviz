@@ -1,0 +1,1325 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mdaviz.mainwindow &#8212; mdaviz 1.3</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=8749d347"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/mdaviz/mainwindow';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mdaviz 1.3</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Changes
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../changes.html">
+    Changes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../license.html">
+    License
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">mdaviz.mainwindow</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for mdaviz.mainwindow</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Defines MainWindow class.</span>
+
+<span class="sd">.. autosummary::</span>
+
+<span class="sd">    ~MainWindow</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtWidgets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QTimer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6.QtWidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">QMainWindow</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="p">,</span> <span class="n">QApplication</span>
+
+<span class="c1"># QAction import removed - no longer needed</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz</span><span class="w"> </span><span class="kn">import</span> <span class="n">APP_TITLE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.mda_folder</span><span class="w"> </span><span class="kn">import</span> <span class="n">MDA_MVC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.user_settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.opendialog</span><span class="w"> </span><span class="kn">import</span> <span class="n">DIR_SETTINGS_KEY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.lazy_folder_scanner</span><span class="w"> </span><span class="kn">import</span> <span class="n">LazyFolderScanner</span><span class="p">,</span> <span class="n">FolderScanResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_logger</span>
+
+<span class="c1"># Get logger for this module</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;mainwindow&quot;</span><span class="p">)</span>
+
+<span class="n">UI_FILE</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">getUiFileName</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+<span class="n">MAX_FILES</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">MAX_RECENT_DIRS</span> <span class="o">=</span> <span class="mi">10</span>
+
+
+<div class="viewcode-block" id="MainWindow">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MainWindow</span><span class="p">(</span><span class="n">QMainWindow</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The main window of the app, built in Qt designer.</span>
+
+<span class="sd">    .. autosummary::</span>
+
+<span class="sd">        ~status</span>
+<span class="sd">        ~setStatus</span>
+<span class="sd">        ~doAboutDialog</span>
+<span class="sd">        ~closeEvent</span>
+<span class="sd">        ~doClose</span>
+<span class="sd">        ~doOpen</span>
+<span class="sd">        ~reset_mainwindow</span>
+<span class="sd">        ~dataPath</span>
+<span class="sd">        ~setDataPath</span>
+<span class="sd">        ~mdaFileList</span>
+<span class="sd">        ~setMdaFileList</span>
+<span class="sd">        ~mdaInfoList</span>
+<span class="sd">        ~setMdaInfoList</span>
+<span class="sd">        ~folderList</span>
+<span class="sd">        ~setFolderList</span>
+<span class="sd">        ~onFolderSelected</span>
+<span class="sd">        ~onRefresh</span>
+<span class="sd">        ~doPreferences</span>
+<span class="sd">        ~doPopUp</span>
+<span class="sd">        ~proceed</span>
+<span class="sd">        ~cancel</span>
+<span class="sd">        ~get_auto_load_setting</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># ==========================================</span>
+    <span class="c1"># Window Initialization &amp; Setup</span>
+    <span class="c1"># ==========================================</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">myLoadUi</span><span class="p">(</span><span class="n">UI_FILE</span><span class="p">,</span> <span class="n">baseinstance</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="n">APP_TITLE</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_window_properties</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_data</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_scanner</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_connect</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_window_geometry</span><span class="p">()</span>
+
+        <span class="c1"># Auto-load the first valid folder from recent folders (delayed to preserve startup message)</span>
+        <span class="n">QTimer</span><span class="o">.</span><span class="n">singleShot</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auto_load_first_folder</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MainWindow._initialize_data">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow._initialize_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize data structures and state.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setDataPath</span><span class="p">()</span>  <span class="c1"># the combined data path obj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setFolderList</span><span class="p">()</span>  <span class="c1"># the list of recent folders in folder QComboBox</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setMdaFileList</span><span class="p">()</span>  <span class="c1"># the list of mda file NAME str (name only)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setMdaInfoList</span><span class="p">()</span>  <span class="c1"># the list of mda file Info (all the data necessary to fill the table view)</span></div>
+
+
+<div class="viewcode-block" id="MainWindow._setup_scanner">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow._setup_scanner">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_scanner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize and configure the lazy folder scanner.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lazy_scanner</span> <span class="o">=</span> <span class="n">LazyFolderScanner</span><span class="p">(</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">max_files</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">use_lightweight_scan</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lazy_scanner</span><span class="o">.</span><span class="n">scan_progress</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_scan_progress</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lazy_scanner</span><span class="o">.</span><span class="n">scan_complete</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_scan_complete</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lazy_scanner</span><span class="o">.</span><span class="n">scan_error</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_scan_error</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionOpen</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doOpen</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionAbout</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doAboutDialog</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionPreferences</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doPreferences</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actionExit</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doClose</span><span class="p">)</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">reconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="o">.</span><span class="n">released</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">doOpen</span><span class="p">)</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">reconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="o">.</span><span class="n">released</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onRefresh</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="o">.</span><span class="n">currentTextChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onFolderSelected</span><span class="p">)</span>
+
+    <span class="c1"># ==========================================</span>
+    <span class="c1"># Window Geometry</span>
+    <span class="c1"># ==========================================</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_window_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Restore window geometry from settings</span>
+        <span class="n">geometry_restored</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">restoreWindowGeometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;mainwindow_geometry&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Settings are saved in: </span><span class="si">{</span><span class="n">settings</span><span class="o">.</span><span class="n">fileName</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get the maximum dimensions across all screens</span>
+        <span class="n">max_width</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">max_height</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">screen</span> <span class="ow">in</span> <span class="n">QApplication</span><span class="o">.</span><span class="n">screens</span><span class="p">():</span>
+            <span class="n">max_width</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_width</span><span class="p">,</span> <span class="n">screen</span><span class="o">.</span><span class="n">geometry</span><span class="p">()</span><span class="o">.</span><span class="n">width</span><span class="p">())</span>
+            <span class="n">max_height</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_height</span><span class="p">,</span> <span class="n">screen</span><span class="o">.</span><span class="n">geometry</span><span class="p">()</span><span class="o">.</span><span class="n">height</span><span class="p">())</span>
+        <span class="n">max_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_width</span> <span class="o">*</span> <span class="mf">0.8</span><span class="p">)</span>
+        <span class="n">max_height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_height</span> <span class="o">*</span> <span class="mf">0.8</span><span class="p">)</span>
+
+        <span class="c1"># Only apply size constraints and centering if no geometry was previously saved</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">geometry_restored</span><span class="p">:</span>
+            <span class="c1"># Ensure the window size is reasonable (not too large)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">max_width</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">max_height</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">max_width</span><span class="p">)),</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">(),</span> <span class="n">max_height</span><span class="p">)),</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">400</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">300</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">720</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>  <span class="c1"># Reasonable default size</span>
+            <span class="c1"># Center the window on the screen only if no geometry was restored</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_center_window</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If geometry was restored, only apply size constraints if window is unreasonably large</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">max_width</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">max_height</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">max_width</span><span class="p">)),</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">(),</span> <span class="n">max_height</span><span class="p">)),</span>
+                <span class="p">)</span>
+
+<div class="viewcode-block" id="MainWindow._setup_window_properties">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow._setup_window_properties">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_window_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up window flags, attributes, and basic properties.&quot;&quot;&quot;</span>
+        <span class="c1"># Set proper window flags for macOS resizing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowFlags</span><span class="p">(</span>
+            <span class="n">Qt</span><span class="o">.</span><span class="n">WindowType</span><span class="o">.</span><span class="n">Window</span>
+            <span class="o">|</span> <span class="n">Qt</span><span class="o">.</span><span class="n">WindowType</span><span class="o">.</span><span class="n">WindowMinimizeButtonHint</span>
+            <span class="o">|</span> <span class="n">Qt</span><span class="o">.</span><span class="n">WindowType</span><span class="o">.</span><span class="n">WindowMaximizeButtonHint</span>
+            <span class="o">|</span> <span class="n">Qt</span><span class="o">.</span><span class="n">WindowType</span><span class="o">.</span><span class="n">WindowCloseButtonHint</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Additional macOS-specific properties for proper resizing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">WidgetAttribute</span><span class="o">.</span><span class="n">WA_MacShowFocusRect</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">WidgetAttribute</span><span class="o">.</span><span class="n">WA_MacNormalSize</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Ensure the window can be resized</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setMinimumSize</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="mi">300</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">720</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>  <span class="c1"># More reasonable initial size</span>
+
+        <span class="c1"># Ensure the window is resizable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setSizePolicy</span><span class="p">(</span><span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">,</span> <span class="n">QSizePolicy</span><span class="o">.</span><span class="n">Policy</span><span class="o">.</span><span class="n">Expanding</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MainWindow._center_window">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow._center_window">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_center_window</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Center the window on the screen.&quot;&quot;&quot;</span>
+        <span class="n">screen</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QApplication</span><span class="o">.</span><span class="n">primaryScreen</span><span class="p">()</span><span class="o">.</span><span class="n">geometry</span><span class="p">()</span>
+        <span class="n">window_geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">()</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">screen</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">-</span> <span class="n">window_geometry</span><span class="o">.</span><span class="n">width</span><span class="p">())</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">screen</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">-</span> <span class="n">window_geometry</span><span class="o">.</span><span class="n">height</span><span class="p">())</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
+
+
+    <span class="c1"># ==========================================</span>
+    <span class="c1"># Status &amp; Dialog Management</span>
+    <span class="c1"># ==========================================</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">statusbar</span><span class="o">.</span><span class="n">currentMessage</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MainWindow.setStatus">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow.setStatus">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write new status to the main window and terminal output.&quot;&quot;&quot;</span>
+        <span class="c1"># Avoid logging duplicate consecutive messages</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_last_status&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_status</span> <span class="o">!=</span> <span class="n">text</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_status</span> <span class="o">=</span> <span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statusbar</span><span class="o">.</span><span class="n">showMessage</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">text</span><span class="p">),</span> <span class="n">msecs</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MainWindow.doAboutDialog">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow.doAboutDialog">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">doAboutDialog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Show the &quot;About ...&quot; dialog</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.aboutdialog</span><span class="w"> </span><span class="kn">import</span> <span class="n">AboutDialog</span>
+
+        <span class="n">about</span> <span class="o">=</span> <span class="n">AboutDialog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">about</span><span class="o">.</span><span class="n">open</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MainWindow.doPreferences">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow.doPreferences">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">doPreferences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Show the Preferences dialog.&quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.preferences_dialog</span><span class="w"> </span><span class="kn">import</span> <span class="n">PreferencesDialog</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6.QtWidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">QDialog</span>
+
+        <span class="n">dialog</span> <span class="o">=</span> <span class="n">PreferencesDialog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dialog</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span> <span class="o">==</span> <span class="n">QDialog</span><span class="o">.</span><span class="n">DialogCode</span><span class="o">.</span><span class="n">Accepted</span><span class="p">:</span>
+            <span class="n">new_settings</span> <span class="o">=</span> <span class="n">dialog</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_apply_preferences</span><span class="p">(</span><span class="n">new_settings</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MainWindow._apply_preferences">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow._apply_preferences">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_preferences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings_dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply preference changes to the application.&quot;&quot;&quot;</span>
+        <span class="c1"># Save settings</span>
+        <span class="n">settings</span><span class="o">.</span><span class="n">setKey</span><span class="p">(</span><span class="s2">&quot;plot_max_height&quot;</span><span class="p">,</span> <span class="n">settings_dict</span><span class="p">[</span><span class="s2">&quot;plot_max_height&quot;</span><span class="p">])</span>
+        <span class="n">settings</span><span class="o">.</span><span class="n">setKey</span><span class="p">(</span><span class="s2">&quot;auto_load_folder&quot;</span><span class="p">,</span> <span class="n">settings_dict</span><span class="p">[</span><span class="s2">&quot;auto_load_folder&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Update UI components</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_plot_height</span><span class="p">(</span><span class="n">settings_dict</span><span class="p">[</span><span class="s2">&quot;plot_max_height&quot;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Settings updated: plot height </span><span class="si">{</span><span class="n">settings_dict</span><span class="p">[</span><span class="s1">&#39;plot_max_height&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">px, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;auto-load </span><span class="si">{</span><span class="s1">&#39;enabled&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">settings_dict</span><span class="p">[</span><span class="s1">&#39;auto_load_folder&#39;</span><span class="p">]</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;disabled&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MainWindow._update_plot_height">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow._update_plot_height">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_plot_height</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_height</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update plot height in existing components.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;mvc_folder&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="p">,</span> <span class="s2">&quot;mda_file_viz&quot;</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">mda_file_viz</span>
+            <span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">mda_file_viz</span><span class="p">,</span> <span class="s2">&quot;chart_view&quot;</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">mda_file_viz</span><span class="o">.</span><span class="n">chart_view</span>
+                <span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">mda_file_viz</span><span class="o">.</span><span class="n">chart_view</span><span class="o">.</span><span class="n">setMaximumPlotHeight</span><span class="p">(</span>
+                        <span class="n">new_height</span>
+                    <span class="p">)</span>
+
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">mda_file_viz</span><span class="p">,</span> <span class="s2">&quot;_updateTabWidgetMaxHeight&quot;</span>
+                    <span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">mda_file_viz</span><span class="o">.</span><span class="n">_updateTabWidgetMaxHeight</span><span class="p">()</span></div>
+
+
+    <span class="c1"># ==========================================</span>
+    <span class="c1"># Window Lifecycle</span>
+    <span class="c1"># ==========================================</span>
+
+<div class="viewcode-block" id="MainWindow.closeEvent">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow.closeEvent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">closeEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        User clicked the big [X] to quit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doClose</span><span class="p">()</span>
+        <span class="n">event</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>  <span class="c1"># let the window close</span></div>
+
+
+<div class="viewcode-block" id="MainWindow.doClose">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow.doClose">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">doClose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        User chose exit (or quit), or closeEvent() was called.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s2">&quot;Application quitting ...&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Cancel any ongoing scan operations</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;lazy_scanner&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lazy_scanner</span><span class="o">.</span><span class="n">cancel_scan</span><span class="p">()</span>
+
+        <span class="n">settings</span><span class="o">.</span><span class="n">saveWindowGeometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;mainwindow_geometry&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MainWindow.doPopUp">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow.doPopUp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">doPopUp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        User chose to show a popup dialog with a message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.popup</span><span class="w"> </span><span class="kn">import</span> <span class="n">PopUp</span>
+
+        <span class="n">popup</span> <span class="o">=</span> <span class="n">PopUp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">popup</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span> <span class="o">==</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QDialog</span><span class="o">.</span><span class="n">accepted</span></div>
+
+
+<div class="viewcode-block" id="MainWindow.proceed">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow.proceed">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">proceed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle the logic when the user clicks &#39;OK&#39;.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="MainWindow.cancel">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow.cancel">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle the logic when the user clicks &#39;Cancel&#39;.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+    <span class="c1"># ==========================================</span>
+    <span class="c1"># File Operations</span>
+    <span class="c1"># ==========================================</span>
+
+<div class="viewcode-block" id="MainWindow.doOpen">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow.doOpen">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">doOpen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;User chose to open a file or folder dialog.&quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_show_open_dialog</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+            <span class="n">folder_path</span><span class="p">,</span> <span class="n">selected_file_name</span> <span class="o">=</span> <span class="n">result</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_handle_folder_selection</span><span class="p">(</span><span class="n">folder_path</span><span class="p">,</span> <span class="n">selected_file_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MainWindow._show_open_dialog">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow._show_open_dialog">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_show_open_dialog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Show the open dialog and return selected path info.&quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.opendialog</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenDialog</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6.QtWidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">QFileDialog</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s2">&quot;Please select a file...&quot;</span><span class="p">)</span>
+        <span class="n">open_dialog</span> <span class="o">=</span> <span class="n">OpenDialog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">open_dialog</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s2">&quot;Select a File&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Use exec() to show the dialog and get the result</span>
+        <span class="k">if</span> <span class="n">open_dialog</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span> <span class="o">==</span> <span class="n">QFileDialog</span><span class="o">.</span><span class="n">DialogCode</span><span class="o">.</span><span class="n">Accepted</span><span class="p">:</span>
+            <span class="c1"># Get the selected files</span>
+            <span class="n">selected_files</span> <span class="o">=</span> <span class="n">open_dialog</span><span class="o">.</span><span class="n">selectedFiles</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">selected_files</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_selected_path</span><span class="p">(</span><span class="n">selected_files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="MainWindow._process_selected_path">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow._process_selected_path">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_selected_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selected_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process the selected path and return folder/file info.&quot;&quot;&quot;</span>
+        <span class="n">path_obj</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">selected_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">path_obj</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="c1"># If a file was selected, get its parent directory</span>
+            <span class="n">folder_path</span> <span class="o">=</span> <span class="n">path_obj</span><span class="o">.</span><span class="n">parent</span>
+            <span class="n">selected_file_name</span> <span class="o">=</span> <span class="n">path_obj</span><span class="o">.</span><span class="n">name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Selected file: </span><span class="si">{</span><span class="n">selected_file_name</span><span class="si">}</span><span class="s2">, loading folder: </span><span class="si">{</span><span class="n">folder_path</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">folder_path</span><span class="p">,</span> <span class="n">selected_file_name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If a directory was selected, use it directly</span>
+            <span class="n">folder_path</span> <span class="o">=</span> <span class="n">path_obj</span>
+            <span class="n">selected_file_name</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Selected folder: </span><span class="si">{</span><span class="n">folder_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">folder_path</span><span class="p">,</span> <span class="n">selected_file_name</span></div>
+
+
+<div class="viewcode-block" id="MainWindow._handle_folder_selection">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow._handle_folder_selection">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_folder_selection</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">folder_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">selected_file_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle the selected folder and file.&quot;&quot;&quot;</span>
+        <span class="c1"># Store the selected file name for highlighting</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_selected_file_name</span> <span class="o">=</span> <span class="n">selected_file_name</span>
+
+        <span class="c1"># Add to folder list and load</span>
+        <span class="n">folder_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folderList</span><span class="p">()</span>
+        <span class="n">folder_list</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">folder_path</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setFolderList</span><span class="p">(</span><span class="n">folder_list</span><span class="p">)</span>
+
+        <span class="c1"># Set the combobox selection to the new folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="o">.</span><span class="n">setCurrentText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">folder_path</span><span class="p">))</span>  <span class="c1"># type: ignore[attr-defined]</span></div>
+
+
+    <span class="c1"># ==========================================</span>
+    <span class="c1"># Data Management</span>
+    <span class="c1"># ==========================================</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_mainwindow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setDataPath</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setMdaInfoList</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setMdaFileList</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">clearContents</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MainWindow.dataPath">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow.dataPath">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dataPath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Full path object for the selected folder</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataPath</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">setDataPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dataPath</span> <span class="o">=</span> <span class="n">path</span>
+
+<div class="viewcode-block" id="MainWindow.mdaFileList">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow.mdaFileList">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mdaFileList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;List of mda file (name only) in the selected folder.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mdaFileList</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">setMdaFileList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mda_file_list</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mdaFileList</span> <span class="o">=</span> <span class="n">mda_file_list</span> <span class="k">if</span> <span class="n">mda_file_list</span> <span class="k">else</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">mdaInfoList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mdaInfoList</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">setMdaInfoList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infoList</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mdaInfoList</span> <span class="o">=</span> <span class="n">infoList</span> <span class="k">if</span> <span class="n">infoList</span> <span class="k">else</span> <span class="p">[]</span>
+
+    <span class="c1"># ==========================================</span>
+    <span class="c1"># Folder Operations</span>
+    <span class="c1"># ==========================================</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">folderList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_folderList</span>
+
+<div class="viewcode-block" id="MainWindow.setFolderList">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow.setFolderList">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setFolderList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder_list</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the folder path list &amp; populating the folder QComboBox.</span>
+
+<span class="sd">        - If folder_list is not None, it will remove its duplicates.</span>
+<span class="sd">        - If folder_list is None, the call to buildFolderList will take care of building the list</span>
+<span class="sd">          based on the recent list of folder saved in the app settings.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            folder_list (list, optional): the current list of recent folders. Defaults to None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Ensure we always pass a list or None to _buildFolderList; never store a string in _folderList</span>
+        <span class="k">if</span> <span class="n">folder_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="n">folder_list</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">folder_list</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">folder_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">folder_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buildFolderList</span><span class="p">(</span><span class="n">folder_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fillFolderBox</span><span class="p">(</span><span class="n">folder_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_folderList</span> <span class="o">=</span> <span class="n">folder_list</span></div>
+
+
+<div class="viewcode-block" id="MainWindow.onFolderSelected">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow.onFolderSelected">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onFolderSelected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A folder was selected (from the open dialog or pull down menu).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">folder_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;Select a folder...&quot;</span><span class="p">,</span> <span class="s2">&quot;Please select a folder...&quot;</span><span class="p">]:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">folder_name</span> <span class="o">==</span> <span class="s2">&quot;Clear Recently Open...&quot;</span><span class="p">:</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">setKey</span><span class="p">(</span><span class="n">DIR_SETTINGS_KEY</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">folder_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataPath</span><span class="p">())]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataPath</span><span class="p">()</span> <span class="k">else</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setFolderList</span><span class="p">(</span><span class="n">folder_list</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">folder_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">folder_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">folder_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">folder_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>  <span class="c1"># folder exists</span>
+                <span class="c1"># Use lazy folder scanner for better performance</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scanning folder: </span><span class="si">{</span><span class="n">folder_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lazy_scanner</span><span class="o">.</span><span class="n">scan_folder_async</span><span class="p">(</span><span class="n">folder_path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reset_mainwindow</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">folder_name</span><span class="si">}</span><span class="s2"> does not exist or is not a directory&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MainWindow.onRefresh">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow.onRefresh">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">onRefresh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Refreshes the file list in the currently selected folder</span>
+<span class="sd">        - Re-fetch the list of MDA files in the current folder.</span>
+<span class="sd">        - Display the updated file list in the MDA folder table view.</span>
+<span class="sd">        - Invalidate cache for files in the current folder to ensure fresh data.</span>
+<span class="sd">        - Preserve the currently selected file after refresh.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s2">&quot;Refreshing folder...&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;🔄 REFRESH DEBUG: Refreshing folder...&quot;</span><span class="p">)</span>
+        <span class="n">current_folder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataPath</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">current_folder</span><span class="p">:</span>
+            <span class="c1"># Preserve the currently selected file (and detector/positioner selection)</span>
+            <span class="n">selected_file_name</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_saved_selection_field&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_saved_selection_field</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span>
+                <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="p">,</span> <span class="s2">&quot;mda_folder_tableview&quot;</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">()</span>
+            <span class="p">):</span>
+                <span class="n">current_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">()</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">current_index</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+                    <span class="n">current_file_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdaFileList</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">current_index</span><span class="o">.</span><span class="n">row</span><span class="p">()</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_file_list</span><span class="p">):</span>
+                        <span class="n">selected_file_name</span> <span class="o">=</span> <span class="n">current_file_list</span><span class="p">[</span><span class="n">current_index</span><span class="o">.</span><span class="n">row</span><span class="p">()]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_selected_file_name</span> <span class="o">=</span> <span class="n">selected_file_name</span>
+                        <span class="c1"># Preserve detector/positioner selection for restore after refresh</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_saved_selection_field</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">selectionField</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">selectionField</span><span class="p">()</span>
+                            <span class="k">else</span> <span class="kc">None</span>
+                        <span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Preserving selection: </span><span class="si">{</span><span class="n">selected_file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s2">&quot;Invalid row index for current selection&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s2">&quot;No valid selection to preserve&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s2">&quot;No selection model available to preserve selection&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Alternative approach: try to get selection from the table view directly</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">selected_file_name</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="p">,</span> <span class="s2">&quot;mda_folder_tableview&quot;</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="n">table_view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span>
+                <span class="k">if</span> <span class="n">table_view</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">():</span>
+                    <span class="n">current_index</span> <span class="o">=</span> <span class="n">table_view</span><span class="o">.</span><span class="n">selectionModel</span><span class="p">()</span><span class="o">.</span><span class="n">currentIndex</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">current_index</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+                        <span class="n">current_file_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdaFileList</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">current_index</span><span class="o">.</span><span class="n">row</span><span class="p">()</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_file_list</span><span class="p">):</span>
+                            <span class="n">selected_file_name</span> <span class="o">=</span> <span class="n">current_file_list</span><span class="p">[</span><span class="n">current_index</span><span class="o">.</span><span class="n">row</span><span class="p">()]</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_selected_file_name</span> <span class="o">=</span> <span class="n">selected_file_name</span>
+                            <span class="c1"># Preserve detector/positioner selection for restore after refresh</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_saved_selection_field</span> <span class="o">=</span> <span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">selectionField</span><span class="p">()</span>
+                                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">selectionField</span><span class="p">()</span>
+                                <span class="k">else</span> <span class="kc">None</span>
+                            <span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Preserving selection (alt method): </span><span class="si">{</span><span class="n">selected_file_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+
+            <span class="c1"># Invalidate cache for all files in the current folder</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">mdaviz.data_cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_global_cache</span>
+
+            <span class="n">cache</span> <span class="o">=</span> <span class="n">get_global_cache</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;🔄 REFRESH DEBUG: Invalidating cache for folder: </span><span class="si">{</span><span class="n">current_folder</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalidating cache for folder: </span><span class="si">{</span><span class="n">current_folder</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">invalidated_count</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">invalidate_folder</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">current_folder</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;🔄 REFRESH DEBUG: Invalidated </span><span class="si">{</span><span class="n">invalidated_count</span><span class="si">}</span><span class="s2"> files from cache&quot;</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">invalidated_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalidated cache for </span><span class="si">{</span><span class="n">invalidated_count</span><span class="si">}</span><span class="s2"> files&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s2">&quot;No cached files found to invalidate&quot;</span><span class="p">)</span>
+
+            <span class="n">current_mdaFileList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdaFileList</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">onFolderSelected</span><span class="p">(</span><span class="n">current_folder</span><span class="p">)</span>
+            <span class="n">new_mdaFileList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdaFileList</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">new_mdaFileList</span><span class="p">:</span>
+                <span class="n">difference</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">new_mdaFileList</span> <span class="k">if</span> <span class="n">item</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">current_mdaFileList</span>
+                <span class="p">]</span>
+                <span class="k">if</span> <span class="n">difference</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading new files: </span><span class="si">{</span><span class="n">difference</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s2">&quot;No new files.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s2">&quot;Nothing to update.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MainWindow._buildFolderList">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow._buildFolderList">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_buildFolderList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder_list</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the list of recent folders and remove duplicates from the folder list.</span>
+
+<span class="sd">        - If folder_list arg is not None (after a doOpen call), it just removes duplicates.</span>
+<span class="sd">        - If folder_list arg is None, it grabs the list of recent folder from the app settings.</span>
+<span class="sd">          The directory loaded at start-up will be added at index 0.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            folder_list (list, optional): a list folders. Defaults to None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: list of folders to be populated in the QComboBox</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">unique_paths</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">candidate_paths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">folder_list</span><span class="p">:</span>
+            <span class="n">recent_dirs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getRecentFolders</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">recent_dirs</span><span class="p">:</span>
+                <span class="n">candidate_paths</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">recent_dirs</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">and</span> <span class="n">d</span> <span class="o">!=</span> <span class="s2">&quot;.&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">candidate_paths</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">folder_list</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">and</span> <span class="n">d</span> <span class="o">!=</span> <span class="s2">&quot;.&quot;</span><span class="p">])</span>
+        <span class="n">new_path_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">p</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">candidate_paths</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_paths</span> <span class="ow">and</span> <span class="p">(</span><span class="n">unique_paths</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">new_path_list</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_getRecentFolders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">recent_dirs</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">getKey</span><span class="p">(</span><span class="n">DIR_SETTINGS_KEY</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">getKey</span><span class="p">(</span><span class="n">DIR_SETTINGS_KEY</span><span class="p">)</span>
+            <span class="k">else</span> <span class="p">[]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">recent_dirs</span>
+
+<div class="viewcode-block" id="MainWindow._addToRecentFolders">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow._addToRecentFolders">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_addToRecentFolders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a new folder path to the list of recent folders in the app settings.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            folder_path (str): The path of the folder to be added.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">recent_dirs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getRecentFolders</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">folder_path</span> <span class="ow">in</span> <span class="n">recent_dirs</span><span class="p">:</span>
+            <span class="n">recent_dirs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">folder_path</span><span class="p">)</span>
+        <span class="n">recent_dirs</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">folder_path</span><span class="p">))</span>
+        <span class="n">recent_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dir</span> <span class="k">for</span> <span class="nb">dir</span> <span class="ow">in</span> <span class="n">recent_dirs</span> <span class="k">if</span> <span class="nb">dir</span> <span class="o">!=</span> <span class="s2">&quot;.&quot;</span><span class="p">]</span>
+        <span class="n">settings</span><span class="o">.</span><span class="n">setKey</span><span class="p">(</span><span class="n">DIR_SETTINGS_KEY</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">recent_dirs</span><span class="p">[:</span><span class="n">MAX_RECENT_DIRS</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="MainWindow._fillFolderBox">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow._fillFolderBox">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fillFolderBox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder_list</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fill the Folder ComboBox; Clear Recently Open... is added at the end by default.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            folder_list (list, optional): The list of folders to be displayed in the ComboBox. Defaults to [].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">folder_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">folder_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>  <span class="c1"># type: ignore[attr-defined]</span>
+
+        <span class="c1"># If no folders and auto-load is disabled, show &quot;Please select a folder...&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">folder_list</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_auto_load_setting</span><span class="p">():</span>
+            <span class="n">folder_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Please select a folder...&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If we have folders and auto-load is disabled, add &quot;Please select a folder...&quot; at the beginning</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_auto_load_setting</span><span class="p">():</span>
+                <span class="n">folder_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Please select a folder...&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">folder_list</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="o">.</span><span class="n">addItems</span><span class="p">(</span><span class="n">folder_list</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="o">.</span><span class="n">addItems</span><span class="p">([</span><span class="s2">&quot;Clear Recently Open...&quot;</span><span class="p">])</span>  <span class="c1"># type: ignore[attr-defined]</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>  <span class="c1"># type: ignore[attr-defined]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="o">.</span><span class="n">insertSeparator</span><span class="p">(</span><span class="n">count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span></div>
+
+
+    <span class="c1"># ==========================================</span>
+    <span class="c1"># Scan Progress Handling</span>
+    <span class="c1"># ==========================================</span>
+
+<div class="viewcode-block" id="MainWindow._on_scan_progress">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow._on_scan_progress">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_scan_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">total</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle scan progress updates.&quot;&quot;&quot;</span>
+        <span class="n">progress_percent</span> <span class="o">=</span> <span class="p">(</span><span class="n">current</span> <span class="o">/</span> <span class="n">total</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span> <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scanning files: </span><span class="si">{</span><span class="n">current</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">progress_percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%)&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MainWindow._on_scan_complete">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow._on_scan_complete">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_scan_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">FolderScanResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle scan completion.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">is_complete</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">file_list</span><span class="p">:</span>
+            <span class="c1"># Sort the file list</span>
+            <span class="n">sorted_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">file_list</span><span class="p">)</span>
+            <span class="n">sorted_info</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">file_info_list</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">])</span>
+
+            <span class="c1"># Set the data - extract folder path from the first file</span>
+            <span class="k">if</span> <span class="n">sorted_info</span> <span class="ow">and</span> <span class="s2">&quot;folderPath&quot;</span> <span class="ow">in</span> <span class="n">sorted_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">folder_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">sorted_info</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;folderPath&quot;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Fallback: construct folder path from file path</span>
+                <span class="n">folder_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">sorted_files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="n">sorted_files</span> <span class="k">else</span> <span class="kc">None</span>  <span class="c1"># type: ignore[assignment]</span>
+
+            <span class="k">if</span> <span class="n">folder_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setDataPath</span><span class="p">(</span><span class="n">folder_path</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setMdaInfoList</span><span class="p">(</span><span class="n">sorted_info</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setMdaFileList</span><span class="p">(</span><span class="n">sorted_files</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_addToRecentFolders</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">folder_path</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sorted_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> mda files&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+
+                <span class="c1"># Create or update the folder view</span>
+                <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">groupbox</span><span class="o">.</span><span class="n">layout</span><span class="p">()</span>  <span class="c1"># type: ignore[attr-defined]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span> <span class="o">=</span> <span class="n">MDA_MVC</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                    <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Always update the folder view since it is a new folder</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">updateFolderView</span><span class="p">()</span>
+
+                <span class="c1"># Highlight the selected file if one was specified, otherwise select the first file</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_selected_file_name&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selected_file_name</span><span class="p">:</span>
+                    <span class="c1"># Use a timer to delay selection restoration (helps with timing issues on Linux)</span>
+                    <span class="kn">from</span><span class="w"> </span><span class="nn">PyQt6.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">QTimer</span>
+
+                    <span class="k">def</span><span class="w"> </span><span class="nf">restore_selection</span><span class="p">():</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="c1"># Restore detector/positioner selection before selecting file</span>
+                            <span class="k">if</span> <span class="p">(</span>
+                                <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_saved_selection_field&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span>
+                            <span class="p">):</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">setSelectionField</span><span class="p">(</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">_saved_selection_field</span>
+                                <span class="p">)</span>
+                            <span class="c1"># Find the index of the selected file</span>
+                            <span class="n">selected_index</span> <span class="o">=</span> <span class="n">sorted_files</span><span class="o">.</span><span class="n">index</span><span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">_selected_file_name</span>
+                            <span class="p">)</span>
+                            <span class="c1"># Select and highlight the file in the folder view</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="p">,</span> <span class="s2">&quot;mda_folder_tableview&quot;</span>
+                            <span class="p">):</span>
+                                <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+                                <span class="k">if</span> <span class="n">model</span> <span class="ow">and</span> <span class="n">selected_index</span> <span class="o">&lt;</span> <span class="n">model</span><span class="o">.</span><span class="n">rowCount</span><span class="p">():</span>
+                                    <span class="n">index</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">selected_index</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">selectAndShowIndex</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span>
+                                        <span class="sa">f</span><span class="s2">&quot;Highlighted selected file: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_selected_file_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                                    <span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                            <span class="c1"># File not found in the list, ignore</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Selected file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_selected_file_name</span><span class="si">}</span><span class="s2"> not found after refresh&quot;</span>
+                            <span class="p">)</span>
+                        <span class="k">finally</span><span class="p">:</span>
+                            <span class="c1"># Clear the selected file name and saved selection</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_selected_file_name</span> <span class="o">=</span> <span class="kc">None</span>
+                            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_saved_selection_field&quot;</span><span class="p">):</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">_saved_selection_field</span> <span class="o">=</span> <span class="kc">None</span>
+
+                    <span class="c1"># Use a short delay to ensure the model is fully updated</span>
+                    <span class="n">QTimer</span><span class="o">.</span><span class="n">singleShot</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">restore_selection</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Auto-select the first file if no specific file was selected</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="p">,</span> <span class="s2">&quot;mda_folder_tableview&quot;</span>
+                    <span class="p">):</span>
+                        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">mda_folder_tableview</span><span class="o">.</span><span class="n">tableView</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">model</span> <span class="ow">and</span> <span class="n">model</span><span class="o">.</span><span class="n">rowCount</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">first_index</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">mvc_folder</span><span class="o">.</span><span class="n">selectAndShowIndex</span><span class="p">(</span><span class="n">first_index</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Auto-selected first file: </span><span class="si">{</span><span class="n">sorted_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sorted_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> MDA files from </span><span class="si">{</span><span class="n">folder_path</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">error_msg</span> <span class="o">=</span> <span class="s2">&quot;Could not determine folder path from scan results&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;No mda files&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">doPopUp</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reset_mainwindow</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scan failed: </span><span class="si">{</span><span class="n">error_msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">error_message</span> <span class="ow">or</span> <span class="s2">&quot;No MDA files found&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;No mda files&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">doPopUp</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reset_mainwindow</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scan failed: </span><span class="si">{</span><span class="n">error_msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MainWindow._on_scan_error">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow._on_scan_error">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_scan_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle scan errors.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_mainwindow</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scan error: </span><span class="si">{</span><span class="n">error_message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doPopUp</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error scanning folder: </span><span class="si">{</span><span class="n">error_message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MainWindow._auto_load_first_folder">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow._auto_load_first_folder">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_auto_load_first_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Auto-load the first valid folder from recent folders.</span>
+
+<span class="sd">        This method attempts to automatically load the first folder from the recent</span>
+<span class="sd">        folders list if it exists and is valid. This provides a better user experience</span>
+<span class="sd">        by not requiring manual folder selection on startup.</span>
+
+<span class="sd">        The auto-loading can be disabled by setting the &#39;auto_load_folder&#39; setting to False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if auto-loading is enabled using the proper boolean conversion</span>
+        <span class="n">auto_load_enabled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_auto_load_setting</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">auto_load_enabled</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s2">&quot;Auto-loading disabled by user preference&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">recent_dirs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getRecentFolders</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">recent_dirs</span><span class="p">:</span>
+            <span class="n">first_folder</span> <span class="o">=</span> <span class="n">recent_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">first_folder</span> <span class="ow">and</span> <span class="n">first_folder</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                <span class="n">folder_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">first_folder</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="k">if</span> <span class="n">folder_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">folder_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Auto-loading folder: </span><span class="si">{</span><span class="n">first_folder</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="c1"># Use lazy folder scanner for better performance</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lazy_scanner</span><span class="o">.</span><span class="n">scan_folder_async</span><span class="p">(</span><span class="n">folder_path</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Auto-load failed: </span><span class="si">{</span><span class="n">first_folder</span><span class="si">}</span><span class="s2"> does not exist or is not a directory&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s2">&quot;No valid recent folders to auto-load&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s2">&quot;No recent folders available for auto-loading&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MainWindow.get_auto_load_setting">
+<a class="viewcode-back" href="../../api/mainwindow.html#mdaviz.mainwindow.MainWindow.get_auto_load_setting">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_auto_load_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the current auto-load folder setting.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if auto-loading is enabled, False if disabled</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">setting</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">getKey</span><span class="p">(</span><span class="s2">&quot;auto_load_folder&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">setting</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Default to True if not set</span>
+            <span class="n">setting</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">setKey</span><span class="p">(</span><span class="s2">&quot;auto_load_folder&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">setting</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c1"># Convert string to boolean</span>
+            <span class="n">setting</span> <span class="o">=</span> <span class="n">setting</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="s2">&quot;on&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">setting</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

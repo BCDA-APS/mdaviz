@@ -1,0 +1,1116 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Source Code Documentation &#8212; mdaviz 1.3</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=8749d347"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="About Dialog" href="api/aboutdialog.html" />
+    <link rel="prev" title="Known Bugs" href="known_bugs.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mdaviz 1.3</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="changes.html">
+    Changes
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="license.html">
+    License
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="changes.html">
+    Changes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="license.html">
+    License
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="api/aboutdialog.html">About Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/app.html">Application starting point</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/chartview.html">Chartview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/data_cache.html">Data Cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/data_table_model.html">Data Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/data_table_view.html">Data Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/empty_table_model.html">Empty Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/fit_manager.html">Fit Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/fit_models.html">Fit Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/lazy_folder_scanner.html">Lazy Folder Scanner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/lazy_loading_config.html">Lazy Loading Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/licensedialog.html">License Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/mainwindow.html">Main Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/mda_file.html">MDA File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/mda_file_table_model.html">MDA File Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/mda_file_table_view.html">MDA File Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/mda_file_viz.html">MDA File Viz</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/mda_folder.html">MDA Folder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/mda_folder_table_model.html">MDA Folder Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/mda_folder_table_view.html">MDA Folder Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/opendialog.html">Open Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/popup.html">Popup Dialogs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/progress_dialog.html">Progress Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/user_settings.html">User Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/virtual_table_model.html">Virtual Table Model</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Source Code Documentation</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="source-code-documentation">
+<h1>Source Code Documentation<a class="headerlink" href="#source-code-documentation" title="Link to this heading">#</a></h1>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/aboutdialog.html">About Dialog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/aboutdialog.html#mdaviz.aboutdialog.AboutDialog"><code class="docutils literal notranslate"><span class="pre">AboutDialog</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/aboutdialog.html#mdaviz.aboutdialog.AboutDialog.clearStatus"><code class="docutils literal notranslate"><span class="pre">AboutDialog.clearStatus()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/aboutdialog.html#mdaviz.aboutdialog.AboutDialog.closeEvent"><code class="docutils literal notranslate"><span class="pre">AboutDialog.closeEvent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/aboutdialog.html#mdaviz.aboutdialog.AboutDialog.doDocsUrl"><code class="docutils literal notranslate"><span class="pre">AboutDialog.doDocsUrl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/aboutdialog.html#mdaviz.aboutdialog.AboutDialog.doIssuesUrl"><code class="docutils literal notranslate"><span class="pre">AboutDialog.doIssuesUrl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/aboutdialog.html#mdaviz.aboutdialog.AboutDialog.doLicense"><code class="docutils literal notranslate"><span class="pre">AboutDialog.doLicense()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/aboutdialog.html#mdaviz.aboutdialog.AboutDialog.doUrl"><code class="docutils literal notranslate"><span class="pre">AboutDialog.doUrl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/aboutdialog.html#mdaviz.aboutdialog.AboutDialog.setStatus"><code class="docutils literal notranslate"><span class="pre">AboutDialog.setStatus()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/app.html">Application starting point</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/chartview.html">Chartview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/data_cache.html">Data Cache</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.CachedFileData"><code class="docutils literal notranslate"><span class="pre">CachedFileData</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.CachedFileData.get_size_mb"><code class="docutils literal notranslate"><span class="pre">CachedFileData.get_size_mb()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.CachedFileData.update_access_time"><code class="docutils literal notranslate"><span class="pre">CachedFileData.update_access_time()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache"><code class="docutils literal notranslate"><span class="pre">DataCache</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache._check_memory_usage"><code class="docutils literal notranslate"><span class="pre">DataCache._check_memory_usage()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache._evict_lru"><code class="docutils literal notranslate"><span class="pre">DataCache._evict_lru()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache._load_without_caching"><code class="docutils literal notranslate"><span class="pre">DataCache._load_without_caching()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache._perform_memory_cleanup"><code class="docutils literal notranslate"><span class="pre">DataCache._perform_memory_cleanup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache.cache_eviction"><code class="docutils literal notranslate"><span class="pre">DataCache.cache_eviction</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache.cache_hit"><code class="docutils literal notranslate"><span class="pre">DataCache.cache_hit</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache.cache_miss"><code class="docutils literal notranslate"><span class="pre">DataCache.cache_miss</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache.clear"><code class="docutils literal notranslate"><span class="pre">DataCache.clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache.get"><code class="docutils literal notranslate"><span class="pre">DataCache.get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache.get_or_load"><code class="docutils literal notranslate"><span class="pre">DataCache.get_or_load()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache.get_stats"><code class="docutils literal notranslate"><span class="pre">DataCache.get_stats()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache.invalidate_file"><code class="docutils literal notranslate"><span class="pre">DataCache.invalidate_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache.invalidate_folder"><code class="docutils literal notranslate"><span class="pre">DataCache.invalidate_folder()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache.load_and_cache"><code class="docutils literal notranslate"><span class="pre">DataCache.load_and_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache.memory_warning"><code class="docutils literal notranslate"><span class="pre">DataCache.memory_warning</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache.put"><code class="docutils literal notranslate"><span class="pre">DataCache.put()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache.remove"><code class="docutils literal notranslate"><span class="pre">DataCache.remove()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache.set_max_entries"><code class="docutils literal notranslate"><span class="pre">DataCache.set_max_entries()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.DataCache.set_max_size_mb"><code class="docutils literal notranslate"><span class="pre">DataCache.set_max_size_mb()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.get_global_cache"><code class="docutils literal notranslate"><span class="pre">get_global_cache()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/data_cache.html#mdaviz.data_cache.set_global_cache"><code class="docutils literal notranslate"><span class="pre">set_global_cache()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/data_table_model.html">Data Table Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/data_table_model.html#mdaviz.data_table_model.DataTableModel"><code class="docutils literal notranslate"><span class="pre">DataTableModel</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/data_table_model.html#mdaviz.data_table_model.DataTableModel.allData"><code class="docutils literal notranslate"><span class="pre">DataTableModel.allData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_table_model.html#mdaviz.data_table_model.DataTableModel.columnCount"><code class="docutils literal notranslate"><span class="pre">DataTableModel.columnCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_table_model.html#mdaviz.data_table_model.DataTableModel.columnLabels"><code class="docutils literal notranslate"><span class="pre">DataTableModel.columnLabels()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_table_model.html#mdaviz.data_table_model.DataTableModel.data"><code class="docutils literal notranslate"><span class="pre">DataTableModel.data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_table_model.html#mdaviz.data_table_model.DataTableModel.headerData"><code class="docutils literal notranslate"><span class="pre">DataTableModel.headerData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_table_model.html#mdaviz.data_table_model.DataTableModel.rowCount"><code class="docutils literal notranslate"><span class="pre">DataTableModel.rowCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_table_model.html#mdaviz.data_table_model.DataTableModel.setAllData"><code class="docutils literal notranslate"><span class="pre">DataTableModel.setAllData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data_table_model.html#mdaviz.data_table_model.DataTableModel.setColumnLabels"><code class="docutils literal notranslate"><span class="pre">DataTableModel.setColumnLabels()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/data_table_view.html">Data Table View</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/data_table_view.html#mdaviz.data_table_view.DataTableView"><code class="docutils literal notranslate"><span class="pre">DataTableView</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/empty_table_model.html">Empty Table Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/empty_table_model.html#mdaviz.empty_table_model.EmptyTableModel"><code class="docutils literal notranslate"><span class="pre">EmptyTableModel</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/fit_manager.html">Fit Manager</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/fit_manager.html#mdaviz.fit_manager.FitData"><code class="docutils literal notranslate"><span class="pre">FitData</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/fit_manager.html#mdaviz.fit_manager.FitManager"><code class="docutils literal notranslate"><span class="pre">FitManager</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_manager.html#mdaviz.fit_manager.FitManager.addFit"><code class="docutils literal notranslate"><span class="pre">FitManager.addFit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_manager.html#mdaviz.fit_manager.FitManager.clearAllFits"><code class="docutils literal notranslate"><span class="pre">FitManager.clearAllFits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_manager.html#mdaviz.fit_manager.FitManager.fitAdded"><code class="docutils literal notranslate"><span class="pre">FitManager.fitAdded</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_manager.html#mdaviz.fit_manager.FitManager.fitRemoved"><code class="docutils literal notranslate"><span class="pre">FitManager.fitRemoved</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_manager.html#mdaviz.fit_manager.FitManager.fitUpdated"><code class="docutils literal notranslate"><span class="pre">FitManager.fitUpdated</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_manager.html#mdaviz.fit_manager.FitManager.getFitCurveData"><code class="docutils literal notranslate"><span class="pre">FitManager.getFitCurveData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_manager.html#mdaviz.fit_manager.FitManager.getFitData"><code class="docutils literal notranslate"><span class="pre">FitManager.getFitData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_manager.html#mdaviz.fit_manager.FitManager.getFitParameters"><code class="docutils literal notranslate"><span class="pre">FitManager.getFitParameters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_manager.html#mdaviz.fit_manager.FitManager.getFitQualityMetrics"><code class="docutils literal notranslate"><span class="pre">FitManager.getFitQualityMetrics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_manager.html#mdaviz.fit_manager.FitManager.getFitUncertainties"><code class="docutils literal notranslate"><span class="pre">FitManager.getFitUncertainties()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_manager.html#mdaviz.fit_manager.FitManager.hasFits"><code class="docutils literal notranslate"><span class="pre">FitManager.hasFits()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_manager.html#mdaviz.fit_manager.FitManager.removeFit"><code class="docutils literal notranslate"><span class="pre">FitManager.removeFit()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/fit_models.html">Fit Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.ErrorFunctionFit"><code class="docutils literal notranslate"><span class="pre">ErrorFunctionFit</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.ErrorFunctionFit._error_function"><code class="docutils literal notranslate"><span class="pre">ErrorFunctionFit._error_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.ErrorFunctionFit._get_default_initial_guess"><code class="docutils literal notranslate"><span class="pre">ErrorFunctionFit._get_default_initial_guess()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.ExponentialFit"><code class="docutils literal notranslate"><span class="pre">ExponentialFit</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.ExponentialFit._exponential_function"><code class="docutils literal notranslate"><span class="pre">ExponentialFit._exponential_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.ExponentialFit._get_default_initial_guess"><code class="docutils literal notranslate"><span class="pre">ExponentialFit._get_default_initial_guess()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.FitModel"><code class="docutils literal notranslate"><span class="pre">FitModel</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.FitModel._get_default_initial_guess"><code class="docutils literal notranslate"><span class="pre">FitModel._get_default_initial_guess()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.FitModel.fit"><code class="docutils literal notranslate"><span class="pre">FitModel.fit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.FitResult"><code class="docutils literal notranslate"><span class="pre">FitResult</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.GaussianFit"><code class="docutils literal notranslate"><span class="pre">GaussianFit</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.GaussianFit._gaussian_function"><code class="docutils literal notranslate"><span class="pre">GaussianFit._gaussian_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.GaussianFit._get_default_initial_guess"><code class="docutils literal notranslate"><span class="pre">GaussianFit._get_default_initial_guess()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.LinearFit"><code class="docutils literal notranslate"><span class="pre">LinearFit</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.LinearFit._get_default_initial_guess"><code class="docutils literal notranslate"><span class="pre">LinearFit._get_default_initial_guess()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.LinearFit._linear_function"><code class="docutils literal notranslate"><span class="pre">LinearFit._linear_function()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.LorentzianFit"><code class="docutils literal notranslate"><span class="pre">LorentzianFit</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.LorentzianFit._get_default_initial_guess"><code class="docutils literal notranslate"><span class="pre">LorentzianFit._get_default_initial_guess()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.LorentzianFit._lorentzian_function"><code class="docutils literal notranslate"><span class="pre">LorentzianFit._lorentzian_function()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.NegativeGaussianFit"><code class="docutils literal notranslate"><span class="pre">NegativeGaussianFit</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.NegativeGaussianFit._gaussian_function"><code class="docutils literal notranslate"><span class="pre">NegativeGaussianFit._gaussian_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.NegativeGaussianFit._get_default_initial_guess"><code class="docutils literal notranslate"><span class="pre">NegativeGaussianFit._get_default_initial_guess()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.NegativeLorentzianFit"><code class="docutils literal notranslate"><span class="pre">NegativeLorentzianFit</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.NegativeLorentzianFit._get_default_initial_guess"><code class="docutils literal notranslate"><span class="pre">NegativeLorentzianFit._get_default_initial_guess()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.NegativeLorentzianFit._lorentzian_function"><code class="docutils literal notranslate"><span class="pre">NegativeLorentzianFit._lorentzian_function()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.PolynomialFit"><code class="docutils literal notranslate"><span class="pre">PolynomialFit</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.PolynomialFit._get_default_initial_guess"><code class="docutils literal notranslate"><span class="pre">PolynomialFit._get_default_initial_guess()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.PolynomialFit._polynomial_function"><code class="docutils literal notranslate"><span class="pre">PolynomialFit._polynomial_function()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.TopHatFit"><code class="docutils literal notranslate"><span class="pre">TopHatFit</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.TopHatFit._get_default_initial_guess"><code class="docutils literal notranslate"><span class="pre">TopHatFit._get_default_initial_guess()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.TopHatFit._tophat_function"><code class="docutils literal notranslate"><span class="pre">TopHatFit._tophat_function()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/fit_models.html#mdaviz.fit_models.get_available_models"><code class="docutils literal notranslate"><span class="pre">get_available_models()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/lazy_folder_scanner.html">Lazy Folder Scanner</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.FolderScanResult"><code class="docutils literal notranslate"><span class="pre">FolderScanResult</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.FolderScanWorker"><code class="docutils literal notranslate"><span class="pre">FolderScanWorker</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.FolderScanWorker._continue_progressive_scan"><code class="docutils literal notranslate"><span class="pre">FolderScanWorker._continue_progressive_scan()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.FolderScanWorker._progressive_scan"><code class="docutils literal notranslate"><span class="pre">FolderScanWorker._progressive_scan()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.FolderScanWorker.cancel"><code class="docutils literal notranslate"><span class="pre">FolderScanWorker.cancel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.FolderScanWorker.complete"><code class="docutils literal notranslate"><span class="pre">FolderScanWorker.complete</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.FolderScanWorker.error"><code class="docutils literal notranslate"><span class="pre">FolderScanWorker.error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.FolderScanWorker.progress"><code class="docutils literal notranslate"><span class="pre">FolderScanWorker.progress</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.FolderScanWorker.progressive_update"><code class="docutils literal notranslate"><span class="pre">FolderScanWorker.progressive_update</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.FolderScanWorker.scan"><code class="docutils literal notranslate"><span class="pre">FolderScanWorker.scan()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner"><code class="docutils literal notranslate"><span class="pre">LazyFolderScanner</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner._continue_progressive_scan"><code class="docutils literal notranslate"><span class="pre">LazyFolderScanner._continue_progressive_scan()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner._on_progressive_update"><code class="docutils literal notranslate"><span class="pre">LazyFolderScanner._on_progressive_update()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner._on_scan_complete"><code class="docutils literal notranslate"><span class="pre">LazyFolderScanner._on_scan_complete()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner._on_scan_error"><code class="docutils literal notranslate"><span class="pre">LazyFolderScanner._on_scan_error()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner._on_scan_thread_finished"><code class="docutils literal notranslate"><span class="pre">LazyFolderScanner._on_scan_thread_finished()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner._progressive_scan"><code class="docutils literal notranslate"><span class="pre">LazyFolderScanner._progressive_scan()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner._update_progress"><code class="docutils literal notranslate"><span class="pre">LazyFolderScanner._update_progress()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner.cancel_scan"><code class="docutils literal notranslate"><span class="pre">LazyFolderScanner.cancel_scan()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner.is_scanning"><code class="docutils literal notranslate"><span class="pre">LazyFolderScanner.is_scanning()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner.progressive_scan_update"><code class="docutils literal notranslate"><span class="pre">LazyFolderScanner.progressive_scan_update</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner.scan_complete"><code class="docutils literal notranslate"><span class="pre">LazyFolderScanner.scan_complete</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner.scan_error"><code class="docutils literal notranslate"><span class="pre">LazyFolderScanner.scan_error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner.scan_folder"><code class="docutils literal notranslate"><span class="pre">LazyFolderScanner.scan_folder()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner.scan_folder_async"><code class="docutils literal notranslate"><span class="pre">LazyFolderScanner.scan_folder_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_folder_scanner.html#mdaviz.lazy_folder_scanner.LazyFolderScanner.scan_progress"><code class="docutils literal notranslate"><span class="pre">LazyFolderScanner.scan_progress</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/lazy_loading_config.html">Lazy Loading Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/lazy_loading_config.html#mdaviz.lazy_loading_config.ConfigManager"><code class="docutils literal notranslate"><span class="pre">ConfigManager</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_loading_config.html#mdaviz.lazy_loading_config.ConfigManager._load_config"><code class="docutils literal notranslate"><span class="pre">ConfigManager._load_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_loading_config.html#mdaviz.lazy_loading_config.ConfigManager.config_changed"><code class="docutils literal notranslate"><span class="pre">ConfigManager.config_changed</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_loading_config.html#mdaviz.lazy_loading_config.ConfigManager.get_config"><code class="docutils literal notranslate"><span class="pre">ConfigManager.get_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_loading_config.html#mdaviz.lazy_loading_config.ConfigManager.get_memory_usage_mb"><code class="docutils literal notranslate"><span class="pre">ConfigManager.get_memory_usage_mb()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_loading_config.html#mdaviz.lazy_loading_config.ConfigManager.is_memory_usage_high"><code class="docutils literal notranslate"><span class="pre">ConfigManager.is_memory_usage_high()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_loading_config.html#mdaviz.lazy_loading_config.ConfigManager.reset_to_defaults"><code class="docutils literal notranslate"><span class="pre">ConfigManager.reset_to_defaults()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_loading_config.html#mdaviz.lazy_loading_config.ConfigManager.save_config"><code class="docutils literal notranslate"><span class="pre">ConfigManager.save_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_loading_config.html#mdaviz.lazy_loading_config.ConfigManager.update_config"><code class="docutils literal notranslate"><span class="pre">ConfigManager.update_config()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/lazy_loading_config.html#mdaviz.lazy_loading_config.LazyLoadingConfig"><code class="docutils literal notranslate"><span class="pre">LazyLoadingConfig</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_loading_config.html#mdaviz.lazy_loading_config.LazyLoadingConfig.from_dict"><code class="docutils literal notranslate"><span class="pre">LazyLoadingConfig.from_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_loading_config.html#mdaviz.lazy_loading_config.LazyLoadingConfig.load_from_file"><code class="docutils literal notranslate"><span class="pre">LazyLoadingConfig.load_from_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_loading_config.html#mdaviz.lazy_loading_config.LazyLoadingConfig.save_to_file"><code class="docutils literal notranslate"><span class="pre">LazyLoadingConfig.save_to_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lazy_loading_config.html#mdaviz.lazy_loading_config.LazyLoadingConfig.to_dict"><code class="docutils literal notranslate"><span class="pre">LazyLoadingConfig.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/lazy_loading_config.html#mdaviz.lazy_loading_config.get_config"><code class="docutils literal notranslate"><span class="pre">get_config()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lazy_loading_config.html#mdaviz.lazy_loading_config.get_global_config_manager"><code class="docutils literal notranslate"><span class="pre">get_global_config_manager()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lazy_loading_config.html#mdaviz.lazy_loading_config.update_config"><code class="docutils literal notranslate"><span class="pre">update_config()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/licensedialog.html">License Dialog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/licensedialog.html#mdaviz.licensedialog.LicenseDialog"><code class="docutils literal notranslate"><span class="pre">LicenseDialog</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/mainwindow.html">Main Window</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow"><code class="docutils literal notranslate"><span class="pre">MainWindow</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow._addToRecentFolders"><code class="docutils literal notranslate"><span class="pre">MainWindow._addToRecentFolders()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow._apply_preferences"><code class="docutils literal notranslate"><span class="pre">MainWindow._apply_preferences()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow._auto_load_first_folder"><code class="docutils literal notranslate"><span class="pre">MainWindow._auto_load_first_folder()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow._buildFolderList"><code class="docutils literal notranslate"><span class="pre">MainWindow._buildFolderList()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow._center_window"><code class="docutils literal notranslate"><span class="pre">MainWindow._center_window()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow._fillFolderBox"><code class="docutils literal notranslate"><span class="pre">MainWindow._fillFolderBox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow._handle_folder_selection"><code class="docutils literal notranslate"><span class="pre">MainWindow._handle_folder_selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow._initialize_data"><code class="docutils literal notranslate"><span class="pre">MainWindow._initialize_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow._on_scan_complete"><code class="docutils literal notranslate"><span class="pre">MainWindow._on_scan_complete()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow._on_scan_error"><code class="docutils literal notranslate"><span class="pre">MainWindow._on_scan_error()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow._on_scan_progress"><code class="docutils literal notranslate"><span class="pre">MainWindow._on_scan_progress()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow._process_selected_path"><code class="docutils literal notranslate"><span class="pre">MainWindow._process_selected_path()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow._setup_scanner"><code class="docutils literal notranslate"><span class="pre">MainWindow._setup_scanner()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow._setup_window_properties"><code class="docutils literal notranslate"><span class="pre">MainWindow._setup_window_properties()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow._show_open_dialog"><code class="docutils literal notranslate"><span class="pre">MainWindow._show_open_dialog()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow._update_plot_height"><code class="docutils literal notranslate"><span class="pre">MainWindow._update_plot_height()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow.cancel"><code class="docutils literal notranslate"><span class="pre">MainWindow.cancel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow.closeEvent"><code class="docutils literal notranslate"><span class="pre">MainWindow.closeEvent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow.dataPath"><code class="docutils literal notranslate"><span class="pre">MainWindow.dataPath()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow.doAboutDialog"><code class="docutils literal notranslate"><span class="pre">MainWindow.doAboutDialog()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow.doClose"><code class="docutils literal notranslate"><span class="pre">MainWindow.doClose()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow.doOpen"><code class="docutils literal notranslate"><span class="pre">MainWindow.doOpen()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow.doPopUp"><code class="docutils literal notranslate"><span class="pre">MainWindow.doPopUp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow.doPreferences"><code class="docutils literal notranslate"><span class="pre">MainWindow.doPreferences()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow.get_auto_load_setting"><code class="docutils literal notranslate"><span class="pre">MainWindow.get_auto_load_setting()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow.mdaFileList"><code class="docutils literal notranslate"><span class="pre">MainWindow.mdaFileList()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow.onFolderSelected"><code class="docutils literal notranslate"><span class="pre">MainWindow.onFolderSelected()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow.onRefresh"><code class="docutils literal notranslate"><span class="pre">MainWindow.onRefresh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow.proceed"><code class="docutils literal notranslate"><span class="pre">MainWindow.proceed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow.setFolderList"><code class="docutils literal notranslate"><span class="pre">MainWindow.setFolderList()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mainwindow.html#mdaviz.mainwindow.MainWindow.setStatus"><code class="docutils literal notranslate"><span class="pre">MainWindow.setStatus()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/mda_file.html">MDA File</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile"><code class="docutils literal notranslate"><span class="pre">MDAFile</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.addFileTab"><code class="docutils literal notranslate"><span class="pre">MDAFile.addFileTab()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.buttonPushed"><code class="docutils literal notranslate"><span class="pre">MDAFile.buttonPushed</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.createNewTab"><code class="docutils literal notranslate"><span class="pre">MDAFile.createNewTab()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.data"><code class="docutils literal notranslate"><span class="pre">MDAFile.data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.dataPath"><code class="docutils literal notranslate"><span class="pre">MDAFile.dataPath()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.defaultSelection"><code class="docutils literal notranslate"><span class="pre">MDAFile.defaultSelection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.displayData"><code class="docutils literal notranslate"><span class="pre">MDAFile.displayData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.displayMetadata"><code class="docutils literal notranslate"><span class="pre">MDAFile.displayMetadata()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.getLast2DSelection"><code class="docutils literal notranslate"><span class="pre">MDAFile.getLast2DSelection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.handle2DMode"><code class="docutils literal notranslate"><span class="pre">MDAFile.handle2DMode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.highlightRowInTab"><code class="docutils literal notranslate"><span class="pre">MDAFile.highlightRowInTab()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.mdaFileList"><code class="docutils literal notranslate"><span class="pre">MDAFile.mdaFileList()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.mode"><code class="docutils literal notranslate"><span class="pre">MDAFile.mode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.onClearGraphRequested"><code class="docutils literal notranslate"><span class="pre">MDAFile.onClearGraphRequested()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.onTabCloseRequested"><code class="docutils literal notranslate"><span class="pre">MDAFile.onTabCloseRequested()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.onTabRemoved"><code class="docutils literal notranslate"><span class="pre">MDAFile.onTabRemoved()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.removeAllFileTabs"><code class="docutils literal notranslate"><span class="pre">MDAFile.removeAllFileTabs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.responder"><code class="docutils literal notranslate"><span class="pre">MDAFile.responder()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.selectAndShowRow"><code class="docutils literal notranslate"><span class="pre">MDAFile.selectAndShowRow()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.setData"><code class="docutils literal notranslate"><span class="pre">MDAFile.setData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.setLast2DSelection"><code class="docutils literal notranslate"><span class="pre">MDAFile.setLast2DSelection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.tabChanged"><code class="docutils literal notranslate"><span class="pre">MDAFile.tabChanged</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.tabIndex2Path"><code class="docutils literal notranslate"><span class="pre">MDAFile.tabIndex2Path()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.tabIndex2Tableview"><code class="docutils literal notranslate"><span class="pre">MDAFile.tabIndex2Tableview()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.tabPath2Index"><code class="docutils literal notranslate"><span class="pre">MDAFile.tabPath2Index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.tabPath2Tableview"><code class="docutils literal notranslate"><span class="pre">MDAFile.tabPath2Tableview()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.updateButtonVisibility"><code class="docutils literal notranslate"><span class="pre">MDAFile.updateButtonVisibility()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.updateCurrentTabInfo"><code class="docutils literal notranslate"><span class="pre">MDAFile.updateCurrentTabInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.MDAFile.x2ValueChanged"><code class="docutils literal notranslate"><span class="pre">MDAFile.x2ValueChanged</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.TabManager"><code class="docutils literal notranslate"><span class="pre">TabManager</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.TabManager.addTab"><code class="docutils literal notranslate"><span class="pre">TabManager.addTab()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.TabManager.getTabData"><code class="docutils literal notranslate"><span class="pre">TabManager.getTabData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.TabManager.removeAllTabs"><code class="docutils literal notranslate"><span class="pre">TabManager.removeAllTabs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.TabManager.removeTab"><code class="docutils literal notranslate"><span class="pre">TabManager.removeTab()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.TabManager.tabRemoved"><code class="docutils literal notranslate"><span class="pre">TabManager.tabRemoved</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file.html#mdaviz.mda_file.TabManager.tabs"><code class="docutils literal notranslate"><span class="pre">TabManager.tabs()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/mda_file_table_model.html">MDA File Table Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.ColumnDataType"><code class="docutils literal notranslate"><span class="pre">ColumnDataType</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.FieldRuleType"><code class="docutils literal notranslate"><span class="pre">FieldRuleType</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.FieldRuleType.apply"><code class="docutils literal notranslate"><span class="pre">FieldRuleType.apply()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel.applySelectionRules"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel.applySelectionRules()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel.checkbox"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel.checkbox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel.checkboxStateChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel.checkboxStateChanged</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel.clearAllCheckboxes"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel.clearAllCheckboxes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel.columnCount"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel.columnCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel.data"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel.data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel.fields"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel.fields()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel.flags"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel.flags()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel.headerData"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel.headerData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel.isI0Selected"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel.isI0Selected()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel.plotFields"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel.plotFields()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel.rowCount"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel.rowCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel.setCheckbox"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel.setCheckbox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel.setColumns"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel.setColumns()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel.setData"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel.setData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel.setFields"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel.setFields()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.MDAFileTableModel.updateCheckboxes"><code class="docutils literal notranslate"><span class="pre">MDAFileTableModel.updateCheckboxes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.TableColumn"><code class="docutils literal notranslate"><span class="pre">TableColumn</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/mda_file_table_model.html#mdaviz.mda_file_table_model.TableField"><code class="docutils literal notranslate"><span class="pre">TableField</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/mda_file_table_view.html">MDA File Table View</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView._apply2DPlotStyle"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView._apply2DPlotStyle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView._apply2DSelectionImpl"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView._apply2DSelectionImpl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView._populatePlotStyleComboBox"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView._populatePlotStyleComboBox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView._setup2DControlsDelayed"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView._setup2DControlsDelayed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView._trigger2DPlot"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView._trigger2DPlot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView._updateX2ValueLabel"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView._updateX2ValueLabel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.apply2DSelection"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.apply2DSelection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.data"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.data2Plot"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.data2Plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.data2Plot2D"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.data2Plot2D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.get2DSelections"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.get2DSelections()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.get2DSelectionsByPV"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.get2DSelectionsByPV()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.getX2Value"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.getX2Value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onColorPaletteChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onColorPaletteChanged()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onI0SelectionChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onI0SelectionChanged()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onLogScaleChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onLogScaleChanged()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onPlotButtonClicked"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onPlotButtonClicked()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onPlotTypeChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onPlotTypeChanged()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onX1SelectionChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onX1SelectionChanged()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onX2SelectionChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onX2SelectionChanged()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onX2ValueChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onX2ValueChanged()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.onYDetSelectionChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onYDetSelectionChanged()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.populate2DControls"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.populate2DControls()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.populateI0ComboBox"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.populateI0ComboBox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.populateX1ComboBox"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.populateX1ComboBox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.populateX2ComboBox"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.populateX2ComboBox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.populateYDetComboBox"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.populateYDetComboBox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.setData"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.setData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.setup2DControls"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.setup2DControls()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.setupX2Controls"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.setupX2Controls()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_table_view.html#mdaviz.mda_file_table_view.MDAFileTableView.update2DControls"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.update2DControls()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/mda_file_viz.html">MDA File Viz</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization._updateTabWidgetMaxHeight"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization._updateTabWidgetMaxHeight()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.clearContents"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.clearContents()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.connectToFileTabChanges"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.connectToFileTabChanges()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.getCurrentFileTableview"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.getCurrentFileTableview()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.getLogScaleState"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.getLogScaleState()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.onClearFitsButtonClicked"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.onClearFitsButtonClicked()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.onCurveStyleChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.onCurveStyleChanged()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.onFileTabChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.onFileTabChanged()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.onFitButtonClicked"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.onFitButtonClicked()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.onLogScaleChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.onLogScaleChanged()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.onTabChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.onTabChanged()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.set2DData"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.set2DData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setLogScaleState"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setLogScaleState()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setMetadata"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setMetadata()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setPlot"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setPlot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setStatus"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setStatus()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setTableData"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setTableData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setup"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setup2DFunctionality"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setup2DFunctionality()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setupCurveStyleUI"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setupCurveStyleUI()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setupFitUI"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setupFitUI()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setupLogScaleUI"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setupLogScaleUI()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.setupSearchFunctionality"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.setupSearchFunctionality()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.showAnalysisControls"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.showAnalysisControls()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.showModeControls"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.showModeControls()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.showSearchDialog"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.showSearchDialog()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.syncLogScaleCheckboxes"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.syncLogScaleCheckboxes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.update2DPlot"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.update2DPlot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.update2DTabVisibility"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.update2DTabVisibility()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.updateControlVisibility"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.updateControlVisibility()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MDAFileVisualization.updatePlotControls"><code class="docutils literal notranslate"><span class="pre">MDAFileVisualization.updatePlotControls()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MetadataSearchDialog"><code class="docutils literal notranslate"><span class="pre">MetadataSearchDialog</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MetadataSearchDialog.findNext"><code class="docutils literal notranslate"><span class="pre">MetadataSearchDialog.findNext()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MetadataSearchDialog.findPrevious"><code class="docutils literal notranslate"><span class="pre">MetadataSearchDialog.findPrevious()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MetadataSearchDialog.findText"><code class="docutils literal notranslate"><span class="pre">MetadataSearchDialog.findText()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MetadataSearchDialog.keyPressEvent"><code class="docutils literal notranslate"><span class="pre">MetadataSearchDialog.keyPressEvent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_file_viz.html#mdaviz.mda_file_viz.MetadataSearchDialog.setupUI"><code class="docutils literal notranslate"><span class="pre">MetadataSearchDialog.setupUI()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/mda_folder.html">MDA Folder</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC"><code class="docutils literal notranslate"><span class="pre">MDA_MVC</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.applySelectionChanges"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.applySelectionChanges()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.currentFileTableview"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.currentFileTableview()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.dataPath"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.dataPath()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.detRemoved"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.detRemoved</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.doPlot"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.doPlot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.doPlot2D"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.doPlot2D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.goToFirst"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.goToFirst()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.goToLast"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.goToLast()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.goToNext"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.goToNext()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.goToPrevious"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.goToPrevious()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.handlePlotBasedOnMode"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.handlePlotBasedOnMode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.mdaFileList"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.mdaFileList()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.mdaInfoList"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.mdaInfoList()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.onCheckboxStateChanged"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.onCheckboxStateChanged()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.onFileSelected"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.onFileSelected()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.onTabChanged"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.onTabChanged()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.selectAndShowIndex"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.selectAndShowIndex()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.selectionField"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.selectionField()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.selectionModel"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.selectionModel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.setCurrentFileTableview"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.setCurrentFileTableview()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.setSelectionField"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.setSelectionField()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.setSelectionModel"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.setSelectionModel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.setStatus"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.setStatus()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.splitter_moved"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.splitter_moved()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.splitter_settings_name"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.splitter_settings_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.uncheckI0"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.uncheckI0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.updateDetectorSelection"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.updateDetectorSelection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.updateFolderView"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.updateFolderView()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.updateI0Selection"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.updateI0Selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder.html#mdaviz.mda_folder.MDA_MVC.updateSelectionForNewPVs"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.updateSelectionForNewPVs()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/mda_folder_table_model.html">MDA Folder Table Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/mda_folder_table_model.html#mdaviz.mda_folder_table_model.MDAFolderTableModel"><code class="docutils literal notranslate"><span class="pre">MDAFolderTableModel</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder_table_model.html#mdaviz.mda_folder_table_model.MDAFolderTableModel.fileInfoList"><code class="docutils literal notranslate"><span class="pre">MDAFolderTableModel.fileInfoList()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder_table_model.html#mdaviz.mda_folder_table_model.MDAFolderTableModel.headerData"><code class="docutils literal notranslate"><span class="pre">MDAFolderTableModel.headerData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder_table_model.html#mdaviz.mda_folder_table_model.MDAFolderTableModel.setFileInfoList"><code class="docutils literal notranslate"><span class="pre">MDAFolderTableModel.setFileInfoList()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/mda_folder_table_view.html">MDA Folder Table View</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/mda_folder_table_view.html#mdaviz.mda_folder_table_view.MDAFolderTableView"><code class="docutils literal notranslate"><span class="pre">MDAFolderTableView</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/mda_folder_table_view.html#mdaviz.mda_folder_table_view.MDAFolderTableView.mdaInfoList"><code class="docutils literal notranslate"><span class="pre">MDAFolderTableView.mdaInfoList()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/opendialog.html">Open Dialog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/opendialog.html#mdaviz.opendialog.OpenDialog"><code class="docutils literal notranslate"><span class="pre">OpenDialog</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/popup.html">Popup Dialogs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/popup.html#mdaviz.popup.PopUp"><code class="docutils literal notranslate"><span class="pre">PopUp</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/popup.html#mdaviz.popup.PopUp.accept"><code class="docutils literal notranslate"><span class="pre">PopUp.accept()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/popup.html#mdaviz.popup.PopUp.reject"><code class="docutils literal notranslate"><span class="pre">PopUp.reject()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/progress_dialog.html">Progress Dialog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.AsyncProgressDialog"><code class="docutils literal notranslate"><span class="pre">AsyncProgressDialog</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.AsyncProgressDialog._operation_completed_slot"><code class="docutils literal notranslate"><span class="pre">AsyncProgressDialog._operation_completed_slot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.AsyncProgressDialog._operation_failed_slot"><code class="docutils literal notranslate"><span class="pre">AsyncProgressDialog._operation_failed_slot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.AsyncProgressDialog._set_message_slot"><code class="docutils literal notranslate"><span class="pre">AsyncProgressDialog._set_message_slot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.AsyncProgressDialog._update_progress_slot"><code class="docutils literal notranslate"><span class="pre">AsyncProgressDialog._update_progress_slot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.AsyncProgressDialog.complete_async"><code class="docutils literal notranslate"><span class="pre">AsyncProgressDialog.complete_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.AsyncProgressDialog.fail_async"><code class="docutils literal notranslate"><span class="pre">AsyncProgressDialog.fail_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.AsyncProgressDialog.message_updated"><code class="docutils literal notranslate"><span class="pre">AsyncProgressDialog.message_updated</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.AsyncProgressDialog.operation_failed"><code class="docutils literal notranslate"><span class="pre">AsyncProgressDialog.operation_failed</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.AsyncProgressDialog.progress_updated"><code class="docutils literal notranslate"><span class="pre">AsyncProgressDialog.progress_updated</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.AsyncProgressDialog.set_message_async"><code class="docutils literal notranslate"><span class="pre">AsyncProgressDialog.set_message_async()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.AsyncProgressDialog.update_progress_async"><code class="docutils literal notranslate"><span class="pre">AsyncProgressDialog.update_progress_async()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.ProgressDialog"><code class="docutils literal notranslate"><span class="pre">ProgressDialog</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.ProgressDialog._on_canceled"><code class="docutils literal notranslate"><span class="pre">ProgressDialog._on_canceled()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.ProgressDialog.is_canceled"><code class="docutils literal notranslate"><span class="pre">ProgressDialog.is_canceled()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.ProgressDialog.reset_cancel_state"><code class="docutils literal notranslate"><span class="pre">ProgressDialog.reset_cancel_state()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.ProgressDialog.set_cancel_callback"><code class="docutils literal notranslate"><span class="pre">ProgressDialog.set_cancel_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.ProgressDialog.set_message"><code class="docutils literal notranslate"><span class="pre">ProgressDialog.set_message()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/progress_dialog.html#mdaviz.progress_dialog.ProgressDialog.update_progress"><code class="docutils literal notranslate"><span class="pre">ProgressDialog.update_progress()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/user_settings.html">User Settings</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/user_settings.html#mdaviz.user_settings.ApplicationQSettings"><code class="docutils literal notranslate"><span class="pre">ApplicationQSettings</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/user_settings.html#mdaviz.user_settings.ApplicationQSettings._keySplit_"><code class="docutils literal notranslate"><span class="pre">ApplicationQSettings._keySplit_()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/user_settings.html#mdaviz.user_settings.ApplicationQSettings.getKey"><code class="docutils literal notranslate"><span class="pre">ApplicationQSettings.getKey()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/user_settings.html#mdaviz.user_settings.ApplicationQSettings.keyExists"><code class="docutils literal notranslate"><span class="pre">ApplicationQSettings.keyExists()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/user_settings.html#mdaviz.user_settings.ApplicationQSettings.resetDefaults"><code class="docutils literal notranslate"><span class="pre">ApplicationQSettings.resetDefaults()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/user_settings.html#mdaviz.user_settings.ApplicationQSettings.restoreSplitter"><code class="docutils literal notranslate"><span class="pre">ApplicationQSettings.restoreSplitter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/user_settings.html#mdaviz.user_settings.ApplicationQSettings.restoreWindowGeometry"><code class="docutils literal notranslate"><span class="pre">ApplicationQSettings.restoreWindowGeometry()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/user_settings.html#mdaviz.user_settings.ApplicationQSettings.saveSplitter"><code class="docutils literal notranslate"><span class="pre">ApplicationQSettings.saveSplitter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/user_settings.html#mdaviz.user_settings.ApplicationQSettings.saveWindowGeometry"><code class="docutils literal notranslate"><span class="pre">ApplicationQSettings.saveWindowGeometry()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/user_settings.html#mdaviz.user_settings.ApplicationQSettings.setKey"><code class="docutils literal notranslate"><span class="pre">ApplicationQSettings.setKey()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/user_settings.html#mdaviz.user_settings.ApplicationQSettings.to_dict"><code class="docutils literal notranslate"><span class="pre">ApplicationQSettings.to_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/utils.html">Utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.byte2str"><code class="docutils literal notranslate"><span class="pre">byte2str()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.extract_file_prefix"><code class="docutils literal notranslate"><span class="pre">extract_file_prefix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.ftm2mda"><code class="docutils literal notranslate"><span class="pre">ftm2mda()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.getUiFileName"><code class="docutils literal notranslate"><span class="pre">getUiFileName()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.get_det"><code class="docutils literal notranslate"><span class="pre">get_det()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.get_file_info"><code class="docutils literal notranslate"><span class="pre">get_file_info()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.get_file_info_full"><code class="docutils literal notranslate"><span class="pre">get_file_info_full()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.get_file_info_lightweight"><code class="docutils literal notranslate"><span class="pre">get_file_info_lightweight()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.get_md"><code class="docutils literal notranslate"><span class="pre">get_md()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.get_scan"><code class="docutils literal notranslate"><span class="pre">get_scan()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.get_scan_2d"><code class="docutils literal notranslate"><span class="pre">get_scan_2d()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.human_readable_size"><code class="docutils literal notranslate"><span class="pre">human_readable_size()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.iso2dt"><code class="docutils literal notranslate"><span class="pre">iso2dt()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.iso2ts"><code class="docutils literal notranslate"><span class="pre">iso2ts()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.mda2ftm"><code class="docutils literal notranslate"><span class="pre">mda2ftm()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.myLoadUi"><code class="docutils literal notranslate"><span class="pre">myLoadUi()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.num2fstr"><code class="docutils literal notranslate"><span class="pre">num2fstr()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.reconnect"><code class="docutils literal notranslate"><span class="pre">reconnect()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.removeAllLayoutWidgets"><code class="docutils literal notranslate"><span class="pre">removeAllLayoutWidgets()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.run_in_thread"><code class="docutils literal notranslate"><span class="pre">run_in_thread()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.ts2dt"><code class="docutils literal notranslate"><span class="pre">ts2dt()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html#mdaviz.utils.ts2iso"><code class="docutils literal notranslate"><span class="pre">ts2iso()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/virtual_table_model.html">Virtual Table Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.MDAVirtualDataProvider"><code class="docutils literal notranslate"><span class="pre">MDAVirtualDataProvider</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.MDAVirtualDataProvider.clear_cache"><code class="docutils literal notranslate"><span class="pre">MDAVirtualDataProvider.clear_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.MDAVirtualDataProvider.get_column_count"><code class="docutils literal notranslate"><span class="pre">MDAVirtualDataProvider.get_column_count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.MDAVirtualDataProvider.get_column_headers"><code class="docutils literal notranslate"><span class="pre">MDAVirtualDataProvider.get_column_headers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.MDAVirtualDataProvider.get_data"><code class="docutils literal notranslate"><span class="pre">MDAVirtualDataProvider.get_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.MDAVirtualDataProvider.get_memory_usage_mb"><code class="docutils literal notranslate"><span class="pre">MDAVirtualDataProvider.get_memory_usage_mb()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.MDAVirtualDataProvider.get_row_count"><code class="docutils literal notranslate"><span class="pre">MDAVirtualDataProvider.get_row_count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.MDAVirtualDataProvider.is_data_loaded"><code class="docutils literal notranslate"><span class="pre">MDAVirtualDataProvider.is_data_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.MDAVirtualDataProvider.load_data_range"><code class="docutils literal notranslate"><span class="pre">MDAVirtualDataProvider.load_data_range()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.VirtualDataProvider"><code class="docutils literal notranslate"><span class="pre">VirtualDataProvider</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.VirtualDataProvider.clear_cache"><code class="docutils literal notranslate"><span class="pre">VirtualDataProvider.clear_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.VirtualDataProvider.get_column_count"><code class="docutils literal notranslate"><span class="pre">VirtualDataProvider.get_column_count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.VirtualDataProvider.get_column_headers"><code class="docutils literal notranslate"><span class="pre">VirtualDataProvider.get_column_headers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.VirtualDataProvider.get_data"><code class="docutils literal notranslate"><span class="pre">VirtualDataProvider.get_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.VirtualDataProvider.get_row_count"><code class="docutils literal notranslate"><span class="pre">VirtualDataProvider.get_row_count()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.VirtualDataProvider.is_data_loaded"><code class="docutils literal notranslate"><span class="pre">VirtualDataProvider.is_data_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.VirtualDataProvider.load_data_range"><code class="docutils literal notranslate"><span class="pre">VirtualDataProvider.load_data_range()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.VirtualTableModel"><code class="docutils literal notranslate"><span class="pre">VirtualTableModel</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.VirtualTableModel._ensure_data_loaded"><code class="docutils literal notranslate"><span class="pre">VirtualTableModel._ensure_data_loaded()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.VirtualTableModel.clear_cache"><code class="docutils literal notranslate"><span class="pre">VirtualTableModel.clear_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.VirtualTableModel.columnCount"><code class="docutils literal notranslate"><span class="pre">VirtualTableModel.columnCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.VirtualTableModel.data"><code class="docutils literal notranslate"><span class="pre">VirtualTableModel.data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.VirtualTableModel.headerData"><code class="docutils literal notranslate"><span class="pre">VirtualTableModel.headerData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.VirtualTableModel.rowCount"><code class="docutils literal notranslate"><span class="pre">VirtualTableModel.rowCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/virtual_table_model.html#mdaviz.virtual_table_model.VirtualTableModel.set_visible_range"><code class="docutils literal notranslate"><span class="pre">VirtualTableModel.set_visible_range()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="known_bugs.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Known Bugs</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="api/aboutdialog.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">About Dialog</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/api.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

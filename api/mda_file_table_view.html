@@ -1,0 +1,916 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>MDA File Table View &#8212; mdaviz 1.3</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=8749d347"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/mda_file_table_view';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="MDA File Viz" href="mda_file_viz.html" />
+    <link rel="prev" title="MDA File Table Model" href="mda_file_table_model.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mdaviz 1.3</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changes.html">
+    Changes
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../license.html">
+    License
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changes.html">
+    Changes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../license.html">
+    License
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="aboutdialog.html">About Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="app.html">Application starting point</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chartview.html">Chartview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_cache.html">Data Cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_table_model.html">Data Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_table_view.html">Data Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="empty_table_model.html">Empty Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_manager.html">Fit Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_models.html">Fit Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lazy_folder_scanner.html">Lazy Folder Scanner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lazy_loading_config.html">Lazy Loading Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licensedialog.html">License Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mainwindow.html">Main Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file.html">MDA File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_table_model.html">MDA File Table Model</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">MDA File Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_viz.html">MDA File Viz</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder.html">MDA Folder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder_table_model.html">MDA Folder Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder_table_view.html">MDA Folder Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opendialog.html">Open Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="popup.html">Popup Dialogs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="progress_dialog.html">Progress Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_settings.html">User Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtual_table_model.html">Virtual Table Model</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">Source Code Documentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">MDA File Table View</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-mdaviz.mda_file_table_view">
+<span id="mda-file-table-view"></span><h1>MDA File Table View<a class="headerlink" href="#module-mdaviz.mda_file_table_view" title="Link to this heading">#</a></h1>
+<p>MDA file table view for data field selection and 2D plotting controls.</p>
+<p>This module provides the MDAFileTableView widget which displays a table of MDA file
+data fields with checkboxes for selection. It supports both 1D and 2D data visualization
+with specialized controls for 2D plotting including X2 slice selection, X1/X2 positioner
+selection, Y detector selection, and I0 normalization.</p>
+<p>For 1D data, users can select X, Y, I0 fields for plotting.
+For 2D data, additional controls are available for:
+- X2 slice selection (spinbox)
+- X1/X2 positioner selection (comboboxes)
+- Y detector selection (combobox)
+- I0 normalization (combobox)
+- Plot type selection (Heatmap/Contour)
+- Color palette selection
+- Log scale options</p>
+<p>Uses <code class="xref py py-class docutils literal notranslate"><span class="pre">mda_file_table_model.MDAFileTableModel</span></code> for data display.</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdaviz.mda_file_table_view.MDAFileTableView" title="mdaviz.mda_file_table_view.MDAFileTableView"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MDAFileTableView</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">HEADERS</span></code></p></td>
+<td><p>Built-in immutable sequence.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">COLUMNS</span></code></p></td>
+<td><p>Built-in mutable sequence.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mdaviz.mda_file_table_view.</span></span><span class="sig-name descname"><span class="pre">MDAFileTableView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView" title="Link to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView._apply2DPlotStyle">
+<span class="sig-name descname"><span class="pre">_apply2DPlotStyle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection_by_pv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView._apply2DPlotStyle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView._apply2DPlotStyle" title="Link to this definition">#</a></dt>
+<dd><p>Apply plot style selection to controls.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView._apply2DSelectionImpl">
+<span class="sig-name descname"><span class="pre">_apply2DSelectionImpl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection_by_pv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileInfo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView._apply2DSelectionImpl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView._apply2DSelectionImpl" title="Link to this definition">#</a></dt>
+<dd><p>Apply PV-based selection to controls (called with _applying_2d_selection True).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView._populatePlotStyleComboBox">
+<span class="sig-name descname"><span class="pre">_populatePlotStyleComboBox</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView._populatePlotStyleComboBox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView._populatePlotStyleComboBox" title="Link to this definition">#</a></dt>
+<dd><p>Populate the plot type and color palette comboboxes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView._setup2DControlsDelayed">
+<span class="sig-name descname"><span class="pre">_setup2DControlsDelayed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView._setup2DControlsDelayed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView._setup2DControlsDelayed" title="Link to this definition">#</a></dt>
+<dd><p>Setup Y DET controls after UI is fully loaded.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView._trigger2DPlot">
+<span class="sig-name descname"><span class="pre">_trigger2DPlot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView._trigger2DPlot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView._trigger2DPlot" title="Link to this definition">#</a></dt>
+<dd><p>Helper method to trigger 2D plotting with current selections.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView._updateX2ValueLabel">
+<span class="sig-name descname"><span class="pre">_updateX2ValueLabel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x2_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2_positioner_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView._updateX2ValueLabel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView._updateX2ValueLabel" title="Link to this definition">#</a></dt>
+<dd><p>Update the X2 value label with the current positioner value.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>x2_index (int): The current X2 index
+x2_positioner_info (dict): Information about the X2 positioner</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.apply2DSelection">
+<span class="sig-name descname"><span class="pre">apply2DSelection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection_by_pv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.apply2DSelection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.apply2DSelection" title="Link to this definition">#</a></dt>
+<dd><p>Apply PV-based 2D selection to this file’s controls; use defaults when a PV is missing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.data">
+<span class="sig-name descname"><span class="pre">data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.data" title="Link to this definition">#</a></dt>
+<dd><p>Return the data from the table view:
+self.data=  {“fileInfo”: fileInfo, “fields”: fields}</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.data2Plot">
+<span class="sig-name descname"><span class="pre">data2Plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selections</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.data2Plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.data2Plot" title="Link to this definition">#</a></dt>
+<dd><p>Extracts selected datasets for plotting from scanDict based on user selections.
+Slice (if multidimensional) and/or normalize the data as needed.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>selections: A dictionary with keys:</dt><dd><ul>
+<li><p>“X”: The index for the x-axis data</p></li>
+<li><p>“Y”: A list of indices for the y-axis data</p></li>
+<li><p>“I0” (optional): The index for normalization data</p></li>
+<li><p>e.g. selections = {“X”: 1, “Y”: [2, 3, 5], “I0”: 4}</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><ul class="simple">
+<li><p>A tuple of (datasets, plot_options), where datasets is a list of tuples containing the
+data and options (label) for each dataset, and plot_options contains overall plotting configurations.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.data2Plot2D">
+<span class="sig-name descname"><span class="pre">data2Plot2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selections</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.data2Plot2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.data2Plot2D" title="Link to this definition">#</a></dt>
+<dd><p>Extracts 2D datasets for plotting from scanDict2D based on user selections.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>selections: A dictionary with keys:</dt><dd><ul>
+<li><p>“X”: The index for the x1-axis data</p></li>
+<li><p>“X2”: The index for the x2-axis data</p></li>
+<li><p>“Y”: A list of indices for the y-axis data (only the 1st element is used)</p></li>
+<li><p>“I0” (optional): The index for normalization data</p></li>
+<li><p>e.g. selections = {“X”: 1, “X2”: 2 ,”Y”: [3], “I0”: 4}</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Returns:</dt><dd><ul class="simple">
+<li><p>A tuple of (datasets, plot_options), where datasets contains 2D data arrays,
+and plot_options contains overall plotting configurations.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.get2DSelections">
+<span class="sig-name descname"><span class="pre">get2DSelections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.get2DSelections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.get2DSelections" title="Link to this definition">#</a></dt>
+<dd><p>Get current 2D plotting selections.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.get2DSelectionsByPV">
+<span class="sig-name descname"><span class="pre">get2DSelectionsByPV</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.get2DSelectionsByPV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.get2DSelectionsByPV" title="Link to this definition">#</a></dt>
+<dd><p>Return current 2D selection using PV/field names instead of internal ids.</p>
+<dl>
+<dt>Structure:</dt><dd><dl class="simple">
+<dt>{</dt><dd><p>“X1_pv”: str | None,
+“X2_pv”: str | None,
+“Y_pv”: str | None,
+“I0_pv”: str | None,
+“plot_type”: str | None,
+“color_palette”: str | None,
+“log_y”: bool,
+“x2_slice”: int,</p>
+</dd>
+</dl>
+<p>}</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.getX2Value">
+<span class="sig-name descname"><span class="pre">getX2Value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.getX2Value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.getX2Value" title="Link to this definition">#</a></dt>
+<dd><p>Get the current X2 value from the spinbox.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.onColorPaletteChanged">
+<span class="sig-name descname"><span class="pre">onColorPaletteChanged</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.onColorPaletteChanged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.onColorPaletteChanged" title="Link to this definition">#</a></dt>
+<dd><p>Handle color palette selection change.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.onI0SelectionChanged">
+<span class="sig-name descname"><span class="pre">onI0SelectionChanged</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.onI0SelectionChanged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.onI0SelectionChanged" title="Link to this definition">#</a></dt>
+<dd><p>Handle I0 detector selection change.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.onLogScaleChanged">
+<span class="sig-name descname"><span class="pre">onLogScaleChanged</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">checked</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.onLogScaleChanged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.onLogScaleChanged" title="Link to this definition">#</a></dt>
+<dd><p>Handle log scale checkbox changes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.onPlotButtonClicked">
+<span class="sig-name descname"><span class="pre">onPlotButtonClicked</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.onPlotButtonClicked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.onPlotButtonClicked" title="Link to this definition">#</a></dt>
+<dd><p>Handle plot button click.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.onPlotTypeChanged">
+<span class="sig-name descname"><span class="pre">onPlotTypeChanged</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.onPlotTypeChanged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.onPlotTypeChanged" title="Link to this definition">#</a></dt>
+<dd><p>Handle plot type selection change.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.onX1SelectionChanged">
+<span class="sig-name descname"><span class="pre">onX1SelectionChanged</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.onX1SelectionChanged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.onX1SelectionChanged" title="Link to this definition">#</a></dt>
+<dd><p>Handle X1 positioner selection change.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.onX2SelectionChanged">
+<span class="sig-name descname"><span class="pre">onX2SelectionChanged</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.onX2SelectionChanged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.onX2SelectionChanged" title="Link to this definition">#</a></dt>
+<dd><p>Handle X2 positioner selection change.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.onX2ValueChanged">
+<span class="sig-name descname"><span class="pre">onX2ValueChanged</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.onX2ValueChanged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.onX2ValueChanged" title="Link to this definition">#</a></dt>
+<dd><p>Handle X2 spinbox value changes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.onYDetSelectionChanged">
+<span class="sig-name descname"><span class="pre">onYDetSelectionChanged</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.onYDetSelectionChanged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.onYDetSelectionChanged" title="Link to this definition">#</a></dt>
+<dd><p>Handle Y detector selection change.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.populate2DControls">
+<span class="sig-name descname"><span class="pre">populate2DControls</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.populate2DControls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.populate2DControls" title="Link to this definition">#</a></dt>
+<dd><p>Populate all 2D control comboboxes with data from current file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.populateI0ComboBox">
+<span class="sig-name descname"><span class="pre">populateI0ComboBox</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.populateI0ComboBox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.populateI0ComboBox" title="Link to this definition">#</a></dt>
+<dd><p>Populate I0 detector combobox with available detectors from scanDict2D.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.populateX1ComboBox">
+<span class="sig-name descname"><span class="pre">populateX1ComboBox</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.populateX1ComboBox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.populateX1ComboBox" title="Link to this definition">#</a></dt>
+<dd><p>Populate X1 combobox with available positioners from scanDictInner.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.populateX2ComboBox">
+<span class="sig-name descname"><span class="pre">populateX2ComboBox</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.populateX2ComboBox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.populateX2ComboBox" title="Link to this definition">#</a></dt>
+<dd><p>Populate X2 combobox with available positioners from scanDict (outer dimension).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.populateYDetComboBox">
+<span class="sig-name descname"><span class="pre">populateYDetComboBox</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.populateYDetComboBox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.populateYDetComboBox" title="Link to this definition">#</a></dt>
+<dd><p>Populate Y detector combobox with available detectors from scanDict2D.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.setData">
+<span class="sig-name descname"><span class="pre">setData</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.setData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.setData" title="Link to this definition">#</a></dt>
+<dd><p>Populates the <cite>_data</cite> attribute with file information and data extracted
+from a file.</p>
+<dl class="simple">
+<dt>The populated <cite>_data</cite> dictionary includes:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>fileInfo (dict): A dictionary of all the file information:</dt><dd><ul>
+<li><p>fileName (str): The name of the file without its extension.</p></li>
+<li><p>filePath (str): The full path of the file.</p></li>
+<li><p>folderPath (str): The full path of the parent folder.</p></li>
+<li><p>metadata (dict): The extracted metadata from the file.</p></li>
+<li><p>scanDict (dict): A dictionary of positioner &amp; detector dataset for plot.</p></li>
+<li><p>scanDict2D (dict): For 2D data</p></li>
+<li><p>scanDictInner (dict): For 2D data</p></li>
+<li><p>isMultidimensional (bool)</p></li>
+<li><p>firstPos (float): The first positioner (P1, or if no positioner, P0 = index).</p></li>
+<li><p>firstDet (float): The first detector (D01).</p></li>
+<li><p>pvList (list of str): List of detectors PV names as strings.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>field (list): List of TableField object, one for each det/pos:</dt><dd><p>([TableField(name=’P0’, selection=None,…
+…desc=’Index’, pv=’Index’, unit=’a.u’),…])</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.setup2DControls">
+<span class="sig-name descname"><span class="pre">setup2DControls</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.setup2DControls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.setup2DControls" title="Link to this definition">#</a></dt>
+<dd><p>Setup Y DET selection controls for 2D plotting.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.setupX2Controls">
+<span class="sig-name descname"><span class="pre">setupX2Controls</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.setupX2Controls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.setupX2Controls" title="Link to this definition">#</a></dt>
+<dd><p>Setup 2D data controls (X2 selection for 1D plot/slice).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_file_table_view.MDAFileTableView.update2DControls">
+<span class="sig-name descname"><span class="pre">update2DControls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_multidimensional</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimensions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquired_dimensions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2_positioner_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_file_table_view.html#MDAFileTableView.update2DControls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_file_table_view.MDAFileTableView.update2DControls" title="Link to this definition">#</a></dt>
+<dd><p>Update 2D controls visibility and settings based on data dimensions.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>is_multidimensional (bool): Whether the data is multidimensional
+dimensions (list): List of intended dimensions [X2_points, X1_points, …]
+acquired_dimensions (list): List of actual acquired dimensions [X2_points, X1_points, …]
+x2_positioner_info (dict): Information about the X2 positioner (name, unit, data)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="mda_file_table_model.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">MDA File Table Model</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="mda_file_viz.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">MDA File Viz</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView._apply2DPlotStyle"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView._apply2DPlotStyle()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView._apply2DSelectionImpl"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView._apply2DSelectionImpl()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView._populatePlotStyleComboBox"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView._populatePlotStyleComboBox()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView._setup2DControlsDelayed"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView._setup2DControlsDelayed()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView._trigger2DPlot"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView._trigger2DPlot()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView._updateX2ValueLabel"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView._updateX2ValueLabel()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.apply2DSelection"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.apply2DSelection()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.data"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.data2Plot"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.data2Plot()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.data2Plot2D"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.data2Plot2D()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.get2DSelections"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.get2DSelections()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.get2DSelectionsByPV"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.get2DSelectionsByPV()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.getX2Value"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.getX2Value()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.onColorPaletteChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onColorPaletteChanged()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.onI0SelectionChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onI0SelectionChanged()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.onLogScaleChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onLogScaleChanged()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.onPlotButtonClicked"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onPlotButtonClicked()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.onPlotTypeChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onPlotTypeChanged()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.onX1SelectionChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onX1SelectionChanged()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.onX2SelectionChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onX2SelectionChanged()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.onX2ValueChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onX2ValueChanged()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.onYDetSelectionChanged"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.onYDetSelectionChanged()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.populate2DControls"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.populate2DControls()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.populateI0ComboBox"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.populateI0ComboBox()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.populateX1ComboBox"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.populateX1ComboBox()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.populateX2ComboBox"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.populateX2ComboBox()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.populateYDetComboBox"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.populateYDetComboBox()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.setData"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.setData()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.setup2DControls"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.setup2DControls()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.setupX2Controls"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.setupX2Controls()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_file_table_view.MDAFileTableView.update2DControls"><code class="docutils literal notranslate"><span class="pre">MDAFileTableView.update2DControls()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/mda_file_table_view.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

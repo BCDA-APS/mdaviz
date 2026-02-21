@@ -1,0 +1,751 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Changes &#8212; mdaviz 1.3</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=8749d347"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'changes';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="License" href="license.html" />
+    <link rel="prev" title="Virtual Table Model" href="api/virtual_table_model.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mdaviz 1.3</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Changes
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="license.html">
+    License
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Changes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="license.html">
+    License
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"></div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Changes</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="changes">
+<span id="id1"></span><h1>Changes<a class="headerlink" href="#changes" title="Link to this heading">#</a></h1>
+<section id="version-1-3-2-latest">
+<h2>Version 1.3.2 (latest)<a class="headerlink" href="#version-1-3-2-latest" title="Link to this heading">#</a></h2>
+<p><strong>Minor Features</strong></p>
+<ul class="simple">
+<li><p>Move x axis label closer to plot</p></li>
+<li><p>Add refresh button between previous and next buttons</p></li>
+<li><p>Format fit results, basic stats and cursor coordinates with significant figures (sigfigs)</p></li>
+</ul>
+</section>
+<section id="version-1-3-1-latest">
+<h2>Version 1.3.1 (latest)<a class="headerlink" href="#version-1-3-1-latest" title="Link to this heading">#</a></h2>
+<p><strong>Logging</strong></p>
+<ul class="simple">
+<li><p><strong>Log rotation</strong>: Use <code class="docutils literal notranslate"><span class="pre">RotatingFileHandler</span></code> to cap log file size (5 MB per file, 3 backups); prevents unbounded growth during long or debug sessions.</p></li>
+<li><p><strong>Default file level</strong>: File handler uses the same level as console (default WARNING). The log file records warnings, errors, and unhandled crash tracebacks. Use <code class="docutils literal notranslate"><span class="pre">--log</span> <span class="pre">debug</span></code> when actively debugging for full detail.</p></li>
+</ul>
+</section>
+<section id="version-1-3-0">
+<h2>Version 1.3.0<a class="headerlink" href="#version-1-3-0" title="Link to this heading">#</a></h2>
+<p><strong>Major Features</strong></p>
+<ul class="simple">
+<li><p><strong>2D selection persistence</strong>: Remember 2D selection (X1, X2, Y, I0, plot type, color palette, log scale, x2 slice) across file switches; restore when switching back to 2D files.</p></li>
+<li><p><strong>Unscale feature</strong>: <code class="docutils literal notranslate"><span class="pre">Un</span></code> column removed from table, moved to curve panel; apply to currently selected curve in curve dropdown menu.</p></li>
+<li><p><strong>Derivative support</strong>: Add derivative option for curves in curve panel; apply to currently selected curve in curve dropdown menu.</p></li>
+<li><p><strong>Active scans</strong>: Plot only acquired points; omit the final (0,0) placeholder point.</p></li>
+<li><p><strong>Multi-fit support</strong>: Each curve can have its own fit; the fit panel shows the result for the curve currently selected in the pull down menu.</p></li>
+<li><p><strong>Progress dialog</strong>: Progress dialog during folder scan (throttled updates, non-modal).</p></li>
+<li><p><strong>Folder refresh cache</strong>: Reuse cached file info for unchanged files (mtime) on refresh to speed up repeated scans.</p></li>
+<li><p><strong>Exception logging</strong>: Custom excepthook logs unhandled exceptions to <code class="docutils literal notranslate"><span class="pre">~/.mdaviz/logs/</span></code> for debugging.</p></li>
+</ul>
+<p><strong>Minor Features</strong></p>
+<ul class="simple">
+<li><p>Preserve visualization tab (1D/2D) when switching files.</p></li>
+<li><p>Show cursor info panel in 2D tab.</p></li>
+<li><p>Add horizontal splitter between graph and curve/cursor panel (collapsible).</p></li>
+<li><p>Fit improvements: display uncertainty and FWHM when available; smooth x array for fit plotting.</p></li>
+<li><p>Fit models: add topHat model; negative Gaussian/Lorentzian.</p></li>
+<li><p>Curve panel: select last plotted curve when added; restore curve selection after replace and when I0 toggled.</p></li>
+<li><p>Reset log scale when graph is cleared.</p></li>
+<li><p>Snap-to-curve uses normalized nearest-point.</p></li>
+</ul>
+<p><strong>Bug Fixes</strong></p>
+<ul class="simple">
+<li><p><strong>Crash guards</strong>: Guard <code class="docutils literal notranslate"><span class="pre">addCurve</span></code> when <code class="docutils literal notranslate"><span class="pre">len(ds)</span> <span class="pre">&lt;</span> <span class="pre">2</span></code>; guard <code class="docutils literal notranslate"><span class="pre">removeAllLayoutWidgets</span></code> when layout item has no widget (spacer); defensive null checks for <code class="docutils literal notranslate"><span class="pre">getCurveData()</span></code>, plot widgets, and 2D data validation; default X when missing in <code class="docutils literal notranslate"><span class="pre">data2Plot</span></code>; skip None y_data; validate 2D plot data shape/empty in <code class="docutils literal notranslate"><span class="pre">ChartView2D.plot2D</span></code>.</p></li>
+<li><p><strong>Excepthook</strong>: Wrap handler flush in try/except so bad logger cannot crash excepthook; ensure <code class="docutils literal notranslate"><span class="pre">_folderList</span></code> is never a string in main window (avoids <code class="docutils literal notranslate"><span class="pre">insert</span></code> on string).</p></li>
+<li><p><strong>Lazy scan</strong>: Throttle scan progress to every 100 files (avoid RecursionError); clear <code class="docutils literal notranslate"><span class="pre">_scanning</span></code> only when scan thread has finished; wait for previous scan thread before starting new one; timeout and error on duplicate refresh.</p></li>
+<li><p><strong>Plot data</strong>: Truncate 1D/2D plot data to <code class="docutils literal notranslate"><span class="pre">acquiredDimensions</span></code> for incomplete scans; early return when no acquired points; fix zero-size array crashes; bounds checking for X/I0 slicing.</p></li>
+<li><p><strong>2D UI</strong>: Fix Ydet control panel visibility when switching 2D files; fix 2D control panel sometimes missing (defer retry with QTimer); avoid Ydet flicker; guard 2D selection restore from duplicate plots; fix invalid plot type when combo not yet populated.</p></li>
+<li><p><strong>Curves</strong>: Reset persistent curve props on detector uncheck; refresh unscale when adding/removing det(s) or normalizing; fix I0 checkbox uncheck to use current file model; fix curve combobox selection after replace and I0 toggle.</p></li>
+<li><p><strong>2D plot</strong>: Fix heatmap/contour orientation and log scale handling; fix <code class="docutils literal notranslate"><span class="pre">first_det</span></code> for 2D data;</p></li>
+<li><p><strong>Other</strong>: Fix window geometry save/restore for multi-monitor; progress dialog non-modal (fix modalSession warning); <code class="docutils literal notranslate"><span class="pre">displayData()</span></code> tabledata optional; fix data truncation and unscaling (constant reference, bounds); duplicate selection prevention (X/Y checkboxes); fix <code class="docutils literal notranslate"><span class="pre">has_curve</span></code> boolean in showAnalysisControls; fix progress dialog rendering at 100% (hide bar on completion).</p></li>
+</ul>
+<p><strong>Refactoring / Code Quality</strong></p>
+<ul class="simple">
+<li><p>Main window: extract preferences dialog; extract <code class="docutils literal notranslate"><span class="pre">doOpen</span></code> into helpers; reorganize sections; center window.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mda_file_viz</span></code>: refactor mode control and tab widget; rename 2D control setup methods; simplify <code class="docutils literal notranslate"><span class="pre">onPlotButtonClicked</span></code>.</p></li>
+<li><p>Curve manager: move to <code class="docutils literal notranslate"><span class="pre">curve_manager.py</span></code>; use curveID for persistent properties; store <code class="docutils literal notranslate"><span class="pre">original_y</span></code> and add transformations helper; <code class="docutils literal notranslate"><span class="pre">getTransformedCurveXYData</span></code>.</p></li>
+<li><p>ChartView: use CurveManager transformations; docstrings and section headers.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mda_file_table_model</span></code>: duplicate selection fix; docstrings; setData/data order; defensive None checks.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mda_folder</span></code>: clean up; <code class="docutils literal notranslate"><span class="pre">doPlot2D</span></code> public; remove dead code; null checks for selection.</p></li>
+<li><p>Utils: <code class="docutils literal notranslate"><span class="pre">get_scan</span></code> reuses <code class="docutils literal notranslate"><span class="pre">get_det</span></code>; remove code duplication.</p></li>
+<li><p>Logging consolidated into <code class="docutils literal notranslate"><span class="pre">logger.py</span></code>; remove <code class="docutils literal notranslate"><span class="pre">logging_config.py</span></code> and unused methods (fit visibility, toggle_auto_load, fit data tab, etc.).</p></li>
+</ul>
+<p><strong>Testing</strong></p>
+<ul class="simple">
+<li><p>Tests for crash guards: <code class="docutils literal notranslate"><span class="pre">addCurve</span></code> len(ds)&lt;2, <code class="docutils literal notranslate"><span class="pre">removeAllLayoutWidgets</span></code> spacer, <code class="docutils literal notranslate"><span class="pre">ChartView2D.plot2D</span></code> invalid data.</p></li>
+<li><p>Tests for DataTableModel, EmptyTableModel, PreferencesDialog (coverage).</p></li>
+<li><p>Fix mypy in tests (conftest qapp, qtbot type, patch mocks).</p></li>
+<li><p>Tests for duplicate selection prevention, transformation functionality, log scale reset.</p></li>
+</ul>
+</section>
+<section id="version-1-2-5">
+<h2>Version 1.2.5<a class="headerlink" href="#version-1-2-5" title="Link to this heading">#</a></h2>
+<p><strong>Bug Fixes</strong></p>
+<ul class="simple">
+<li><p>Fix detector selection mismatch in 2D panel</p></li>
+</ul>
+</section>
+<section id="version-1-2-4">
+<h2>Version 1.2.4<a class="headerlink" href="#version-1-2-4" title="Link to this heading">#</a></h2>
+<p><strong>Bug Fixes</strong></p>
+<ul class="simple">
+<li><p>Fixed plot refresh issue where plots would not update when clicking refresh during real-time data acquisition.</p></li>
+<li><p>Added file selection preservation to maintain the currently selected file after folder refresh.</p></li>
+</ul>
+</section>
+<section id="version-1-2-3">
+<h2>Version 1.2.3<a class="headerlink" href="#version-1-2-3" title="Link to this heading">#</a></h2>
+<p><strong>Bug Fixes</strong></p>
+<ul class="simple">
+<li><p>Fixed crash when changing X2 spinbox values after clearing the graph</p></li>
+<li><p>Fixed issue where X2 spinbox appeared unexpectedly for 1D scans after removing curves or switching between files</p></li>
+<li><p>Fixed issue where 2D tab disappeared after switching to a 1D file in auto-add mode</p></li>
+</ul>
+</section>
+<section id="version-1-2-2">
+<h2>Version 1.2.2<a class="headerlink" href="#version-1-2-2" title="Link to this heading">#</a></h2>
+<p><strong>Bug Fixes</strong></p>
+<ul class="simple">
+<li><p><strong>Incomplete 2D Scan Handling</strong>: Fixed crash and display issues when loading aborted 2D scans</p></li>
+</ul>
+</section>
+<section id="version-1-2-1">
+<h2>Version 1.2.1<a class="headerlink" href="#version-1-2-1" title="Link to this heading">#</a></h2>
+<p><strong>Bug Fixes</strong></p>
+<ul class="simple">
+<li><p><strong>UI/UX Improvements</strong>: Fixed dark mode contrast issues in data table view</p></li>
+<li><p><strong>Data Visualization</strong>: Fixed X2 spinner control incorrectly appearing for 1D data files</p></li>
+</ul>
+<p><strong>Infrastructure</strong></p>
+<ul class="simple">
+<li><p><strong>Build System</strong>: Commented out automatic release creation and fixed PyInstaller commands to properly include UI resources with <cite>–add-data</cite> flag</p></li>
+<li><p><strong>Documentation</strong>: Enhanced installation and build documentation</p></li>
+</ul>
+</section>
+<section id="version-1-2-0">
+<h2>Version 1.2.0<a class="headerlink" href="#version-1-2-0" title="Link to this heading">#</a></h2>
+<p><strong>Major Features</strong></p>
+<ul class="simple">
+<li><p><strong>2D Mesh Scan Visualization</strong>: Implemented 2D mesh scan support, enabling visualization of mesh scans in both 2D and 1D slice modes. 2D visualization is available in contour and heatmap modes, with multiple color palettes options.</p></li>
+<li><p><strong>Snap Cursor to Selected Curve</strong>: Added configurable cursor snapping functionality. Users can now toggle between snapping cursors to the nearest data point or placing them at exact mouse click locations.</p></li>
+</ul>
+<p><strong>Bug Fixes</strong></p>
+<ul class="simple">
+<li><p><strong>Tab Switching Responsiveness</strong>: Fixed issue where curve remove button and plot controls became unresponsive after switching between 1D and 2D tabs.</p></li>
+<li><p><strong>2D Mode Auto-Replace Behavior</strong>: Improved user experience in 2D mode by addressing confusing behavior with forceAutoReplaceMode. The interface now provides more intuitive and predictable interactions.</p></li>
+</ul>
+<p><strong>Infrastructure Improvements</strong></p>
+<ul class="simple">
+<li><p><strong>Logging System</strong>: Replaced print statements with proper logging infrastructure.</p></li>
+<li><p><strong>Documentation Updates</strong>: Comprehensive documentation updates including user guides, API documentation, and improved examples to support new features and functionality.</p></li>
+<li><p><strong>Type Safety Enhancements</strong>: Improved code quality with enhanced type annotations, stricter mypy configuration, and better error handling throughout the codebase.</p></li>
+</ul>
+<p><strong>Technical Notes</strong></p>
+<ul class="simple">
+<li><p>Enhanced type checking with proper Optional handling</p></li>
+<li><p>Improved CI/CD pipeline with stricter quality checks</p></li>
+<li><p>Updated dependencies and build configuration</p></li>
+</ul>
+</section>
+<section id="version-1-1-2">
+<h2>Version 1.1.2<a class="headerlink" href="#version-1-1-2" title="Link to this heading">#</a></h2>
+<p><strong>Major Features:</strong></p>
+<ul class="simple">
+<li><p><strong>PyQt6 Migration</strong>: Complete migration from PyQt5 to PyQt6 for future compatibility</p></li>
+<li><p><strong>Python 3.13+ Support</strong>: Ensured compatibility with Python 3.13 and future versions</p></li>
+<li><p><strong>Curve Unscaling</strong>: New “Un” column for rescaling curves to match the range of other Y curves</p></li>
+<li><p><strong>Multiple Selection Support</strong>: Enhanced table model to support multiple selections per row for data processing</p></li>
+<li><p><strong>Auto-Load Folders</strong>: Toggle auto-load in preferences</p></li>
+</ul>
+<p><strong>Technical Improvements:</strong></p>
+<ul class="simple">
+<li><p><strong>CI/CD Pipeline</strong>: Comprehensive GitHub Actions workflows with cross-platform testing</p></li>
+<li><p><strong>Code Quality</strong>: Pre-commit hooks, ruff linting, mypy type checking</p></li>
+<li><p><strong>Testing</strong>: 244 tests passing with 47% coverage, automated testing on multiple Python versions</p></li>
+</ul>
+<p><strong>Bug Fixes:</strong></p>
+<ul class="simple">
+<li><p>Fixed PyQt6 API compatibility issues</p></li>
+<li><p>Fixed time scan not displaying plot</p></li>
+<li><p>Fixed data table view shrinking vertically</p></li>
+</ul>
+</section>
+<section id="version-1-1-1">
+<h2>Version 1.1.1<a class="headerlink" href="#version-1-1-1" title="Link to this heading">#</a></h2>
+<p><strong>Bug Fixes:</strong></p>
+<ul class="simple">
+<li><p>Fixed Qt flags conversion error in MDAFileTableModel by using proper Qt constants instead of integer values</p></li>
+<li><p>Fixed license dialog crashes the app</p></li>
+</ul>
+</section>
+<section id="version-1-1-0">
+<h2>Version 1.1.0<a class="headerlink" href="#version-1-1-0" title="Link to this heading">#</a></h2>
+<p><strong>Features:</strong></p>
+<ul class="simple">
+<li><p>Implement lazy loading for improved performance</p></li>
+<li><p>Increase file loading limit to 10,000 files</p></li>
+<li><p>Add curve fitting functionality</p></li>
+<li><p>Add I0 normalization feature</p></li>
+<li><p>Add line style customization options</p></li>
+<li><p>Add Ctrl+F search functionality to metadata</p></li>
+<li><p>Add comprehensive test suite</p></li>
+</ul>
+<p><strong>Bug Fixes:</strong></p>
+<ul class="simple">
+<li><p>Fixed main window layout expansion issues</p></li>
+<li><p>Fixed core dump when refresh button is triggered multiple times</p></li>
+</ul>
+</section>
+<section id="version-1-0-0">
+<h2>Version 1.0.0<a class="headerlink" href="#version-1-0-0" title="Link to this heading">#</a></h2>
+<p><strong>Features:</strong></p>
+<ul class="simple">
+<li><p>Basic MDA data visualization</p></li>
+<li><p>Interactive plotting with matplotlib</p></li>
+<li><p>Folder navigation and file selection</p></li>
+<li><p>Basic mathematical analysis tools</p></li>
+<li><p>Remembers recently opened folders for quick access</p></li>
+</ul>
+<p><strong>Initial Release:</strong></p>
+<ul class="simple">
+<li><p>Core MVC architecture</p></li>
+<li><p>Qt5-based user interface</p></li>
+<li><p>Basic data loading and display</p></li>
+<li><p>Cross-platform support</p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="api/virtual_table_model.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Virtual Table Model</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="license.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">License</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-3-2-latest">Version 1.3.2 (latest)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-3-1-latest">Version 1.3.1 (latest)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-3-0">Version 1.3.0</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-2-5">Version 1.2.5</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-2-4">Version 1.2.4</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-2-3">Version 1.2.3</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-2-2">Version 1.2.2</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-2-1">Version 1.2.1</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-2-0">Version 1.2.0</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-1-2">Version 1.1.2</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-1-1">Version 1.1.1</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-1-0">Version 1.1.0</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-0-0">Version 1.0.0</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/changes.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

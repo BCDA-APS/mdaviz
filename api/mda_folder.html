@@ -1,0 +1,972 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>MDA Folder &#8212; mdaviz 1.3</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=8749d347"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/mda_folder';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="MDA Folder Table Model" href="mda_folder_table_model.html" />
+    <link rel="prev" title="MDA File Viz" href="mda_file_viz.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">mdaviz 1.3</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changes.html">
+    Changes
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../license.html">
+    License
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Installation Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../known_bugs.html">
+    Known Bugs
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    Source Code Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changes.html">
+    Changes
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../license.html">
+    License
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/BCDA-APS/mdaviz" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github-square fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="aboutdialog.html">About Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="app.html">Application starting point</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chartview.html">Chartview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_cache.html">Data Cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_table_model.html">Data Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_table_view.html">Data Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="empty_table_model.html">Empty Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_manager.html">Fit Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit_models.html">Fit Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lazy_folder_scanner.html">Lazy Folder Scanner</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lazy_loading_config.html">Lazy Loading Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licensedialog.html">License Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mainwindow.html">Main Window</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file.html">MDA File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_table_model.html">MDA File Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_table_view.html">MDA File Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_file_viz.html">MDA File Viz</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">MDA Folder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder_table_model.html">MDA Folder Table Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mda_folder_table_view.html">MDA Folder Table View</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opendialog.html">Open Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="popup.html">Popup Dialogs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="progress_dialog.html">Progress Dialog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_settings.html">User Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtual_table_model.html">Virtual Table Model</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">Source Code Documentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">MDA Folder</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-mdaviz.mda_folder">
+<span id="mda-folder"></span><h1>MDA Folder<a class="headerlink" href="#module-mdaviz.mda_folder" title="Link to this heading">#</a></h1>
+<p>MVC implementation of mda files.</p>
+<ul class="simple">
+<li><p>MVC: Model View Controller</p></li>
+</ul>
+<dl class="py class">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">mdaviz.mda_folder.</span></span><span class="sig-name descname"><span class="pre">MDA_MVC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC" title="Link to this definition">#</a></dt>
+<dd><p>Model View Controller class for mda files.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.applySelectionChanges">
+<span class="sig-name descname"><span class="pre">applySelectionChanges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_selection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.applySelectionChanges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.applySelectionChanges" title="Link to this definition">#</a></dt>
+<dd><p>Applies changes to the field selection and updates checkboxes accordingly:
+- Updates the selection field with the new selection.
+- Updates checkboxes in the current file’s table view based on the new selection.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.currentFileTableview">
+<span class="sig-name descname"><span class="pre">currentFileTableview</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.currentFileTableview"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.currentFileTableview" title="Link to this definition">#</a></dt>
+<dd><p>Gets the current file TableView being displayed in the active tab.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>QTableView: The TableView widget associated with the currently selected MDA file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.dataPath">
+<span class="sig-name descname"><span class="pre">dataPath</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.dataPath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.dataPath" title="Link to this definition">#</a></dt>
+<dd><p>Retrieves the path of the currently selected data folder.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: The path to the data folder as determined by the folder +
+subfolder comboBoxes in the mainWindow.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.detRemoved">
+<span class="sig-name descname"><span class="pre">detRemoved</span></span><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.detRemoved" title="Link to this definition">#</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.doPlot">
+<span class="sig-name descname"><span class="pre">doPlot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.doPlot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.doPlot" title="Link to this definition">#</a></dt>
+<dd><p>Initiates plotting based on the currently selected file &amp; selection field, and the specified action
+(‘add’, ‘replace’, or ‘clear’).
+- Retrieves and plots datasets based on the selection for actions ‘add’ or ‘replace’.
+- Uses a ChartView widget for plotting within a specified layout.</p>
+<p>Parameters:
+- args[0] (str or int): The plotting action to be taken (‘add’, ‘replace’, or ‘clear’),</p>
+<blockquote>
+<div><p>or an integer representing the X2 value change.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>kwargs (dict): Additional options for plotting, if any.</p></li>
+</ul>
+<p>Behavior:
+- ‘clear’: Removes all tabs and clears the visualization.
+- ‘add’/’replace’: Plots new data according to the current selection, adding to existing plots or replacing them.
+- X2 value change: Replots the current selection with the new X2 slice.
+- Exits with a status message if no file is selected or no detectors (Y) are selected for plotting.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.doPlot2D">
+<span class="sig-name descname"><span class="pre">doPlot2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.doPlot2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.doPlot2D" title="Link to this definition">#</a></dt>
+<dd><p>Handle 2D plotting with the given selection.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>action (str): ‘add’ or ‘replace’
+selection (dict): 2D selection with X1, X2, Y, I0, plot_type keys</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.goToFirst">
+<span class="sig-name descname"><span class="pre">goToFirst</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.goToFirst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.goToFirst" title="Link to this definition">#</a></dt>
+<dd><p>Navigates to and selects the first file in the folder table view.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.goToLast">
+<span class="sig-name descname"><span class="pre">goToLast</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.goToLast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.goToLast" title="Link to this definition">#</a></dt>
+<dd><p>Navigates to and selects the last file in the folder table view.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.goToNext">
+<span class="sig-name descname"><span class="pre">goToNext</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.goToNext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.goToNext" title="Link to this definition">#</a></dt>
+<dd><p>Navigates to and selects the next file relative to the current selection in the folder table view.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.goToPrevious">
+<span class="sig-name descname"><span class="pre">goToPrevious</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.goToPrevious"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.goToPrevious" title="Link to this definition">#</a></dt>
+<dd><p>Navigates to and selects the previous file relative to the current selection in the folder table view.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.handlePlotBasedOnMode">
+<span class="sig-name descname"><span class="pre">handlePlotBasedOnMode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.handlePlotBasedOnMode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.handlePlotBasedOnMode" title="Link to this definition">#</a></dt>
+<dd><p>Handle plotting based on the current mode (add, replace, or auto-off).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.mdaFileList">
+<span class="sig-name descname"><span class="pre">mdaFileList</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.mdaFileList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.mdaFileList" title="Link to this definition">#</a></dt>
+<dd><p>Fetches a list of MDA file names from the currently selected folder.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>list: A list of strings representing the names of MDA files in the selected folder.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.mdaInfoList">
+<span class="sig-name descname"><span class="pre">mdaInfoList</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.mdaInfoList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.mdaInfoList" title="Link to this definition">#</a></dt>
+<dd><p>Fetches a list of MDA file info from the currently selected folder.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>list: A list of dictionary containing the high level info for the MDA files in the selected folder.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.onCheckboxStateChanged">
+<span class="sig-name descname"><span class="pre">onCheckboxStateChanged</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">det_removed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.onCheckboxStateChanged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.onCheckboxStateChanged" title="Link to this definition">#</a></dt>
+<dd><dl>
+<dt>Responds to changes in checkbox states within the file’s data view.</dt><dd><ul class="simple">
+<li><p>adjusts the plot based on the selection of detectors and I0.</p></li>
+<li><p>updates the selection field with the new selection and initiates plotting based</p></li>
+</ul>
+<p>on the current mode (Auto-add, Auto-replace, or Auto-off).</p>
+</dd>
+</dl>
+<p>Parameters:
+- selection (dict): The current selection of detectors (Y), positioner (X), and I0 for plotting.
+- det_removed (bool): Indicates if a detector has been removed (unchecked).</p>
+<p>Notes:
+- The selection dict format: {‘X’: int, ‘Y’: list[int], ‘I0’: int}.
+- If ‘Auto-off’ mode is active, the method returns without updating the plot.
+- If no positioner is selected, default to Index.
+- If no detectors are selected or if all curves are removed, the plot is cleared.
+- If a detector is unchecked, the corresponding curve is removed from the plot.
+- If I0 is selected, Y data will be normalized as Y/I0.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.onFileSelected">
+<span class="sig-name descname"><span class="pre">onFileSelected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.onFileSelected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.onFileSelected" title="Link to this definition">#</a></dt>
+<dd><ul class="simple">
+<li><p>Handles the selection of a new file in the folder table view.</p></li>
+<li><dl class="simple">
+<dt>Updates the UI to:</dt><dd><ul>
+<li><p>Add a tab with the selected file content in a table view.</p></li>
+<li><p>Display the data for the selected file.</p></li>
+<li><p>Display the metadata for the selected file.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Manages connections for:</dt><dd><ul>
+<li><p>Selection changes in the folder table view.</p></li>
+<li><p>Checkbox state changes in the file’s data view.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initiates plotting based on the current mode, which can be:</dt><dd><ul>
+<li><p>Auto-add: Automatically adds new data to the existing plot.</p></li>
+<li><p>Auto-replace: Automatically replaces the existing plot with new data.</p></li>
+<li><p>Auto-off: Does not automatically plot new data; requires manual action to plot.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>This method ensures the selection of positioners and detectors reflects the PVs available
+in the newly selected file, accounting for  index changes from the previously selected file.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>addFileTab -&gt; tabWidget.setCurrentIndex updates -&gt; onTabChanged triggered</dt><dd><p>-&gt; setCurrentFileTableview()
+-&gt; updateSelectionField() (if selectionField was None only)
+-&gt; mda_file.setData()
+-&gt; mda_file.displayMetadata(metadata)
+-&gt; mda_file.displayData(tabledata)</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>Args:</dt><dd><p>index (QModelIndex): The model index of the selected file in the file list.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.onTabChanged">
+<span class="sig-name descname"><span class="pre">onTabChanged</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection_field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.onTabChanged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.onTabChanged" title="Link to this definition">#</a></dt>
+<dd><p>Updates UI to reflect the content of the newly selected tab or resets UI if no tab is selected.
+- Activates the corresponding table view for the new tab, displaying the selected file’s metadata and data.
+- Resets UI to a default state if no tab is selected (index == -1), indicating no active file.
+- Connected to the <cite>tabChanged</cite> signal to handle UI updates when a tab is switched.</p>
+<p>Parameters:
+- index (int): Index of the newly selected tab; -1 indicates no tab is selected.
+- file_path (str): Path of the file associated with the newly selected tab.
+- file_data (dict): Contains metadata and table data for the file. Expected keys: ‘metadata’, ‘tabledata’.
+- selection_field (dict or None): Specifies the fields (POS/DET) selected for plotting.</p>
+<p>Notes: This method is connected to the <cite>tabChanged</cite> signal of the MDAFile’s QTabWidget:
+In MDAFile:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>self.mda_file.tabWidget.currentChanged.connect [signal: emits new_tab_index]</dt><dd><dl class="simple">
+<dt>–&gt; self.mda_file.updateCurrentTabInfo(new_tab_index) [slot]</dt><dd><dl class="simple">
+<dt>–&gt; self.mda_file.tabChanged.emit  [QtCore.pyqtSignal]</dt><dd><p>emits: new_tab_index, _file_path, _tab_data, _selection_field</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>In MDA_MVC:</dt><dd><dl class="simple">
+<dt>self.mda_file.tabChanged.connect</dt><dd><p>–&gt; self.onTabChanged(new_tab_index, _file_path, _tab_data, _selection_field)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.selectAndShowIndex">
+<span class="sig-name descname"><span class="pre">selectAndShowIndex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.selectAndShowIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.selectAndShowIndex" title="Link to this definition">#</a></dt>
+<dd><p>Selects a file by its index in the folder table view and ensures it is visible to the user.</p>
+<p>Parameters:
+- index (QModelIndex): Index of the file to select.</p>
+<p>Details:
+- Focuses on the table view for visual feedback (blue highlight in Mac OS).
+- Adjusts scroll position based on the file’s position in the list.
+- Trigger actions associated with file selection (onFileSelected).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.selectionField">
+<span class="sig-name descname"><span class="pre">selectionField</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.selectionField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.selectionField" title="Link to this definition">#</a></dt>
+<dd><p>Retrieves the current field selection for plotting.
+- Returns a dictionary with selected positioner, detectors, and I0 indices.
+- Format: {‘X’: positioner_index, ‘Y’: [detector_indices], ‘I0’: i0_index}.
+- Returns None if no selection is made.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.selectionModel">
+<span class="sig-name descname"><span class="pre">selectionModel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.selectionModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.selectionModel" title="Link to this definition">#</a></dt>
+<dd><p>Accesses the selection model of the view (e.g. MDAFolderTableView)
+managing the selection state.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>QItemSelectionModel: The selection model associated with a view,
+managing which rows/items are selected.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.setCurrentFileTableview">
+<span class="sig-name descname"><span class="pre">setCurrentFileTableview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tableview</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.setCurrentFileTableview"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.setCurrentFileTableview" title="Link to this definition">#</a></dt>
+<dd><p>Sets the current file TableView to be displayed.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>tableview (QTableView, optional): The TableView widget to be set as
+the current file TableView. Defaults to None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.setSelectionField">
+<span class="sig-name descname"><span class="pre">setSelectionField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.setSelectionField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.setSelectionField" title="Link to this definition">#</a></dt>
+<dd><p>Updates the current field selection for plotting.
+- Accepts a dictionary specifying new selection of positioner, detectors, and I0.
+- Resets to None if given an empty dictionary.
+- Format for new_selection: {‘X’: positioner_index, ‘Y’: [detector_indices], ‘I0’: i0_index}.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.setSelectionModel">
+<span class="sig-name descname"><span class="pre">setSelectionModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.setSelectionModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.setSelectionModel" title="Link to this definition">#</a></dt>
+<dd><p>Sets the selection model for managing view selections.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>selection (QItemSelectionModel, optional): The selection model to be
+associated with the view. Defaults to None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.setStatus">
+<span class="sig-name descname"><span class="pre">setStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.setStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.setStatus" title="Link to this definition">#</a></dt>
+<dd><p>Set status text.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.splitter_moved">
+<span class="sig-name descname"><span class="pre">splitter_moved</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">arg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.splitter_moved"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.splitter_moved" title="Link to this definition">#</a></dt>
+<dd><p>Handles a splitter’s movement by initiating a delay before updating the settings.
+- Sets a deadline for changes and starts a new thread if one isn’t already monitoring changes.
+- Ensures settings are updated only after movement has ceased for a defined interval.</p>
+<p>Parameters:
+- key (str): Identifier for the splitter (‘hsplitter’ or ‘vsplitter’).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.splitter_settings_name">
+<span class="sig-name descname"><span class="pre">splitter_settings_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.splitter_settings_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.splitter_settings_name" title="Link to this definition">#</a></dt>
+<dd><p>Generates a unique settings name for the given splitter.
+- Formats the name based on the class name and splitter identifier.</p>
+<p>Parameters:
+- key (str): Identifier for the splitter.</p>
+<p>Returns:
+- str: A unique name for storing splitter settings.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.uncheckI0">
+<span class="sig-name descname"><span class="pre">uncheckI0</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.uncheckI0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.uncheckI0" title="Link to this definition">#</a></dt>
+<dd><p>Finds and unchecks the I0 checkbox in the current file’s table view.
+Only unchecks if I0 is currently selected.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.updateDetectorSelection">
+<span class="sig-name descname"><span class="pre">updateDetectorSelection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oldPvList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_selection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newPvList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_selection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.updateDetectorSelection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.updateDetectorSelection" title="Link to this definition">#</a></dt>
+<dd><p>Helper function to update detector selections in the new selection field.
+- Iterates through old detector selections and updates based on new PVs.
+- Adds updated detector indices to new_selection[‘Y’].
+- Returns True if changes were made, otherwise False.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.updateFolderView">
+<span class="sig-name descname"><span class="pre">updateFolderView</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.updateFolderView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.updateFolderView" title="Link to this definition">#</a></dt>
+<dd><p>Clear existing data and set new data for the folder tableview</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.updateI0Selection">
+<span class="sig-name descname"><span class="pre">updateI0Selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oldPvList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_selection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newPvList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_selection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.updateI0Selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.updateI0Selection" title="Link to this definition">#</a></dt>
+<dd><p>Helper function to update the I0 selection in the new selection field.
+Returns True if changes were made, otherwise False.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mdaviz.mda_folder.MDA_MVC.updateSelectionForNewPVs">
+<span class="sig-name descname"><span class="pre">updateSelectionForNewPVs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_selection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oldPvList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newPvList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdaviz/mda_folder.html#MDA_MVC.updateSelectionForNewPVs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdaviz.mda_folder.MDA_MVC.updateSelectionForNewPVs" title="Link to this definition">#</a></dt>
+<dd><p>Updates field selection based on new PV list when a new file is selected.
+- Adjusts selection indices for POS, DET, and I0 to match new PVs indexes.
+- Directly updates the selection field if changes are made.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>old_selection (dict): selection fields for the previously selected file.
+oldPvList (list): PVs in the previously selected file.
+newPvList (list): Matching PVs in the newly selected file.
+verbose (bool): If True, print detailed changes.</p>
+</dd>
+<dt>Returns:</dt><dd><p>None: Updates the selection field directly if changes are made.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="mda_file_viz.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">MDA File Viz</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="mda_folder_table_model.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">MDA Folder Table Model</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC"><code class="docutils literal notranslate"><span class="pre">MDA_MVC</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.applySelectionChanges"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.applySelectionChanges()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.currentFileTableview"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.currentFileTableview()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.dataPath"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.dataPath()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.detRemoved"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.detRemoved</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.doPlot"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.doPlot()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.doPlot2D"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.doPlot2D()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.goToFirst"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.goToFirst()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.goToLast"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.goToLast()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.goToNext"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.goToNext()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.goToPrevious"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.goToPrevious()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.handlePlotBasedOnMode"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.handlePlotBasedOnMode()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.mdaFileList"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.mdaFileList()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.mdaInfoList"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.mdaInfoList()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.onCheckboxStateChanged"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.onCheckboxStateChanged()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.onFileSelected"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.onFileSelected()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.onTabChanged"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.onTabChanged()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.selectAndShowIndex"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.selectAndShowIndex()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.selectionField"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.selectionField()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.selectionModel"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.selectionModel()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.setCurrentFileTableview"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.setCurrentFileTableview()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.setSelectionField"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.setSelectionField()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.setSelectionModel"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.setSelectionModel()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.setStatus"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.setStatus()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.splitter_moved"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.splitter_moved()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.splitter_settings_name"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.splitter_settings_name()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.uncheckI0"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.uncheckI0()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.updateDetectorSelection"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.updateDetectorSelection()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.updateFolderView"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.updateFolderView()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.updateI0Selection"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.updateI0Selection()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mdaviz.mda_folder.MDA_MVC.updateSelectionForNewPVs"><code class="docutils literal notranslate"><span class="pre">MDA_MVC.updateSelectionForNewPVs()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/mda_folder.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, UChicago Argonne, LLC.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
