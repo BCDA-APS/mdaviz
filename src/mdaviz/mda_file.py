@@ -478,7 +478,7 @@ class MDAFile(QWidget):
     # Tab management
     # =============================================
 
-    def addFileTab(self, index, selection_field):
+    def addFileTab(self, index, selection_field, force_add=False):
         """
         Handles adding or activating a file tab within the tab widget.
         - Retrieves data for the selected file based on its index in the MDA file list.
@@ -492,6 +492,8 @@ class MDAFile(QWidget):
         - index (int): The index of the file in the MDA file list.
         - selection_field (dict): Specifies the fields (positioners/detectors) for display
         and plotting.
+        - force_add (bool): If True, keep existing tabs even in Auto-replace mode (e.g.
+        triggered by Ctrl/Cmd+click).
         """
 
         # Get data for the selected file:
@@ -512,7 +514,7 @@ class MDAFile(QWidget):
         mode = self.mode()
         if self.tabManager.getTabData(file_path):
             # File already exists in tab manager
-            if mode in ("Auto-replace"):
+            if mode in ("Auto-replace") and not force_add:
                 # In auto-replace mode, clear all tabs and recreate this one
                 while self.tabWidget.count() > 0:
                     self.tabWidget.removeTab(0)
@@ -522,13 +524,13 @@ class MDAFile(QWidget):
                 # Add new tab to tabManager:
                 self.tabManager.addTab(file_path, metadata, tabledata)
             else:
-                # In auto-add/auto-off mode, just switch to existing tab
+                # In auto-add/auto-off mode (or force_add), just switch to existing tab
                 tab_index = self.tabPath2Index(file_path)
                 if tab_index is not None:
                     self.tabWidget.setCurrentIndex(tab_index)
         else:
             # File is new
-            if mode in ("Auto-add", "Auto-off"):
+            if mode in ("Auto-add", "Auto-off") or force_add:
                 # Add this tab to the UI:
                 self.createNewTab(file_name, file_path, selection_field)
             elif mode in ("Auto-replace"):

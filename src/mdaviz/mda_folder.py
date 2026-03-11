@@ -68,7 +68,7 @@ from pathlib import Path
 
 from PyQt6 import QtCore
 from PyQt6.QtCore import QItemSelectionModel, Qt, pyqtSignal
-from PyQt6.QtWidgets import QAbstractItemView, QWidget
+from PyQt6.QtWidgets import QAbstractItemView, QApplication, QWidget
 
 from mdaviz import utils
 from mdaviz.logger import get_logger
@@ -484,8 +484,13 @@ class MDA_MVC(QWidget):
             old_pv_list = old_tab_tableview.data()["fileInfo"]["pvList"]
             old_selection = self.selectionField()
 
+        # Ctrl (Win/Linux) or Cmd (macOS, mapped to ControlModifier by Qt) forces "add"
+        # behavior even when the current mode is "Auto-replace".
+        modifiers = QApplication.keyboardModifiers()
+        force_add = bool(modifiers & Qt.KeyboardModifier.ControlModifier)
+
         # Add (or replace) a tab & update selectionField() to default if it was None:
-        self.mda_file.addFileTab(index.row(), self.selectionField())
+        self.mda_file.addFileTab(index.row(), self.selectionField(), force_add=force_add)
         new_pv_list = self.mda_file.data().get("pvList")
         new_tab_tableview = self.currentFileTableview()
         # Manage signal connections for the new file selection.
@@ -503,16 +508,19 @@ class MDA_MVC(QWidget):
                 except Exception as exc:
                     logger.error(str(exc))
 
-            self.handlePlotBasedOnMode()
+            self.handlePlotBasedOnMode(force_add=force_add)
         else:
             self.setStatus("Could not find a (positioner,detector) pair to plot.")
 
     # # ------------ Plot methods:
 
-    def handlePlotBasedOnMode(self):
-        """Handle plotting based on the current mode (add, replace, or auto-off)."""
+    def handlePlotBasedOnMode(self, force_add=False):
+        """Handle plotting based on the current mode (add, replace, or auto-off).
+
+        If force_add is True (e.g. Ctrl/Cmd+click), always use "add" action regardless of mode.
+        """
         mode = self.mda_file.mode()
-        if mode == "Auto-add":
+        if mode == "Auto-add" or force_add:
             self.doPlot("add")
         elif mode == "Auto-replace":
             self.doPlot("replace")
