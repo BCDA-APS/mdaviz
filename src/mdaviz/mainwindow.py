@@ -443,8 +443,9 @@ class MainWindow(QMainWindow):
                 current_index = self.mvc_folder.selectionModel().currentIndex()
                 if current_index.isValid():
                     current_file_list = self.mdaFileList()
-                    if current_index.row() < len(current_file_list):
-                        selected_file_name = current_file_list[current_index.row()]
+                    source_row = self.mvc_folder.mda_folder_tableview.sourceRow(current_index)
+                    if source_row < len(current_file_list):
+                        selected_file_name = current_file_list[source_row]
                         self._selected_file_name = selected_file_name
                         # Preserve detector/positioner selection for restore after refresh
                         self._saved_selection_field = (
@@ -469,8 +470,9 @@ class MainWindow(QMainWindow):
                     current_index = table_view.selectionModel().currentIndex()
                     if current_index.isValid():
                         current_file_list = self.mdaFileList()
-                        if current_index.row() < len(current_file_list):
-                            selected_file_name = current_file_list[current_index.row()]
+                        source_row = self.mvc_folder.mda_folder_tableview.sourceRow(current_index)
+                        if source_row < len(current_file_list):
+                            selected_file_name = current_file_list[source_row]
                             self._selected_file_name = selected_file_name
                             # Preserve detector/positioner selection for restore after refresh
                             self._saved_selection_field = (

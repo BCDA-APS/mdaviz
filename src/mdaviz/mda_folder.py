@@ -463,7 +463,9 @@ class MDA_MVC(QWidget):
             index (QModelIndex): The model index of the selected file in the file list.
         """
 
-        selected_file = self.mdaFileList()[index.row()]
+        # Map proxy index → source model row so file lookups are correct after sorting.
+        source_row = self.mda_folder_tableview.sourceRow(index)
+        selected_file = self.mdaFileList()[source_row]
         file_path = f"{str(self.dataPath())}/{selected_file}"
         self.setStatus(f"\nLoading {file_path}")
 
@@ -490,7 +492,7 @@ class MDA_MVC(QWidget):
         force_add = bool(modifiers & Qt.KeyboardModifier.ControlModifier)
 
         # Add (or replace) a tab & update selectionField() to default if it was None:
-        self.mda_file.addFileTab(index.row(), self.selectionField(), force_add=force_add)
+        self.mda_file.addFileTab(source_row, self.selectionField(), force_add=force_add)
         new_pv_list = self.mda_file.data().get("pvList")
         new_tab_tableview = self.currentFileTableview()
         # Manage signal connections for the new file selection.
