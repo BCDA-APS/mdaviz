@@ -210,9 +210,12 @@ class MainWindow(QMainWindow):
         # Save settings
         settings.setKey("plot_max_height", settings_dict["plot_max_height"])
         settings.setKey("auto_load_folder", settings_dict["auto_load_folder"])
+        settings.setKey("sort_newest_first", settings_dict["sort_newest_first"])
 
         # Update UI components
         self._update_plot_height(settings_dict["plot_max_height"])
+        if hasattr(self, "mvc_folder") and self.mvc_folder:
+            self.mvc_folder.mda_folder_tableview.applyDefaultSort()
 
         self.setStatus(
             f"Settings updated: plot height {settings_dict['plot_max_height']}px, "

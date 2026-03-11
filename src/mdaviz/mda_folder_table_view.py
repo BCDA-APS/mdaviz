@@ -57,10 +57,26 @@ class MDAFolderTableView(QWidget):
             self.proxyModel.setSourceModel(data_model)
             self.tableView.setModel(self.proxyModel)
             self.tableView.setSortingEnabled(True)
+            self.applyDefaultSort()
         else:
             self.proxyModel = None
             empty_model = EmptyTableModel(HEADERS)
             self.tableView.setModel(empty_model)
+
+    def applyDefaultSort(self):
+        """Apply the sort order from user preferences (newest first or natural order)."""
+        if self.proxyModel is None:
+            return
+        from mdaviz.user_settings import settings
+
+        sort_newest = settings.getKey("sort_newest_first")
+        if isinstance(sort_newest, str):
+            sort_newest = sort_newest.lower() in ("true", "1", "yes", "on")
+        DATE_COLUMN = 4
+        if sort_newest:
+            self.proxyModel.sort(DATE_COLUMN, Qt.SortOrder.DescendingOrder)
+        else:
+            self.proxyModel.sort(-1)  # -1 restores natural (source model) order
 
     def sourceRow(self, proxy_index):
         """Map a proxy model index to the underlying source model row."""
