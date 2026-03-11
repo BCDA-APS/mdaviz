@@ -176,3 +176,6 @@ mdaviz/resources/*.py
 Untitled.ipynb
 
 .cursorrules
+
+# Claude Code project settings
+.claude/
