@@ -62,12 +62,13 @@ MVC implementation of mda files.
                 |___> Retrieve and plot data based on selected positioner and detectors
 """
 
+import datetime
 import time
 from functools import partial
 from pathlib import Path
 
 from PyQt6 import QtCore
-from PyQt6.QtCore import QItemSelectionModel, Qt, pyqtSignal
+from PyQt6.QtCore import QFileSystemWatcher, QItemSelectionModel, QTimer, Qt, pyqtSignal
 from PyQt6.QtWidgets import QAbstractItemView, QApplication, QWidget
 
 from mdaviz import utils
@@ -131,6 +132,15 @@ class MDA_MVC(QWidget):
         self.setCurrentFileTableview()
         self._last_plotted_file_path = None
         self._last_selection = None
+
+        # Live plotting: watch the current file for changes and replot automatically.
+        self._live_watcher = QFileSystemWatcher()
+        self._live_watcher.fileChanged.connect(self._onLiveFileChanged)
+        self._live_debounce_timer = QTimer()
+        self._live_debounce_timer.setSingleShot(True)
+        self._live_debounce_timer.setInterval(2000)  # ms
+        self._live_debounce_timer.timeout.connect(self._doLiveUpdate)
+        self._live_file_path = None
 
         # Set Selection Model & Focus for keyboard arrow keys to Folder Table View:
         model = self.mda_folder_tableview.tableView.model()
@@ -514,6 +524,44 @@ class MDA_MVC(QWidget):
         else:
             self.setStatus("Could not find a (positioner,detector) pair to plot.")
 
+    # # ------------ Live plotting methods:
+
+    def _startWatching(self, file_path):
+        """Watch file_path for changes; stop watching the previous file."""
+        if self._live_file_path and self._live_file_path != file_path:
+            self._live_watcher.removePath(self._live_file_path)
+        if file_path and file_path not in self._live_watcher.files():
+            self._live_watcher.addPath(file_path)
+        self._live_file_path = file_path
+
+    def _onLiveFileChanged(self, path):
+        """Slot called when the watched file changes on disk."""
+        # Some tools write by deleting+recreating the file; re-add if needed.
+        if path not in self._live_watcher.files():
+            self._live_watcher.addPath(path)
+        self._live_debounce_timer.start()
+
+    def _doLiveUpdate(self):
+        """Invalidate cache for the watched file and replot."""
+        if not self._live_file_path:
+            return
+        from mdaviz.data_cache import get_global_cache
+
+        get_global_cache().invalidate_file(self._live_file_path)
+        self.doPlot("replace")
+        self._updateLiveTitle()
+
+    def _updateLiveTitle(self):
+        """Append a [LIVE HH:MM:SS] marker to the chart title."""
+        from mdaviz.chartview import ChartView
+
+        layout = self.mda_file_viz.plotPageMpl.layout()
+        widget = layout.itemAt(0).widget()
+        if isinstance(widget, ChartView):
+            now = datetime.datetime.now().strftime("%H:%M:%S")
+            widget.setPlotTitle(f"{widget.title()} [LIVE {now}]")
+            widget.canvas.draw()
+
     # # ------------ Plot methods:
 
     def handlePlotBasedOnMode(self, force_add=False):
@@ -633,6 +681,7 @@ class MDA_MVC(QWidget):
                 widgetMpl.plot(i, *ds, **options)
             widgetMpl.refreshAllUnscaledCurves()
             self.mda_file_viz.setPlot(widgetMpl)
+            self._startWatching(current_file_path)
 
     def doPlot2D(self, action, selection):
         """
