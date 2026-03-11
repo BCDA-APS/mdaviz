@@ -68,7 +68,7 @@ from functools import partial
 from pathlib import Path
 
 from PyQt6 import QtCore
-from PyQt6.QtCore import QFileSystemWatcher, QItemSelectionModel, QTimer, Qt, pyqtSignal
+from PyQt6.QtCore import QItemSelectionModel, QTimer, Qt, pyqtSignal
 from PyQt6.QtWidgets import QAbstractItemView, QApplication, QWidget
 
 from mdaviz import utils
@@ -133,14 +133,13 @@ class MDA_MVC(QWidget):
         self._last_plotted_file_path = None
         self._last_selection = None
 
-        # Live plotting: watch the current file for changes and replot automatically.
-        self._live_watcher = QFileSystemWatcher()
-        self._live_watcher.fileChanged.connect(self._onLiveFileChanged)
-        self._live_debounce_timer = QTimer()
-        self._live_debounce_timer.setSingleShot(True)
-        self._live_debounce_timer.setInterval(2000)  # ms
-        self._live_debounce_timer.timeout.connect(self._doLiveUpdate)
+        # Live plotting: poll the current file's mtime every 2s and replot if it changed.
         self._live_file_path = None
+        self._live_mtime = None
+        self._poll_timer = QTimer()
+        self._poll_timer.setInterval(2000)  # ms
+        self._poll_timer.timeout.connect(self._pollForChanges)
+        self._poll_timer.start()
 
         # Set Selection Model & Focus for keyboard arrow keys to Folder Table View:
         model = self.mda_folder_tableview.tableView.model()
@@ -527,29 +526,29 @@ class MDA_MVC(QWidget):
     # # ------------ Live plotting methods:
 
     def _startWatching(self, file_path):
-        """Watch file_path for changes; stop watching the previous file."""
-        if self._live_file_path and self._live_file_path != file_path:
-            self._live_watcher.removePath(self._live_file_path)
-        if file_path and file_path not in self._live_watcher.files():
-            self._live_watcher.addPath(file_path)
+        """Track file_path as the current file to poll for live updates."""
         self._live_file_path = file_path
+        self._live_mtime = self._getMtime(file_path)
 
-    def _onLiveFileChanged(self, path):
-        """Slot called when the watched file changes on disk."""
-        # Some tools write by deleting+recreating the file; re-add if needed.
-        if path not in self._live_watcher.files():
-            self._live_watcher.addPath(path)
-        self._live_debounce_timer.start()
+    def _getMtime(self, file_path):
+        """Return the mtime of file_path, or None if it cannot be stat'd."""
+        try:
+            return Path(file_path).stat().st_mtime if file_path else None
+        except OSError:
+            return None
 
-    def _doLiveUpdate(self):
-        """Invalidate cache for the watched file and replot."""
+    def _pollForChanges(self):
+        """Check if the current file has changed on disk; replot if so."""
         if not self._live_file_path:
             return
-        from mdaviz.data_cache import get_global_cache
+        mtime = self._getMtime(self._live_file_path)
+        if mtime is not None and mtime != self._live_mtime:
+            self._live_mtime = mtime
+            from mdaviz.data_cache import get_global_cache
 
-        get_global_cache().invalidate_file(self._live_file_path)
-        self.doPlot("replace")
-        self._updateLiveTitle()
+            get_global_cache().invalidate_file(self._live_file_path)
+            self.doPlot("replace")
+            self._updateLiveTitle()
 
     def _updateLiveTitle(self):
         """Append a [LIVE HH:MM:SS] marker to the chart title."""
