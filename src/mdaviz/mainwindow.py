@@ -656,10 +656,18 @@ class MainWindow(QMainWindow):
                             if self.mvc_folder and hasattr(
                                 self.mvc_folder, "mda_folder_tableview"
                             ):
-                                model = self.mvc_folder.mda_folder_tableview.tableView.model()
-                                if model and selected_index < model.rowCount():
-                                    index = model.index(selected_index, 0)
-                                    self.mvc_folder.selectAndShowIndex(index)
+                                proxy = self.mvc_folder.mda_folder_tableview.tableView.model()
+                                if proxy is not None:
+                                    source_model = proxy.sourceModel()
+                                    if (
+                                        source_model
+                                        and selected_index < source_model.rowCount()
+                                    ):
+                                        source_idx = source_model.index(
+                                            selected_index, 0
+                                        )
+                                        proxy_idx = proxy.mapFromSource(source_idx)
+                                        self.mvc_folder.selectAndShowIndex(proxy_idx)
                                     self.setStatus(
                                         f"Highlighted selected file: {self._selected_file_name}"
                                     )
