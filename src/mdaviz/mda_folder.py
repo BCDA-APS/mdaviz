@@ -136,6 +136,7 @@ class MDA_MVC(QWidget):
         # Live plotting: poll the current file's mtime every 2s and replot if it changed.
         self._live_file_path = None
         self._live_mtime = None
+        self._live_selection = None  # selection at the time live watch was started
         self._poll_timer = QTimer()
         self._poll_timer.setInterval(2000)  # ms
         self._poll_timer.timeout.connect(self._pollForChanges)
@@ -529,6 +530,7 @@ class MDA_MVC(QWidget):
         """Track file_path as the current file to poll for live updates."""
         self._live_file_path = file_path
         self._live_mtime = self._getMtime(file_path)
+        self._live_selection = self.selectionField()
 
     def _getMtime(self, file_path):
         """Return the mtime of file_path, or None if it cannot be stat'd."""
@@ -552,12 +554,12 @@ class MDA_MVC(QWidget):
             from mdaviz.data_cache import get_global_cache
 
             get_global_cache().invalidate_file(self._live_file_path)
-            # Reload mda_file data from disk so doPlot uses fresh data.
+            # Reload mda_file data from disk so the live tableview uses fresh data.
             try:
                 file_name = Path(self._live_file_path).name
                 file_index = self.mdaFileList().index(file_name)
                 self.mda_file.setData(file_index)
-                tableview = self.currentFileTableview()
+                tableview = self.mda_file.tabPath2Tableview(self._live_file_path)
                 if tableview is not None:
                     tableview.setData()
                 # Update "Points" column in folder table with the latest acquired count.
@@ -572,7 +574,7 @@ class MDA_MVC(QWidget):
                         source_model.dataChanged.emit(cell, cell)
             except Exception as exc:
                 logger.warning(f"Live update: failed to reload data: {exc}")
-            self.doPlot("replace")
+            self._doLiveUpdate()
             self._updateLiveTitle()
 
     def _updateLiveTitle(self):
@@ -586,6 +588,30 @@ class MDA_MVC(QWidget):
             widget.setPlotTitle(f"● {widget.title()} [LIVE {now}]")
             widget.main_axes.title.set_color("red")
             widget.canvas.draw()
+
+    def _doLiveUpdate(self):
+        """Refresh only the live file's curves, preserving curves from other files."""
+        from mdaviz.chartview import ChartView
+
+        layoutMpl = self.mda_file_viz.plotPageMpl.layout()
+        if layoutMpl.count() != 1:
+            return
+        widgetMpl = layoutMpl.itemAt(0).widget()
+        if not isinstance(widgetMpl, ChartView):
+            return
+        live_tableview = self.mda_file.tabPath2Tableview(self._live_file_path)
+        selection = self._live_selection
+        if not live_tableview or not selection or not selection.get("Y"):
+            return
+        # Re-plot the live file's curves; addCurve updates them in-place if data changed,
+        # leaving curves from other files untouched.
+        datasets, plot_options = live_tableview.data2Plot(selection)
+        y_index = selection.get("Y", [])
+        for i, (ds, ds_options) in zip(y_index, datasets):
+            options = {"ds_options": ds_options, "plot_options": plot_options}
+            widgetMpl.plot(i, *ds, **options)
+        widgetMpl.refreshAllUnscaledCurves()
+        self.mda_file_viz.setPlot(widgetMpl)
 
     # # ------------ Plot methods:
 
@@ -706,7 +732,8 @@ class MDA_MVC(QWidget):
                 widgetMpl.plot(i, *ds, **options)
             widgetMpl.refreshAllUnscaledCurves()
             self.mda_file_viz.setPlot(widgetMpl)
-            self._startWatching(current_file_path)
+            if action == "replace":
+                self._startWatching(current_file_path)
 
     def doPlot2D(self, action, selection):
         """
