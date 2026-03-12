@@ -6,7 +6,7 @@ QAbstractTableModel of folder content.
     ~MDAFolderTableModel
 """
 
-from PyQt6.QtCore import QAbstractTableModel, Qt
+from PyQt6.QtCore import QAbstractTableModel, QModelIndex, Qt
 from mdaviz.utils import HEADERS
 
 
@@ -75,3 +75,10 @@ class MDAFolderTableModel(QAbstractTableModel):
         ie the list of mda files info
         """
         self._data = data
+
+    def appendRow(self, file_info):
+        """Append a single row to the model, notifying the view."""
+        row = len(self._data)
+        self.beginInsertRows(QModelIndex(), row, row)
+        self._data.append(file_info)
+        self.endInsertRows()

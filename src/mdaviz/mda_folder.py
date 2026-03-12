@@ -137,6 +137,9 @@ class MDA_MVC(QWidget):
         self._live_file_path = None
         self._live_mtime = None
         self._live_selection = None  # selection at the time live watch was started
+        self._folder_mtime = None  # mtime of the watched folder (for new-file detection)
+        self._pending_metadata = []  # files whose metadata was incomplete at detection time
+        self._tracking_files = {}  # file_path → last_mtime, for Points column auto-update
         self._poll_timer = QTimer()
         self._poll_timer.setInterval(2000)  # ms
         self._poll_timer.timeout.connect(self._pollForChanges)
@@ -267,6 +270,8 @@ class MDA_MVC(QWidget):
 
     def updateFolderView(self):
         """Clear existing data and set new data for the folder tableview"""
+        self._folder_mtime = None  # re-baseline folder mtime after a full rescan
+        self._tracking_files = {}
         self.mda_folder_tableview.clearContents()
         self.mda_folder_tableview.displayTable()
         model = self.mda_folder_tableview.tableView.model()
@@ -540,7 +545,19 @@ class MDA_MVC(QWidget):
             return None
 
     def _pollForChanges(self):
-        """Check if the current file has changed on disk; replot if so."""
+        """Check if the current file has changed on disk; replot if so.
+        Also check if new files appeared in the folder."""
+        folder_path = self.dataPath()
+        if folder_path:
+            folder_mtime = self._getMtime(folder_path)
+            if self._folder_mtime is not None and folder_mtime != self._folder_mtime:
+                self._checkForNewFiles(folder_path)
+            self._folder_mtime = folder_mtime
+        if self._pending_metadata:
+            self._retryPendingMetadata()
+        if self._tracking_files:
+            self._updateTrackingFiles()
+
         if not self._live_file_path:
             return
         mtime = self._getMtime(self._live_file_path)
@@ -576,6 +593,79 @@ class MDA_MVC(QWidget):
                 logger.warning(f"Live update: failed to reload data: {exc}")
             self._doLiveUpdate()
             self._updateLiveTitle()
+
+    def _checkForNewFiles(self, folder_path):
+        """Append any new .mda files found in folder_path to the table without a full rescan."""
+        from mdaviz.utils import get_file_info_lightweight
+
+        current_names = set(self.mdaFileList())
+        try:
+            all_files = sorted(Path(folder_path).glob("*.mda"), key=lambda p: p.name)
+        except OSError:
+            return
+        new_files = [f for f in all_files if f.name not in current_names]
+        if not new_files:
+            return
+        proxy = self.mda_folder_tableview.proxyModel
+        source_model = proxy.sourceModel() if proxy is not None else None
+        for file_path in new_files:
+            file_info = get_file_info_lightweight(file_path)
+            self.mdaFileList().append(file_path.name)
+            if source_model is not None:
+                # appendRow() appends to source_model._data, which IS mdaInfoList()
+                source_model.appendRow(file_info)
+            else:
+                self.mdaInfoList().append(file_info)
+            if not file_info.get("Scan #"):
+                self._pending_metadata.append(file_path)
+            self._tracking_files[file_path] = self._getMtime(file_path)
+            self.setStatus(f"New file: {file_path.name}")
+
+    def _retryPendingMetadata(self):
+        """Re-read metadata for files that were incomplete when first detected."""
+        from mdaviz.utils import get_file_info_lightweight
+
+        proxy = self.mda_folder_tableview.proxyModel
+        source_model = proxy.sourceModel() if proxy is not None else None
+        still_pending = []
+        for file_path in self._pending_metadata:
+            file_info = get_file_info_lightweight(file_path)
+            if not file_info.get("Scan #"):
+                still_pending.append(file_path)
+                continue
+            try:
+                file_index = self.mdaFileList().index(file_path.name)
+            except ValueError:
+                continue
+            self.mdaInfoList()[file_index].update(file_info)
+            if source_model is not None:
+                top_left = source_model.index(file_index, 0)
+                bottom_right = source_model.index(file_index, source_model.columnCount() - 1)
+                source_model.dataChanged.emit(top_left, bottom_right)
+        self._pending_metadata = still_pending
+
+    def _updateTrackingFiles(self):
+        """Update the Points column for tracked new files when their mtime changes."""
+        from mdaviz.utils import get_file_info_lightweight
+
+        POINTS_COL = 2
+        proxy = self.mda_folder_tableview.proxyModel
+        source_model = proxy.sourceModel() if proxy is not None else None
+        for file_path in list(self._tracking_files):
+            current_mtime = self._getMtime(file_path)
+            if current_mtime == self._tracking_files[file_path]:
+                continue  # no new data written since last tick
+            self._tracking_files[file_path] = current_mtime
+            try:
+                file_index = self.mdaFileList().index(file_path.name)
+            except ValueError:
+                del self._tracking_files[file_path]
+                continue
+            file_info = get_file_info_lightweight(file_path)
+            self.mdaInfoList()[file_index]["Points"] = file_info.get("Points", "")
+            if source_model is not None:
+                cell = source_model.index(file_index, POINTS_COL)
+                source_model.dataChanged.emit(cell, cell)
 
     def _updateLiveTitle(self):
         """Set chart title to '● <title> [LIVE HH:MM:SS]' in red."""
