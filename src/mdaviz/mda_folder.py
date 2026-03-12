@@ -542,23 +542,49 @@ class MDA_MVC(QWidget):
         if not self._live_file_path:
             return
         mtime = self._getMtime(self._live_file_path)
-        if mtime is not None and mtime != self._live_mtime:
+        if mtime is None:
+            return
+        if mtime != self._live_mtime:
+            logger.debug(
+                f"Live update: {Path(self._live_file_path).name} changed, replotting"
+            )
             self._live_mtime = mtime
             from mdaviz.data_cache import get_global_cache
 
             get_global_cache().invalidate_file(self._live_file_path)
+            # Reload mda_file data from disk so doPlot uses fresh data.
+            try:
+                file_name = Path(self._live_file_path).name
+                file_index = self.mdaFileList().index(file_name)
+                self.mda_file.setData(file_index)
+                tableview = self.currentFileTableview()
+                if tableview is not None:
+                    tableview.setData()
+                # Update "Points" column in folder table with the latest acquired count.
+                acq_dims = self.mda_file.data().get("acquiredDimensions", [])
+                if acq_dims and file_index < len(self.mdaInfoList()):
+                    self.mdaInfoList()[file_index]["Points"] = acq_dims[0]
+                    proxy = self.mda_folder_tableview.proxyModel
+                    if proxy is not None:
+                        source_model = proxy.sourceModel()
+                        POINTS_COL = 2  # index of "Points" in HEADERS
+                        cell = source_model.index(file_index, POINTS_COL)
+                        source_model.dataChanged.emit(cell, cell)
+            except Exception as exc:
+                logger.warning(f"Live update: failed to reload data: {exc}")
             self.doPlot("replace")
             self._updateLiveTitle()
 
     def _updateLiveTitle(self):
-        """Append a [LIVE HH:MM:SS] marker to the chart title."""
+        """Set chart title to '● <title> [LIVE HH:MM:SS]' in red."""
         from mdaviz.chartview import ChartView
 
         layout = self.mda_file_viz.plotPageMpl.layout()
         widget = layout.itemAt(0).widget()
         if isinstance(widget, ChartView):
             now = datetime.datetime.now().strftime("%H:%M:%S")
-            widget.setPlotTitle(f"{widget.title()} [LIVE {now}]")
+            widget.setPlotTitle(f"● {widget.title()} [LIVE {now}]")
+            widget.main_axes.title.set_color("red")
             widget.canvas.draw()
 
     # # ------------ Plot methods:
