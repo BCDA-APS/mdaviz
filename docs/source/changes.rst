@@ -27,7 +27,7 @@ Version 1.4.0 (latest)
 - Restore correct file selection after refresh when the list is sorted.
 - Fix Points column update on live file reload.
 
-Version 1.3.1 
+Version 1.3.1
 -------------
 
 **Logging**
