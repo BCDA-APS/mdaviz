@@ -62,13 +62,14 @@ MVC implementation of mda files.
                 |___> Retrieve and plot data based on selected positioner and detectors
 """
 
+import datetime
 import time
 from functools import partial
 from pathlib import Path
 
 from PyQt6 import QtCore
-from PyQt6.QtCore import QItemSelectionModel, Qt, pyqtSignal
-from PyQt6.QtWidgets import QAbstractItemView, QWidget
+from PyQt6.QtCore import QItemSelectionModel, QTimer, Qt, pyqtSignal
+from PyQt6.QtWidgets import QAbstractItemView, QApplication, QWidget
 
 from mdaviz import utils
 from mdaviz.logger import get_logger
@@ -131,6 +132,20 @@ class MDA_MVC(QWidget):
         self.setCurrentFileTableview()
         self._last_plotted_file_path = None
         self._last_selection = None
+
+        # Live plotting: poll the current file's mtime every 2s and replot if it changed.
+        self._live_file_path = None
+        self._live_mtime = None
+        self._live_selection = None  # selection at the time live watch was started
+        self._folder_mtime = (
+            None  # mtime of the watched folder (for new-file detection)
+        )
+        self._pending_metadata = []  # files whose metadata was incomplete at detection time
+        self._tracking_files = {}  # file_path → last_mtime, for Points column auto-update
+        self._poll_timer = QTimer()
+        self._poll_timer.setInterval(2000)  # ms
+        self._poll_timer.timeout.connect(self._pollForChanges)
+        self._poll_timer.start()
 
         # Set Selection Model & Focus for keyboard arrow keys to Folder Table View:
         model = self.mda_folder_tableview.tableView.model()
@@ -257,6 +272,8 @@ class MDA_MVC(QWidget):
 
     def updateFolderView(self):
         """Clear existing data and set new data for the folder tableview"""
+        self._folder_mtime = None  # re-baseline folder mtime after a full rescan
+        self._tracking_files = {}
         self.mda_folder_tableview.clearContents()
         self.mda_folder_tableview.displayTable()
         model = self.mda_folder_tableview.tableView.model()
@@ -463,7 +480,9 @@ class MDA_MVC(QWidget):
             index (QModelIndex): The model index of the selected file in the file list.
         """
 
-        selected_file = self.mdaFileList()[index.row()]
+        # Map proxy index → source model row so file lookups are correct after sorting.
+        source_row = self.mda_folder_tableview.sourceRow(index)
+        selected_file = self.mdaFileList()[source_row]
         file_path = f"{str(self.dataPath())}/{selected_file}"
         self.setStatus(f"\nLoading {file_path}")
 
@@ -484,8 +503,13 @@ class MDA_MVC(QWidget):
             old_pv_list = old_tab_tableview.data()["fileInfo"]["pvList"]
             old_selection = self.selectionField()
 
+        # Ctrl (Win/Linux) or Cmd (macOS, mapped to ControlModifier by Qt) forces "add"
+        # behavior even when the current mode is "Auto-replace".
+        modifiers = QApplication.keyboardModifiers()
+        force_add = bool(modifiers & Qt.KeyboardModifier.ControlModifier)
+
         # Add (or replace) a tab & update selectionField() to default if it was None:
-        self.mda_file.addFileTab(index.row(), self.selectionField())
+        self.mda_file.addFileTab(source_row, self.selectionField(), force_add=force_add)
         new_pv_list = self.mda_file.data().get("pvList")
         new_tab_tableview = self.currentFileTableview()
         # Manage signal connections for the new file selection.
@@ -503,16 +527,195 @@ class MDA_MVC(QWidget):
                 except Exception as exc:
                     logger.error(str(exc))
 
-            self.handlePlotBasedOnMode()
+            self.handlePlotBasedOnMode(force_add=force_add)
         else:
             self.setStatus("Could not find a (positioner,detector) pair to plot.")
 
+    # # ------------ Live plotting methods:
+
+    def _startWatching(self, file_path):
+        """Track file_path as the current file to poll for live updates."""
+        self._live_file_path = file_path
+        self._live_mtime = self._getMtime(file_path)
+        self._live_selection = self.selectionField()
+
+    def _getMtime(self, file_path):
+        """Return the mtime of file_path, or None if it cannot be stat'd."""
+        try:
+            return Path(file_path).stat().st_mtime if file_path else None
+        except OSError:
+            return None
+
+    def _pollForChanges(self):
+        """Check if the current file has changed on disk; replot if so.
+        Also check if new files appeared in the folder."""
+        folder_path = self.dataPath()
+        if folder_path:
+            folder_mtime = self._getMtime(folder_path)
+            if self._folder_mtime is not None and folder_mtime != self._folder_mtime:
+                self._checkForNewFiles(folder_path)
+            self._folder_mtime = folder_mtime
+        if self._pending_metadata:
+            self._retryPendingMetadata()
+        if self._tracking_files:
+            self._updateTrackingFiles()
+
+        if not self._live_file_path:
+            return
+        mtime = self._getMtime(self._live_file_path)
+        if mtime is None:
+            return
+        if mtime != self._live_mtime:
+            logger.debug(
+                f"Live update: {Path(self._live_file_path).name} changed, replotting"
+            )
+            self._live_mtime = mtime
+            from mdaviz.data_cache import get_global_cache
+
+            get_global_cache().invalidate_file(self._live_file_path)
+            # Reload mda_file data from disk so the live tableview uses fresh data.
+            try:
+                file_name = Path(self._live_file_path).name
+                file_index = self.mdaFileList().index(file_name)
+                self.mda_file.setData(file_index)
+                tableview = self.mda_file.tabPath2Tableview(self._live_file_path)
+                if tableview is not None:
+                    tableview.setData()
+                # Update "Points" column in folder table with the latest acquired count.
+                acq_dims = self.mda_file.data().get("acquiredDimensions", [])
+                if acq_dims and file_index < len(self.mdaInfoList()):
+                    self.mdaInfoList()[file_index]["Points"] = acq_dims[0]
+                    proxy = self.mda_folder_tableview.proxyModel
+                    if proxy is not None:
+                        source_model = proxy.sourceModel()
+                        POINTS_COL = 2  # index of "Points" in HEADERS
+                        cell = source_model.index(file_index, POINTS_COL)
+                        source_model.dataChanged.emit(cell, cell)
+            except Exception as exc:
+                logger.warning(f"Live update: failed to reload data: {exc}")
+            self._doLiveUpdate()
+            self._updateLiveTitle()
+
+    def _checkForNewFiles(self, folder_path):
+        """Append any new .mda files found in folder_path to the table without a full rescan."""
+        from mdaviz.utils import get_file_info_lightweight
+
+        current_names = set(self.mdaFileList())
+        try:
+            all_files = sorted(Path(folder_path).glob("*.mda"), key=lambda p: p.name)
+        except OSError:
+            return
+        new_files = [f for f in all_files if f.name not in current_names]
+        if not new_files:
+            return
+        proxy = self.mda_folder_tableview.proxyModel
+        source_model = proxy.sourceModel() if proxy is not None else None
+        for file_path in new_files:
+            file_info = get_file_info_lightweight(file_path)
+            self.mdaFileList().append(file_path.name)
+            if source_model is not None:
+                # appendRow() appends to source_model._data, which IS mdaInfoList()
+                source_model.appendRow(file_info)
+            else:
+                self.mdaInfoList().append(file_info)
+            if not file_info.get("Scan #"):
+                self._pending_metadata.append(file_path)
+            self._tracking_files[file_path] = self._getMtime(file_path)
+            self.setStatus(f"New file: {file_path.name}")
+
+    def _retryPendingMetadata(self):
+        """Re-read metadata for files that were incomplete when first detected."""
+        from mdaviz.utils import get_file_info_lightweight
+
+        proxy = self.mda_folder_tableview.proxyModel
+        source_model = proxy.sourceModel() if proxy is not None else None
+        still_pending = []
+        for file_path in self._pending_metadata:
+            file_info = get_file_info_lightweight(file_path)
+            if not file_info.get("Scan #"):
+                still_pending.append(file_path)
+                continue
+            try:
+                file_index = self.mdaFileList().index(file_path.name)
+            except ValueError:
+                continue
+            self.mdaInfoList()[file_index].update(file_info)
+            if source_model is not None:
+                top_left = source_model.index(file_index, 0)
+                bottom_right = source_model.index(
+                    file_index, source_model.columnCount() - 1
+                )
+                source_model.dataChanged.emit(top_left, bottom_right)
+        self._pending_metadata = still_pending
+
+    def _updateTrackingFiles(self):
+        """Update the Points column for tracked new files when their mtime changes."""
+        from mdaviz.utils import get_file_info_lightweight
+
+        POINTS_COL = 2
+        proxy = self.mda_folder_tableview.proxyModel
+        source_model = proxy.sourceModel() if proxy is not None else None
+        for file_path in list(self._tracking_files):
+            current_mtime = self._getMtime(file_path)
+            if current_mtime == self._tracking_files[file_path]:
+                continue  # no new data written since last tick
+            self._tracking_files[file_path] = current_mtime
+            try:
+                file_index = self.mdaFileList().index(file_path.name)
+            except ValueError:
+                del self._tracking_files[file_path]
+                continue
+            file_info = get_file_info_lightweight(file_path)
+            self.mdaInfoList()[file_index]["Points"] = file_info.get("Points", "")
+            if source_model is not None:
+                cell = source_model.index(file_index, POINTS_COL)
+                source_model.dataChanged.emit(cell, cell)
+
+    def _updateLiveTitle(self):
+        """Set chart title to '● <title> [LIVE HH:MM:SS]' in red."""
+        from mdaviz.chartview import ChartView
+
+        layout = self.mda_file_viz.plotPageMpl.layout()
+        widget = layout.itemAt(0).widget()
+        if isinstance(widget, ChartView):
+            now = datetime.datetime.now().strftime("%H:%M:%S")
+            widget.setPlotTitle(f"● {widget.title()} [LIVE {now}]")
+            widget.main_axes.title.set_color("red")
+            widget.canvas.draw()
+
+    def _doLiveUpdate(self):
+        """Refresh only the live file's curves, preserving curves from other files."""
+        from mdaviz.chartview import ChartView
+
+        layoutMpl = self.mda_file_viz.plotPageMpl.layout()
+        if layoutMpl.count() != 1:
+            return
+        widgetMpl = layoutMpl.itemAt(0).widget()
+        if not isinstance(widgetMpl, ChartView):
+            return
+        live_tableview = self.mda_file.tabPath2Tableview(self._live_file_path)
+        selection = self._live_selection
+        if not live_tableview or not selection or not selection.get("Y"):
+            return
+        # Re-plot the live file's curves; addCurve updates them in-place if data changed,
+        # leaving curves from other files untouched.
+        datasets, plot_options = live_tableview.data2Plot(selection)
+        y_index = selection.get("Y", [])
+        for i, (ds, ds_options) in zip(y_index, datasets):
+            options = {"ds_options": ds_options, "plot_options": plot_options}
+            widgetMpl.plot(i, *ds, **options)
+        widgetMpl.refreshAllUnscaledCurves()
+        self.mda_file_viz.setPlot(widgetMpl)
+
     # # ------------ Plot methods:
 
-    def handlePlotBasedOnMode(self):
-        """Handle plotting based on the current mode (add, replace, or auto-off)."""
+    def handlePlotBasedOnMode(self, force_add=False):
+        """Handle plotting based on the current mode (add, replace, or auto-off).
+
+        If force_add is True (e.g. Ctrl/Cmd+click), always use "add" action regardless of mode.
+        """
         mode = self.mda_file.mode()
-        if mode == "Auto-add":
+        if mode == "Auto-add" or force_add:
             self.doPlot("add")
         elif mode == "Auto-replace":
             self.doPlot("replace")
@@ -623,6 +826,8 @@ class MDA_MVC(QWidget):
                 widgetMpl.plot(i, *ds, **options)
             widgetMpl.refreshAllUnscaledCurves()
             self.mda_file_viz.setPlot(widgetMpl)
+            if action == "replace":
+                self._startWatching(current_file_path)
 
     def doPlot2D(self, action, selection):
         """

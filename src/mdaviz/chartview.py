@@ -632,15 +632,19 @@ class ChartView(QWidget):
 
         # For x-data updates, we need to recreate the plot object to maintain style
         if curve_data and update_x:
+            existing_color = None
             if curveID in self.plotObjects:
-                # Remove the old plot object
+                # Preserve the line color before removing the old plot object
                 old_plot_obj = self.plotObjects[curveID]
+                existing_color = old_plot_obj.get_color()
                 old_plot_obj.remove()
                 del self.plotObjects[curveID]
 
             # Recreate the plot object with proper style
             ds = curve_data["ds"]
             ds_options = curve_data["ds_options"].copy()
+            if existing_color is not None:
+                ds_options["color"] = existing_color
 
             # Apply the curve style
             style = curve_data.get("style", "-")

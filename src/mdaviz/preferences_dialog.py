@@ -62,6 +62,13 @@ class PreferencesDialog(QDialog):
         # Add spacing
         layout.addStretch()
 
+        # Sort order setting
+        self.sort_newest_first_checkbox = QCheckBox("Sort files newest first (by date)")
+        layout.addWidget(self.sort_newest_first_checkbox)
+
+        # Add spacing
+        layout.addStretch()
+
         # Buttons
         button_box = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
@@ -88,9 +95,18 @@ class PreferencesDialog(QDialog):
             plot_height_val = 800
         self.plot_spinbox.setValue(plot_height_val)
 
+        # Sort newest first setting
+        sort_val = settings.getKey("sort_newest_first")
+        if sort_val is None:
+            sort_val = False
+        elif isinstance(sort_val, str):
+            sort_val = sort_val.lower() in ("true", "1", "yes", "on")
+        self.sort_newest_first_checkbox.setChecked(bool(sort_val))
+
     def get_settings(self):
         """Get the current settings from the dialog."""
         return {
             "auto_load_folder": self.auto_load_checkbox.isChecked(),
             "plot_max_height": self.plot_spinbox.value(),
+            "sort_newest_first": self.sort_newest_first_checkbox.isChecked(),
         }

@@ -210,9 +210,12 @@ class MainWindow(QMainWindow):
         # Save settings
         settings.setKey("plot_max_height", settings_dict["plot_max_height"])
         settings.setKey("auto_load_folder", settings_dict["auto_load_folder"])
+        settings.setKey("sort_newest_first", settings_dict["sort_newest_first"])
 
         # Update UI components
         self._update_plot_height(settings_dict["plot_max_height"])
+        if hasattr(self, "mvc_folder") and self.mvc_folder:
+            self.mvc_folder.mda_folder_tableview.applyDefaultSort()
 
         self.setStatus(
             f"Settings updated: plot height {settings_dict['plot_max_height']}px, "
@@ -443,8 +446,11 @@ class MainWindow(QMainWindow):
                 current_index = self.mvc_folder.selectionModel().currentIndex()
                 if current_index.isValid():
                     current_file_list = self.mdaFileList()
-                    if current_index.row() < len(current_file_list):
-                        selected_file_name = current_file_list[current_index.row()]
+                    source_row = self.mvc_folder.mda_folder_tableview.sourceRow(
+                        current_index
+                    )
+                    if source_row < len(current_file_list):
+                        selected_file_name = current_file_list[source_row]
                         self._selected_file_name = selected_file_name
                         # Preserve detector/positioner selection for restore after refresh
                         self._saved_selection_field = (
@@ -469,8 +475,11 @@ class MainWindow(QMainWindow):
                     current_index = table_view.selectionModel().currentIndex()
                     if current_index.isValid():
                         current_file_list = self.mdaFileList()
-                        if current_index.row() < len(current_file_list):
-                            selected_file_name = current_file_list[current_index.row()]
+                        source_row = self.mvc_folder.mda_folder_tableview.sourceRow(
+                            current_index
+                        )
+                        if source_row < len(current_file_list):
+                            selected_file_name = current_file_list[source_row]
                             self._selected_file_name = selected_file_name
                             # Preserve detector/positioner selection for restore after refresh
                             self._saved_selection_field = (
@@ -647,10 +656,18 @@ class MainWindow(QMainWindow):
                             if self.mvc_folder and hasattr(
                                 self.mvc_folder, "mda_folder_tableview"
                             ):
-                                model = self.mvc_folder.mda_folder_tableview.tableView.model()
-                                if model and selected_index < model.rowCount():
-                                    index = model.index(selected_index, 0)
-                                    self.mvc_folder.selectAndShowIndex(index)
+                                proxy = self.mvc_folder.mda_folder_tableview.tableView.model()
+                                if proxy is not None:
+                                    source_model = proxy.sourceModel()
+                                    if (
+                                        source_model
+                                        and selected_index < source_model.rowCount()
+                                    ):
+                                        source_idx = source_model.index(
+                                            selected_index, 0
+                                        )
+                                        proxy_idx = proxy.mapFromSource(source_idx)
+                                        self.mvc_folder.selectAndShowIndex(proxy_idx)
                                     self.setStatus(
                                         f"Highlighted selected file: {self._selected_file_name}"
                                     )
