@@ -137,7 +137,9 @@ class MDA_MVC(QWidget):
         self._live_file_path = None
         self._live_mtime = None
         self._live_selection = None  # selection at the time live watch was started
-        self._folder_mtime = None  # mtime of the watched folder (for new-file detection)
+        self._folder_mtime = (
+            None  # mtime of the watched folder (for new-file detection)
+        )
         self._pending_metadata = []  # files whose metadata was incomplete at detection time
         self._tracking_files = {}  # file_path → last_mtime, for Points column auto-update
         self._poll_timer = QTimer()
@@ -640,7 +642,9 @@ class MDA_MVC(QWidget):
             self.mdaInfoList()[file_index].update(file_info)
             if source_model is not None:
                 top_left = source_model.index(file_index, 0)
-                bottom_right = source_model.index(file_index, source_model.columnCount() - 1)
+                bottom_right = source_model.index(
+                    file_index, source_model.columnCount() - 1
+                )
                 source_model.dataChanged.emit(top_left, bottom_right)
         self._pending_metadata = still_pending
 
