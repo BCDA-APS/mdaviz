@@ -3,8 +3,16 @@
 Changes
 =======
 
-Version 1.3.2 (latest)
+Version 1.4.0 (latest)
 ----------------------
+
+**Major Features**
+
+- **Live plot updates**: Monitor the current file for on-disk changes and automatically refresh the plot; the title bar shows a red "LIVE" indicator while watching. Uses mtime polling for reliable cross-platform detection.
+- **Auto-detect new scan files**: Poll the open folder for new ``.mda`` files; newly detected files are added to the table and the Points column is updated automatically — no manual refresh needed.
+- **Ctrl/Cmd+click multi-plot**: In Auto-replace mode, Ctrl/Cmd+click adds a trace instead of replacing, enabling multi-curve plots without switching modes.
+- **Sortable folder table**: Click any column headers to sort the folder file list (scan #, file name, dim, date).
+- **"Sort newest first" preference**: New preference to sort the file list by newest modification time on load.
 
 **Minor Features**
 
@@ -12,9 +20,15 @@ Version 1.3.2 (latest)
 - Add refresh button between previous and next buttons
 - Format fit results, basic stats and cursor coordinates with significant figures (sigfigs)
 
+**Bug Fixes**
 
-Version 1.3.1 (latest)
-----------------------
+- Preserve curves from other files during a live update — only the active file's curve is replaced.
+- Fix color cycling so colors do not reset on live refresh.
+- Restore correct file selection after refresh when the list is sorted.
+- Fix Points column update on live file reload.
+
+Version 1.3.1 
+-------------
 
 **Logging**
 
