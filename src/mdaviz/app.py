@@ -67,8 +67,8 @@ def main() -> None:  # for future command-line options
     """Main entry point for the application."""
     options = command_line_interface()
 
-    # Clean up old log files (keep logs from last 1 day)
-    clear_old_logs(keep_days=1)
+    # Clean up old log files (keep logs from last 2 days)
+    clear_old_logs(keep_days=2)
 
     # Configure logging level based on command line argument or environment variable
     import os
