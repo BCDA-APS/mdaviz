@@ -3,8 +3,28 @@
 Changes
 =======
 
-Version 1.4.0 (latest)
+Version 1.4.1 (latest)
 ----------------------
+
+**Bug Fixes**
+
+- Fix file selection jumping to the wrong scan when multiple scans are on the graph and the folder table is sorted (proxy index mapping error in ``onTabChanged``).
+- Fix live watch not starting when adding an acquiring scan on top of an existing finished-scan plot (mtime comparison now switches the live watch to the most recently modified file).
+
+**2D Scan Live Behavior**
+
+- Disable live replotting for 2D scans (inner scan structure was unavailable during the first inner scan, causing an empty table and no plot).
+- Auto-detect when the inner scan structure becomes available (after the first outer scan point completes) and rebuild the tableview and plot automatically.
+- Update the X2 spinbox maximum every poll cycle so the user cannot scroll past the number of acquired outer scan points during acquisition.
+- Refresh the X2 positioner value label every poll cycle so it always shows the correct value for the current spinbox position.
+
+**Infrastructure**
+
+- Extend log file retention from 1 day to 2 days.
+- Bundle conda environment's ``libgcc_s.so.1`` in the PyInstaller executable for portability across systems with GLIBC 2.34 (fixes ``GLIBC_2.35 not found`` error on older machines).
+
+Version 1.4.0
+-------------
 
 **Major Features**
 
