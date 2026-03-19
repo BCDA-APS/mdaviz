@@ -137,6 +137,8 @@ class MDA_MVC(QWidget):
         self._live_file_path = None
         self._live_mtime = None
         self._live_selection = None  # selection at the time live watch was started
+        self._2d_watch_path = None  # 2D scan being watched for structure changes only
+        self._2d_watch_mtime = None
         self._folder_mtime = (
             None  # mtime of the watched folder (for new-file detection)
         )
@@ -534,10 +536,23 @@ class MDA_MVC(QWidget):
     # # ------------ Live plotting methods:
 
     def _startWatching(self, file_path):
-        """Track file_path as the current file to poll for live updates."""
+        """Track file_path for updates.
+        - 1D scans: full live replotting every poll cycle.
+        - 2D scans: only watch for the inner scan structure becoming available (no replot)."""
+        file_data = self.mda_file.data()
+        if file_data and file_data.get("isMultidimensional", False):
+            # 2D: watch for structure changes only, no live plotting.
+            self._2d_watch_path = file_path
+            self._2d_watch_mtime = self._getMtime(file_path)
+            self._live_file_path = None
+            self._live_mtime = None
+            self._live_selection = None
+            return
         self._live_file_path = file_path
         self._live_mtime = self._getMtime(file_path)
         self._live_selection = self.selectionField()
+        self._2d_watch_path = None
+        self._2d_watch_mtime = None
 
     def _getMtime(self, file_path):
         """Return the mtime of file_path, or None if it cannot be stat'd."""
@@ -559,6 +574,11 @@ class MDA_MVC(QWidget):
             self._retryPendingMetadata()
         if self._tracking_files:
             self._updateTrackingFiles()
+        if self._2d_watch_path:
+            mtime = self._getMtime(self._2d_watch_path)
+            if mtime is not None and mtime != self._2d_watch_mtime:
+                self._2d_watch_mtime = mtime
+                self._check2DStructure()
 
         if not self._live_file_path:
             return
@@ -670,6 +690,66 @@ class MDA_MVC(QWidget):
             if source_model is not None:
                 cell = source_model.index(file_index, POINTS_COL)
                 source_model.dataChanged.emit(cell, cell)
+
+    def _check2DStructure(self):
+        """For 2D scans: update X2 controls and rebuild the tableview when the inner scan
+        structure becomes available. Called when the watched 2D file changes on disk.
+        Does not replot."""
+        from mdaviz.data_cache import get_global_cache
+
+        get_global_cache().invalidate_file(self._2d_watch_path)
+        try:
+            file_name = Path(self._2d_watch_path).name
+            file_index = self.mdaFileList().index(file_name)
+            self.mda_file.setData(file_index)
+            tableview = self.mda_file.tabPath2Tableview(self._2d_watch_path)
+            if tableview is None:
+                return
+            tableview.setData()
+            file_data = self.mda_file.data()
+
+            # Always update X2 spinbox max and value label to reflect latest acquired count.
+            # This prevents the user from going past available points and keeps the label correct.
+            acquired_dims = file_data.get("acquiredDimensions", [])
+            scan_dict_2d = file_data.get("scanDict2D", {})
+            if acquired_dims and scan_dict_2d:
+                x2_max = max(0, acquired_dims[0] - 1)
+                tableview.x2SpinBox.setMaximum(x2_max)
+                for key, value in scan_dict_2d.items():
+                    if value.get("type") == "POS" and key == 0:
+                        x2_positioner_info = {
+                            "name": value.get("name", "X2"),
+                            "unit": value.get("unit", ""),
+                            "data": value.get("data", []),
+                        }
+                        tableview._x2_positioner_info = x2_positioner_info
+                        tableview._updateX2ValueLabel(
+                            tableview.x2SpinBox.value(), x2_positioner_info
+                        )
+                        break
+
+            # Rebuild tableview if the inner scan structure just became available.
+            expected = (
+                len(tableview.data().get("fields", [])) if tableview.data() else 0
+            )
+            current_model = tableview.tableView.model()
+            visual_rows = current_model.rowCount() if current_model else 0
+            if visual_rows != expected and expected > 0:
+                first_pos = file_data.get("firstPos", 0)
+                first_det = file_data.get("firstDet", 1)
+                if first_det is not None:
+                    new_selection = self.mda_file.defaultSelection(
+                        first_pos, first_det, None
+                    )
+                    tableview.displayTable(new_selection)
+                    self.setSelectionField(new_selection)
+                    self.doPlot("replace")
+                    logger.debug(
+                        f"2D structure updated: {file_name} "
+                        f"({visual_rows} → {expected} rows)"
+                    )
+        except Exception as exc:
+            logger.warning(f"2D structure check failed: {exc}")
 
     def _updateLiveTitle(self):
         """Set chart title to '● <title> [LIVE HH:MM:SS]' in red."""
