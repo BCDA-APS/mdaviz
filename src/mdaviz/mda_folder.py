@@ -828,6 +828,17 @@ class MDA_MVC(QWidget):
             self.mda_file_viz.setPlot(widgetMpl)
             if action == "replace":
                 self._startWatching(current_file_path)
+            elif action == "add":
+                # Switch the live watch to the added file if it is more recently
+                # modified than the current live file (i.e. it is the acquiring scan).
+                new_mtime = self._getMtime(current_file_path)
+                live_mtime = (
+                    self._getMtime(self._live_file_path)
+                    if self._live_file_path
+                    else None
+                )
+                if live_mtime is None or (new_mtime and new_mtime > live_mtime):
+                    self._startWatching(current_file_path)
 
     def doPlot2D(self, action, selection):
         """

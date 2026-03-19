@@ -55,7 +55,7 @@ Navigating Files
 
 1. **File Selection**: Click on any MDA file in the folder view to load it.
 2. **Navigation**: Browse through files using the First/Previous/Next/Last buttons, scroll up and down, or use your keyboard's arrow keys.
-3. **Sorting**: Click any column header to sort the file list by that column (scan number, name, points, or date). The **Sort newest first** preference (in Preferences) automatically sorts by date descending on load.
+3. **Sorting**: Click any column header to sort the file list by that column. The **Sort newest first** preference (in File/Preferences) automatically sorts by date descending on load.
 4. **New files**: When a scan is started, the new file appears in the folder table automatically — no manual refresh needed.
 5. **Refresh**: Click the refresh button to reload the current folder.
 
