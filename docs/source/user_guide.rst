@@ -34,6 +34,11 @@ After installation, you can run `mdaviz` in several ways:
     cd mdaviz
     mdaviz
 
+**At the Advanced Photon Source:**
+
+.. code-block:: bash
+
+    /APSshare/bin/mdaviz
 
 Basic Usage
 -----------
@@ -50,21 +55,25 @@ Navigating Files
 
 1. **File Selection**: Click on any MDA file in the folder view to load it.
 2. **Navigation**: Browse through files using the First/Previous/Next/Last buttons, scroll up and down, or use your keyboard's arrow keys.
-3. **Refresh**: Click the refresh button to reload the current folder.
+3. **Sorting**: Click any column header to sort the file list by that column (scan number, name, points, or date). The **Sort newest first** preference (in Preferences) automatically sorts by date descending on load.
+4. **New files**: When a scan is started, the new file appears in the folder table automatically — no manual refresh needed.
+5. **Refresh**: Click the refresh button to reload the current folder.
 
 Data Visualization
 ^^^^^^^^^^^^^^^^^^
 
 1. **Plot Mode**: Choose between Auto-replace, Auto-add, or Auto-off (i.e. add/replace manually) modes.
-2. **Data Selection**: Use the checkbox columns to control what's plotted:
+2. **Add to graph**: In Auto-replace mode, hold CTRL (CMD on macOS) while clicking a file to overlay its curves on the current plot. In Auto-add mode, clicking a file always adds its curves to the plot.
+3. **Live plotting**: When a scan is acquiring, the plot updates automatically every 2 seconds as new data points are recorded. A red **● LIVE HH:MM:SS** indicator appears in the chart title during live updates. You can overlay curves from other scans using CTRL+click without interrupting the live update.
+4. **Data Selection**: Use the checkbox columns to control what's plotted:
 
    - **X**: Positioner (only one allowed)
    - **Y**: Detector (multiple allowed)
    - **I0**: Select for normalization (divide Y data by this field, only one allowed)
    - **Un**: Unscale curves to match the range of other Y curves (requires Y selection on same row)
 
-3. **Interactive Plot**: Use matplotlib's interactive features for zooming, panning, and changing figure options.
-4. **Data Processing Options**:
+5. **Interactive Plot**: Use matplotlib's interactive features for zooming, panning, and changing figure options.
+6. **Data Processing Options**:
 
    - **I0 Normalization**: Divide Y data by the selected I0 field to normalize intensity.
    - **Curve Unscaling**: Rescale selected curves to match the range of other Y curves.
