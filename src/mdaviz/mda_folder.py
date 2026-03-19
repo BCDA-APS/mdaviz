@@ -916,11 +916,15 @@ class MDA_MVC(QWidget):
                     # Find the index of the file in the current folder's file list
                     file_index = self.mdaFileList().index(file_name)
 
-                    # Get the model and create the index
-                    model = self.mda_folder_tableview.tableView.model()
-                    if model and file_index < model.rowCount():
-                        index = model.index(file_index, 0)
-
+                    # Map the source row to a proxy index (accounts for sorting).
+                    proxy = self.mda_folder_tableview.proxyModel
+                    if proxy is not None:
+                        source_idx = proxy.sourceModel().index(file_index, 0)
+                        proxy_idx = proxy.mapFromSource(source_idx)
+                    else:
+                        model = self.mda_folder_tableview.tableView.model()
+                        proxy_idx = model.index(file_index, 0) if model else None
+                    if proxy_idx is not None and proxy_idx.isValid():
                         # Temporarily disconnect the currentChanged signal to avoid triggering onFileSelected
                         if self.selectionModel():
                             self.selectionModel().currentChanged.disconnect(
@@ -930,12 +934,12 @@ class MDA_MVC(QWidget):
                         # Highlight the file in the folder table view
                         self.mda_folder_tableview.tableView.setFocus()
                         self.selectionModel().setCurrentIndex(
-                            index,
+                            proxy_idx,
                             QItemSelectionModel.SelectionFlag.ClearAndSelect
                             | QItemSelectionModel.SelectionFlag.Rows,
                         )
                         self.mda_folder_tableview.tableView.scrollTo(
-                            index, QAbstractItemView.ScrollHint.EnsureVisible
+                            proxy_idx, QAbstractItemView.ScrollHint.EnsureVisible
                         )
 
                         # Reconnect the currentChanged signal
