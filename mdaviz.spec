@@ -14,15 +14,40 @@ a = Analysis(
     noarchive=False,
     optimize=0,
 )
-# Replace the system's libgcc_s.so.1 (which may require a newer GLIBC than
-# the target machines have) with the conda env's portable version.
+# Exclude any bundled lib that requires a GLIBC newer than the oldest supported
+# target machine (ratchet: GLIBC 2.28). Those libs will come from the system.
+# libgcc_s and libstdc++ are replaced with conda's portable versions instead
+# of excluded, since they are compiler runtime libs not guaranteed on all systems.
 import os
-_conda_libgcc = os.path.join(os.environ.get('CONDA_PREFIX', ''), 'lib', 'libgcc_s.so.1')
-if os.path.exists(_conda_libgcc):
-    a.binaries = [
-        (n, _conda_libgcc, t) if n == 'libgcc_s.so.1' else (n, p, t)
-        for n, p, t in a.binaries
-    ]
+import re
+import subprocess
+
+TARGET_GLIBC = (2, 28)
+
+def _max_glibc(path):
+    try:
+        out = subprocess.check_output(
+            ['readelf', '-V', path], stderr=subprocess.DEVNULL
+        ).decode()
+        versions = re.findall(r'GLIBC_(\d+)\.(\d+)', out)
+        return max(((int(a), int(b)) for a, b in versions), default=(0, 0))
+    except Exception:
+        return (0, 0)
+
+_conda_lib = os.path.join(os.environ.get('CONDA_PREFIX', ''), 'lib')
+_replacements = {}
+for _lib in ('libgcc_s.so.1', 'libstdc++.so.6'):
+    _path = os.path.join(_conda_lib, _lib)
+    if os.path.exists(_path):
+        _replacements[_lib] = _path
+
+_filtered = []
+for n, p, t in a.binaries:
+    if n in _replacements:
+        _filtered.append((n, _replacements[n], t))
+    elif _max_glibc(p) <= TARGET_GLIBC:
+        _filtered.append((n, p, t))
+a.binaries = _filtered
 
 pyz = PYZ(a.pure)
 
