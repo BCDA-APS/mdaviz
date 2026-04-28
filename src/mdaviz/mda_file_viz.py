@@ -296,6 +296,8 @@ class MDAFileVisualization(QWidget):
             "Y": selection.get("Y", []),
             "I0": selection.get("I0"),
             "log_y": selection.get("log_y", False),
+            "vmin": selection.get("vmin"),
+            "vmax": selection.get("vmax"),
         }
         logger.debug(f"Converted to 1D format: {converted_selection}")
 
@@ -368,6 +370,9 @@ class MDAFileVisualization(QWidget):
 
                     plot_options["color_palette"] = color_palette
                     logger.debug(f"Set color palette to: {color_palette}")
+
+                    plot_options["vmin"] = selection.get("vmin")
+                    plot_options["vmax"] = selection.get("vmax")
 
                     widgetMpl2D.plot2D(y_data, x_data, x2_data, plot_options)
                 else:

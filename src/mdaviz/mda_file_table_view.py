@@ -108,10 +108,15 @@ class MDAFileTableView(QWidget):
         self.colorPaletteComboBox.currentIndexChanged.connect(
             self.onColorPaletteChanged
         )
-        self.plotButton.clicked.connect(self.onPlotButtonClicked)
 
         # Connect log scale controls
         self.logYCheckBox.toggled.connect(self.onLogScaleChanged)
+
+        # Connect vmin/vmax controls
+        self.lineEdit_VMIN.editingFinished.connect(self.onVminVmaxChanged)
+        self.lineEdit_VMAX.editingFinished.connect(self.onVminVmaxChanged)
+        self.lineEdit_VMIN.setPlaceholderText("auto")
+        self.lineEdit_VMAX.setPlaceholderText("auto")
 
         # Populate plot type and color palette comboboxes
         if self.plotTypeComboBox.count() == 0 or self.colorPaletteComboBox.count() == 0:
@@ -415,6 +420,12 @@ class MDAFileTableView(QWidget):
         if not plot_type or plot_type.strip() == "":
             plot_type = "heatmap"
 
+        def _parse_float(text):
+            try:
+                return float(text.strip())
+            except (ValueError, AttributeError):
+                return None
+
         selections = {
             "X1": self.x1ComboBox.currentData(),
             "X2": self.x2ComboBox.currentData(),
@@ -427,6 +438,8 @@ class MDAFileTableView(QWidget):
             "plot_type": plot_type,
             "color_palette": color_palette,
             "log_y": self.logYCheckBox.isChecked(),
+            "vmin": _parse_float(self.lineEdit_VMIN.text()),
+            "vmax": _parse_float(self.lineEdit_VMAX.text()),
         }
         logger.debug(f"get2DSelections - {selections}")
         return selections
@@ -757,9 +770,8 @@ class MDAFileTableView(QWidget):
         if selection_by_pv:
             self.mda_file.setLast2DSelection(selection_by_pv)
 
-    def onPlotButtonClicked(self):
-        """Handle plot button click."""
-        logger.debug("onPlotButtonClicked - Plot button clicked")
+    def onVminVmaxChanged(self):
+        """Handle vmin/vmax line edit changes."""
         self._trigger2DPlot()
 
     # ==========================================

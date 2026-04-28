@@ -1824,14 +1824,32 @@ class ChartView2D(ChartView):
 
         # Apply log scale normalization if enabled
         norm = None
+        vmin = plot_options.get("vmin") if plot_options.get("vmin") is not None else y_data.min()
+        vmax = plot_options.get("vmax") if plot_options.get("vmax") is not None else y_data.max()
+        if vmin > vmax:
+            vmin, vmax = vmax, vmin
         if hasattr(self, "_log_y_2d") and self._log_y_2d:
-            # Only apply log if all values are positive
-            vmin, vmax = y_data.min(), y_data.max()
-            if vmin > 0:
-                from matplotlib.colors import LogNorm
+            from matplotlib.colors import LogNorm
 
-                # Use LogNorm for proper log color scaling
-                norm = LogNorm(vmin, vmax)
+            positive = y_data[y_data > 0]
+            if positive.size == 0:
+                self.main_axes.text(
+                    0.5, 0.5,
+                    "Log scale requires positive data",
+                    ha="center", va="center",
+                    transform=self.main_axes.transAxes,
+                    fontsize=12, color="red",
+                )
+                return
+            if vmin <= 0:
+                vmin = positive.min()
+            if vmax <= 0:
+                vmax = positive.max()
+            norm = LogNorm(vmin, vmax)
+        else:
+            from matplotlib.colors import Normalize
+
+            norm = Normalize(vmin=vmin, vmax=vmax)
 
         # Plot heatmap
         im = self.main_axes.imshow(
@@ -1870,14 +1888,32 @@ class ChartView2D(ChartView):
         # Apply log scale normalization if enabled
         norm = None
         levels = 20
+        vmin = plot_options.get("vmin") if plot_options.get("vmin") is not None else y_data.min()
+        vmax = plot_options.get("vmax") if plot_options.get("vmax") is not None else y_data.max()
+        if vmin > vmax:
+            vmin, vmax = vmax, vmin
         if hasattr(self, "_log_y_2d") and self._log_y_2d:
-            # Only apply log if all values are positive
-            vmin, vmax = y_data.min(), y_data.max()
-            if vmin > 0:  # Only apply log if all values are positive
-                from matplotlib.colors import LogNorm
+            from matplotlib.colors import LogNorm
 
-                # Use LogNorm for proper log color scaling
-                norm = LogNorm(vmin=vmin, vmax=vmax)
+            positive = y_data[y_data > 0]
+            if positive.size == 0:
+                self.main_axes.text(
+                    0.5, 0.5,
+                    "Log scale requires positive data",
+                    ha="center", va="center",
+                    transform=self.main_axes.transAxes,
+                    fontsize=12, color="red",
+                )
+                return
+            if vmin <= 0:
+                vmin = positive.min()
+            if vmax <= 0:
+                vmax = positive.max()
+            norm = LogNorm(vmin=vmin, vmax=vmax)
+        else:
+            from matplotlib.colors import Normalize
+
+            norm = Normalize(vmin=vmin, vmax=vmax)
 
         # Plot contour
         contour = self.main_axes.contourf(
