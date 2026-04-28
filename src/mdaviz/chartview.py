@@ -1824,8 +1824,16 @@ class ChartView2D(ChartView):
 
         # Apply log scale normalization if enabled
         norm = None
-        vmin = plot_options.get("vmin") if plot_options.get("vmin") is not None else y_data.min()
-        vmax = plot_options.get("vmax") if plot_options.get("vmax") is not None else y_data.max()
+        vmin = (
+            plot_options.get("vmin")
+            if plot_options.get("vmin") is not None
+            else y_data.min()
+        )
+        vmax = (
+            plot_options.get("vmax")
+            if plot_options.get("vmax") is not None
+            else y_data.max()
+        )
         if vmin > vmax:
             vmin, vmax = vmax, vmin
         if hasattr(self, "_log_y_2d") and self._log_y_2d:
@@ -1834,11 +1842,14 @@ class ChartView2D(ChartView):
             positive = y_data[y_data > 0]
             if positive.size == 0:
                 self.main_axes.text(
-                    0.5, 0.5,
+                    0.5,
+                    0.5,
                     "Log scale requires positive data",
-                    ha="center", va="center",
+                    ha="center",
+                    va="center",
                     transform=self.main_axes.transAxes,
-                    fontsize=12, color="red",
+                    fontsize=12,
+                    color="red",
                 )
                 return
             if vmin <= 0:
@@ -1888,8 +1899,16 @@ class ChartView2D(ChartView):
         # Apply log scale normalization if enabled
         norm = None
         levels = 20
-        vmin = plot_options.get("vmin") if plot_options.get("vmin") is not None else y_data.min()
-        vmax = plot_options.get("vmax") if plot_options.get("vmax") is not None else y_data.max()
+        vmin = (
+            plot_options.get("vmin")
+            if plot_options.get("vmin") is not None
+            else y_data.min()
+        )
+        vmax = (
+            plot_options.get("vmax")
+            if plot_options.get("vmax") is not None
+            else y_data.max()
+        )
         if vmin > vmax:
             vmin, vmax = vmax, vmin
         if hasattr(self, "_log_y_2d") and self._log_y_2d:
@@ -1898,11 +1917,14 @@ class ChartView2D(ChartView):
             positive = y_data[y_data > 0]
             if positive.size == 0:
                 self.main_axes.text(
-                    0.5, 0.5,
+                    0.5,
+                    0.5,
                     "Log scale requires positive data",
-                    ha="center", va="center",
+                    ha="center",
+                    va="center",
                     transform=self.main_axes.transAxes,
-                    fontsize=12, color="red",
+                    fontsize=12,
+                    color="red",
                 )
                 return
             if vmin <= 0:

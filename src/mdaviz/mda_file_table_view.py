@@ -764,6 +764,7 @@ class MDAFileTableView(QWidget):
         sender = self.sender()
         if sender == self.logYCheckBox:
             logger.debug(f"onLogScaleChanged - LogY: {checked}")
+        self._validateVminVmax()
         self._trigger2DPlot()
         # Save selection
         selection_by_pv = self.get2DSelectionsByPV()
@@ -772,7 +773,27 @@ class MDAFileTableView(QWidget):
 
     def onVminVmaxChanged(self):
         """Handle vmin/vmax line edit changes."""
+        self._validateVminVmax()
         self._trigger2DPlot()
+
+    def _validateVminVmax(self):
+        """Highlight VMIN/VMAX fields red if invalid for current scale."""
+        log_scale = self.logYCheckBox.isChecked()
+        invalid_style = "background-color: rgb(255, 200, 200);"
+        valid_style = ""
+        for field in (self.lineEdit_VMIN, self.lineEdit_VMAX):
+            text = field.text().strip()
+            if text == "":
+                field.setStyleSheet(valid_style)
+                continue
+            try:
+                value = float(text)
+                if log_scale and value <= 0:
+                    field.setStyleSheet(invalid_style)
+                else:
+                    field.setStyleSheet(valid_style)
+            except ValueError:
+                field.setStyleSheet(invalid_style)
 
     # ==========================================
     # Data management & table display
