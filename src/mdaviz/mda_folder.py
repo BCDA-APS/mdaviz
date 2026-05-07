@@ -351,15 +351,21 @@ class MDA_MVC(QWidget):
         changes_made |= self.updateI0Selection(
             oldPvList, old_selection, newPvList, new_selection, verbose
         )
-        # Update X selection and check for changes: if X was 0 or None, set to 0; if not, set to 1st POS
+        # Update X selection with PV-based matching (consistent with Y/I0 handling).
         old_idx = old_selection.get("X")
-        if old_idx:
+        if old_idx and oldPvList and old_idx < len(oldPvList):
+            old_x_pv = oldPvList[old_idx]
+            if newPvList and old_x_pv in newPvList:
+                new_idx = newPvList.index(old_x_pv)
+            else:
+                new_idx = tableview.data()["fileInfo"]["firstPos"]
+        elif old_idx:
             new_idx = tableview.data()["fileInfo"]["firstPos"]
         else:
             new_idx = 0
+        new_selection["X"] = new_idx
         if old_idx != new_idx:
             changes_made = True
-            new_selection["X"] = new_idx
 
         if changes_made:
             self.applySelectionChanges(new_selection)
@@ -379,7 +385,7 @@ class MDA_MVC(QWidget):
         for old_index in old_selection.get("Y", []):
             if oldPvList and old_index < len(oldPvList):
                 old_pv = oldPvList[old_index]
-                if old_pv in newPvList:
+                if newPvList and old_pv in newPvList:
                     new_index = newPvList.index(old_pv)
                     new_selection["Y"].append(new_index)
                     if new_index != old_index:
@@ -414,7 +420,7 @@ class MDA_MVC(QWidget):
         if old_i0_idx is not None:
             if oldPvList and old_i0_idx < len(oldPvList):
                 old_i0_pv = oldPvList[old_i0_idx]
-                if old_i0_pv in newPvList:
+                if newPvList and old_i0_pv in newPvList:
                     new_i0_idx = newPvList.index(old_i0_pv)
                     new_selection["I0"] = new_i0_idx
                     if new_i0_idx != old_i0_idx:
