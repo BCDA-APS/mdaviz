@@ -573,7 +573,8 @@ class ChartView(QWidget):
         # so 'home' always reflects the combined bounds of all currently plotted scans.
         file_path = curveData.get("file_path", "")
         curves_from_file = [
-            cid for cid, cd in self.curveManager.curves().items()
+            cid
+            for cid, cd in self.curveManager.curves().items()
             if cd.get("file_path") == file_path
         ]
         if len(curves_from_file) == 1:
