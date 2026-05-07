@@ -569,6 +569,16 @@ class ChartView(QWidget):
         # Refresh axis labels, legend, limits, and redraw the plot:
         self.updatePlot(update_title=True)
 
+        # Reset toolbar navigation history when the first curve from a new file is added,
+        # so 'home' always reflects the combined bounds of all currently plotted scans.
+        file_path = curveData.get("file_path", "")
+        curves_from_file = [
+            cid for cid, cd in self.curveManager.curves().items()
+            if cd.get("file_path") == file_path
+        ]
+        if len(curves_from_file) == 1:
+            self.toolbar.update()
+
         # Select the last plotted curve in the comboBox and syncs UI to the curve selected:
         # derivative, offset/factor, tooltip, basic maths, fits...
         if self.curveBox.count() > 1:
