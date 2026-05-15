@@ -230,11 +230,10 @@ class TestLazyFolderScanner:
         for i in range(n_files):
             (temp_folder / f"test_{i:03d}.mda").touch()
 
-        with patch(
-            "mdaviz.lazy_folder_scanner.get_file_info_full"
-        ) as mock_full, patch(
-            "mdaviz.lazy_folder_scanner.get_file_info_lightweight"
-        ) as mock_light:
+        with (
+            patch("mdaviz.lazy_folder_scanner.get_file_info_full") as mock_full,
+            patch("mdaviz.lazy_folder_scanner.get_file_info_lightweight") as mock_light,
+        ):
             mock_full.return_value = {"Name": "x", "Positioners": "p1"}
             mock_light.return_value = {"Name": "x"}
 
