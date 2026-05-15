@@ -1730,6 +1730,18 @@ class ChartView2D(ChartView):
         self._plot_type = "heatmap"  # "heatmap" or "contour"
         self._current_colorbar = None  # Store reference to current colorbar
 
+        # The parent ChartView wires curveBox.currentIndexChanged -> onCurveSelected
+        # to manage 1D curve UI. That handler ends in updatePlot()->configPlot(),
+        # which writes the 1D widget's internal _title/_xlabel/_ylabel onto the
+        # axes. For a 2D widget those internals are empty (labels are set
+        # directly by _set_2d_labels), so reusing the 1D handler wipes our title
+        # and axis labels every time the shared curveBox index changes (e.g.
+        # when a sibling 1D plot adds a curve). Disconnect to keep our labels.
+        try:
+            self.curveBox.currentIndexChanged.disconnect(self.onCurveSelected)
+        except TypeError:
+            pass
+
     def configPlot(self, grid=False):
         """Apply axis labels and title; no grid for 2D plots."""
         super().configPlot(grid=grid)
