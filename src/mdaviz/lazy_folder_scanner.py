@@ -391,6 +391,9 @@ class LazyFolderScanner(QObject):
             self._progress_dialog = AsyncProgressDialog(
                 "Scanning folder...", parent=None
             )
+            # Wire Cancel button to actually stop the worker (otherwise the
+            # dialog just hides itself and the scan keeps running).
+            self._progress_dialog.set_cancel_callback(self.cancel_scan)
             self._progress_dialog.show()
         else:
             self._progress_dialog = None
@@ -643,7 +646,7 @@ class FolderScanWorker(QObject):
                 if key in cache and cache[key][0] == st.st_mtime:
                     file_info = cache[key][1]
                 else:
-                    if self.use_lightweight_scan:
+                    if self.use_lightweight_scan and not self.show_positioners:
                         file_info = get_file_info_lightweight(file_path)
                     else:
                         file_info = get_file_info_full(file_path)
@@ -676,12 +679,20 @@ class FolderScanWorker(QObject):
             )
             self.progressive_update.emit(result)
 
-        # Continue scanning in background
+        # Continue scanning in background; pass the initial-batch lists in so they
+        # accumulate across all subsequent batches (the final emit needs the full set).
         if not self._cancelled:
-            self._continue_progressive_scan(mda_files, scanned_files, cache)
+            self._continue_progressive_scan(
+                mda_files, scanned_files, cache, file_list, file_info_list
+            )
 
     def _continue_progressive_scan(
-        self, mda_files: list[Path], start_index: int, cache: FileInfoCache
+        self,
+        mda_files: list[Path],
+        start_index: int,
+        cache: FileInfoCache,
+        file_list: Optional[list[str]] = None,
+        file_info_list: Optional[list[dict[str, Any]]] = None,
     ) -> None:
         """
         Continue progressive scanning from a given index.
@@ -690,20 +701,23 @@ class FolderScanWorker(QObject):
             mda_files (list[Path]): List of MDA files to scan
             start_index (int): Index to start scanning from
             cache (dict): File info cache (path -> (mtime, file_info)); updated in place.
+            file_list (list, optional): Cumulative file names from earlier batches; appended to.
+            file_info_list (list, optional): Cumulative file info from earlier batches; appended to.
         """
         total_files = len(mda_files)
-        file_list: list[str] = []
-        file_info_list: list[dict[str, Any]] = []
+        if file_list is None:
+            file_list = []
+        if file_info_list is None:
+            file_info_list = []
         scanned_files = start_index
 
-        # Continue scanning from where we left off; reuse cache when mtime unchanged
+        # Continue scanning from where we left off; reuse cache when mtime unchanged.
+        # Lists accumulate across batches so the final completion emit carries every file.
         for i in range(start_index, total_files, self.batch_size):
             if self._cancelled:
                 break
 
             batch_files = mda_files[i : i + self.batch_size]
-            file_list.clear()
-            file_info_list.clear()
 
             for file_path in batch_files:
                 if self._cancelled:
@@ -715,7 +729,7 @@ class FolderScanWorker(QObject):
                     if key in cache and cache[key][0] == st.st_mtime:
                         file_info = cache[key][1]
                     else:
-                        if self.use_lightweight_scan:
+                        if self.use_lightweight_scan and not self.show_positioners:
                             file_info = get_file_info_lightweight(file_path)
                         else:
                             file_info = get_file_info_full(file_path)

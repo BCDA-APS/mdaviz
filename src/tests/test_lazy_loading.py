@@ -188,6 +188,70 @@ class TestLazyFolderScanner:
             # All 3 files should be served from cache
             mock_light.assert_not_called()
 
+    def test_progressive_scan_emits_complete_file_list(
+        self, temp_folder: Path, qapp: QApplication
+    ) -> None:
+        """Progressive scan must emit ALL files in the final complete event,
+        not just the last batch (regression: per-batch lists used to be cleared
+        and the final emit reused them, dropping every file but the last batch)."""
+        n_files = 15
+        for i in range(n_files):
+            (temp_folder / f"test_{i:03d}.mda").touch()
+
+        worker = FolderScanWorker(
+            temp_folder,
+            batch_size=3,
+            max_files=10,
+            use_lightweight_scan=True,
+            progressive_loading=True,
+        )
+        completes: list[FolderScanResult] = []
+        worker.complete.connect(completes.append)
+        worker.scan()
+
+        assert len(completes) == 1
+        final = completes[0]
+        assert final.is_complete
+        assert final.is_progressive
+        assert final.scanned_files == n_files
+        assert len(final.file_list) == n_files
+        assert len(final.file_info_list) == n_files
+        assert sorted(final.file_list) == sorted(
+            f"test_{i:03d}.mda" for i in range(n_files)
+        )
+
+    def test_progressive_scan_respects_show_positioners(
+        self, temp_folder: Path, qapp: QApplication
+    ) -> None:
+        """Progressive scan must use the full reader when show_positioners=True
+        (regression: progressive paths used to ignore the flag and always do
+        the lightweight read, leaving the Positioners column empty)."""
+        n_files = 12
+        for i in range(n_files):
+            (temp_folder / f"test_{i:03d}.mda").touch()
+
+        with patch(
+            "mdaviz.lazy_folder_scanner.get_file_info_full"
+        ) as mock_full, patch(
+            "mdaviz.lazy_folder_scanner.get_file_info_lightweight"
+        ) as mock_light:
+            mock_full.return_value = {"Name": "x", "Positioners": "p1"}
+            mock_light.return_value = {"Name": "x"}
+
+            worker = FolderScanWorker(
+                temp_folder,
+                batch_size=3,
+                max_files=10,
+                use_lightweight_scan=True,
+                progressive_loading=True,
+                show_positioners=True,
+            )
+            worker.complete.connect(lambda r: None)
+            worker.scan()
+
+            assert mock_full.call_count == n_files
+            mock_light.assert_not_called()
+
 
 class TestDataCache:
     """Test cases for the DataCache class."""
