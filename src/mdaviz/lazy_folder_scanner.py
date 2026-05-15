@@ -133,6 +133,14 @@ class LazyFolderScanner(QObject):
                 f"Too many files ({total_files} > {self.max_files})",
             )
 
+        # Read setting in main thread (QSettings is not thread-safe)
+        from mdaviz.user_settings import settings
+
+        show_pos = settings.getKey("show_positioners_in_folder")
+        if isinstance(show_pos, str):
+            show_pos = show_pos.lower() in ("true", "1", "yes", "on")
+        show_pos = bool(show_pos)
+
         # Scan files in batches
         file_list = []
         file_info_list = []
@@ -143,7 +151,7 @@ class LazyFolderScanner(QObject):
 
             for file_path in batch_files:
                 try:
-                    if self.use_lightweight_scan:
+                    if self.use_lightweight_scan and not show_pos:
                         file_info = get_file_info_lightweight(file_path)
                     else:
                         file_info = get_file_info_full(file_path)
@@ -195,6 +203,13 @@ class LazyFolderScanner(QObject):
         """
         total_files = len(mda_files)
 
+        from mdaviz.user_settings import settings
+
+        show_pos = settings.getKey("show_positioners_in_folder")
+        if isinstance(show_pos, str):
+            show_pos = show_pos.lower() in ("true", "1", "yes", "on")
+        show_pos = bool(show_pos)
+
         # For progressive loading, we'll scan the first batch immediately
         # and return a partial result
         initial_batch_size = min(self.batch_size * 2, total_files)
@@ -207,7 +222,7 @@ class LazyFolderScanner(QObject):
         for i in range(initial_batch_size):
             file_path = mda_files[i]
             try:
-                if self.use_lightweight_scan:
+                if self.use_lightweight_scan and not show_pos:
                     file_info = get_file_info_lightweight(file_path)
                 else:
                     file_info = get_file_info_full(file_path)
@@ -266,13 +281,20 @@ class LazyFolderScanner(QObject):
         file_info_list = []
         scanned_files = start_index
 
+        from mdaviz.user_settings import settings
+
+        show_pos = settings.getKey("show_positioners_in_folder")
+        if isinstance(show_pos, str):
+            show_pos = show_pos.lower() in ("true", "1", "yes", "on")
+        show_pos = bool(show_pos)
+
         # Continue scanning from where we left off
         for i in range(start_index, total_files, self.batch_size):
             batch_files = mda_files[i : i + self.batch_size]
 
             for file_path in batch_files:
                 try:
-                    if self.use_lightweight_scan:
+                    if self.use_lightweight_scan and not show_pos:
                         file_info = get_file_info_lightweight(file_path)
                     else:
                         file_info = get_file_info_full(file_path)
@@ -373,6 +395,14 @@ class LazyFolderScanner(QObject):
         else:
             self._progress_dialog = None
 
+        # Read setting in main thread (QSettings is not thread-safe)
+        from mdaviz.user_settings import settings
+
+        show_pos = settings.getKey("show_positioners_in_folder")
+        if isinstance(show_pos, str):
+            show_pos = show_pos.lower() in ("true", "1", "yes", "on")
+        show_pos = bool(show_pos)
+
         # Create a worker thread for scanning
         self.scanner_thread = QThread()
         self.scanner_worker = FolderScanWorker(
@@ -382,6 +412,7 @@ class LazyFolderScanner(QObject):
             self.use_lightweight_scan,
             self.progressive_loading,
             previous_cache=previous_cache,
+            show_positioners=show_pos,
         )
 
         # Move worker to thread
@@ -468,6 +499,7 @@ class FolderScanWorker(QObject):
         use_lightweight_scan: bool,
         progressive_loading: bool = True,
         previous_cache: Optional[FileInfoCache] = None,
+        show_positioners: bool = False,
     ):
         """
         Initialize the folder scan worker.
@@ -487,6 +519,7 @@ class FolderScanWorker(QObject):
         self.max_files = max_files
         self.use_lightweight_scan = use_lightweight_scan
         self.progressive_loading = progressive_loading
+        self.show_positioners = show_positioners
         self._previous_cache = dict(previous_cache) if previous_cache else {}
         self._cancelled = False
 
@@ -545,7 +578,7 @@ class FolderScanWorker(QObject):
                         if key in cache and cache[key][0] == st.st_mtime:
                             file_info = cache[key][1]
                         else:
-                            if self.use_lightweight_scan:
+                            if self.use_lightweight_scan and not self.show_positioners:
                                 file_info = get_file_info_lightweight(file_path)
                             else:
                                 file_info = get_file_info_full(file_path)

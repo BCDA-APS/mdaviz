@@ -11,7 +11,7 @@ from mdaviz.utils import HEADERS
 
 
 class MDAFolderTableModel(QAbstractTableModel):
-    def __init__(self, data, parent):
+    def __init__(self, data, parent, show_positioners=False):
         """
         Create the model and connect with its parent.
 
@@ -24,7 +24,7 @@ class MDAFolderTableModel(QAbstractTableModel):
         self.mda_mvc = parent
         super().__init__()
 
-        self.columnLabels = HEADERS
+        self.columnLabels = HEADERS + ("Positioners",) if show_positioners else HEADERS
         self.setFileInfoList(data)
 
     # ------------ methods required by Qt's view
@@ -44,7 +44,7 @@ class MDAFolderTableModel(QAbstractTableModel):
         if role == 0:  # Qt.DisplayRole
             label = self.columnLabels[index.column()]
             file_info = self.fileInfoList()[index.row()]
-            value = file_info[label]
+            value = file_info.get(label, "")
             return value
         elif role == Qt.ItemDataRole.TextAlignmentRole:
             # Center align specific columns

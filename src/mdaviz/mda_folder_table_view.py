@@ -50,9 +50,17 @@ class MDAFolderTableView(QWidget):
         from mdaviz.mda_folder_table_model import MDAFolderTableModel
         from mdaviz.empty_table_model import EmptyTableModel
 
+        from mdaviz.user_settings import settings
+
+        show_pos = settings.getKey("show_positioners_in_folder")
+        if isinstance(show_pos, str):
+            show_pos = show_pos.lower() in ("true", "1", "yes", "on")
+
         data = self.mdaInfoList()
         if len(data) > 0:
-            data_model = MDAFolderTableModel(data, self.mda_mvc)
+            data_model = MDAFolderTableModel(
+                data, self.mda_mvc, show_positioners=bool(show_pos)
+            )
             self.proxyModel = FolderSortProxyModel()
             self.proxyModel.setSourceModel(data_model)
             self.tableView.setModel(self.proxyModel)

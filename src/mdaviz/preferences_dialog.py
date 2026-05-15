@@ -25,7 +25,6 @@ class PreferencesDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Preferences")
         self.setModal(True)
-        self.resize(400, 200)
 
         self._setup_ui()
         self._load_settings()
@@ -69,6 +68,20 @@ class PreferencesDialog(QDialog):
         # Add spacing
         layout.addStretch()
 
+        # Positioners column setting
+        self.show_positioners_checkbox = QCheckBox("Show positioners in folder view")
+        layout.addWidget(self.show_positioners_checkbox)
+
+        pos_warning = QLabel(
+            "Warning: requires reading each file completely and will significantly slow down folder loading."
+        )
+        pos_warning.setWordWrap(True)
+        pos_warning.setStyleSheet("color: orange; font-size: 10px;")
+        layout.addWidget(pos_warning)
+
+        # Add spacing
+        layout.addStretch()
+
         # Buttons
         button_box = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
@@ -103,10 +116,19 @@ class PreferencesDialog(QDialog):
             sort_val = sort_val.lower() in ("true", "1", "yes", "on")
         self.sort_newest_first_checkbox.setChecked(bool(sort_val))
 
+        # Show positioners setting
+        show_pos = settings.getKey("show_positioners_in_folder")
+        if show_pos is None:
+            show_pos = False
+        elif isinstance(show_pos, str):
+            show_pos = show_pos.lower() in ("true", "1", "yes", "on")
+        self.show_positioners_checkbox.setChecked(bool(show_pos))
+
     def get_settings(self):
         """Get the current settings from the dialog."""
         return {
             "auto_load_folder": self.auto_load_checkbox.isChecked(),
             "plot_max_height": self.plot_spinbox.value(),
             "sort_newest_first": self.sort_newest_first_checkbox.isChecked(),
+            "show_positioners_in_folder": self.show_positioners_checkbox.isChecked(),
         }

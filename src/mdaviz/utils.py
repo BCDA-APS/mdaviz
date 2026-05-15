@@ -238,6 +238,7 @@ def get_file_info_lightweight(file_path: pathlib.Path) -> dict:
     ]
     for k, v in zip(HEADERS, values):
         fileInfo[k] = v
+    fileInfo["Positioners"] = ""
     return fileInfo
 
 
@@ -260,7 +261,7 @@ def get_file_info_full(file_path: pathlib.Path) -> dict:
     result = readMDA(str(file_path))
     if result is None:
         # Return minimal info if file cannot be read
-        minimal_file_info = {"Name": file_name}
+        minimal_file_info = {"Name": file_name, "folderPath": str(file_path.parent)}
         values = [
             "",
             "",
@@ -273,17 +274,20 @@ def get_file_info_full(file_path: pathlib.Path) -> dict:
         ]
         for k, v in zip(HEADERS, values):
             minimal_file_info[k] = v
+        minimal_file_info["Positioners"] = ""
         return minimal_file_info
 
     file_metadata, file_data_dim1, *_ = result
     file_num = file_metadata.get("scan_number", None)
     file_prefix = extract_file_prefix(file_name, file_num)
     file_size = human_readable_size(file_path.stat().st_size)
-    file_date = str(byte2str(file_data_dim1.time)).split(".")[0]
+    file_date = datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
     file_pts = file_data_dim1.curr_pt
-    file_dim = file_data_dim1.dim
+    file_dim = file_metadata.get("rank", 1)
 
-    fileInfo: dict[str, Any] = {"Name": file_name}
+    fileInfo: dict[str, Any] = {"Name": file_name, "folderPath": str(file_path.parent)}
     values = [
         str(file_prefix) if file_prefix is not None else "",
         str(file_num) if file_num is not None else "",
@@ -294,6 +298,14 @@ def get_file_info_full(file_path: pathlib.Path) -> dict:
     ]
     for k, v in zip(HEADERS, values):
         fileInfo[k] = v
+    positioners = []
+    for pos in file_data_dim1.p:
+        name = byte2str(pos.name).strip()
+        desc = byte2str(pos.desc).strip()
+        label = desc if desc else name
+        if label:
+            positioners.append(label)
+    fileInfo["Positioners"] = ", ".join(positioners)
     return fileInfo
 
 

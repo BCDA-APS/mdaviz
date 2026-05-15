@@ -211,11 +211,20 @@ class MainWindow(QMainWindow):
         settings.setKey("plot_max_height", settings_dict["plot_max_height"])
         settings.setKey("auto_load_folder", settings_dict["auto_load_folder"])
         settings.setKey("sort_newest_first", settings_dict["sort_newest_first"])
+        settings.setKey(
+            "show_positioners_in_folder", settings_dict["show_positioners_in_folder"]
+        )
 
         # Update UI components
         self._update_plot_height(settings_dict["plot_max_height"])
         if hasattr(self, "mvc_folder") and self.mvc_folder:
             self.mvc_folder.mda_folder_tableview.applyDefaultSort()
+
+        # If positioners setting changed, clear the scan cache and rescan the current folder
+        # so the column appears/disappears immediately without requiring a manual refresh.
+        if hasattr(self, "lazy_scanner") and self.dataPath():
+            self.lazy_scanner._file_info_cache.clear()
+            self.lazy_scanner.scan_folder_async(self.dataPath())
 
         self.setStatus(
             f"Settings updated: plot height {settings_dict['plot_max_height']}px, "
