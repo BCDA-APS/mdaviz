@@ -398,7 +398,9 @@ class MDAFileVisualization(QWidget):
                 layoutMpl2D.addWidget(widgetMpl2D)
             # Use the showMessage method if the widget supports it
             if hasattr(widgetMpl2D, "showMessage"):
-                widgetMpl2D.showMessage("Nothing to plot")
+                widgetMpl2D.showMessage(
+                    plot_options.get("wait_message", "Nothing to plot")
+                )
                 self.chart_view_2d = widgetMpl2D
             else:
                 # Create a simple message widget if needed

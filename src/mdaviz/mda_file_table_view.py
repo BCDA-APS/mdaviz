@@ -1194,6 +1194,14 @@ class MDAFileTableView(QWidget):
                     logger.debug("data2Plot2D - Validation failed:")
                     for error in validation_errors:
                         logger.debug(f"  ❌ {error}")
+                    # Surface a contextual wait message for the common
+                    # live-acquisition case (only one X2 row written so far).
+                    if any(
+                        "X2 data has only one point" in e for e in validation_errors
+                    ):
+                        plot_options["wait_message"] = (
+                            "Plot will appear after the next row."
+                        )
                     return datasets, plot_options
             else:
                 logger.debug("data2Plot2D - Missing required data:")

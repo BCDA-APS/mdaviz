@@ -539,6 +539,14 @@ class MDA_MVC(QWidget):
         else:
             self.setStatus("Could not find a (positioner,detector) pair to plot.")
 
+        # Initialize live polling for 2D files. _startWatching is normally called
+        # from doPlot's 1D auto-fallback at the end, but if the 2D scan is so fresh
+        # it has no detector yet, doPlot bails early at "Nothing to plot" and never
+        # sets _2d_watch_path. Without it, _check2DStructure never fires and the
+        # plot stays blank until the user manually refreshes.
+        if self.mda_file.data().get("isMultidimensional", False):
+            self._startWatching(file_path)
+
     # # ------------ Live plotting methods:
 
     def _startWatching(self, file_path):
@@ -714,7 +722,8 @@ class MDA_MVC(QWidget):
     def _check2DStructure(self):
         """For 2D scans: update X2 controls and rebuild the tableview when the inner scan
         structure becomes available. Called when the watched 2D file changes on disk.
-        Does not replot."""
+        Also pushes the refreshed data through set2DData so the 2D plot auto-updates
+        on live acquisitions (matches the live-replot behavior of 1D scans)."""
         from mdaviz.data_cache import get_global_cache
 
         get_global_cache().invalidate_file(self._2d_watch_path)
@@ -763,11 +772,23 @@ class MDA_MVC(QWidget):
                     )
                     tableview.displayTable(new_selection)
                     self.setSelectionField(new_selection)
+                    # The inner scan structure just became available -- re-run
+                    # handle2DMode so the 2D controls (X1 / Y DET combos,
+                    # X2 spinbox range) populate with the now-known positioners
+                    # and detectors. Without this, get2DSelections returns
+                    # X1=None / Y=[] forever and update2DPlot stays at
+                    # "Nothing to plot" until the user manually refreshes.
+                    self.mda_file.handle2DMode()
                     self.doPlot("replace")
                     logger.debug(
                         f"2D structure updated: {file_name} "
                         f"({visual_rows} → {expected} rows)"
                     )
+
+            # Push refreshed data to the viz panel so the 2D plot replots when
+            # the user is on the 2D tab. set2DData refreshes _2d_data and calls
+            # update2DPlot() if the 2D tab is currently active.
+            self.mda_file_viz.set2DData(file_data)
         except Exception as exc:
             logger.warning(f"2D structure check failed: {exc}")
 
