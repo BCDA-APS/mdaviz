@@ -622,10 +622,26 @@ class MDA_MVC(QWidget):
             self._doLiveUpdate()
             self._updateLiveTitle()
 
+    def _showPositionersSetting(self):
+        """Read the show_positioners_in_folder QSetting as a bool (must run on main thread)."""
+        from mdaviz.user_settings import settings
+
+        val = settings.getKey("show_positioners_in_folder")
+        if isinstance(val, str):
+            val = val.lower() in ("true", "1", "yes", "on")
+        return bool(val)
+
+    def _readNewFileInfo(self, file_path):
+        """Read file info for a newly-detected file, using the full reader when the
+        Positioners column is enabled so the new row matches the rest of the table."""
+        from mdaviz.utils import get_file_info_lightweight, get_file_info_full
+
+        if self._showPositionersSetting():
+            return get_file_info_full(file_path)
+        return get_file_info_lightweight(file_path)
+
     def _checkForNewFiles(self, folder_path):
         """Append any new .mda files found in folder_path to the table without a full rescan."""
-        from mdaviz.utils import get_file_info_lightweight
-
         current_names = set(self.mdaFileList())
         try:
             all_files = sorted(Path(folder_path).glob("*.mda"), key=lambda p: p.name)
@@ -637,7 +653,7 @@ class MDA_MVC(QWidget):
         proxy = self.mda_folder_tableview.proxyModel
         source_model = proxy.sourceModel() if proxy is not None else None
         for file_path in new_files:
-            file_info = get_file_info_lightweight(file_path)
+            file_info = self._readNewFileInfo(file_path)
             self.mdaFileList().append(file_path.name)
             if source_model is not None:
                 # appendRow() appends to source_model._data, which IS mdaInfoList()
@@ -651,13 +667,11 @@ class MDA_MVC(QWidget):
 
     def _retryPendingMetadata(self):
         """Re-read metadata for files that were incomplete when first detected."""
-        from mdaviz.utils import get_file_info_lightweight
-
         proxy = self.mda_folder_tableview.proxyModel
         source_model = proxy.sourceModel() if proxy is not None else None
         still_pending = []
         for file_path in self._pending_metadata:
-            file_info = get_file_info_lightweight(file_path)
+            file_info = self._readNewFileInfo(file_path)
             if not file_info.get("Scan #"):
                 still_pending.append(file_path)
                 continue
