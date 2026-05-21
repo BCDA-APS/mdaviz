@@ -3,8 +3,26 @@
 Changes
 =======
 
-Version 1.4.1 (latest)
+Version 1.4.2 (latest)
 ----------------------
+
+**New Features**
+
+- Optional **Positioners** column in the folder view (toggled via Preferences).
+- **VMIN/VMAX controls** for 2D color scale; invalid values for log scale are highlighted in red.
+
+**Bug Fixes**
+
+- Live 2D scans now auto-update without requiring a manual refresh.
+- 2D plot title and axis labels no longer disappear on second file selection.
+- Live folder polling respects the ``show_positioners`` preference.
+- Progressive folder scan now reports correct completeness, honors the positioners flag, and can be cancelled mid-scan.
+- Matplotlib toolbar "home" view is reset when switching scans (no more stale zoom range).
+- Preserve the positioner choice when adding scans with different PV lists.
+- Improve PyInstaller GLIBC compatibility for older target machines.
+
+Version 1.4.1
+-------------
 
 **Bug Fixes**
 
