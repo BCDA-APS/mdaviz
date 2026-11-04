@@ -64,16 +64,43 @@ manually from the Actions page with the ``deploy`` input set to true.
 
 **6. Build and deploy the APS executable**
 
+Prerequisites, all of which the spec file depends on silently:
+
+- A **conda** environment containing mdaviz's dependencies and PyInstaller
+  (``pip install -e ".[dev,build]"``). A plain virtualenv will not do; the spec
+  needs conda-forge's ``libgcc_s.so.1`` and ``libstdc++.so.6``.
+- That environment **activated**, so ``CONDA_PREFIX`` points at it.
+- ``readelf`` on the PATH (the ``binutils`` package).
+- A Linux host. Build-host GLIBC may be newer than the target; the spec filters
+  for that.
+
 .. code-block:: bash
 
     cd workspace/mdaviz
     git pull
-    conda activate mda12
+    conda activate mda12          # or your own build environment
     rm -rf build/ dist/
-    /home/beams/RODOLAKIS/.conda/envs/mda12/bin/pyinstaller mdaviz.spec
-    ./dist/mdaviz          # smoke-test it before deploying
+    python -m PyInstaller mdaviz.spec
+    ./dist/mdaviz                 # smoke-test it before deploying
 
 Then copy it to APSshare as epicsadm.
+
+.. important::
+
+   Use ``python -m PyInstaller``, not bare ``pyinstaller``. Activating the conda
+   environment fixes ``python`` but not necessarily ``pyinstaller``: if a
+   ``pip install --user`` copy exists in ``~/.local/bin``, and ``~/.local/bin``
+   precedes the environment's ``bin`` on your PATH, the bare command silently
+   runs the wrong PyInstaller from the wrong interpreter. Going through
+   ``python -m`` cannot be shadowed by PATH.
+
+   The two prerequisites above fail the same quiet way. If the environment is not
+   activated, ``CONDA_PREFIX`` is wrong, the ``libgcc_s``/``libstdc++``
+   substitution in ``mdaviz.spec`` finds nothing and is skipped. If ``readelf``
+   is missing, the GLIBC check returns ``(0, 0)`` for every library and excludes
+   none of them. Both produce a build that completes without error and then fails
+   to start on older APS machines. Always smoke-test on an older host, not just
+   on the build machine.
 
 .. _two_builds:
 

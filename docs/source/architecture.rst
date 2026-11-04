@@ -68,11 +68,12 @@ Module map
 **Reading files**
 
 ``synApps_mdalib/``
-    Vendored third-party MDA format parser (``mda.py``, plus ``f_xdrlib.py``
-    standing in for the ``xdrlib`` module removed from the Python standard
-    library in 3.13). Upstream is EPICS synApps ``mdaPythonUtils`` by Tim
-    Mooney, version 2022.post9. **Do not modify this directory.** It is excluded
-    from ruff, mypy, and coverage, and nothing works without it.
+    The MDA format parser (``mda.py``, plus ``f_xdrlib.py``, a local stand-in
+    for the ``xdrlib`` module removed from the Python standard library in 3.13).
+    A copy of EPICS synApps ``mdaPythonUtils`` (version 2022.post9), kept in the
+    repo instead of installed as a dependency. Written by Tim Mooney in this
+    group, with later fixes by Pete Jemian. **Do not touch this directory.** It
+    is excluded from ruff, mypy and coverage, and nothing works without it.
 ``lazy_folder_scanner.py``
     ``LazyFolderScanner`` and ``FolderScanWorker``. Scans a folder for ``.mda``
     files on a ``QThread``, emitting progress so the UI stays responsive on

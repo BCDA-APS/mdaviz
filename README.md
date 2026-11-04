@@ -15,184 +15,80 @@ Coverage | License | Python | Pre-commit
 ## Features
 
 * **Data Visualization**: Visualize MDA data with support for 1-D and 2D plots (mesh scans) with matplotlib integration.
+* **Live Updates**: Plots refresh automatically while a scan is acquiring, marked by a red LIVE indicator. Newly created files appear in the folder table with no manual refresh.
+* **Multi-Scan Overlay**: Ctrl/Cmd+click to overlay curves from several files on a single plot, including while one of them is still acquiring.
+* **2D Visualization**: Heatmap or contour display, with selectable color palette, log scale, VMIN/VMAX limits, I0 normalization, and a slice selector for the outer positioner.
+* **Curve Transformations**: Apply an offset, scaling factor, derivative, or unscaling to any individual curve.
 * **Auto-Load Folders**: Automatically loads the first valid folder from recent folders list (can be disabled in the preferences).
 * **Recent Folders**: Remembers recently opened folders for quick access.
 * **Lazy Loading**: Efficient folder scanning with progress indicators for large datasets.
 * **Curve Management**: Add, remove, and style multiple data curves.
-* **Axis Selection**: Select X-axis (positioners), Y-axis (detectors), I0 normalization, and curve unscaling using checkboxes. Axis selection is saved from one file to the next.
-* **Curve Unscaling**: Rescale curves to match the range of other Y curves for better comparison.
-* **Data Analysis**: Basic statistics, cursor measurements, and curve fitting.
+* **Axis Selection**: Select X-axis (positioners), Y-axis (detectors), and I0 normalization using checkboxes. Axis selection is saved from one file to the next.
+* **Data Analysis**: Basic statistics, cursor measurements, and curve fitting, with an independent fit per curve.
 * **Metadata Search**: Searchable metadata to quickly locate specific parameters and settings.
 * **Cross-Platform**: Runs on Linux, macOS and Windows.
 
-## Quickstart
+## Installation
 
-### Option 1: Download a standalone executable (no Python needed)
+**Standalone executable.** Download for your platform from the
+[Releases](https://github.com/BCDA-APS/mdaviz/releases) page and run it. It is
+self-contained; no Python or conda environment needed.
 
-Download the executable for your platform from the
-[GitHub Releases](https://github.com/BCDA-APS/mdaviz/releases) page and run it.
-It is self-contained and needs no conda environment.
+At the APS, use `/APSshare/bin/mdaviz` instead. The GitHub release build targets
+personal machines and does not run on APS hosts; the
+[Release Process](https://bcda-aps.github.io/mdaviz/release.html) explains why the
+two builds differ.
 
-**At the APS**, use the executable on APSshare instead (`/APSshare/bin/mdaviz`);
-the GitHub release build targets personal machines and does not run on APS
-hosts. See the [Release Process](https://bcda-aps.github.io/mdaviz/release.html)
-for why the two builds differ.
-
-### Option 2: Install from PyPI (Recommended for users)
-
-Mdaviz is available on PyPI. We recommend creating a dedicated environment:
+**From PyPI.**
 
 ```bash
-# Create a simple conda environment
 conda create -n mdaviz python=3.12
 conda activate mdaviz
-pip install PyQt6 Qt6
-
-# Install mdaviz
 pip install mdaviz
-```
-
-Once installed, you can run the application at any time using:
-```bash
-conda activate mdaviz
 mdaviz
 ```
-**Note**:
-* PyQt6 and Qt6 are required dependencies that may need to be installed separately via pip as they are not available in conda-forge for all platforms.
-* At the APS: PyQt6 requires to install the following library:
-```bash
-sudo yum install xcb-util-cursor
-```
 
+At the APS, PyQt6 additionally requires `sudo yum install xcb-util-cursor`.
 
-### Option 3: Development setup with conda environment
-
-For development and contributing, it is strongly recommended to use the provided conda environment. This ensures all dependencies (including PyQt6) are available and compatible.
+**From source**, for development:
 
 ```bash
-# Clone the repo first
 git clone https://github.com/BCDA-APS/mdaviz.git
 cd mdaviz
-
-# Create and activate a conda environment
 conda create -n mdaviz python=3.12
 conda activate mdaviz
-
-# Install in development mode, with the test and lint tooling
 pip install -e ".[dev]"
 ```
 
-This installs everything mdaviz needs, including PyQt6 and the developer
-tools (pytest, pytest-qt, ruff, mypy, pre-commit). Note the `[dev]` extra: a
-plain `pip install -e .` omits the tooling, and the test and pre-commit
-commands below will not work.
+The `[dev]` extra brings in pytest, pytest-qt, ruff, mypy and pre-commit; a plain
+`pip install -e .` omits them and the commands below will not work.
 
-Once installed, you can run the application at any time using:
-```bash
-cd mdaviz
-conda activate mdaviz
-mdaviz
-```
-
-Always activate the environment before running, testing, or using pre-commit hooks.
-
-
-**Note**:
-* PyQt6 and Qt6 are required dependencies that may need to be installed separately via pip as they are not available in conda-forge for all platforms.
-* At the APS: PyQt6 requires to install the following library:
-```bash
-sudo yum install xcb-util-cursor
-```
-
+Full installation guide, including troubleshooting:
+<https://bcda-aps.github.io/mdaviz/install.html>
 
 ## Usage
 
-### Basic Operation
-
-1. **Load Data**: Click "Open" (folder icon) and select an MDA file.
-2. **Select Axes**: Use the checkboxes in the data table to select:
-   - **X**: Positioner for the x-axis (only one can be selected)
-   - **Y**: Detectors for the y-axis (multiple can be selected)
-   - **I0**: Normalization detector (only one can be selected)
-   - **Un**: Unscale curves to match the range of other Y curves (requires Y selection on same row)
-3. **Plot Data**: Data will automatically plot based on your selection mode
-
-### Plotting Modes
-
-- **Auto-add**: New curves are added to existing plots
-- **Auto-replace**: New curves replace existing plots
-- **Auto-off**: Manual plotting using buttons
-
-### Plot Controls
-
-- **Log Scale**: Use the "LogX" and "LogY" checkboxes to switch between linear and logarithmic scales.
-- **Curve Styling**: Select different line styles and markers for the selected curve.
-- **Data Manipulation**: Apply offset and scaling factors to individual curves.
-- **Data Analysis**: Basic statistics, cursor measurements, and curve fitting.
-
-
+See the [User Guide](https://bcda-aps.github.io/mdaviz/user_guide.html) for opening
+data, selecting axes, plotting modes, cursors, curve fitting, 2D maps, and logging.
 
 ## Development
 
-### Logging and Debugging
+Start with the [Architecture guide](https://bcda-aps.github.io/mdaviz/architecture.html):
+module map, data flow, and the parts of the codebase that are easy to get wrong.
 
-**Default Behavior:**
-By default, `mdaviz` logs at the WARNING level, showing only warnings, errors and critical messages (quiet mode).
-
-**Command Line Options:**
-You can control the logging level using the `--log` argument:
-
-```bash
-# Show only errors and critical messages
-mdaviz --log error
-
-# Show warnings, errors, critical messages and info (progress messages, file loading status, and important application events).
-mdaviz --log info
-
-# Show all messages including debug information
-mdaviz --log debug
-```
-**Log Files:**
-Log files are automatically created in `~/.mdaviz/logs/` with timestamps. Old log files (older than 1 day) are automatically cleaned up on startup.
-
-
-### Testing
-
-Run all tests:
 ```bash
 pytest src/tests
-```
-
-Current test status: **317 tests — 270 passing, 47 skipped, ~48% coverage.**
-
-The skipped tests are GUI tests blocked by
-[issue #13](https://github.com/BCDA-APS/mdaviz/issues/13) (pytest-qt
-compatibility with PyQt6), not failures. They do mean the widget layer is
-less covered than the headline number suggests.
-
-Live acquisition is not covered by the suite; it is verified by hand against
-a test IOC writing MDA files.
-
-
-### Code Quality
-
-The project uses pre-commit hooks for code quality. Run them before committing:
-```bash
 pre-commit run --all-files
 ```
+
+Test suite status and coverage caveats are in that guide. Cutting a release is
+documented in the [Release Process](https://bcda-aps.github.io/mdaviz/release.html).
 
 ## Contributing
 
 mdaviz has been maintained by a single developer committing directly to `main`;
 there is no enforced branch or review process. Run `pre-commit run --all-files`
 and `pytest src/tests` before committing.
-
-New to the codebase? Start with the
-[Architecture guide](https://bcda-aps.github.io/mdaviz/architecture.html).
-Cutting a release is documented in the
-[Release Process](https://bcda-aps.github.io/mdaviz/release.html).
-
-For a complete installation guide, see [https://bcda-aps.github.io/mdaviz/](https://bcda-aps.github.io/mdaviz/).
 
 ## Acknowledgements
 

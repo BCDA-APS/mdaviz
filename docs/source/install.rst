@@ -39,14 +39,14 @@ For most users, the quickest way to get started is to install from `PyPI
     # Create a simple conda environment
     conda create -n mdaviz python=3.12
     conda activate mdaviz
-    pip install PyQt6 Qt6
 
     # Install mdaviz
     pip install mdaviz
 
 **Note**:
 
-- PyQt6 and Qt6 are required dependencies that may need to be installed separately.
+- PyQt6 is a declared dependency of mdaviz and is installed automatically;
+  no separate ``pip install PyQt6`` step is needed.
 - At the APS: PyQt6 requires to install the following library:
 
 .. code-block:: bash
@@ -145,11 +145,11 @@ Common Installation Issues (Windows)
 
 .. code-block:: bash
 
-    # Ensure PyQt6 is installed
-    pip install PyQt6 Qt6
-
     # Verify installation
     python -c "import PyQt6; print('PyQt6 installed successfully')"
+
+    # Reinstall it if the import fails
+    pip install --force-reinstall PyQt6
 
 **Conda Environment Issues:**
 
@@ -157,17 +157,16 @@ Common Installation Issues (Windows)
 
     # Recreate environment if needed
     conda env remove -n mdaviz
-    conda env create -f env.yml
+    conda create -n mdaviz python=3.12
     conda activate mdaviz
-    pip install PyQt6 Qt6
+    pip install mdaviz
 
 **Missing Dependencies:**
 
 .. code-block:: bash
 
-    # Install all dependencies explicitly
-    conda install matplotlib scipy lmfit pyyaml
-    pip install PyQt6 Qt6
+    # Reinstall mdaviz and everything it declares in pyproject.toml
+    pip install --force-reinstall mdaviz
 
 
 
@@ -181,26 +180,38 @@ Clone the repository and install the dependencies:
     git clone https://github.com/BCDA-APS/mdaviz.git
     cd mdaviz
 
-    conda env create -f env.yml
+    conda create -n mdaviz python=3.12
     conda activate mdaviz
 
     pip install -e ".[dev,build]"
 
 
-To build the executables, install pyinstaller (available via pip) and use the following commands:
+The ``[build]`` extra installed above already provides PyInstaller, so no
+separate install step is needed:
 
 .. code-block:: bash
-
-    # Install pyinstaller via conda
-    conda install -c conda-forge pyinstaller
-    # OR install pyinstaller via pip
-    pip install pyinstaller
 
     # Build the spec file
     pyi-makespec --onefile --windowed --name mdaviz src/mdaviz/app.py --add-data "src/mdaviz/resources:mdaviz/resources"
 
     # Build the executable
-    pyinstaller mdaviz.spec
+    python -m PyInstaller mdaviz.spec
+
+.. note::
+
+   ``python -m PyInstaller`` is deliberate. Activating a conda environment fixes
+   ``python`` but not necessarily ``pyinstaller``: a ``pip install --user`` copy
+   in ``~/.local/bin`` can shadow the environment's own. Going through
+   ``python -m`` cannot be shadowed by PATH.
+
+.. warning::
+
+   ``pyi-makespec`` **overwrites the committed** ``mdaviz.spec``. The recipe above
+   reproduces the executables built by CI, which target personal machines and do
+   not run on APS hosts. The committed spec is a different build, carrying GLIBC
+   compatibility handling the generated spec lacks. To build that one, skip
+   ``pyi-makespec`` entirely and run ``pyinstaller mdaviz.spec`` against the
+   committed file -- see :ref:`two_builds`.
 
 You can start the application by running the executable:
 

@@ -70,7 +70,6 @@ Data Visualization
    - **X**: Positioner (only one allowed)
    - **Y**: Detector (multiple allowed)
    - **I0**: Select for normalization (divide Y data by this field, only one allowed)
-   - **Un**: Unscale curves to match the range of other Y curves (requires Y selection on same row)
 
 5. **Interactive Plot**: Use matplotlib's interactive features for zooming, panning, and changing figure options.
 6. **Data Processing Options**:
@@ -146,7 +145,9 @@ Curve Fitting
 3. **Set Range** (optional): Check "Use cursor range" if you want to fit only a portion of the data.
 4. **Perform Fit**: Click the "Fit" button.
 5. **View Results**: The fit results will appear in the "Fit Results" section
-6. **Available models**: Gaussian, Lorentzian, Linear, Exponential, Quadratic, Cubic, Error Function.
+6. **Available models**: Gaussian, Lorentzian, Negative Gaussian, Negative
+   Lorentzian, Linear, Exponential, Quadratic, Cubic, Error Function, Top Hat.
+   The negative variants fit valleys and dips rather than peaks.
 
 .. figure:: _static/mdaFit.jpg
    :alt: Fit tab interface
@@ -184,7 +185,8 @@ Common Issues
 
 **Application won't start:**
 
-- Ensure PyQt6 is properly installed: `pip install PyQt6 Qt6`
+- Check that PyQt6 imports: ``python -c "import PyQt6"``. It installs with
+  mdaviz; if the import fails, ``pip install --force-reinstall PyQt6``
 - Check conda environment is activated: `conda activate mdaviz`
 - Verify Python version (3.10+ required)
 
@@ -203,11 +205,12 @@ Common Issues
 
 2. The plotting area sometimes expands vertically beyond reasonable bounds:
 
-   - Workaround: set the maximum plot height to a reasonable value (e.g., 600 pixels) in the preferences
+   - Workaround: set the maximum plot height to a reasonable value (e.g., 600
+     pixels; the default is 800) in the preferences
 
 **Fitting fails:**
 
-- Ensure sufficient data points (at least 3 per parameter)
+- Ensure sufficient data points: a fit needs at least one point per model parameter
 - Try a different fit model
 - Check for invalid data values
 
