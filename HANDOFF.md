@@ -4,7 +4,7 @@
 
 1. **`docs/source/architecture.rst`** — the orientation document. Module map,
    data flow diagrams, and a section called "Concepts that will trip you up"
-   that is worth reading twice. 
+   that is worth reading twice.
 2. **`docs/source/release.rst`** — how a release is cut, and why there are two
    different executable builds. Read it before touching anything to do with
    packaging.
