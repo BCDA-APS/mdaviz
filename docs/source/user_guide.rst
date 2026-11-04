@@ -217,37 +217,6 @@ Common Issues
 
 
 
-Testing & Development
----------------------
-
-To run all tests:
-
-.. code-block:: bash
-
-    pytest src/tests
-
-To run code quality checks:
-
-.. code-block:: bash
-
-    pre-commit run --all-files
-
-To run type checking:
-
-.. code-block:: bash
-
-    mypy src/mdaviz
-
-Contributing
-------------
-
-- Fork the repository and create a branch for your feature or bugfix.
-- Add or update tests for your changes.
-- Run pre-commit, mypy and pytest to ensure all checks pass.
-- Submit a pull request on GitHub.
-
-For detailed contributing guidelines, see the project's GitHub repository.
-
 .. |folder_icon| raw:: html
 
    <span class="material-icons" style="font-size: 1em; vertical-align: middle;">folder</span>
@@ -297,4 +266,4 @@ You can also enable debug mode using the environment variable:
     mdaviz
 
 **Log Files:**
-Log files are automatically created in ``~/.mdaviz/logs/`` with timestamps. Old log files (older than 1 day) are automatically cleaned up on startup.
+Log files are automatically created in ``~/.mdaviz/logs/`` with timestamps. Old log files (older than 2 days) are automatically cleaned up on startup.

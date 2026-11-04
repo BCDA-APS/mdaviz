@@ -73,8 +73,6 @@ dev = [
 
 build = [
   "pyinstaller>=6.0.0",
-  "cx_Freeze>=6.15.0",
-  "nuitka>=1.8.0",
 ]
 
 [project.urls]
