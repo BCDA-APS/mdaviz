@@ -23,11 +23,22 @@ Coverage | License | Python | Pre-commit
 * **Curve Unscaling**: Rescale curves to match the range of other Y curves for better comparison.
 * **Data Analysis**: Basic statistics, cursor measurements, and curve fitting.
 * **Metadata Search**: Searchable metadata to quickly locate specific parameters and settings.
-* **Cross-Platform**: Runs on macOS and Linux (Windows TBD).
+* **Cross-Platform**: Runs on Linux, macOS and Windows.
 
 ## Quickstart
 
-### Option 1: Install from PyPI (Recommended for users)
+### Option 1: Download a standalone executable (no Python needed)
+
+Download the executable for your platform from the
+[GitHub Releases](https://github.com/BCDA-APS/mdaviz/releases) page and run it.
+It is self-contained and needs no conda environment.
+
+**At the APS**, use the executable on APSshare instead (`/APSshare/bin/mdaviz`);
+the GitHub release build targets personal machines and does not run on APS
+hosts. See the [Release Process](https://bcda-aps.github.io/mdaviz/release.html)
+for why the two builds differ.
+
+### Option 2: Install from PyPI (Recommended for users)
 
 Mdaviz is available on PyPI. We recommend creating a dedicated environment:
 
@@ -54,7 +65,7 @@ sudo yum install xcb-util-cursor
 ```
 
 
-### Option 2: Development setup with conda environment
+### Option 3: Development setup with conda environment
 
 For development and contributing, it is strongly recommended to use the provided conda environment. This ensures all dependencies (including PyQt6) are available and compatible.
 
@@ -63,14 +74,18 @@ For development and contributing, it is strongly recommended to use the provided
 git clone https://github.com/BCDA-APS/mdaviz.git
 cd mdaviz
 
-# Create and activate conda environment
-conda env create -f env.yml
+# Create and activate a conda environment
+conda create -n mdaviz python=3.12
 conda activate mdaviz
-pip install PyQt6 Qt6
 
-# Install in development mode
-pip install -e .
+# Install in development mode, with the test and lint tooling
+pip install -e ".[dev]"
 ```
+
+This installs everything mdaviz needs, including PyQt6 and the developer
+tools (pytest, pytest-qt, ruff, mypy, pre-commit). Note the `[dev]` extra: a
+plain `pip install -e .` omits the tooling, and the test and pre-commit
+commands below will not work.
 
 Once installed, you can run the application at any time using:
 ```bash
@@ -148,10 +163,15 @@ Run all tests:
 pytest src/tests
 ```
 
-Current test status:
-- **223 tests passing** with 54% coverage
-- **48 skipped tests** (GUI tests in headless environment)
-- **0 failed tests** (all tests are now passing!)
+Current test status: **317 tests — 270 passing, 47 skipped, ~48% coverage.**
+
+The skipped tests are GUI tests blocked by
+[issue #13](https://github.com/BCDA-APS/mdaviz/issues/13) (pytest-qt
+compatibility with PyQt6), not failures. They do mean the widget layer is
+less covered than the headline number suggests.
+
+Live acquisition is not covered by the suite; it is verified by hand against
+a test IOC writing MDA files.
 
 
 ### Code Quality
@@ -163,11 +183,14 @@ pre-commit run --all-files
 
 ## Contributing
 
-1. Fork and clone the repository.
-2. Create a new branch for your feature or bugfix.
-3. Make your changes and add tests.
-4. Run pre-commit and pytest to ensure all checks pass.
-5. Submit a pull request.
+mdaviz has been maintained by a single developer committing directly to `main`;
+there is no enforced branch or review process. Run `pre-commit run --all-files`
+and `pytest src/tests` before committing.
+
+New to the codebase? Start with the
+[Architecture guide](https://bcda-aps.github.io/mdaviz/architecture.html).
+Cutting a release is documented in the
+[Release Process](https://bcda-aps.github.io/mdaviz/release.html).
 
 For a complete installation guide, see [https://bcda-aps.github.io/mdaviz/](https://bcda-aps.github.io/mdaviz/).
 

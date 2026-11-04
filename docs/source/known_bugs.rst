@@ -1,3 +1,5 @@
+.. _known_bugs:
+
 Known Bugs
 ==========
 

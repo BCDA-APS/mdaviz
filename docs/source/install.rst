@@ -57,7 +57,7 @@ For most users, the quickest way to get started is to install from `PyPI
 Option 3: Install from source (Recommended for developers)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For development and contributing, it is strongly recommended to use the provided conda environment. This ensures all dependencies (including PyQt6) are available and compatible.
+For development and contributing, use a dedicated conda environment. This ensures all dependencies (including PyQt6) are available and compatible.
 
 .. code-block:: bash
 
@@ -65,17 +65,20 @@ For development and contributing, it is strongly recommended to use the provided
     git clone https://github.com/BCDA-APS/mdaviz.git
     cd mdaviz
 
-    # Create and activate conda environment
-    conda env create -f env.yml
+    # Create and activate a conda environment
+    conda create -n mdaviz python=3.12
     conda activate mdaviz
-    pip install PyQt6 Qt6
 
-    # Install in development mode
-    pip install -e .
+    # Install in development mode, with the test and lint tooling
+    pip install -e ".[dev]"
 
 **Note**:
 
-- PyQt6 and Qt6 are required dependencies that may need to be installed separately.
+- The ``[dev]`` extra matters: a plain ``pip install -e .`` omits pytest,
+  pytest-qt, ruff, mypy and pre-commit, and the testing and pre-commit steps
+  will not work without them.
+- This installs PyQt6 as a normal dependency; no separate ``pip install PyQt6``
+  step is needed.
 - At the APS: PyQt6 requires to install the following library:
 
 .. code-block:: bash
@@ -86,10 +89,9 @@ For development and contributing, it is strongly recommended to use the provided
 Required Libraries
 ------------------
 
-The repository's ``env.yml`` file lists the additional packages
-required by ``mdaviz``. Most packages are available as conda packages
-from https://anaconda.org. The others are available on
-https://PyPI.python.org.
+All runtime and development dependencies are declared in ``pyproject.toml``
+and installed by ``pip install -e ".[dev]"``. The repository also contains an
+``env.yml``, which predates this and is no longer the recommended path.
 
 **Core Dependencies:**
 

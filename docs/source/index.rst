@@ -79,6 +79,8 @@ Screenshots
 
    user_guide
    install
+   architecture
+   release
    known_bugs
    api
    changes
