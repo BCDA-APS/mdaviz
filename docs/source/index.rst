@@ -8,15 +8,18 @@ Key Features
 ============
 
 * **Data Visualization**: Visualize MDA data with support for 1-D and 2D plots (mesh scans) with matplotlib integration.
+* **Live Updates**: Plots refresh automatically while a scan is acquiring, marked by a red LIVE indicator. Newly created files appear in the folder table with no manual refresh.
+* **Multi-Scan Overlay**: Ctrl/Cmd+click to overlay curves from several files on a single plot, including while one of them is still acquiring.
+* **2D Visualization**: Heatmap or contour display, with selectable color palette, log scale, VMIN/VMAX limits, I0 normalization, and a slice selector for the outer positioner.
+* **Curve Transformations**: Apply an offset, scaling factor, derivative, or unscaling to any individual curve.
 * **Auto-Load Folders**: Automatically loads the first valid folder from recent folders list (can be disabled in the preferences).
 * **Recent Folders**: Remembers recently opened folders for quick access.
 * **Lazy Loading**: Efficient folder scanning with progress indicators for large datasets.
 * **Curve Management**: Add, remove, and style multiple data curves.
-* **Axis Selection**: Select X-axis (positioners), Y-axis (detectors), I0 normalization, and curve unscaling using checkboxes. Axis selection is saved from one file to the next.
-* **Curve Unscaling**: Rescale curves to match the range of other Y curves for better comparison.
-* **Data Analysis**: Basic statistics, cursor measurements, and curve fitting.
+* **Axis Selection**: Select X-axis (positioners), Y-axis (detectors), and I0 normalization using checkboxes. Axis selection is saved from one file to the next.
+* **Data Analysis**: Basic statistics, cursor measurements, and curve fitting, with an independent fit per curve.
 * **Metadata Search**: Searchable metadata to quickly locate specific parameters and settings.
-* **Cross-Platform**: Runs on macOS, Windows and Linux.
+* **Cross-Platform**: Runs on Linux, macOS and Windows.
 
 Documentation
 =============
@@ -79,6 +82,8 @@ Screenshots
 
    user_guide
    install
+   architecture
+   release
    known_bugs
    api
    changes

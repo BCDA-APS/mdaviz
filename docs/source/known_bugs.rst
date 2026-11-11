@@ -1,3 +1,5 @@
+.. _known_bugs:
+
 Known Bugs
 ==========
 
@@ -46,7 +48,8 @@ Plotting Area Vertical Expansion Bug
 
 **Workaround**:
 
-- Set a maximum height for the plotting area in the preferences (e.g., 500 pixels)
+- Set a maximum height for the plotting area in the preferences (e.g., 600
+  pixels; the default is 800)
 - This prevents the plotting area from expanding beyond the specified limit
 
 **Root Cause**: This appears to be a Qt layout management issue where the plotting widget's size constraints are not properly maintained when opening many files in sequence.
