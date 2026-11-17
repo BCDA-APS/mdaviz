@@ -177,3 +177,6 @@ Untitled.ipynb
 
 # Claude Code project settings
 .claude/
+
+# local-only content
+.nogit_*

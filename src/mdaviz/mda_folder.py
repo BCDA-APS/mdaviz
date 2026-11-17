@@ -1237,6 +1237,11 @@ class MDA_MVC(QWidget):
                 file_path = self.mda_file.tabIndex2Path(tab_index)
                 self.detRemoved.emit(file_path, y)
 
+        # Synchronize live selection immediately after checkbox change.
+        # This ensures _doLiveUpdate() uses the current selection, not stale state,
+        # preventing unchecked detectors from being re-plotted by live polling.
+        self._live_selection = dict(selection)
+
         # Get dataset for the positioner/detector selection:
         datasets, plot_options = tableview.data2Plot(selection)
 
